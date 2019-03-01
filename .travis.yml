@@ -1,0 +1,24 @@
+language: python
+python:
+  - "3.5"
+  - "3.5-dev"  # 3.5 development branch
+  - "3.6"
+  - "3.6-dev"  # 3.6 development branch
+  - "3.7-dev"  # 3.7 development branch
+
+env:
+  - FEATURES=
+  - FEATURES=[crypto]
+  - FEATURES=[reactive]
+  - FEATURES=[tornado]
+  - FEATURES=[crypto,reactive]
+  - FEATURES=[reactive,tornado]
+  - FEATURES=[crypto,reactive,tornado]
+
+install:
+  - pip install .$FEATURES
+
+script:
+  - python setup.py mypy
+  - python setup.py test
+  - python setup.py test_internet
