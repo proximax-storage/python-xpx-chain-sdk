@@ -41,6 +41,7 @@ __all__ = ['factory']
 
 from nem2 import models, util
 from . import nis
+from .host import Host
 
 
 def factory(callback):
@@ -49,19 +50,19 @@ def factory(callback):
     class Http:
         """Main client for the asynchronous NIS API."""
 
-        def __init__(self, endpoint):
+        def __init__(self, endpoint: str) -> None:
             self._host = callback(endpoint)
             self.account = AccountHttp.from_host(self._host)
 
         @classmethod
-        def from_host(cls, host):
+        def from_host(cls, host: Host) -> 'Http':
             http = cls.__new__(cls)
             http._host = host
             http.account = AccountHttp.from_host(self._host)
             return http
 
         @util.observable
-        async def heartbeat(self, timeout=None):
+        async def heartbeat(self, timeout=None) -> nis.Heartbeat:
             """
             Determines if NIS is up and responsive.
 
@@ -71,7 +72,7 @@ def factory(callback):
             return await nis.async_heartbeat(self._host, timeout=timeout)
 
         @util.observable
-        async def status(self, timeout=None):
+        async def status(self, timeout=None) -> nis.Status:
             """
             Determines the status of NIS.
 
@@ -83,11 +84,11 @@ def factory(callback):
     class AccountHttp:
         """Account client for the asynchronous NIS API."""
 
-        def __init__(self, endpoint):
+        def __init__(self, endpoint: str) -> None:
             self._host = callback(endpoint)
 
         @classmethod
-        def from_host(cls, host):
+        def from_host(cls, host: Host) -> 'AccountHttp':
             account = cls.__new__(cls)
             account._host = host
             return account

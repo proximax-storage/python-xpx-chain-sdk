@@ -55,6 +55,7 @@ TESTS_REQUIRE = [
 ]
 
 EXTRAS_REQUIRE = {
+    'sphinx': ['sphinx_rtd_theme>=0.4', 'sphinx_autodoc_typehints'],
     'crypto': ['pycryptodome>=3.4', 'ed25519>=1.4', 'ed25519sha3>=1.4'],
     'reactive': ['rx>=1.6'],
     'tornado': ['tornado>=5.1'],

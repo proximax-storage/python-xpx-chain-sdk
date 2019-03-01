@@ -84,15 +84,15 @@ class Heartbeat(IntEnum):
     UNKNOWN = 0
     OK = 1
 
-    def describe(self):
+    def description(self) -> str:
         """Describe the enumeration value."""
 
-        if self == Heartbeat.UNKNOWN:
-            return "Unknown status."
-        elif self == Heartbeat.OK:
-            return "NIS is ok."
-        else:
-            raise ValueError("Unknown enum variant in Heartbeat.")
+        return HEARTBEAT_DESCRIPTION[self]
+
+HEARTBEAT_DESCRIPTION = {
+    Heartbeat.UNKNOWN: "Unknown status.",
+    Heartbeat.OK: "NIS is ok.",
+}
 
 
 def request_heartbeat(host, timeout=None):
@@ -147,30 +147,23 @@ class Status(IntEnum):
     LOCAL = 7
     LOADING = 8
 
-
-    def describe(self):
+    def description(self) -> str:
         """Describe the enumeration value."""
 
-        if self == Status.UNKNOWN:
-            return "Unknown status."
-        elif self == Status.STOPPED:
-            return "NIS is stopped."
-        elif self == Status.STARTING:
-            return "NIS is starting."
-        elif self == Status.RUNNING:
-            return "NIS is running."
-        elif self == Status.BOOTING:
-            return "NIS is booting the local node (implies NIS is running)."
-        elif self == Status.BOOTED:
-            return "The local node is booted (implies NIS is running)."
-        elif self == Status.SYNCHRONIZED:
-            return "The local node is synchronized (implies NIS is running and the local node is booted)."
-        elif self == Status.LOCAL:
-            return "NIS local node does not see any remote NIS node (implies running and booted)."
-        elif self == Status.LOADING:
-            return "NIS is currently loading the block chain from the database. In this state NIS cannot serve any requests."
-        else:
-            raise ValueError("Unknown enum variant in Status.")
+        return STATUS_DESCRIPTION[self]
+
+
+STATUS_DESCRIPTION = {
+    Status.UNKNOWN: "Unknown status.",
+    Status.STOPPED: "NIS is stopped.",
+    Status.STARTING: "NIS is starting.",
+    Status.RUNNING: "NIS is running.",
+    Status.BOOTING: "NIS is booting the local node (implies NIS is running).",
+    Status.BOOTED: "The local node is booted (implies NIS is running).",
+    Status.SYNCHRONIZED: "The local node is synchronized (implies NIS is running and the local node is booted).",
+    Status.LOCAL: "NIS local node does not see any remote NIS node (implies running and booted).",
+    Status.LOADING: "NIS is currently loading the block chain from the database. In this state NIS cannot serve any requests.",
+}
 
 
 def request_status(host, timeout=None):

@@ -34,26 +34,26 @@ class MosaicId(util.Model):
     Unique identifier for a custom NEM asset.
     """
 
-    def __init__(self, id: int):
+    def __init__(self, id: int) -> None:
         self._id = id
 
     @property
     def id(self) -> int:
         return self._id
 
-    def __int__(self):
+    def __int__(self) -> int:
         return self.id
 
-    def __index__(self):
+    def __index__(self) -> int:
         return self.__int__()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'MosaicId(id={!r})'.format(self.id)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return 'MosaicId(id={!s})'.format(self.id)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, MosaicId):
             return False
         return self.id == other.id
@@ -64,18 +64,25 @@ class MosaicId(util.Model):
 
         return MosaicId(int(data, 16))
 
-    def to_dto(self):
+    def to_dto(self) -> int:
         return self.id
 
+    to_dto.__doc__ = util.Model.to_dto.__doc__
+
     @classmethod
-    def from_dto(cls, data: int):
+    def from_dto(cls, data: int) -> 'MosaicId':
         return cls(data)
 
-    def to_catbuffer(self):
+    from_dto.__doc__ = util.Model.from_dto.__doc__
+
+    def to_catbuffer(self) -> bytes:
         return struct.pack('<Q', self.id)
 
+    to_catbuffer.__doc__ = util.Model.to_catbuffer.__doc__
+
     @classmethod
-    def from_catbuffer(cls, data: bytes):
+    def from_catbuffer(cls, data: bytes) -> 'MosaicId':
         assert len(data) == 8
         return cls(struct.unpack('<Q', data)[0])
 
+    from_catbuffer.__doc__ = util.Model.from_catbuffer.__doc__

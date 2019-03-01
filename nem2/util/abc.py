@@ -79,8 +79,12 @@ class Model(Dto, Catbuffer):
     """Base class for NEM models."""
 
     def serialize(self, format: InterchangeFormat):
+        """Serialize data to interchange format."""
+
         return format.serialize(self)
 
     @classmethod
     def deserialize(cls, data, format: InterchangeFormat):
+        """Deserialize data from interchange format."""
+
         return format.deserialize(data, cls)

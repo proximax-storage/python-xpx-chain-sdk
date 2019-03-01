@@ -1,15 +1,19 @@
-.. nem2 documentation master file, created by
-   sphinx-quickstart on Thu Feb 21 08:36:06 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+NEM2 Documentation
+==================
 
-Welcome to nem2's documentation!
-================================
+# TODO(ahuszagh) Add build successes on travis.
+
+Some subheader
+--------------
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   introduction
+   getting_started
+   api
 
 
 Indices and tables

@@ -83,7 +83,7 @@ class Address(util.Model):
     uniquely identifies a NEM account.
     """
 
-    def __init__(self, address: str):
+    def __init__(self, address: str) -> None:
         plain = address.strip().upper().replace('-', '')
         if len(plain) != 40:
             raise ValueError("{} does not represent a valid raw address".format(address))
@@ -101,7 +101,7 @@ class Address(util.Model):
         return util.b32decode(self.address)
 
     @property
-    def network_type(self) -> NetworkType:
+    def network_type(self) -> 'NetworkType':
         """Get network type."""
         return self._network_type
 
@@ -188,17 +188,25 @@ class Address(util.Model):
             return False
         return self.tie() == other.tie()
 
-    def to_dto(self):
+    def to_dto(self) -> str:
         return self.address
 
+    to_dto.__doc__ = util.Model.to_dto.__doc__
+
     @classmethod
-    def from_dto(cls, data: str):
+    def from_dto(cls, data: str) -> 'Address':
         return cls.create_from_raw_address(data)
 
-    def to_catbuffer(self):
+    from_dto.__doc__ = util.Model.from_dto.__doc__
+
+    def to_catbuffer(self) -> bytes:
         return self.encoded
 
+    to_catbuffer.__doc__ = util.Model.to_catbuffer.__doc__
+
     @classmethod
-    def from_catbuffer(cls, data: bytes):
+    def from_catbuffer(cls, data: bytes) -> 'Address':
         assert len(data) == 25
         return cls.create_from_encoded(data)
+
+    from_catbuffer.__doc__ = util.Model.from_catbuffer.__doc__

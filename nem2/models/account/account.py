@@ -36,7 +36,7 @@ class Account:
     Describe account via the private key, public key and account address.
     """
 
-    def __init__(self, address: Address, public_key: str, private_key: str):
+    def __init__(self, address: Address, public_key: str, private_key: str) -> None:
         """
         :param address: Address for the account.
         :param public_key: Hex-encoded public key (with or without '0x' prefix).
@@ -151,13 +151,13 @@ class Account:
 
         return self.address, self.public_key, self.private_key
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Account(address={!r}, public_key={!r}, private_key={!r})'.format(*self.tie())
 
-    def __str__(self):
+    def __str__(self) -> str:
         return 'Account(address={!s}, public_key={!s}, private_key={!s})'.format(*self.tie())
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, Account):
             return False
         return self.tie() == other.tie()
