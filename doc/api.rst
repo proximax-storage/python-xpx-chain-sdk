@@ -8,7 +8,6 @@ Client
    :members:
    :inherited-members:
    :undoc-members:
-   :exclude-members: from_host
 
 Models
 ------
@@ -17,4 +16,3 @@ Models
    :members:
    :inherited-members:
    :undoc-members:
-   :exclude-members: createFromIdentifier, createFromEncoded, createFromPublicKey, createFromRawAddress, generateNewAccount, fromCatbuffer, fromDto, isValid, privateKey, publicAccount, publicKey, networkType, signData, toCatbuffer, toDto

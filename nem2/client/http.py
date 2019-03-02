@@ -38,6 +38,7 @@
 __all__ = ['factory']
 
 from nem2 import models
+from . import codes
 from . import nis
 from .host import Host
 
@@ -46,11 +47,11 @@ def factory(callback):
     """Factory to create the synchronous HTTP clients."""
 
     class Http:
-        """Base class for the synchronous NIS client."""
+        """Main client for the synchronous NIS API."""
 
         def __init__(self, endpoint: str) -> None:
             self._host = callback(endpoint)
-            self.account = AccountHttp.from_host(self._host)
+            self._account = AccountHttp.from_host(self._host)
 
         @classmethod
         def from_host(cls, host: Host) -> 'Http':
@@ -59,9 +60,13 @@ def factory(callback):
             http.account = AccountHttp.from_host(self._host)
             return http
 
+        @property
+        def account(self) -> 'AccountHttp':
+            return self._account
+
         # STATUS
 
-        def heartbeat(self, timeout=None) -> nis.Heartbeat:
+        def heartbeat(self, timeout=None) -> codes.Heartbeat:
             """
             Determines if NIS is up and responsive.
 
@@ -70,7 +75,7 @@ def factory(callback):
 
             return nis.heartbeat(self._host, timeout=timeout)
 
-        def status(self, timeout=None) -> nis.Status:
+        def status(self, timeout=None) -> codes.Status:
             """
             Determines the status of NIS.
 
@@ -80,7 +85,7 @@ def factory(callback):
             return nis.status(self._host, timeout=timeout)
 
     class AccountHttp:
-        """Dummy class so `$client.account.$method` calls appear seamless."""
+        """Account client for the synchronous NIS API."""
 
         def __init__(self, endpoint: str) -> None:
             self._host = callback(endpoint)

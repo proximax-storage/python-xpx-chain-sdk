@@ -1,6 +1,9 @@
+import enum
+import inspect
 import os
+import re
 
-# -- Project information -----------------------------------------------------
+# PROJECT INFORMATION
 
 project = 'nem2'
 copyright = '2019, NEM Foundation'
@@ -8,7 +11,7 @@ author = 'NEM Foundation'
 version = ''
 release = '0.0.1'
 
-# -- General configuration ---------------------------------------------------
+# GENERAL CONFIGURATION
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -26,7 +29,7 @@ language = None
 exclude_patterns = []
 pygments_style = None
 
-# -- Options for HTML output -------------------------------------------------
+# OPTIONS FOR HTML OUTPUT
 
 html_theme = None
 if os.environ.get('READTHEDOCS') != 'True':
@@ -36,11 +39,11 @@ if os.environ.get('READTHEDOCS') != 'True':
 
 html_static_path = ['_static']
 
-# -- Options for HTMLHelp output ---------------------------------------------
+# OPTIONS FOR HTMLHELP OUTPUT
 
 htmlhelp_basename = 'nem2doc'
 
-# -- Options for LaTeX output ------------------------------------------------
+# OPTIONS FOR LATEX OUTPUT
 
 latex_elements = {}
 latex_documents = [
@@ -48,14 +51,14 @@ latex_documents = [
      'NEM Foundation', 'manual'),
 ]
 
-# -- Options for manual page output ------------------------------------------
+# OPTIONS FOR MANUAL PAGE OUTPUT
 
 man_pages = [
     (master_doc, 'nem2', 'nem2 Documentation',
      [author], 1)
 ]
 
-# -- Options for Texinfo output ----------------------------------------------
+# OPTIONS FOR TEXINFO OUTPUT
 
 texinfo_documents = [
     (master_doc, 'nem2', 'nem2 Documentation',
@@ -63,7 +66,23 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-# -- Options for Epub output -------------------------------------------------
+# OPTIONS FOR EPUB OUTPUT
 
 epub_title = project
 epub_exclude_files = ['search.html']
+
+# HANDLERS
+
+def autodoc_skip_member_handler(app, what, name, obj, skip, options):
+    """Skip members using camel case."""
+
+    if inspect.ismodule(obj) or inspect.isclass(obj) or isinstance(obj, enum.Enum):
+        return skip
+    # Skip all functions and properties with capital letters.
+    return skip or re.search('[A-Z]', name) is not None
+
+
+def setup(app):
+    """Connect handlers."""
+
+    app.connect('autodoc-skip-member', autodoc_skip_member_handler)

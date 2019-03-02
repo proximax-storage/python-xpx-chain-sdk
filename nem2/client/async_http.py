@@ -37,9 +37,8 @@
     limitations under the License.
 """
 
-__all__ = ['factory']
-
 from nem2 import models, util
+from . import codes
 from . import nis
 from .host import Host
 
@@ -47,22 +46,26 @@ from .host import Host
 def factory(callback):
     """Factory to create the asynchronous HTTP clients."""
 
-    class Http:
+    class AsyncHttp:
         """Main client for the asynchronous NIS API."""
 
         def __init__(self, endpoint: str) -> None:
             self._host = callback(endpoint)
-            self.account = AccountHttp.from_host(self._host)
+            self._account = AsyncAccountHttp.from_host(self._host)
 
         @classmethod
-        def from_host(cls, host: Host) -> 'Http':
+        def from_host(cls, host: Host) -> 'AsyncHttp':
             http = cls.__new__(cls)
             http._host = host
-            http.account = AccountHttp.from_host(self._host)
+            http.account = AsyncAccountHttp.from_host(self._host)
             return http
 
+        @property
+        def account(self) -> 'AsyncAccountHttp':
+            return self._account
+
         @util.observable
-        async def heartbeat(self, timeout=None) -> nis.Heartbeat:
+        async def heartbeat(self, timeout=None) -> codes.Heartbeat:
             """
             Determines if NIS is up and responsive.
 
@@ -72,7 +75,7 @@ def factory(callback):
             return await nis.async_heartbeat(self._host, timeout=timeout)
 
         @util.observable
-        async def status(self, timeout=None) -> nis.Status:
+        async def status(self, timeout=None) -> codes.Status:
             """
             Determines the status of NIS.
 
@@ -81,14 +84,14 @@ def factory(callback):
 
             return await nis.async_status(self._host, timeout=timeout)
 
-    class AccountHttp:
+    class AsyncAccountHttp:
         """Account client for the asynchronous NIS API."""
 
         def __init__(self, endpoint: str) -> None:
             self._host = callback(endpoint)
 
         @classmethod
-        def from_host(cls, host: Host) -> 'AccountHttp':
+        def from_host(cls, host: Host) -> 'AsyncAccountHttp':
             account = cls.__new__(cls)
             account._host = host
             return account
@@ -108,4 +111,4 @@ def factory(callback):
             plain = address.plain()
             return nis.async_account_get(self._host, plain, timeout=timeout)
 
-    return Http, AccountHttp
+    return AsyncHttp, AsyncAccountHttp

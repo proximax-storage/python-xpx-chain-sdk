@@ -1,13 +1,11 @@
-# TODO(ahuszagh) Needs to support Tornado or default.
-from .default import *
-from .nis import Heartbeat, Status
+from . import codes
+from . import default
 
-__all__ = [
-    # TODO(ahuszagh) Restore for sphinx documentation.
-    #'Http',
-    #'AccountHttp',
-    #'AsyncHttp',
-    #'AsyncAccountHttp',
-    'Heartbeat',
-    'Status',
-]
+# TODO(ahuszagh) Needs to support Tornado or default.
+from .codes import *
+from .default import *
+
+__all__ = (
+    codes.__all__ +
+    default.__all__
+)

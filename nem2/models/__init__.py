@@ -1,14 +1,15 @@
-from .account import Account, Address, PublicAccount
-from .blockchain import NetworkType
-from .mosaic import Mosaic, MosaicId
+from . import account
+from . import blockchain
+from . import mosaic
+
+from .account import *
+from .blockchain import *
+from .mosaic import *
 from nem2.util import InterchangeFormat
 
-__all__ = [
-    'Account',
-    'Address',
-    'PublicAccount',
-    'NetworkType',
-    'Mosaic',
-    'MosaicId',
-    'InterchangeFormat',
-]
+__all__ = (
+    account.__all__ +
+    blockchain.__all__ +
+    mosaic.__all__ +
+    ['InterchangeFormat']
+)

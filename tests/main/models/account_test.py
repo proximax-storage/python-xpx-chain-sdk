@@ -97,6 +97,10 @@ class TestAccount(TestCase):
         self.assertTrue(a3 == a3)
 
 
+class TestAccountInfo(TestCase):
+    pass    # TODO(ahuszagh) Implement...
+
+
 class TestAddress(TestCase):
 
     def setUp(self):
@@ -217,6 +221,14 @@ class TestAddress(TestCase):
         value = account.Address.create_from_raw_address(self.pretty)
         self.assertEqual(account.Address.deserialize(value.to_dto(), InterchangeFormat.DTO), value)
         self.assertEqual(account.Address.deserialize(value.to_catbuffer(), InterchangeFormat.CATBUFFER), value)
+
+
+class TestMultisigAccountGraphInfo(TestCase):
+    pass    # TODO(ahuszagh) Implement...
+
+
+class TestMultisigAccountInfo(TestCase):
+    pass    # TODO(ahuszagh) Implement...
 
 
 class TestPublicAccount(TestCase):

@@ -26,7 +26,8 @@
 """
 
 import inspect
-from enum import IntEnum
+
+from . import codes
 
 # BOILERPLATE
 # -----------
@@ -78,22 +79,6 @@ def request(*args, **kwds):
 
 # HEARTBEAT
 
-class Heartbeat(IntEnum):
-    """Enumerations for the status of a "/heartbeat" request."""
-
-    UNKNOWN = 0
-    OK = 1
-
-    def description(self) -> str:
-        """Describe the enumeration value."""
-
-        return HEARTBEAT_DESCRIPTION[self]
-
-HEARTBEAT_DESCRIPTION = {
-    Heartbeat.UNKNOWN: "Unknown status.",
-    Heartbeat.OK: "NIS is ok.",
-}
-
 
 def request_heartbeat(host, timeout=None):
     """
@@ -118,9 +103,9 @@ def process_heartbeat(status, json):
     # If we get any other status code, return an unknown status: the node
     # is accepting requests but doesn't seem to recognize the request.
     if status == 200:
-        return Heartbeat.OK
+        return codes.Heartbeat.OK
     else:
-        return Heartbeat.UNKNOWN
+        return codes.Heartbeat.UNKNOWN
 
 
 HEARTBEAT_DOC = """
@@ -133,37 +118,6 @@ Determines if NIS is up and responsive.
 heartbeat, async_heartbeat = request("heartbeat", HEARTBEAT_DOC)
 
 # STATUS
-
-class Status(IntEnum):
-    """Enumerations for the status of a "/status" request."""
-
-    UNKNOWN = 0
-    STOPPED = 1
-    STARTING = 2
-    RUNNING = 3
-    BOOTING = 4
-    BOOTED = 5
-    SYNCHRONIZED = 6
-    LOCAL = 7
-    LOADING = 8
-
-    def description(self) -> str:
-        """Describe the enumeration value."""
-
-        return STATUS_DESCRIPTION[self]
-
-
-STATUS_DESCRIPTION = {
-    Status.UNKNOWN: "Unknown status.",
-    Status.STOPPED: "NIS is stopped.",
-    Status.STARTING: "NIS is starting.",
-    Status.RUNNING: "NIS is running.",
-    Status.BOOTING: "NIS is booting the local node (implies NIS is running).",
-    Status.BOOTED: "The local node is booted (implies NIS is running).",
-    Status.SYNCHRONIZED: "The local node is synchronized (implies NIS is running and the local node is booted).",
-    Status.LOCAL: "NIS local node does not see any remote NIS node (implies running and booted).",
-    Status.LOADING: "NIS is currently loading the block chain from the database. In this state NIS cannot serve any requests.",
-}
 
 
 def request_status(host, timeout=None):
@@ -189,9 +143,9 @@ def process_status(status, json):
     # If we get any other status code, return an unknown status: the node
     # is accepting requests but doesn't seem to recognize the request.
     if status == 200:
-        return Status(json['code'])
+        return codes.Status(json['code'])
     else:
-        return Status.UNKNOWN
+        return codes.Status.UNKNOWN
 
 
 STATUS_DOC = """
