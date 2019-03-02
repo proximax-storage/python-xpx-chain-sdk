@@ -25,6 +25,7 @@
 from typing import Sequence
 
 from nem2 import util
+from .public_account import PublicAccount
 from ..mosaic import Mosaic
 
 MosaicListType = Sequence[Mosaic]
@@ -56,6 +57,7 @@ class AccountInfo:
 
     @property
     def address(self):
+        """Get address."""
         return self._address
 
     @property
@@ -66,6 +68,7 @@ class AccountInfo:
 
     @property
     def public_key(self):
+        """Get public key."""
         return self._public_key
 
     publicKey = util.undoc(public_key)
@@ -82,6 +85,7 @@ class AccountInfo:
 
     @property
     def importance(self):
+        """Get account importance."""
         return self._importance
 
     @property
@@ -90,4 +94,9 @@ class AccountInfo:
 
     importanceHeight = util.undoc(importance_height)
 
-    # TODO(ahuszagh) Finish the implementation.
+    @property
+    def public_account(self) -> PublicAccount:
+        """Get public account."""
+        return PublicAccount(self.address, self.public_key)
+
+    publicAccount = util.undoc(public_account)

@@ -53,26 +53,31 @@ class MultisigAccountInfo:
 
     @property
     def account(self) -> PublicAccount:
+        """Get public account."""
         return self._account
 
     @property
     def min_approval(self) -> int:
+        """Get min number of cosignatories required to approve a transaction."""
         return self._min_approval
 
     minApproval = util.undoc(min_approval)
 
     @property
     def min_removal(self) -> int:
+        """Get min number of cosignatories required to remove a cosignatory."""
         return self._min_removal
 
     minRemoval = util.undoc(min_removal)
 
     @property
     def cosignatories(self) -> PublicAccountListType:
+        """Get list of cosignatories."""
         return self._cosignatories
 
     @property
     def multisig_accounts(self) -> PublicAccountListType:
+        """Get list of multisig accounts this account cosigns."""
         return self._multisig_accounts
 
     multisigAccounts = util.undoc(multisig_accounts)

@@ -84,6 +84,9 @@ class Address(util.Model):
     """
 
     def __init__(self, address: str) -> None:
+        """
+        :param address: Base32-encoded, human-readable address.
+        """
         plain = address.strip().upper().replace('-', '')
         if len(plain) != 40:
             raise ValueError("{} does not represent a valid raw address".format(address))

@@ -112,7 +112,7 @@ def patch(cls):
     cls.__qualname__ = cls.__name__
     members = inspect.getmembers(cls)
     for key, inner in members:
-        if not key.startswith('_'):
+        if key == '__init__' or not key.startswith('_'):
             # Ignore private and special members
             if inspect.ismethod(inner):
                 # Classmethods only

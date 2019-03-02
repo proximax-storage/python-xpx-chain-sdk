@@ -40,6 +40,7 @@ class MultisigAccountGraphInfo(MutableMapping):
 
     @property
     def multisig_accounts(self) -> GraphType:
+        """Access raw mapping of multisig accounts."""
         return self._multisig_accounts
 
     multisigAccounts = util.undoc(multisig_accounts)

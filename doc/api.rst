@@ -8,6 +8,7 @@ Client
    :members:
    :inherited-members:
    :undoc-members:
+   :special-members: __init__
 
 Models
 ------
@@ -16,3 +17,4 @@ Models
    :members:
    :inherited-members:
    :undoc-members:
+   :special-members: __init__
