@@ -50,11 +50,20 @@ def factory(callback):
         """Main client for the asynchronous NIS API."""
 
         def __init__(self, endpoint: str) -> None:
+            """
+            :param endpoint: Domain name and port for the endpoint.
+            """
             self._host = callback(endpoint)
             self._account = AsyncAccountHttp.from_host(self._host)
 
         @classmethod
         def from_host(cls, host: Host) -> 'AsyncHttp':
+            """
+            Initialize AsyncHttp directly from existing host.
+            For internal use, do not use directly.
+
+            :param host: Wrapper for the HTTP client.
+            """
             http = cls.__new__(cls)
             http._host = host
             http.account = AsyncAccountHttp.from_host(self._host)
@@ -62,6 +71,7 @@ def factory(callback):
 
         @property
         def account(self) -> 'AsyncAccountHttp':
+            """Get AsyncAccountHttp to the same endpoint."""
             return self._account
 
         @util.observable
@@ -88,10 +98,19 @@ def factory(callback):
         """Account client for the asynchronous NIS API."""
 
         def __init__(self, endpoint: str) -> None:
+            """
+            :param endpoint: Domain name and port for the endpoint.
+            """
             self._host = callback(endpoint)
 
         @classmethod
         def from_host(cls, host: Host) -> 'AsyncAccountHttp':
+            """
+            Initialize AsyncAccountHttp directly from existing host.
+            For internal use, do not use directly.
+
+            :param host: Wrapper for the HTTP client.
+            """
             account = cls.__new__(cls)
             account._host = host
             return account

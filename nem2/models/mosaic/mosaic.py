@@ -36,15 +36,21 @@ class Mosaic(util.Model):
     """
 
     def __init__(self, id: MosaicId, amount: int) -> None:
+        """
+        :param id: Identifier for mosaic.
+        :param amount: Mosaic quantity in the smallest unit possible.
+        """
         self._id = id
         self._amount = amount
 
     @property
     def id(self) -> MosaicId:
+        """Get identifier for mosaic."""
         return self._id
 
     @property
     def amount(self) -> int:
+        """Get mosaic quantity in the smallest unit possible."""
         return self._amount
 
     def __repr__(self) -> str:

@@ -46,6 +46,16 @@ class AccountInfo:
         importance: int,
         importance_height: int,
     ):
+        """
+        :param meta: Account metadata.
+        :param address: Account address.
+        :param address_height: Chain height when address was published.
+        :param public_key: Account public key.
+        :param public_key_height: Chain height when public key was published.
+        :param mosaics: List of mosaics owned by account.
+        :param importance: Importance of the account.
+        :param importance_height: Importance height of the account.
+        """
         self._meta = meta
         self._address = address
         self._address_height = address_height
@@ -56,40 +66,44 @@ class AccountInfo:
         self._importance_height = importance_height
 
     @property
-    def address(self):
+    def address(self) -> Address:
         """Get address."""
         return self._address
 
     @property
-    def address_height(self):
+    def address_height(self) -> int:
+        """Get chain height when address was published."""
         return self._address_height
 
     addressHeight = util.undoc(address_height)
 
     @property
-    def public_key(self):
+    def public_key(self) -> str:
         """Get public key."""
         return self._public_key
 
     publicKey = util.undoc(public_key)
 
     @property
-    def public_key_height(self):
+    def public_key_height(self) -> int:
+        """Get chain height when public key was published."""
         return self._public_key_height
 
     publicKeyHeight = util.undoc(public_key_height)
 
     @property
-    def mosaics(self):
+    def mosaics(self) -> MosaicListType:
+        """Get list of mosaics owned by account."""
         return self._mosaics
 
     @property
-    def importance(self):
+    def importance(self) -> int:
         """Get account importance."""
         return self._importance
 
     @property
-    def importance_height(self):
+    def importance_height(self) -> int:
+        """Get importance height of the account."""
         return self._importance_height
 
     importanceHeight = util.undoc(importance_height)

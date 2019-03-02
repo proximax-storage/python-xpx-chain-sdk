@@ -45,6 +45,13 @@ class MultisigAccountInfo:
         cosignatories: PublicAccountListType,
         multisig_accounts: PublicAccountListType,
     ):
+        """
+        :param account: Multisig public account.
+        :param min_approval: Min number of cosignatories required to approve a transaction.
+        :param min_removal: Min number of cosignatories required to remove a cosignatory.
+        :param cosignatories: List of cosignatories.
+        :param multisig_accounts: List of multisig accounts this account cosigns.
+        """
         self._account = account
         self._min_approval = min_approval
         self._min_removal = min_removal

@@ -52,6 +52,7 @@ class MosaicProperties:
 
     def __init__(self, flags: int, divisibility: int, duration: int):
         self._flags = flags
+        # TODO(ahuszagh) Implement...
 
     @property
     def supply_mutable(self) -> bool:
@@ -69,7 +70,7 @@ class MosaicProperties:
 
     @property
     def levy_mutable(self) -> bool:
-        """Levy is mutable."""
+        """Get if levy is mutable."""
 
         return (self._flags & 4) == 4
 
@@ -77,6 +78,8 @@ class MosaicProperties:
 
     @classmethod
     def create(cls, params: Params) -> 'MosaicProperties':
+        # TODO(ahuszagh) Document...
+        # Are these optional? What are the sensible defaults?
         supply_mutable = typing.cast(bool, params['supply_mutable'])
         transferable = typing.cast(bool, params['transferable'])
         levy_mutable = typing.cast(bool, params['levy_mutable'])

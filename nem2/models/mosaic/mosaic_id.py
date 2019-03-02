@@ -35,10 +35,14 @@ class MosaicId(util.Model):
     """
 
     def __init__(self, id: int) -> None:
+        """
+        :param id: Raw identifier for mosaic.
+        """
         self._id = id
 
     @property
     def id(self) -> int:
+        """Get raw identifier for mosaic."""
         return self._id
 
     def __int__(self) -> int:

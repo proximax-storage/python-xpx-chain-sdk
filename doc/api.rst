@@ -9,6 +9,7 @@ Client
    :inherited-members:
    :undoc-members:
    :special-members: __init__
+   :exclude-members: from_host
 
 Models
 ------

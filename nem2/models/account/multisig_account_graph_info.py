@@ -36,6 +36,10 @@ class MultisigAccountGraphInfo(MutableMapping):
     """Graph info for multi-sig accounts."""
 
     def __init__(self, *args, **kwds):
+        """
+        :param *args: (optional) Positional arguments to initialize mapping.
+        :param **kwds: (optional) Keyword arguments to initialize mapping.
+        """
         self._multisig_accounts = dict(*args, **kwds)
 
     @property
