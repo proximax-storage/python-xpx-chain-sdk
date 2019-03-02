@@ -84,6 +84,28 @@ def patch(cls):
 
     This only does a 1-depth pass, and ignores all special and private
     members.
+
+    Warning
+    -------
+
+    This method is very dependent on Python internals, and therefore
+    may break at some time in the future. To avoid this, the internals
+    are clearly described below, with the Python data [`model`],
+    [`functools`], and [`property`] references describing these
+    special attributes in more detail.
+
+        __name__: Function/class name. Writable.
+        __qualname__: Fully-qualified function/class name. Writable.
+        __module__: Name module function/class defined in. Writable.
+        __func__: Internal function for an instance method. Read-only.
+        __wrapped__: Points to the wrapped function object. Writable.
+        fget: Internal function to get a value from a property. Writable.
+        fset: Internal function to set a value from a property. Writable.
+        fdel: Internal function to delete a value from a property. Writable.
+
+    [`model`]: https://docs.python.org/3/reference/datamodel.html
+    [`functools`]: https://docs.python.org/3/library/functools.html
+    [`property`]: https://docs.python.org/3/library/functions.html#property
     """
 
     cls.__module__ = __name__
