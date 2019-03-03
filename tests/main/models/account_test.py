@@ -1,7 +1,7 @@
 import base64
 import warnings
 
-from nem2.models import account, blockchain
+from nem2 import models
 from nem2.util import InterchangeFormat
 from tests.harness import TestCase
 
@@ -11,22 +11,22 @@ class TestAccount(TestCase):
     def setUp(self):
         self.private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
         self.public_key = "1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955"
-        self.network_type = blockchain.NetworkType.MAIN_NET
-        self.address = account.Address.create_from_public_key(self.public_key, self.network_type)
+        self.network_type = models.NetworkType.MAIN_NET
+        self.address = models.Address.create_from_public_key(self.public_key, self.network_type)
 
     def test_init(self):
-        value = account.Account(self.address, self.public_key, self.private_key)
+        value = models.Account(self.address, self.public_key, self.private_key)
         self.assertEqual(value.address, self.address)
         self.assertEqual(value.public_key, self.public_key)
         self.assertEqual(value.private_key, self.private_key)
 
     def test_properties(self):
-        value = account.Account(self.address, self.public_key, self.private_key)
+        value = models.Account(self.address, self.public_key, self.private_key)
         self.assertEqual(value.address.address, "NAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGBSM5RH7")
         self.assertEqual(value.public_key, self.public_key)
         self.assertEqual(value.private_key, self.private_key)
         self.assertEqual(value.network_type, self.network_type)
-        self.assertEqual(value.public_account, account.PublicAccount(self.address, self.public_key))
+        self.assertEqual(value.public_account, models.PublicAccount(self.address, self.public_key))
 
         self.assertEqual(value.publicKey, value.public_key)
         self.assertEqual(value.privateKey, value.private_key)
@@ -37,7 +37,7 @@ class TestAccount(TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
 
-            value = account.Account.create_from_private_key(self.private_key, self.network_type)
+            value = models.Account.create_from_private_key(self.private_key, self.network_type)
             self.assertEqual(value.address, self.address)
             self.assertEqual(value.public_key, self.public_key)
             self.assertEqual(value.private_key, self.private_key)
@@ -50,13 +50,13 @@ class TestAccount(TestCase):
             warnings.simplefilter("ignore")
 
             # try the random version
-            value = account.Account.generate_new_account(self.network_type)
+            value = models.Account.generate_new_account(self.network_type)
             message = b'Hello World!'
             signature = value.sign_data(message)
             self.assertTrue(value.public_account.verify_signature(message, signature))
 
             # try with a deterministic version
-            value = account.Account.generate_new_account(self.network_type, fake_entropy)
+            value = models.Account.generate_new_account(self.network_type, fake_entropy)
             self.assertEqual(value.address.address, 'NA4PGCTZHFCTC5WHYSZCEJZPOO3X7OFBAHZCCC4K')
             self.assertEqual(value.public_key, 'dcedb3902b8fa33f8ced2c9ea62497ae4f43e8208cdedaf4d7cac50abc53ddac')
             self.assertEqual(value.private_key, '3030303030303030303030303030303030303030303030303030303030303030')
@@ -71,23 +71,23 @@ class TestAccount(TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
 
-            value = account.Account(self.address, self.public_key, self.private_key)
+            value = models.Account(self.address, self.public_key, self.private_key)
             message = b'Hello World!'
             signature = value.sign_data(message)
             self.assertEqual(signature, '40af0cb5a7a7533f07a4ba6f1cb2df64f2347feb1b2eaabb9374d28603d146497ea83d3d6ee15758d39c298b48f58e578cc42f36a373e15eef7412e0bd19a801')
 
     def test_repr(self):
-        value = account.Account(self.address, self.public_key, self.private_key)
+        value = models.Account(self.address, self.public_key, self.private_key)
         self.assertEqual(repr(value), "Account(address=Address(address='NAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGBSM5RH7', network_type=<NetworkType.MAIN_NET: 104>), public_key='1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955', private_key='97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca')")
 
     def test_str(self):
-        value = account.Account(self.address, self.public_key, self.private_key)
+        value = models.Account(self.address, self.public_key, self.private_key)
         self.assertEqual(str(value), 'Account(address=Address(address=NAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGBSM5RH7, network_type=NetworkType.MAIN_NET), public_key=1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955, private_key=97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca)')
 
     def test_eq(self):
-        a1 = account.Account(self.address, self.public_key, self.private_key)
-        a2 = account.Account(self.address, self.public_key, self.private_key)
-        a3 = account.Account(self.address, self.public_key, self.private_key[:-1] + 'b')
+        a1 = models.Account(self.address, self.public_key, self.private_key)
+        a2 = models.Account(self.address, self.public_key, self.private_key)
+        a3 = models.Account(self.address, self.public_key, self.private_key[:-1] + 'b')
 
         self.assertTrue(a1 == a1)
         self.assertTrue(a1 == a2)
@@ -109,78 +109,78 @@ class TestAddress(TestCase):
         self.encoded = b"\x90\xfa9\xecG\xe0V\x00\xaf\xa7C\x08\xa7\xea`}\x14^7\x1b_O\x14G\xbc"
 
     def test_init(self):
-        value = account.Address(self.pretty)
+        value = models.Address(self.pretty)
         self.assertEqual(value.address, self.plain)
-        self.assertEqual(value.network_type, blockchain.NetworkType.MIJIN_TEST)
+        self.assertEqual(value.network_type, models.NetworkType.MIJIN_TEST)
 
     def test_properties(self):
-        value = account.Address(self.pretty)
+        value = models.Address(self.pretty)
         self.assertEqual(value.address, self.plain)
-        self.assertEqual(value.network_type, blockchain.NetworkType.MIJIN_TEST)
+        self.assertEqual(value.network_type, models.NetworkType.MIJIN_TEST)
         self.assertEqual(value.encoded, self.encoded)
 
         self.assertEqual(value.networkType, value.network_type)
 
     def test_create_from_raw_address(self):
-        value = account.Address.create_from_raw_address(self.pretty)
+        value = models.Address.create_from_raw_address(self.pretty)
         self.assertEqual(value.address, self.plain)
-        self.assertEqual(value.network_type, blockchain.NetworkType.MIJIN_TEST)
+        self.assertEqual(value.network_type, models.NetworkType.MIJIN_TEST)
 
-        self.assertEqual(value, account.Address.createFromRawAddress(value.address))
+        self.assertEqual(value, models.Address.createFromRawAddress(value.address))
 
     def test_create_from_encoded(self):
-        value = account.Address.create_from_encoded(self.encoded)
+        value = models.Address.create_from_encoded(self.encoded)
         self.assertEqual(value.address, self.plain)
-        self.assertEqual(value.network_type, blockchain.NetworkType.MIJIN_TEST)
+        self.assertEqual(value.network_type, models.NetworkType.MIJIN_TEST)
 
-        self.assertEqual(value, account.Address.createFromEncoded(value.encoded))
+        self.assertEqual(value, models.Address.createFromEncoded(value.encoded))
 
     def test_create_from_public_key(self):
         public_key = '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246'
 
-        value = account.Address.create_from_public_key(public_key, blockchain.NetworkType.MAIN_NET)
+        value = models.Address.create_from_public_key(public_key, models.NetworkType.MAIN_NET)
         self.assertEqual(value.address, 'ND5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L4CNFATI')
 
-        value = account.Address.create_from_public_key(public_key, blockchain.NetworkType.TEST_NET)
+        value = models.Address.create_from_public_key(public_key, models.NetworkType.TEST_NET)
         self.assertEqual(value.address, 'TD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L4SH3LND')
 
-        value = account.Address.create_from_public_key(public_key, blockchain.NetworkType.MIJIN)
+        value = models.Address.create_from_public_key(public_key, models.NetworkType.MIJIN)
         self.assertEqual(value.address, 'MD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L4R2R2JH')
 
-        value = account.Address.create_from_public_key(public_key, blockchain.NetworkType.MIJIN_TEST)
+        value = models.Address.create_from_public_key(public_key, models.NetworkType.MIJIN_TEST)
         self.assertEqual(value.address, 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54')
 
-        self.assertEqual(value, account.Address.createFromPublicKey(public_key, value.network_type))
+        self.assertEqual(value, models.Address.createFromPublicKey(public_key, value.network_type))
 
     def test_plain(self):
-        value = account.Address.create_from_raw_address(self.pretty)
+        value = models.Address.create_from_raw_address(self.pretty)
         self.assertEqual(value.plain(), self.plain)
 
     def test_pretty(self):
-        value = account.Address.create_from_raw_address(self.pretty)
+        value = models.Address.create_from_raw_address(self.pretty)
         self.assertEqual(value.pretty(), self.pretty)
 
     def test_is_valid(self):
-        value = account.Address.create_from_raw_address(self.pretty)
+        value = models.Address.create_from_raw_address(self.pretty)
         self.assertTrue(value.is_valid())
 
-        value = account.Address.create_from_raw_address("SD5DT3-CH4BLA-BL5HIM-EKP2TA-PUKF4N-Y3L5HR-IR55")
+        value = models.Address.create_from_raw_address("SD5DT3-CH4BLA-BL5HIM-EKP2TA-PUKF4N-Y3L5HR-IR55")
         self.assertFalse(value.is_valid())
 
         self.assertFalse(value.isValid())
 
     def test_repr(self):
-        value = account.Address.create_from_raw_address(self.pretty)
+        value = models.Address.create_from_raw_address(self.pretty)
         self.assertEqual(repr(value), "Address(address='SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', network_type=<NetworkType.MIJIN_TEST: 144>)")
 
     def test_str(self):
-        value = account.Address.create_from_raw_address(self.plain)
+        value = models.Address.create_from_raw_address(self.plain)
         self.assertEqual(str(value), "Address(address=SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54, network_type=NetworkType.MIJIN_TEST)")
 
     def test_eq(self):
-        a1 = account.Address.create_from_raw_address(self.plain)
-        a2 = account.Address.create_from_raw_address(self.pretty)
-        a3 = account.Address.create_from_raw_address("NALICE2A73DLYTP4365GNFCURAUP3XVBFO7YNYOW")
+        a1 = models.Address.create_from_raw_address(self.plain)
+        a2 = models.Address.create_from_raw_address(self.pretty)
+        a3 = models.Address.create_from_raw_address("NALICE2A73DLYTP4365GNFCURAUP3XVBFO7YNYOW")
 
         self.assertTrue(a1 == a1)
         self.assertTrue(a1 == a2)
@@ -190,37 +190,37 @@ class TestAddress(TestCase):
         self.assertTrue(a3 == a3)
 
     def test_to_dto(self):
-        value = account.Address.create_from_raw_address(self.pretty)
+        value = models.Address.create_from_raw_address(self.pretty)
         self.assertEqual(value.to_dto(), self.plain)
-        self.assertEqual(value, account.Address.createFromRawAddress(value.address))
+        self.assertEqual(value, models.Address.createFromRawAddress(value.address))
         self.assertEqual(value.to_dto(), value.toDto())
 
     def test_from_dto(self):
-        value = account.Address.from_dto(self.plain)
+        value = models.Address.from_dto(self.plain)
         self.assertEqual(value.address, self.plain)
-        self.assertEqual(value.network_type, blockchain.NetworkType.MIJIN_TEST)
-        self.assertEqual(value, account.Address.fromDto(value.address))
+        self.assertEqual(value.network_type, models.NetworkType.MIJIN_TEST)
+        self.assertEqual(value, models.Address.fromDto(value.address))
 
     def test_to_catbuffer(self):
-        value = account.Address.create_from_raw_address(self.plain)
+        value = models.Address.create_from_raw_address(self.plain)
         self.assertEqual(value.to_catbuffer(), self.encoded)
         self.assertEqual(value.to_catbuffer(), value.toCatbuffer())
 
     def test_from_catbuffer(self):
-        value = account.Address.from_catbuffer(self.encoded)
+        value = models.Address.from_catbuffer(self.encoded)
         self.assertEqual(value.address, self.plain)
-        self.assertEqual(value.network_type, blockchain.NetworkType.MIJIN_TEST)
-        self.assertEqual(value, account.Address.fromCatbuffer(value.encoded))
+        self.assertEqual(value.network_type, models.NetworkType.MIJIN_TEST)
+        self.assertEqual(value, models.Address.fromCatbuffer(value.encoded))
 
     def test_serialize(self):
-        value = account.Address.create_from_raw_address(self.pretty)
+        value = models.Address.create_from_raw_address(self.pretty)
         self.assertEqual(value.serialize(InterchangeFormat.DTO), value.to_dto())
         self.assertEqual(value.serialize(InterchangeFormat.CATBUFFER), value.to_catbuffer())
 
     def test_deserialize(self):
-        value = account.Address.create_from_raw_address(self.pretty)
-        self.assertEqual(account.Address.deserialize(value.to_dto(), InterchangeFormat.DTO), value)
-        self.assertEqual(account.Address.deserialize(value.to_catbuffer(), InterchangeFormat.CATBUFFER), value)
+        value = models.Address.create_from_raw_address(self.pretty)
+        self.assertEqual(models.Address.deserialize(value.to_dto(), InterchangeFormat.DTO), value)
+        self.assertEqual(models.Address.deserialize(value.to_catbuffer(), InterchangeFormat.CATBUFFER), value)
 
 
 class TestMultisigAccountGraphInfo(TestCase):
@@ -235,16 +235,16 @@ class TestPublicAccount(TestCase):
 
     def setUp(self):
         self.public_key = "1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955"
-        self.network_type = blockchain.NetworkType.MAIN_NET
-        self.address = account.Address.create_from_public_key(self.public_key, self.network_type)
+        self.network_type = models.NetworkType.MAIN_NET
+        self.address = models.Address.create_from_public_key(self.public_key, self.network_type)
 
     def test_init(self):
-        value = account.PublicAccount(self.address, self.public_key)
+        value = models.PublicAccount(self.address, self.public_key)
         self.assertEqual(value.address, self.address)
         self.assertEqual(value.public_key, self.public_key)
 
     def test_properties(self):
-        value = account.PublicAccount(self.address, self.public_key)
+        value = models.PublicAccount(self.address, self.public_key)
         self.assertEqual(value.address.address, "NAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGBSM5RH7")
         self.assertEqual(value.public_key, self.public_key)
         self.assertEqual(value.network_type, self.network_type)
@@ -253,34 +253,34 @@ class TestPublicAccount(TestCase):
         self.assertEqual(value.networkType, value.network_type)
 
     def test_create_from_public_key(self):
-        value = account.PublicAccount.create_from_public_key(self.public_key, self.network_type)
+        value = models.PublicAccount.create_from_public_key(self.public_key, self.network_type)
         self.assertEqual(value.address, self.address)
         self.assertEqual(value.public_key, self.public_key)
 
-        self.assertEqual(value, account.PublicAccount.createFromPublicKey(value.public_key, value.network_type))
+        self.assertEqual(value, models.PublicAccount.createFromPublicKey(value.public_key, value.network_type))
 
     def test_verify_signature(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
 
-            value = account.PublicAccount(self.address, self.public_key)
+            value = models.PublicAccount(self.address, self.public_key)
             message = b'Hello World!'
             signature = '40af0cb5a7a7533f07a4ba6f1cb2df64f2347feb1b2eaabb9374d28603d146497ea83d3d6ee15758d39c298b48f58e578cc42f36a373e15eef7412e0bd19a801'
             self.assertTrue(value.verify_signature(message, signature))
             self.assertTrue(value.verifySignature(message, signature))
 
     def test_repr(self):
-        value = account.PublicAccount(self.address, self.public_key)
+        value = models.PublicAccount(self.address, self.public_key)
         self.assertEqual(repr(value), "PublicAccount(address=Address(address='NAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGBSM5RH7', network_type=<NetworkType.MAIN_NET: 104>), public_key='1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955')")
 
     def test_str(self):
-        value = account.PublicAccount(self.address, self.public_key)
+        value = models.PublicAccount(self.address, self.public_key)
         self.assertEqual(str(value), "PublicAccount(address=Address(address=NAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGBSM5RH7, network_type=NetworkType.MAIN_NET), public_key=1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955)")
 
     def test_eq(self):
-        a1 = account.PublicAccount(self.address, self.public_key)
-        a2 = account.PublicAccount(self.address, self.public_key)
-        a3 = account.PublicAccount(self.address, self.public_key[:-1] + 'b')
+        a1 = models.PublicAccount(self.address, self.public_key)
+        a2 = models.PublicAccount(self.address, self.public_key)
+        a3 = models.PublicAccount(self.address, self.public_key[:-1] + 'b')
 
         self.assertTrue(a1 == a1)
         self.assertTrue(a1 == a2)

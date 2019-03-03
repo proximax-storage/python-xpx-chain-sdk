@@ -26,9 +26,8 @@ from collections.abc import MutableMapping
 from typing import Iterable, Mapping
 
 from nem2 import util
-from .multisig_account_info import MultisigAccountInfo
 
-GraphType = Mapping[int, MultisigAccountInfo]
+GraphType = Mapping[int, 'MultisigAccountInfo']
 GraphIterType = Iterable[GraphType]
 
 
@@ -49,10 +48,10 @@ class MultisigAccountGraphInfo(MutableMapping):
 
     multisigAccounts = util.undoc(multisig_accounts)
 
-    def __getitem__(self, key: int) -> MultisigAccountInfo:
+    def __getitem__(self, key: int) -> 'MultisigAccountInfo':
         return self._multisig_accounts[key]
 
-    def __setitem__(self, key: int, account: MultisigAccountInfo):
+    def __setitem__(self, key: int, account: 'MultisigAccountInfo'):
         self._multisig_accounts[key] = account
 
     def __delitem__(self, key: int):

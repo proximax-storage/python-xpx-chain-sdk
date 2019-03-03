@@ -1,14 +1,20 @@
-from nem2.models import blockchain
+from nem2 import models
 from tests.harness import TestCase
+
+
+class TestBlockInfo(TestCase):
+
+    def test_init(self):
+        pass
 
 
 class TestNetworkType(TestCase):
 
     def setUp(self):
-        self.main_net = blockchain.NetworkType.MAIN_NET
-        self.test_net = blockchain.NetworkType.TEST_NET
-        self.mijin = blockchain.NetworkType.MIJIN
-        self.mijin_test = blockchain.NetworkType.MIJIN_TEST
+        self.main_net = models.NetworkType.MAIN_NET
+        self.test_net = models.NetworkType.TEST_NET
+        self.mijin = models.NetworkType.MIJIN
+        self.mijin_test = models.NetworkType.MIJIN_TEST
 
     def test_values(self):
         self.assertEqual(self.main_net, 0x68)
@@ -31,7 +37,7 @@ class TestNetworkType(TestCase):
     def test_create_from_identifier(self):
 
         def create(address: str):
-            return blockchain.NetworkType.create_from_identifier(address)
+            return models.NetworkType.create_from_identifier(address)
 
         self.assertEqual(self.main_net, create(b"N"))
         self.assertEqual(self.test_net, create(b"T"))
@@ -44,7 +50,7 @@ class TestNetworkType(TestCase):
     def test_create_from_raw_address(self):
 
         def create(address: str):
-            return blockchain.NetworkType.create_from_raw_address(address)
+            return models.NetworkType.create_from_raw_address(address)
 
         self.assertEqual(self.main_net, create("ND5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54"))
         self.assertEqual(self.test_net, create("TD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54"))

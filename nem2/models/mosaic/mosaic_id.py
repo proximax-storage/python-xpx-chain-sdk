@@ -68,25 +68,21 @@ class MosaicId(util.Model):
 
         return MosaicId(int(data, 16))
 
+    @util.doc(util.Model.to_dto.__doc__)
     def to_dto(self) -> int:
         return self.id
 
-    to_dto.__doc__ = util.Model.to_dto.__doc__
-
+    @util.doc(util.Model.from_dto.__doc__)
     @classmethod
     def from_dto(cls, data: int) -> 'MosaicId':
         return cls(data)
 
-    from_dto.__doc__ = util.Model.from_dto.__doc__
-
+    @util.doc(util.Model.to_catbuffer.__doc__)
     def to_catbuffer(self) -> bytes:
         return struct.pack('<Q', self.id)
 
-    to_catbuffer.__doc__ = util.Model.to_catbuffer.__doc__
-
+    @util.doc(util.Model.from_catbuffer.__doc__)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> 'MosaicId':
         assert len(data) == 8
         return cls(struct.unpack('<Q', data)[0])
-
-    from_catbuffer.__doc__ = util.Model.from_catbuffer.__doc__

@@ -25,9 +25,8 @@
 from typing import Sequence
 
 from nem2 import util
-from .public_account import PublicAccount
 
-PublicAccountListType = Sequence[PublicAccount]
+PublicAccountListType = Sequence['PublicAccount']
 
 
 class MultisigAccountInfo:
@@ -39,7 +38,7 @@ class MultisigAccountInfo:
     """
 
     def __init__(self,
-        account: PublicAccount,
+        account: 'PublicAccount',
         min_approval: int,
         min_removal: int,
         cosignatories: PublicAccountListType,
@@ -59,7 +58,7 @@ class MultisigAccountInfo:
         self._multisig_accounts = multisig_accounts
 
     @property
-    def account(self) -> PublicAccount:
+    def account(self) -> 'PublicAccount':
         """Get public account."""
         return self._account
 
@@ -96,7 +95,7 @@ class MultisigAccountInfo:
 
     isMultisig = util.undoc(is_multisig)
 
-    def has_cosigner(self, account: PublicAccount) -> bool:
+    def has_cosigner(self, account: 'PublicAccount') -> bool:
         """
         Check if another account is cosignatory of multisig account.
 
@@ -107,7 +106,7 @@ class MultisigAccountInfo:
 
     hasCosigner = util.undoc(has_cosigner)
 
-    def is_cosigner_of_multisig_account(self, account: PublicAccount) -> bool:
+    def is_cosigner_of_multisig_account(self, account: 'PublicAccount') -> bool:
         """
         Check if multisig account is cosignatory of another account.
 

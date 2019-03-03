@@ -1,8 +1,8 @@
 """
-    responses
-    =========
+    account_metadata
+    ================
 
-    Mocked response data for the .
+    Account metadata.
 
     License
     -------
@@ -22,20 +22,6 @@
     limitations under the License.
 """
 
-import json
-import os
 
-DIR = os.path.dirname(os.path.realpath(__file__))
-DATADIR = os.path.join(DIR, 'data')
-ENDPOINT = os.environ.get('NIS2_ENDPOINT', 'http://localhost:3000')
-
-
-def load_response(name):
-    with open(os.path.join(DATADIR, name)) as f:
-        data = json.load(f)
-        data['content'] = data['content'].encode('utf8')
-        return data
-
-BLOCK_INFO = {
-    'Ok': load_response('block_info.json'),
-}
+class AccountMetadata:
+    pass

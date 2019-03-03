@@ -37,6 +37,7 @@ class AccountInfo:
     def __init__(self,
         # TODO(ahuszagh) Need to describe the metadata structure.
         # THis isn't described even in the typescript SDK.
+        # https://github.com/nemtech/nem2-sdk-typescript-javascript/blob/master/src/infrastructure/AccountHttp.ts
         meta,
         address: Address,
         address_height: int,

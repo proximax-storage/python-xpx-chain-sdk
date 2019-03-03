@@ -26,7 +26,6 @@ from nem2 import util
 from nem2.util.signature import ed25519
 from .address import Address
 from .public_account import PublicAccount
-from ..blockchain.network_type import NetworkType
 
 
 class Account:
@@ -66,7 +65,7 @@ class Account:
     privateKey = util.undoc(private_key)
 
     @property
-    def network_type(self) -> NetworkType:
+    def network_type(self) -> 'NetworkType':
         """Get network type."""
         return self.address.network_type
 
@@ -80,7 +79,7 @@ class Account:
     publicAccount = util.undoc(public_account)
 
     @classmethod
-    def create_from_private_key(cls, private_key: str, network_type: NetworkType) -> 'Account':
+    def create_from_private_key(cls, private_key: str, network_type: 'NetworkType') -> 'Account':
         """
         Generate Account object from private_key and network type.
 
@@ -98,7 +97,7 @@ class Account:
     createFromPrivateKey = util.undoc(create_from_private_key)
 
     @classmethod
-    def generate_new_account(cls, network_type: NetworkType, entropy=None) -> 'Account':
+    def generate_new_account(cls, network_type: 'NetworkType', entropy=None) -> 'Account':
         """
         Generate new NEM account from network type and random bytes.
 

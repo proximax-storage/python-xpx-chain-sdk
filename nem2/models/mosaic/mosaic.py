@@ -64,27 +64,23 @@ class Mosaic(util.Model):
             return False
         return (self.id, self.amount) == (other.id, other.amount)
 
+    @util.doc(util.Model.to_dto.__doc__)
     def to_dto(self) -> dict:
         return {'amount': self.amount, 'id': self.id.to_dto()}
 
-    to_dto.__doc__ = util.Model.to_dto.__doc__
-
+    @util.doc(util.Model.from_dto.__doc__)
     @classmethod
     def from_dto(cls, data: dict) -> 'Mosaic':
         return cls(MosaicId.from_dto(data['id']), data['amount'])
 
-    from_dto.__doc__ = util.Model.from_dto.__doc__
-
+    @util.doc(util.Model.to_catbuffer.__doc__)
     def to_catbuffer(self) -> bytes:
         return self.id.to_catbuffer() + struct.pack('<Q', self.amount)
 
-    to_catbuffer.__doc__ = util.Model.to_catbuffer.__doc__
-
+    @util.doc(util.Model.from_catbuffer.__doc__)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> 'Mosaic':
         assert len(data) == 16
         id = MosaicId.from_catbuffer(data[:8])
         amount = struct.unpack('<Q', data[8:])[0]
         return cls(id, amount)
-
-    from_catbuffer.__doc__ = util.Model.from_catbuffer.__doc__

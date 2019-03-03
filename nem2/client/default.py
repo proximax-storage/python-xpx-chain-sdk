@@ -25,13 +25,6 @@
     limitations under the License.
 """
 
-__all__ = [
-    'Http',
-    'AccountHttp',
-    'AsyncHttp',
-    'AsyncAccountHttp',
-]
-
 import asyncio
 import atexit
 import aiohttp
@@ -39,17 +32,19 @@ import inspect
 import requests
 
 from nem2 import util
-from . import async_http, http
-from .host import Host
+from . import async_http
+from . import host
+from . import http
 
 # SYNCHRONOUS
 
 SYNC_SESSION = requests.Session()
 atexit.register(SYNC_SESSION.close)
 
-Sync = http.factory(lambda endpoint: Host(SYNC_SESSION, endpoint))
+Sync = http.factory(lambda endpoint: host.Host(SYNC_SESSION, endpoint))
 Http = util.defactorize(Sync[0])
 AccountHttp = util.defactorize(Sync[1])
+BlockchainHttp = util.defactorize(Sync[2])
 
 # ASYNCHRONOUS
 
@@ -60,6 +55,7 @@ def close_session():
     loop = asyncio.get_event_loop()
     loop.run_until_complete(ASYNC_SESSION.close())
 
-Async = async_http.factory(lambda endpoint: Host(ASYNC_SESSION, endpoint))
+Async = async_http.factory(lambda endpoint: host.Host(ASYNC_SESSION, endpoint))
 AsyncHttp = util.defactorize(Async[0])
 AsyncAccountHttp = util.defactorize(Async[1])
+AsyncBlockchainHttp = util.defactorize(Async[2])

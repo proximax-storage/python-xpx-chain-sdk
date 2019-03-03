@@ -37,27 +37,27 @@
     limitations under the License.
 """
 
-from nem2 import models, util
-from . import codes
+from nem2 import models
+from nem2 import util
+from . import documentation
+from . import host
 from . import nis
-from .host import Host
 
 
 def factory(callback):
     """Factory to create the asynchronous HTTP clients."""
 
-    class AsyncHttp:
-        """Main client for the asynchronous NIS API."""
+    class HttpBase:
+        """Base class for HTTP clients."""
 
         def __init__(self, endpoint: str) -> None:
             """
             :param endpoint: Domain name and port for the endpoint.
             """
             self._host = callback(endpoint)
-            self._account = AsyncAccountHttp.from_host(self._host)
 
         @classmethod
-        def from_host(cls, host: Host) -> 'AsyncHttp':
+        def from_host(cls, host: host.Host):
             """
             Initialize AsyncHttp directly from existing host.
             For internal use, do not use directly.
@@ -66,7 +66,30 @@ def factory(callback):
             """
             http = cls.__new__(cls)
             http._host = host
-            http.account = AsyncAccountHttp.from_host(self._host)
+            return http
+
+    class AsyncHttp(HttpBase):
+        """Main client for the asynchronous NIS API."""
+
+        def __init__(self, endpoint: str) -> None:
+            """
+            :param endpoint: Domain name and port for the endpoint.
+            """
+            super().__init__(endpoint)
+            self._account = AsyncAccountHttp.from_host(self._host)
+            self._blockchain = AsyncBlockchainHttp.from_host(self._host)
+
+        @classmethod
+        def from_host(cls, host: host.Host) -> 'AsyncHttp':
+            """
+            Initialize AsyncHttp directly from existing host.
+            For internal use, do not use directly.
+
+            :param host: Wrapper for the HTTP client.
+            """
+            http = super(AsyncHttp, cls).from_host(host)
+            http._account = AsyncAccountHttp.from_host(http._host)
+            http._blockchain = AsyncBlockchainHttp.from_host(http._host)
             return http
 
         @property
@@ -74,60 +97,33 @@ def factory(callback):
             """Get AsyncAccountHttp to the same endpoint."""
             return self._account
 
-        @util.observable
-        async def heartbeat(self, timeout=None) -> codes.Heartbeat:
-            """
-            Determines if NIS is up and responsive.
+        @property
+        def blockchain(self) -> 'AsyncBlockchainHttp':
+            """Get AsyncBlockchainHttp to the same endpoint."""
+            return self._blockchain
 
-            :param timeout: (optional) Timeout for request (in seconds).
-            """
 
-            return await nis.async_heartbeat(self._host, timeout=timeout)
-
-        @util.observable
-        async def status(self, timeout=None) -> codes.Status:
-            """
-            Determines the status of NIS.
-
-            :param timeout: (optional) Timeout for request (in seconds).
-            """
-
-            return await nis.async_status(self._host, timeout=timeout)
-
-    class AsyncAccountHttp:
+    class AsyncAccountHttp(HttpBase):
         """Account client for the asynchronous NIS API."""
 
-        def __init__(self, endpoint: str) -> None:
-            """
-            :param endpoint: Domain name and port for the endpoint.
-            """
-            self._host = callback(endpoint)
+        #TODO(ahuszagh) Implement...
 
-        @classmethod
-        def from_host(cls, host: Host) -> 'AsyncAccountHttp':
-            """
-            Initialize AsyncAccountHttp directly from existing host.
-            For internal use, do not use directly.
 
-            :param host: Wrapper for the HTTP client.
-            """
-            account = cls.__new__(cls)
-            account._host = host
-            return account
+    class AsyncBlockchainHttp(HttpBase):
+        """Blockchain client for the asynchronous NIS API."""
 
-        def generate(self, timeout=None):
-            raise NotImplementedError
+        @util.doc(documentation.GET_BLOCK_BY_HEIGHT)
+        @util.observable
+        async def get_block_by_height(self, height: int, timeout=None) -> 'BlockInfo':
+            return await nis.async_get_block_by_height(self._host, height, timeout=timeout)
 
-        def get(self, address, timeout=None):
-            """
-            Gets an AccountMetaDataPair for an account.
+        #TODO(ahuszagh) Implement...
+        # getBlockByHeight
+        # getBlockTransactions
+        # getBlocksByHeightWithLimit
+        # getBlockchainHeight
+        # getBlockchainScore
+        # getDiagnosticStorage
+        pass
 
-            :param address: The address of the account (`Address` or `str`).
-            :param timeout: (optional) Timeout for request (in seconds).
-            """
-            if isinstance(address, str):
-                address = models.Address.create_from_raw_address(address)
-            plain = address.plain()
-            return nis.async_account_get(self._host, plain, timeout=timeout)
-
-    return AsyncHttp, AsyncAccountHttp
+    return AsyncHttp, AsyncAccountHttp, AsyncBlockchainHttp

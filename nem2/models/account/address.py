@@ -43,7 +43,7 @@ def calculate_checksum(address: BytesType) -> bytes:
     return util.hashlib.sha3_256(address[:21]).digest()[:4]
 
 
-def public_key_to_address(public_key: bytes, network_type: NetworkType) -> bytes:
+def public_key_to_address(public_key: bytes, network_type: 'NetworkType') -> bytes:
     """
     Convert public key to address.
 
@@ -140,7 +140,7 @@ class Address(util.Model):
     createFromEncoded = util.undoc(create_from_encoded)
 
     @classmethod
-    def create_from_public_key(cls, public_key: str, network_type: NetworkType) -> 'Address':
+    def create_from_public_key(cls, public_key: str, network_type: 'NetworkType') -> 'Address':
         """
         Create Address from the public key and network type.
 
@@ -191,25 +191,21 @@ class Address(util.Model):
             return False
         return self.tie() == other.tie()
 
+    @util.doc(util.Model.to_dto.__doc__)
     def to_dto(self) -> str:
         return self.address
 
-    to_dto.__doc__ = util.Model.to_dto.__doc__
-
+    @util.doc(util.Model.from_dto.__doc__)
     @classmethod
     def from_dto(cls, data: str) -> 'Address':
         return cls.create_from_raw_address(data)
 
-    from_dto.__doc__ = util.Model.from_dto.__doc__
-
+    @util.doc(util.Model.to_catbuffer.__doc__)
     def to_catbuffer(self) -> bytes:
         return self.encoded
 
-    to_catbuffer.__doc__ = util.Model.to_catbuffer.__doc__
-
+    @util.doc(util.Model.from_catbuffer.__doc__)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> 'Address':
         assert len(data) == 25
         return cls.create_from_encoded(data)
-
-    from_catbuffer.__doc__ = util.Model.from_catbuffer.__doc__

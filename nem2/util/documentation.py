@@ -50,40 +50,84 @@ def isstaticmethod(f):
     return isinstance(f, staticmethod)
 
 
-def wrapproperty(f):
+def doc_function(f, doc):
+    """Add documentation to a function."""
+
+    @wraps(f)
+    def wrapper(*args, **kwds):
+        return f(*args, **kwds)
+
+    wrapper.__doc__ = doc
+    return wrapper
+
+
+def undoc_function(f):
+    """Remove documentation from a function."""
+
+    @wraps(f)
+    def wrapper(*args, **kwds):
+        return f(*args, **kwds)
+
+    wrapper.__doc__ = None
+    return wrapper
+
+
+def wrap_property(f, callback):
     """Wrap and remove doc string from a property."""
 
     kwds = {'doc': None}
     if isfunction(f.fget):
-        kwds['fget'] = wrapfunction(f.fget)
+        kwds['fget'] = wrap_function(f.fget, callback)
     if isfunction(f.fset):
-        kwds['fset'] = wrapfunction(f.fset)
+        kwds['fset'] = wrap_function(f.fset, callback)
     if isfunction(f.fdel):
-        kwds['fdel'] = wrapfunction(f.fdel)
+        kwds['fdel'] = wrap_function(f.fdel, callback)
 
     return property(**kwds)
 
 
-def wrapfunction(f):
+def wrap_function(f, callback):
     """Wrap and remove doc string from a function."""
 
-    @wraps(f)
-    def hidden(*args, **kwds):
-        return f(*args, **kwds)
+    return callback(f)
 
-    hidden.__doc__ = None
-    return hidden
 
-def wrapclassmethod(f):
+def wrap_classmethod(f, callback):
     """Wrap and remove doc string from a classmethod."""
 
-    return classmethod(wrapfunction(f.__func__))
+    value = classmethod(wrap_function(f.__func__, callback))
+    value.__doc__ = f.__func__.__doc__
+    return value
 
 
-def wrapstaticmethod(f):
+def wrap_staticmethod(f, callback):
     """Wrap and remove doc string from a staticmethod."""
 
-    return staticmethod(wrapfunction(f.__func__))
+    value = staticmethod(wrap_function(f.__func__, callback))
+    value.__doc__ = f.__func__.__doc__
+    return value
+
+
+def doc(doc):
+    """Wrap a callable, copying over all attributes with a new doc string."""
+
+    def decorator(f):
+        callback = lambda x: doc_function(x, doc)
+        if isproperty(f):
+            # Properties
+            return wrap_property(f, callback)
+        elif isfunction(f):
+            # Functions, methods
+            return wrap_function(f, callback)
+        elif isclassmethod(f):
+            # Classmethods
+            return wrap_classmethod(f, callback)
+        elif isstaticmethod(f):
+            # Staticmethods
+            return wrap_staticmethod(f, callback)
+        raise NotImplementedError
+
+    return decorator
 
 
 def undoc(f):
@@ -91,14 +135,14 @@ def undoc(f):
 
     if isproperty(f):
         # Properties
-        return wrapproperty(f)
+        return wrap_property(f, undoc_function)
     elif isfunction(f):
         # Functions, methods
-        return wrapfunction(f)
+        return wrap_function(f, undoc_function)
     elif isclassmethod(f):
         # Classmethods
-        return wrapclassmethod(f)
+        return wrap_classmethod(f, undoc_function)
     elif isstaticmethod(f):
         # Staticmethods
-        return wrapstaticmethod(f)
+        return wrap_staticmethod(f, undoc_function)
     raise NotImplementedError

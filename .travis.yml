@@ -21,4 +21,3 @@ install:
 script:
   - python setup.py mypy
   - python setup.py test
-  - python setup.py test_internet

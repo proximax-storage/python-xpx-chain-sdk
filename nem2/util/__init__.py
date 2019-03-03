@@ -28,7 +28,9 @@ from . import signature
 from .abc import Dto, Catbuffer, Model
 from .format import InterchangeFormat
 
-from .documentation import undoc
+from .uint64 import dto_to_uint64, uint64_to_dto
+
+from .documentation import doc, undoc
 from .factory import defactorize
 from .reactive import observable
 
@@ -46,7 +48,12 @@ __all__ = [
     'Model',
     'InterchangeFormat',
 
+    # DTO
+    'dto_to_uint64',
+    'uint64_to_dto',
+
     # Decorators
+    'doc',
     'undoc',
     'defactorize',
     'observable',
