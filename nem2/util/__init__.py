@@ -29,6 +29,7 @@ from .abc import Dto, Catbuffer, Model
 from .format import InterchangeFormat
 
 from .documentation import undoc
+from .factory import defactorize
 from .reactive import observable
 
 from .base64 import b32encode, b32decode, b64encode, b64decode
@@ -47,6 +48,7 @@ __all__ = [
 
     # Decorators
     'undoc',
+    'defactorize',
     'observable',
 
     # Text utilities

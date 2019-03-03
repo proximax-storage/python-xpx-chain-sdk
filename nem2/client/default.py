@@ -37,96 +37,10 @@ import atexit
 import aiohttp
 import inspect
 import requests
+
+from nem2 import util
 from . import async_http, http
 from .host import Host
-
-
-def qualname(cls, func):
-    """Get qualified name from function."""
-
-    return '{}.{}'.format(cls.__name__, func.__name__)
-
-
-def patch_classmethod(cls, meth):
-    """Patch classmethod qualified name."""
-
-    patch_function(cls, meth.__func__)
-
-
-def patch_function(cls, func):
-    """Patch function qualified name."""
-
-    func.__module__ = __name__
-    func.__qualname__ = qualname(cls, func)
-    # Recursively patch wrapped functions.
-    wrapped = getattr(func, '__wrapped__', None)
-    if wrapped is not None:
-        patch_function(cls, wrapped)
-
-
-def patch_property(cls, prop):
-    """Patch property qualified name."""
-
-    if prop.fget is not None:
-        patch_function(cls, prop.fget)
-    if prop.fset is not None:
-        patch_function(cls, prop.fset)
-    if prop.fdel is not None:
-        patch_function(cls, prop.fdel)
-
-
-def patch(cls):
-    """
-    Patch a class to modify the qualified name and module.
-
-    This is mostly for Sphinx compatibility, to avoid
-    treating the class like a local variable in class factories.
-
-    This only does a 1-depth pass, and ignores all special and private
-    members.
-
-    Warning
-    -------
-
-    This method is very dependent on Python internals, and therefore
-    may break at some time in the future. To avoid this, the internals
-    are clearly described below, with the Python data [`model`],
-    [`functools`], and [`property`] references describing these
-    special attributes in more detail.
-
-        __name__: Function/class name. Writable.
-        __qualname__: Fully-qualified function/class name. Writable.
-        __module__: Name module function/class defined in. Writable.
-        __func__: Internal function for an instance method. Read-only.
-        __wrapped__: Points to the wrapped function object. Writable.
-        fget: Internal function to get a value from a property. Writable.
-        fset: Internal function to set a value from a property. Writable.
-        fdel: Internal function to delete a value from a property. Writable.
-
-    [`model`]: https://docs.python.org/3/reference/datamodel.html
-    [`functools`]: https://docs.python.org/3/library/functools.html
-    [`property`]: https://docs.python.org/3/library/functions.html#property
-    """
-
-    cls.__module__ = __name__
-    cls.__qualname__ = cls.__name__
-    members = inspect.getmembers(cls)
-    for key, inner in members:
-        if key == '__init__' or not key.startswith('_'):
-            # Ignore private and special members
-            if inspect.ismethod(inner):
-                # Classmethods only
-                patch_classmethod(cls, inner)
-            elif inspect.isfunction(inner):
-                patch_function(cls, inner)
-            elif isinstance(inner, property):
-                # Properties only
-                patch_property(cls, inner)
-            else:
-                # Error so we can handle other class types.
-                raise NotImplementedError
-
-    return cls
 
 # SYNCHRONOUS
 
@@ -134,8 +48,8 @@ SYNC_SESSION = requests.Session()
 atexit.register(SYNC_SESSION.close)
 
 Sync = http.factory(lambda endpoint: Host(SYNC_SESSION, endpoint))
-Http = patch(Sync[0])
-AccountHttp = patch(Sync[1])
+Http = util.defactorize(Sync[0])
+AccountHttp = util.defactorize(Sync[1])
 
 # ASYNCHRONOUS
 
@@ -147,5 +61,5 @@ def close_session():
     loop.run_until_complete(ASYNC_SESSION.close())
 
 Async = async_http.factory(lambda endpoint: Host(ASYNC_SESSION, endpoint))
-AsyncHttp = patch(Async[0])
-AsyncAccountHttp = patch(Async[1])
+AsyncHttp = util.defactorize(Async[0])
+AsyncAccountHttp = util.defactorize(Async[1])
