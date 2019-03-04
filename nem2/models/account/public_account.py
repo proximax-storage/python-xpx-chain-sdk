@@ -28,18 +28,25 @@ from .address import Address
 from ..blockchain.network_type import NetworkType
 
 
-class PublicAccount:
+class PublicAccount(util.Tie):
     """
     NEM public account.
 
     Describe account via the public key and account address.
     """
 
+    __slots__ = (
+        '_address',
+        '_public_key',
+    )
+
     def __init__(self, address: Address, public_key: str) -> None:
         """
         :param address: Address for the account.
         :param public_key: Hex-encoded public key (with or without '0x' prefix).
         """
+        if len(public_key) != 64:
+            raise ValueError("Invalid public key length")
         self._address = address
         self._public_key = public_key
 
@@ -104,18 +111,6 @@ class PublicAccount:
 
     verifySignature = util.undoc(verify_signature)
 
-    def tie(self):
-        """Create tuple from fields."""
-
-        return self.address, self.public_key
-
-    def __repr__(self) -> str:
-        return 'PublicAccount(address={!r}, public_key={!r})'.format(*self.tie())
-
-    def __str__(self) -> str:
-        return 'PublicAccount(address={!s}, public_key={!s})'.format(*self.tie())
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, PublicAccount):
-            return False
-        return self.tie() == other.tie()
+    @util.doc(util.Tie.tie.__doc__)
+    def tie(self) -> tuple:
+        return super().tie()

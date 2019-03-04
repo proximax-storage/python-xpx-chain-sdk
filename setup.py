@@ -28,7 +28,7 @@ def shell_command(command, short_description, **env):
             pass
 
         def run(self):
-            subprocess.check_call(command, **kwds)
+            subprocess.call(command, **kwds)
 
     return ShellCommand
 

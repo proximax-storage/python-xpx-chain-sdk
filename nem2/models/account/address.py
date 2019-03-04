@@ -83,6 +83,11 @@ class Address(util.Model):
     uniquely identifies a NEM account.
     """
 
+    __slots__= (
+        '_address',
+        '_network_type'
+    )
+
     def __init__(self, address: str) -> None:
         """
         :param address: Base32-encoded, human-readable address.
@@ -175,21 +180,9 @@ class Address(util.Model):
 
     isValid = util.undoc(is_valid)
 
-    def tie(self):
-        """Create tuple from fields."""
-
-        return self.address, self.network_type
-
-    def __repr__(self) -> str:
-        return 'Address(address={!r}, network_type={!r})'.format(*self.tie())
-
-    def __str__(self) -> str:
-        return 'Address(address={!s}, network_type={!s})'.format(*self.tie())
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, Address):
-            return False
-        return self.tie() == other.tie()
+    @util.doc(util.Model.tie.__doc__)
+    def tie(self) -> tuple:
+        return (self.address, self.network_type)
 
     @util.doc(util.Model.to_dto.__doc__)
     def to_dto(self) -> str:
@@ -206,6 +199,7 @@ class Address(util.Model):
 
     @util.doc(util.Model.from_catbuffer.__doc__)
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> 'Address':
-        assert len(data) == 25
-        return cls.create_from_encoded(data)
+    def from_catbuffer(cls, data: bytes) -> ('Address', bytes):
+        assert len(data) >= 25
+        inst = cls.create_from_encoded(data[:25])
+        return inst, data[25:]

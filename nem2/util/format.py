@@ -59,5 +59,5 @@ SERIALIZE = {
 
 DESERIALIZE = {
     InterchangeFormat.DTO: lambda d, t: t.from_dto(d),
-    InterchangeFormat.CATBUFFER: lambda d, t: t.from_catbuffer(d),
+    InterchangeFormat.CATBUFFER: lambda d, t: t.from_catbuffer(d)[0],
 }

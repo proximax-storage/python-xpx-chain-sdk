@@ -75,7 +75,36 @@ class Catbuffer(abc.ABC):
         return cls.from_catbuffer(data)
 
 
-class Model(Dto, Catbuffer):
+class Tie(abc.ABC):
+    """Simplify the implementation of special methods through `tie()`."""
+
+    @abc.abstractmethod
+    def tie(self) -> tuple:
+        """Create tuple from fields, for internal use only."""
+
+        return tuple(getattr(self, i) for i in self.__slots__)
+
+    def __repr__(self) -> str:
+        name = self.__class__.__name__
+        slots = (i.lstrip('_') for i in self.__slots__)
+        fields = ', '.join(i + '={!r}' for i in slots)
+        string = f'{name}({fields})'
+        return string.format(*self.tie())
+
+    def __str__(self) -> str:
+        name = self.__class__.__name__
+        slots = (i.lstrip('_') for i in self.__slots__)
+        fields = ', '.join(i + '={!s}' for i in slots)
+        string = f'{name}({fields})'
+        return string.format(*self.tie())
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, type(self)):
+            return False
+        return self.tie() == other.tie()
+
+
+class Model(Dto, Catbuffer, Tie):
     """Base class for NEM models."""
 
     def serialize(self, format: InterchangeFormat):

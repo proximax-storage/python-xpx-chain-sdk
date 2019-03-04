@@ -31,8 +31,10 @@ GraphType = Mapping[int, 'MultisigAccountInfo']
 GraphIterType = Iterable[GraphType]
 
 
-class MultisigAccountGraphInfo(MutableMapping):
+class MultisigAccountGraphInfo(MutableMapping, util.Tie):
     """Graph info for multi-sig accounts."""
+
+    __slots__ = ('_multisig_accounts',)
 
     def __init__(self, *args, **kwds):
         """
@@ -62,3 +64,7 @@ class MultisigAccountGraphInfo(MutableMapping):
 
     def __len__(self) -> int:
         return len(self._multisig_accounts)
+
+    @util.doc(util.Tie.tie.__doc__)
+    def tie(self) -> tuple:
+        return super().tie()

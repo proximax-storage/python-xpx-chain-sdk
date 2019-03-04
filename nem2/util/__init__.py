@@ -25,10 +25,10 @@
 from . import hashlib
 from . import signature
 
-from .abc import Dto, Catbuffer, Model
+from .abc import Dto, Catbuffer, Model, Tie
 from .format import InterchangeFormat
 
-from .uint64 import dto_to_uint64, uint64_to_dto
+from .stdint import *
 
 from .documentation import doc, undoc
 from .factory import defactorize
@@ -46,11 +46,18 @@ __all__ = [
     'Dto',
     'Catbuffer',
     'Model',
+    'Tie',
     'InterchangeFormat',
 
     # DTO
-    'dto_to_uint64',
+    'uint64_high',
+    'uint64_low',
     'uint64_to_dto',
+    'dto_to_uint64',
+    'uint128_high',
+    'uint128_low',
+    'uint128_to_dto',
+    'dto_to_uint128',
 
     # Decorators
     'doc',

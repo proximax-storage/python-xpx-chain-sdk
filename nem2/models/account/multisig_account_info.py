@@ -29,13 +29,21 @@ from nem2 import util
 PublicAccountListType = Sequence['PublicAccount']
 
 
-class MultisigAccountInfo:
+class MultisigAccountInfo(util.Tie):
     """
     Describes a NEM multisig account.
 
     Multisig accounts allow multiple accounts, or signatories,
     operate as an entity, requiring a certain consensus for operations.
     """
+
+    __slots__ = (
+        '_account',
+        '_min_approval',
+        '_min_removal',
+        '_cosignatories',
+        '_multisig_accounts',
+    )
 
     def __init__(self,
         account: 'PublicAccount',
@@ -116,3 +124,7 @@ class MultisigAccountInfo:
         return account in self.multisig_accounts
 
     isCosignerOfMultisigAccount = util.undoc(is_cosigner_of_multisig_account)
+
+    @util.doc(util.Tie.tie.__doc__)
+    def tie(self) -> tuple:
+        return super().tie()

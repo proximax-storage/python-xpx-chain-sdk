@@ -207,10 +207,11 @@ class TestAddress(TestCase):
         self.assertEqual(value.to_catbuffer(), value.toCatbuffer())
 
     def test_from_catbuffer(self):
-        value = models.Address.from_catbuffer(self.encoded)
+        value, rem = models.Address.from_catbuffer(self.encoded)
         self.assertEqual(value.address, self.plain)
         self.assertEqual(value.network_type, models.NetworkType.MIJIN_TEST)
-        self.assertEqual(value, models.Address.fromCatbuffer(value.encoded))
+        self.assertEqual(value, models.Address.fromCatbuffer(value.encoded)[0])
+        self.assertEqual(rem, b'')
 
     def test_serialize(self):
         value = models.Address.create_from_raw_address(self.pretty)

@@ -2,7 +2,7 @@
     network_type
     ============
 
-    Constants for the NIS network type.
+    Constants for the NEM network type.
 
     License
     -------
@@ -23,13 +23,12 @@
 """
 
 import enum
-import struct
 
 from nem2 import util
 
 
 class NetworkType(enum.IntEnum):
-    """Identifier for the NIS network type."""
+    """Identifier for the NEM network type."""
 
     MAIN_NET    = 0x68
     TEST_NET    = 0x98

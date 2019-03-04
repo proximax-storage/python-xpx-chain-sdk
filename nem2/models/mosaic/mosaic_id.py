@@ -23,8 +23,25 @@
 """
 
 import struct
+from typing import Sequence
 
 from nem2 import util
+
+
+def nonce_to_id(nonce: bytes, public_key: bytes) -> int:
+    """
+    Convert nonce to mosaic ID.
+
+    :param nonce: Mosaic nonce.
+    :param owner: Account of mosaic owner.
+    """
+
+    hasher = util.hashlib.sha3_256()
+    hasher.update(nonce)
+    hasher.update(public_key)
+    result = [i[0] for i in struct.iter_unpack('<I', hasher.digest())]
+
+    return util.dto_to_uint64([result[0], result[1] & 0x7FFFFFFF])
 
 
 class MosaicId(util.Model):
@@ -33,6 +50,8 @@ class MosaicId(util.Model):
 
     Unique identifier for a custom NEM asset.
     """
+
+    __slots__ = ('_id',)
 
     def __init__(self, id: int) -> None:
         """
@@ -51,31 +70,41 @@ class MosaicId(util.Model):
     def __index__(self) -> int:
         return self.__int__()
 
-    def __repr__(self) -> str:
-        return 'MosaicId(id={!r})'.format(self.id)
-
-    def __str__(self) -> str:
-        return 'MosaicId(id={!s})'.format(self.id)
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, MosaicId):
-            return False
-        return self.id == other.id
-
     @classmethod
     def from_hex(cls, data: str) -> 'MosaicId':
-        """Create instance of class from hex string."""
+        """
+        Create instance of class from hex string.
+
+        :param data: Hex-encoded nonce data (with or without '0x' prefix).
+        """
 
         return MosaicId(int(data, 16))
 
+    @classmethod
+    def create_from_nonce(cls, nonce: 'MosaicNonce', owner: 'PublicAccount') -> 'MosaicId':
+        """
+        Create mosaic ID from nonce and owner.
+
+        :param nonce: Mosaic nonce.
+        :param owner: Account of mosaic owner.
+        """
+        key: bytes = util.unhexlify(owner.public_key)
+        return cls(nonce_to_id(nonce.nonce, key))
+
+    createFromNonce = util.undoc(create_from_nonce)
+
+    @util.doc(util.Tie.tie.__doc__)
+    def tie(self) -> tuple:
+        return super().tie()
+
     @util.doc(util.Model.to_dto.__doc__)
-    def to_dto(self) -> int:
-        return self.id
+    def to_dto(self) -> Sequence[int]:
+        return util.uint64_to_dto(self.id)
 
     @util.doc(util.Model.from_dto.__doc__)
     @classmethod
-    def from_dto(cls, data: int) -> 'MosaicId':
-        return cls(data)
+    def from_dto(cls, data: Sequence[int]) -> 'MosaicId':
+        return cls(util.dto_to_uint64(data))
 
     @util.doc(util.Model.to_catbuffer.__doc__)
     def to_catbuffer(self) -> bytes:
@@ -83,6 +112,7 @@ class MosaicId(util.Model):
 
     @util.doc(util.Model.from_catbuffer.__doc__)
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> 'MosaicId':
-        assert len(data) == 8
-        return cls(struct.unpack('<Q', data)[0])
+    def from_catbuffer(cls, data: bytes) -> ('MosaicId', bytes):
+        assert len(data) >= 8
+        inst = cls(struct.unpack('<Q', data[:8])[0])
+        return inst, data[8:]

@@ -28,12 +28,18 @@ from .address import Address
 from .public_account import PublicAccount
 
 
-class Account:
+class Account(util.Tie):
     """
     NEM account.
 
     Describe account via the private key, public key and account address.
     """
+
+    __slots__ = (
+        '_address',
+        '_public_key',
+        '_private_key',
+    )
 
     def __init__(self, address: Address, public_key: str, private_key: str) -> None:
         """
@@ -41,6 +47,10 @@ class Account:
         :param public_key: Hex-encoded public key (with or without '0x' prefix).
         :param private_key: Hex-encoded private key (with or without '0x' prefix).
         """
+        if len(public_key) != 64:
+            raise ValueError("Invalid public key length")
+        if len(private_key) != 64:
+            raise ValueError("Invalid private key length")
         self._address = address
         self._public_key = public_key
         self._private_key = private_key
@@ -145,18 +155,6 @@ class Account:
 
     signData = util.undoc(sign_data)
 
-    def tie(self):
-        """Create tuple from fields."""
-
-        return self.address, self.public_key, self.private_key
-
-    def __repr__(self) -> str:
-        return 'Account(address={!r}, public_key={!r}, private_key={!r})'.format(*self.tie())
-
-    def __str__(self) -> str:
-        return 'Account(address={!s}, public_key={!s}, private_key={!s})'.format(*self.tie())
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, Account):
-            return False
-        return self.tie() == other.tie()
+    @util.doc(util.Tie.tie.__doc__)
+    def tie(self) -> tuple:
+        return super().tie()

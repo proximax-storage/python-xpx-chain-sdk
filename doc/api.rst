@@ -19,3 +19,4 @@ Models
    :inherited-members:
    :undoc-members:
    :special-members: __init__
+   :exclude-members: tie

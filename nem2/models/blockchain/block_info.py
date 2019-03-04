@@ -22,13 +22,36 @@
     limitations under the License.
 """
 
+from typing import Optional, Sequence
+
 from nem2 import util
 from .network_type import NetworkType
 from ..account.public_account import PublicAccount
 
+MerkleTreeType = Sequence[str]
+OptionalMerkleTreeType = Optional[MerkleTreeType]
 
-class BlockInfo(util.Dto):
+
+class BlockInfo(util.Dto, util.Tie):
     """Basic information describing a NEM block."""
+
+    __slots__ = (
+        '_hash',
+        '_generation_hash',
+        '_total_fee',
+        '_num_transactions',
+        '_signature',
+        '_signer',
+        '_network_type',
+        '_version',
+        '_type',
+        '_height',
+        '_timestamp',
+        '_difficulty',
+        '_previous_block_hash',
+        '_block_transactions_hash',
+        '_merkle_tree',
+    )
 
     def __init__(self,
         hash: str,
@@ -44,7 +67,8 @@ class BlockInfo(util.Dto):
         timestamp: int,
         difficulty: int,
         previous_block_hash: str,
-        block_transactions_hash: str
+        block_transactions_hash: str,
+        merkle_tree: OptionalMerkleTreeType = None
     ):
         """
         :param hash: Block hash.
@@ -61,6 +85,7 @@ class BlockInfo(util.Dto):
         :param difficulty: POI difficult to harvest block.
         :param previous_block_hash: Last block hash.
         :param block_transactions_hash: Block transaction hash.
+        :param merkle_tree: (Optional) List of base64-encoded hashes to verify block.
         """
         self._hash = hash
         self._generation_hash = generation_hash
@@ -76,6 +101,7 @@ class BlockInfo(util.Dto):
         self._difficulty = difficulty
         self._previous_block_hash = previous_block_hash
         self._block_transactions_hash = block_transactions_hash
+        self._merkle_tree = merkle_tree
 
     @property
     def hash(self) -> str:
@@ -159,15 +185,20 @@ class BlockInfo(util.Dto):
 
     blockTransactionsHash = util.undoc(block_transactions_hash)
 
-    # TODO(ahuszagh)
-    # tie
-    # __repr__
-    # __str__
-    # __eq__
+    @property
+    def merkle_tree(self) -> OptionalMerkleTreeType:
+        """Get optional list of base64-encoded hashes to verify block."""
+        return self._merkle_tree
+
+    merkleTree = util.undoc(merkle_tree)
+
+    @util.doc(util.Tie.tie.__doc__)
+    def tie(self) -> tuple:
+        return super().tie()
 
     @util.doc(util.Dto.to_dto.__doc__)
     def to_dto(self) -> dict:
-        return {
+        data = {
             'meta': {
                 'hash': self.hash,
                 'generationHash': self.generation_hash,
@@ -177,6 +208,7 @@ class BlockInfo(util.Dto):
             'block': {
                 'signature': self.signature,
                 'signer': self.signer.public_key,
+                'version': self.version,
                 'type': self.type,
                 'height': util.uint64_to_dto(self.height),
                 'timestamp': util.uint64_to_dto(self.timestamp),
@@ -185,6 +217,9 @@ class BlockInfo(util.Dto):
                 'blockTransactionsHash': self.block_transactions_hash,
             },
         }
+        if self.merkle_tree is not None:
+            data['meta']['merkleTree'] = self.merkle_tree
+        return data
 
     @util.doc(util.Dto.from_dto.__doc__)
     @classmethod
@@ -206,4 +241,5 @@ class BlockInfo(util.Dto):
             difficulty=util.dto_to_uint64(data['block']['difficulty']),
             previous_block_hash=data['block']['previousBlockHash'],
             block_transactions_hash=data['block']['blockTransactionsHash'],
+            merkle_tree=data['meta'].get('merkleTree')
         )

@@ -35,6 +35,11 @@ class Mosaic(util.Model):
     Describes an instance of a custom NEM asset.
     """
 
+    __slots__ = (
+        '_id',
+        '_amount',
+    )
+
     def __init__(self, id: MosaicId, amount: int) -> None:
         """
         :param id: Identifier for mosaic.
@@ -53,25 +58,22 @@ class Mosaic(util.Model):
         """Get mosaic quantity in the smallest unit possible."""
         return self._amount
 
-    def __repr__(self) -> str:
-        return 'Mosaic(id={!r}, amount={!r})'.format(self.id, self.amount)
-
-    def __str__(self) -> str:
-        return 'Mosaic(id={!s}, amount={!s})'.format(self.id, self.amount)
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, Mosaic):
-            return False
-        return (self.id, self.amount) == (other.id, other.amount)
+    @util.doc(util.Tie.tie.__doc__)
+    def tie(self) -> tuple:
+        return super().tie()
 
     @util.doc(util.Model.to_dto.__doc__)
     def to_dto(self) -> dict:
-        return {'amount': self.amount, 'id': self.id.to_dto()}
+        return {
+            'amount': util.uint64_to_dto(self.amount),
+            'id': self.id.to_dto(),
+        }
 
     @util.doc(util.Model.from_dto.__doc__)
     @classmethod
     def from_dto(cls, data: dict) -> 'Mosaic':
-        return cls(MosaicId.from_dto(data['id']), data['amount'])
+        amount = util.dto_to_uint64(data['amount'])
+        return cls(MosaicId.from_dto(data['id']), amount)
 
     @util.doc(util.Model.to_catbuffer.__doc__)
     def to_catbuffer(self) -> bytes:
@@ -79,8 +81,9 @@ class Mosaic(util.Model):
 
     @util.doc(util.Model.from_catbuffer.__doc__)
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> 'Mosaic':
-        assert len(data) == 16
-        id = MosaicId.from_catbuffer(data[:8])
-        amount = struct.unpack('<Q', data[8:])[0]
-        return cls(id, amount)
+    def from_catbuffer(cls, data: bytes) -> ('Mosaic', bytes):
+        assert len(data) >= 16
+        id = MosaicId.from_catbuffer(data)[0]
+        amount = struct.unpack('<Q', data[8:16])[0]
+        inst = cls(id, amount)
+        return inst, data[16:]

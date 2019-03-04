@@ -31,8 +31,19 @@ from ..mosaic import Mosaic
 MosaicListType = Sequence[Mosaic]
 
 
-class AccountInfo:
+class AccountInfo(util.Tie):
     """Basic information describing a NEM account."""
+
+    __slots__ = (
+        '_meta',
+        '_address',
+        '_address_height',
+        '_public_key',
+        '_public_key_height',
+        '_mosaics',
+        '_importance',
+        '_importance_height',
+    )
 
     def __init__(self,
         # TODO(ahuszagh) Need to describe the metadata structure.
@@ -115,3 +126,7 @@ class AccountInfo:
         return PublicAccount(self.address, self.public_key)
 
     publicAccount = util.undoc(public_account)
+
+    @util.doc(util.Tie.tie.__doc__)
+    def tie(self) -> tuple:
+        return super().tie()
