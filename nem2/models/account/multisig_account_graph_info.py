@@ -22,16 +22,16 @@
     limitations under the License.
 """
 
-from collections.abc import MutableMapping
-from typing import Iterable, Mapping
+from collections import abc
+import typing
 
 from nem2 import util
 
-GraphType = Mapping[int, 'MultisigAccountInfo']
-GraphIterType = Iterable[GraphType]
+GraphType = typing.Mapping[int, 'MultisigAccountInfo']
+GraphIterType = typing.Iterable[GraphType]
 
 
-class MultisigAccountGraphInfo(MutableMapping, util.Tie):
+class MultisigAccountGraphInfo(abc.MutableMapping, util.Tie):
     """Graph info for multi-sig accounts."""
 
     __slots__ = ('_multisig_accounts',)

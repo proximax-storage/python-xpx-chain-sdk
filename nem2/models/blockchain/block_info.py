@@ -22,14 +22,14 @@
     limitations under the License.
 """
 
-from typing import Optional, Sequence
+import typing
 
 from nem2 import util
 from .network_type import NetworkType
 from ..account.public_account import PublicAccount
 
-MerkleTreeType = Sequence[str]
-OptionalMerkleTreeType = Optional[MerkleTreeType]
+MerkleTreeType = typing.Sequence[str]
+OptionalMerkleTreeType = typing.Optional[MerkleTreeType]
 
 
 class BlockInfo(util.Dto, util.Tie):
@@ -224,22 +224,24 @@ class BlockInfo(util.Dto, util.Tie):
     @util.doc(util.Dto.from_dto.__doc__)
     @classmethod
     def from_dto(cls, data: dict) -> 'BlockInfo':
-        version = data['block']['version']
+        meta = data['meta']
+        block = data['block']
+        version = block['version']
         network_type = NetworkType(version >> 8)
         return cls(
-            hash=data['meta']['hash'],
-            generation_hash=data['meta']['generationHash'],
-            total_fee=util.dto_to_uint64(data['meta']['totalFee']),
-            num_transactions=data['meta']['numTransactions'],
-            signature=data['block']['signature'],
-            signer=PublicAccount.create_from_public_key(data['block']['signer'], network_type),
+            hash=meta['hash'],
+            generation_hash=meta['generationHash'],
+            total_fee=util.dto_to_uint64(meta['totalFee']),
+            num_transactions=meta['numTransactions'],
+            signature=block['signature'],
+            signer=PublicAccount.create_from_public_key(block['signer'], network_type),
             network_type=network_type,
             version=version,
-            type=data['block']['type'],
-            height=util.dto_to_uint64(data['block']['height']),
-            timestamp=util.dto_to_uint64(data['block']['timestamp']),
-            difficulty=util.dto_to_uint64(data['block']['difficulty']),
-            previous_block_hash=data['block']['previousBlockHash'],
-            block_transactions_hash=data['block']['blockTransactionsHash'],
-            merkle_tree=data['meta'].get('merkleTree')
+            type=block['type'],
+            height=util.dto_to_uint64(block['height']),
+            timestamp=util.dto_to_uint64(block['timestamp']),
+            difficulty=util.dto_to_uint64(block['difficulty']),
+            previous_block_hash=block['previousBlockHash'],
+            block_transactions_hash=block['blockTransactionsHash'],
+            merkle_tree=meta.get('merkleTree')
         )

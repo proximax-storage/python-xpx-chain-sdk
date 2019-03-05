@@ -153,9 +153,12 @@ class MosaicProperties(util.Model):
     @util.doc(util.Model.from_catbuffer.__doc__)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> ('MosaicProperties', bytes):
+        # Read the array count, property flags and divisibility.
         assert len(data) >= 3
         count, flags, divisibility = struct.unpack('<BBB', data[:3])
 
+        # Ensure the buffer is long enough for the data, and iteratively
+        # read the remaining properties.
         buffer_length = 3 + 9 * count
         assert len(data) >= buffer_length
         properties = struct.iter_unpack('<BQ', data[3:])

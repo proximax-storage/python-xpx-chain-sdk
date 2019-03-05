@@ -22,11 +22,11 @@
     limitations under the License.
 """
 
-from typing import Sequence
+import typing
 
 from nem2 import util
 
-PublicAccountListType = Sequence['PublicAccount']
+PublicAccountListType = typing.Sequence['PublicAccount']
 
 
 class MultisigAccountInfo(util.Tie):

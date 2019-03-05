@@ -22,13 +22,13 @@
     limitations under the License.
 """
 
-from typing import Sequence
+import typing
 
 from nem2 import util
 from .public_account import PublicAccount
 from ..mosaic import Mosaic
 
-MosaicListType = Sequence[Mosaic]
+MosaicListType = typing.Sequence[Mosaic]
 
 
 class AccountInfo(util.Tie):

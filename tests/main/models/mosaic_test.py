@@ -297,3 +297,35 @@ class TestMosaicProperties(TestCase):
     def test_deserialize(self):
         self.assertEqual(models.MosaicProperties.deserialize(self.properties.to_dto(), InterchangeFormat.DTO), self.properties)
         self.assertEqual(models.MosaicProperties.deserialize(self.properties.to_catbuffer(), InterchangeFormat.CATBUFFER), self.properties)
+
+
+class TestMosaicSupplyType(TestCase):
+
+    def setUp(self):
+        self.decrease = models.MosaicSupplyType.DECREASE
+        self.increase = models.MosaicSupplyType.INCREASE
+
+    def test_values(self):
+        self.assertEqual(self.decrease, 0)
+        self.assertEqual(self.increase, 1)
+
+    def test_description(self):
+        self.assertEqual(self.decrease.description(), "Decrease mosaic supply.")
+        self.assertEqual(self.increase.description(), "Increase mosaic supply.")
+
+    def test_to_catbuffer(self):
+        self.assertEqual(self.decrease.to_catbuffer(), b'\x00')
+        self.assertEqual(self.increase.to_catbuffer(), b'\x01')
+
+        self.assertEqual(self.decrease.toCatbuffer(), b'\x00')
+        self.assertEqual(self.increase.toCatbuffer(), b'\x01')
+
+
+class TestMosaicCurrencyMosaic(TestCase):
+    # TODO(ahuszagh) Implement...
+    pass
+
+
+class TestMosaicHarvestMosaic(TestCase):
+    # TODO(ahuszagh) Implement...
+    pass

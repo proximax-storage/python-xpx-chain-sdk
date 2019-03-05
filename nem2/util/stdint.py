@@ -17,9 +17,15 @@
     in terms of functionality.
 """
 
-from typing import Sequence
+import typing
 
 __all__ = [
+    # Typing
+    'Uint32DtoType',
+    'Uint64DtoType',
+    'Uint128DtoType',
+
+    # Helpers
     'uint64_high',
     'uint64_low',
     'uint64_to_dto',
@@ -33,6 +39,10 @@ __all__ = [
 UINT32_MAX = 0xFFFFFFFF
 UINT64_MAX = 0xFFFFFFFFFFFFFFFF
 UINT128_MAX = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
+Uint32DtoType = int
+Uint64DtoType = typing.Sequence[Uint32DtoType]
+Uint128DtoType = typing.Sequence[Uint64DtoType]
 
 
 def uint64_high(value: int) -> int:
@@ -49,19 +59,19 @@ def uint64_low(value: int) -> int:
     return value & UINT32_MAX
 
 
-def uint64_to_dto(value: int) -> Sequence[int]:
+def uint64_to_dto(value: int) -> Uint64DtoType:
     """Convert 64-bit int to DTO."""
 
     assert value <= UINT64_MAX
     return [uint64_low(value), uint64_high(value)]
 
 
-def dto_to_uint64(l: Sequence[int]) -> int:
+def dto_to_uint64(dto: Uint64DtoType) -> int:
     """Convert DTO to 64-bit int."""
 
-    assert len(l) == 2
-    low = l[0]
-    high = l[1] << 32
+    assert len(dto) == 2
+    low = dto[0]
+    high = dto[1] << 32
     value = low | high
     assert value <= UINT64_MAX
     return value
@@ -81,7 +91,7 @@ def uint128_low(value: int) -> int:
     return value & UINT64_MAX
 
 
-def uint128_to_dto(value: int) -> Sequence[Sequence[int]]:
+def uint128_to_dto(value: int) -> Uint128DtoType:
     """Convert 128-bit int to DTO."""
 
     assert value <= UINT128_MAX
@@ -90,12 +100,12 @@ def uint128_to_dto(value: int) -> Sequence[Sequence[int]]:
     return [low, high]
 
 
-def dto_to_uint128(l: Sequence[Sequence[int]]) -> int:
+def dto_to_uint128(dto: Uint128DtoType) -> int:
     """Convert DTO to 128-bit int."""
 
-    assert len(l) == 2
-    low = dto_to_uint64(l[0])
-    high = dto_to_uint64(l[1]) << 64
+    assert len(dto) == 2
+    low = dto_to_uint64(dto[0])
+    high = dto_to_uint64(dto[1]) << 64
     value = low | high
     assert value <= UINT128_MAX
     return value

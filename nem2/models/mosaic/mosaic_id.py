@@ -23,6 +23,7 @@
 """
 
 import struct
+# TODO(ahuszagh) Remove.
 from typing import Sequence
 
 from nem2 import util
@@ -41,7 +42,7 @@ def nonce_to_id(nonce: bytes, public_key: bytes) -> int:
     hasher.update(public_key)
     result = [i[0] for i in struct.iter_unpack('<I', hasher.digest())]
 
-    return util.dto_to_uint64([result[0], result[1] & 0x7FFFFFFF])
+    return util.dto_to_uint64((result[0], result[1] & 0x7FFFFFFF))
 
 
 class MosaicId(util.Model):
@@ -52,6 +53,7 @@ class MosaicId(util.Model):
     """
 
     __slots__ = ('_id',)
+    _id: int
 
     def __init__(self, id: int) -> None:
         """
