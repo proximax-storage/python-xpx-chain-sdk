@@ -230,6 +230,19 @@ def process_get_block_by_height(status: int, json: dict) -> 'BlockInfo':
 
 get_block_by_height, async_get_block_by_height = request("get_block_by_height", "", True)
 
+# chain/height
+
+# MOSAIC HTTP
+# -----------
+
+# NAMESPACE HTTP
+# --------------
+
+# NETWORK HTTP
+# ------------
+
+# TODO(ahuszagh) Implement...
+
 # FORWARDERS
 # ----------
 

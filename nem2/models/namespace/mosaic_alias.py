@@ -2,7 +2,7 @@
     mosaic_alias
     ============
 
-    Aliases for NEM mosaics.
+    Aliases for mosaics.
 
     License
     -------
@@ -28,11 +28,11 @@ from ..mosaic.mosaic_id import MosaicId
 
 
 class MosaicAlias(Alias):
-    """Alias for NEM mosaic."""
+    """Alias for mosaics."""
 
     def __init__(self, value: MosaicId) -> None:
         """
-        :param value: NEM mosaic ID.
+        :param value: Mosaic ID.
         """
         self._type = AliasType.MOSAIC_ID
         self._value = value

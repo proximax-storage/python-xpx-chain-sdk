@@ -2,7 +2,7 @@
     address
     =======
 
-    A public identifier for a NEM account and network type.
+    A public identifier for an account and network type.
 
     License
     -------
@@ -77,7 +77,7 @@ def is_valid_address(address: bytes) -> bool:
 
 class Address(util.Model):
     """
-    NEM address.
+    Account address for network type.
 
     An address is derived from the public key and network type, and
     uniquely identifies a NEM account.

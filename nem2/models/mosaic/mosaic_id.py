@@ -2,7 +2,7 @@
     mosaic_id
     =========
 
-    Identifier for a NEM asset.
+    Identifier for an asset.
 
     License
     -------
@@ -28,11 +28,7 @@ from nem2 import util
 
 
 class MosaicId(util.Model):
-    """
-    NEM mosaic identifier.
-
-    Unique identifier for a custom NEM asset.
-    """
+    """Mosaic identifier."""
 
     __slots__ = ('_id',)
     _id: int
@@ -53,6 +49,9 @@ class MosaicId(util.Model):
 
     def __index__(self) -> int:
         return self.__int__()
+
+    # TODO(ahuszagh) Likely should have to_hex function.
+    # TODO(ahuszagh) hex() isn't enough.
 
     @classmethod
     def from_hex(cls, data: str) -> 'MosaicId':

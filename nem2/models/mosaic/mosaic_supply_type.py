@@ -29,7 +29,7 @@ from nem2 import util
 
 
 class MosaicSupplyType(util.enum_catbuffer(enum.IntEnum)):
-    """Identifier for the mosaic supply type."""
+    """Mosaic supply type."""
 
     DECREASE = 0
     INCREASE = 1

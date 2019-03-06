@@ -2,7 +2,7 @@
     mosaic_info
     ===========
 
-    Detailed information describing a NEM asset.
+    Detailed information describing an asset.
 
     License
     -------
@@ -22,21 +22,28 @@
     limitations under the License.
 """
 
+import typing
+
 from nem2 import util
+from .mosaic_id import MosaicId
+from ..account.public_account import PublicAccount
+
+OptionalMosaicLevyType = typing.Optional['MosaicLevy']
 
 
-class MosaicInfo(util.Tie):
-    """
-    NEM mosaic information.
-
-    Information describing a custom NEM asset.
-    """
+# TODO(ahuszagh) Needs to/from dto.
+#   Issues:
+#       nonce cannot be generated from the data provided.
+#           Mosaic ID is a hash of nonce + public key, cannot reverse.
+#       namespace ID is missing in info, not in DTO.
+class MosaicInfo(util.Dto, util.Tie):
+    """Information describing a mosaic."""
 
     __slots__ = (
         '_active',
         '_index',
         '_meta_id',
-        '_id',
+        '_mosaic_id',
         '_nonce',
         '_supply',
         '_height',
@@ -49,20 +56,19 @@ class MosaicInfo(util.Tie):
         active: bool,
         index: int,
         meta_id: str,
-        id: 'MosaicId',
+        mosaic_id: 'MosaicId',
         nonce: 'MosaicNonce',
         supply: int,
         height: int,
         owner: 'PublicAccount',
         properties: 'MosaicProperties',
-        # TODO(ahuszagh) Need to check the actual form of the levy.
-        levy = None,
+        levy = OptionalMosaicLevyType,
     ) -> None:
         """
         :param active: Mosaic is active.
         :param index: Mosaic index.
         :param meta_id: Mosaic metadata ID.
-        :param id: Mosaic ID.
+        :param mosaic_id: Mosaic ID.
         :param nonce: Mosaic nonce.
         :param supply: Mosaic supply.
         :param height: Block height when mosaic was created.
@@ -73,7 +79,7 @@ class MosaicInfo(util.Tie):
         self._active = active
         self._index = index
         self._meta_id = meta_id
-        self._id = id
+        self._mosaic_id = mosaic_id
         self._nonce = nonce
         self._supply = supply
         self._height = height
@@ -99,9 +105,9 @@ class MosaicInfo(util.Tie):
         return self._meta_id
 
     @property
-    def id(self) -> 'MosaicId':
+    def mosaic_id(self) -> 'MosaicId':
         """Get the mosaic ID."""
-        return self._id
+        return self._mosaic_id
 
     @property
     def nonce(self) -> 'MosaicNonce':
@@ -130,7 +136,7 @@ class MosaicInfo(util.Tie):
 
     # TODO(ahuszagh) Add type annotations
     @property
-    def levy(self):
+    def levy(self) -> OptionalMosaicLevyType:
         """Get the mosaic levy."""
         return self._levy
 
@@ -165,3 +171,58 @@ class MosaicInfo(util.Tie):
     @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()
+
+    @util.doc(util.Dto.to_dto)
+    def to_dto(self) -> dict:
+        levy = self.levy.to_dto() if self.levy else {}
+        mosaic_id = MosaicId.create_from_nonce(self.nonce, self.owner)
+        # TODO(ahuszagh) This differs, since it seems the old
+        # way was a mosaic name.
+        #return {
+        #    'meta': {
+        #        'active': self.active,
+        #        'index': self.index,
+        #        'id': self.meta_id,
+        #    },
+        #    'mosaic': {
+        #        # TODO(ahuszagh)
+        #        #'namespaceId'
+        #        'mosaicId': self.mosaic_id.to_dto(),
+        #        'supply': util.uint64_to_dto(self.supply),
+        #        'height': util.uint64_to_dto(self.height),
+        #        'owner': self.owner.public_key,
+        #        'properties': self.properties.to_dto(),
+        #        'levy': levy,
+        #    },
+        #}
+        raise NotImplementedError
+
+    @util.doc(util.Dto.from_dto)
+    @classmethod
+    def from_dto(cls, data: dict) -> 'MosaicLevy':
+        meta = data['meta']
+        mosaic = data['mosaic']
+        levy = mosaic['levy']
+        levy = MosaicLevy.from_dto(levy) if levy else None
+        mosaic_id = MosaicId.from_dto(mosaic['mosaicId'])
+        # Namespace ID is clearly the parent ID.
+        # Nonce is clearly found somewhere???
+        # TODO(ahuszagh) We obviously cannot get the nonce...
+        # So remove it?
+        # TODO(ahuszagh) need network type...
+        # TODO(ahuszagh) This differs, since it seems the old
+        # way was a mosaic name.
+        #return cls(
+        #    active=meta['active'],
+        #    index=meta['index'],
+        #    meta_id=meta['id'],
+        #    # TODO(ahuszagh) Likely remove.
+        #    #'nonce'
+        #    mosaic_id=mosaic_id,
+        #    supply=util.dto_to_uint64(mosaic['supply']),
+        #    height=util.dto_to_uint64(mosaic['height']),
+        #    owner=PublicAccount.create_from_public_key(mosaic['owner'], network_type),
+        #    properties=MosaicProperties.from_dto(mosaic['properties']),
+        #    levy=levy,
+        #)
+        raise NotImplementedError

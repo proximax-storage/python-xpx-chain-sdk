@@ -29,11 +29,7 @@ from .public_account import PublicAccount
 
 
 class Account(util.Tie):
-    """
-    NEM account.
-
-    Describe account via the private key, public key and account address.
-    """
+    """Describe account via private key, public key and account address."""
 
     __slots__ = (
         '_address',

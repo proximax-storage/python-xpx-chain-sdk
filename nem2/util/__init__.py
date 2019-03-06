@@ -33,6 +33,7 @@ from .stdint import *
 from .documentation import doc, undoc
 from .factory import defactorize
 from .reactive import observable
+from .reify import reify
 
 from .identifier import generate_mosaic_id, generate_namespace_id
 
@@ -73,6 +74,7 @@ __all__ = [
     'undoc',
     'defactorize',
     'observable',
+    'reify',
 
     # Identifiers
     'generate_mosaic_id',

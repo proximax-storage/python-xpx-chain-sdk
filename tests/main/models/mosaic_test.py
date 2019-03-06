@@ -160,6 +160,33 @@ class TestMosaicInfo(TestCase):
     pass
 
 
+class TestMosaicLevy(TestCase):
+    # TODO(ahuszagh) Implement...
+    pass
+
+
+class TestMosaicLevyType(TestCase):
+
+    def setUp(self):
+        self.absolute = models.MosaicLevyType.ABSOLUTE
+        self.calculated = models.MosaicLevyType.CALCULATED
+
+    def test_values(self):
+        self.assertEqual(self.absolute, 1)
+        self.assertEqual(self.calculated, 2)
+
+    def test_description(self):
+        self.assertTrue(self.absolute.description().startswith("The levy is an absolute fee."))
+        self.assertTrue(self.calculated.description().startswith("The levy is calculated"))
+
+    def test_to_catbuffer(self):
+        self.assertEqual(self.absolute.to_dto(), 1)
+        self.assertEqual(self.calculated.to_dto(), 2)
+
+        self.assertEqual(self.absolute.toDto(), 1)
+        self.assertEqual(self.calculated.toDto(), 2)
+
+
 class TestMosaicNonce(TestCase):
 
     def setUp(self):

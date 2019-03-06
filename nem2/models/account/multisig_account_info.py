@@ -31,7 +31,7 @@ PublicAccountListType = typing.Sequence['PublicAccount']
 
 class MultisigAccountInfo(util.Tie):
     """
-    Describes a NEM multisig account.
+    Information describing a multisig account.
 
     Multisig accounts allow multiple accounts, or signatories,
     operate as an entity, requiring a certain consensus for operations.

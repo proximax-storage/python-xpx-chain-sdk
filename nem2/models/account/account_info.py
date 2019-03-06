@@ -32,7 +32,7 @@ MosaicListType = typing.Sequence[Mosaic]
 
 
 class AccountInfo(util.Tie):
-    """Basic information describing a NEM account."""
+    """Basic information describing an account."""
 
     __slots__ = (
         '_meta',

@@ -29,11 +29,7 @@ from ..blockchain.network_type import NetworkType
 
 
 class PublicAccount(util.Tie):
-    """
-    NEM public account.
-
-    Describe account via the public key and account address.
-    """
+    """Describe public account information via public key and account address."""
 
     __slots__ = (
         '_address',

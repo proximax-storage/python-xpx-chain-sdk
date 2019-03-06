@@ -2,7 +2,7 @@
     mosaic_properties
     =================
 
-    Properties of a NEM asset.
+    Properties of an asset.
 
     License
     -------
@@ -49,11 +49,7 @@ PROPERTIES = {
 }
 
 class MosaicProperties(util.Model):
-    """
-    NEM mosaic properties.
-
-    Properties of a custom NEM asset.
-    """
+    """Properties of an asset."""
 
     __slots__ = (
         '_flags',

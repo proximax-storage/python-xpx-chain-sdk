@@ -33,7 +33,7 @@ OptionalMerkleTreeType = typing.Optional[MerkleTreeType]
 
 
 class BlockInfo(util.Dto, util.Tie):
-    """Basic information describing a NEM block."""
+    """Basic information describing a block."""
 
     __slots__ = (
         '_hash',

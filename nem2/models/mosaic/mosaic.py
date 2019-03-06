@@ -29,11 +29,7 @@ from .mosaic_id import MosaicId
 
 
 class Mosaic(util.Model):
-    """
-    NEM mosaic.
-
-    Describes an instance of a custom NEM asset.
-    """
+    """Basic information describing a mosaic."""
 
     __slots__ = (
         '_id',

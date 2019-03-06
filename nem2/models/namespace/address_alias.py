@@ -2,7 +2,7 @@
     address_alias
     =============
 
-    Aliases for NEM addresses.
+    Aliases for addresses.
 
     License
     -------
@@ -28,11 +28,11 @@ from ..account.address import Address
 
 
 class AddressAlias(Alias):
-    """Alias for NEM address."""
+    """Alias for an address."""
 
     def __init__(self, value: Address) -> None:
         """
-        :param value: NEM address.
+        :param value: Address object.
         """
         self._type = AliasType.ADDRESS
         self._value = value

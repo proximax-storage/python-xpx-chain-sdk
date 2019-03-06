@@ -12,6 +12,8 @@ from .blockchain.network_type import NetworkType
 from .mosaic.mosaic import Mosaic
 from .mosaic.mosaic_id import MosaicId
 from .mosaic.mosaic_info import MosaicInfo
+from .mosaic.mosaic_levy import MosaicLevy
+from .mosaic.mosaic_levy_type import MosaicLevyType
 from .mosaic.mosaic_nonce import MosaicNonce
 from .mosaic.mosaic_properties import MosaicProperties
 from .mosaic.mosaic_supply_type import MosaicSupplyType
@@ -49,6 +51,8 @@ __all__ = [
     'Mosaic',
     'MosaicId',
     'MosaicInfo',
+    'MosaicLevy',
+    'MosaicLevyType',
     'MosaicNonce',
     'MosaicProperties',
     'MosaicSupplyType',

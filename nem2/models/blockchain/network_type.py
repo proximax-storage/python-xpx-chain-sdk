@@ -2,7 +2,7 @@
     network_type
     ============
 
-    Constants for the NEM network type.
+    Constants for the network type.
 
     License
     -------
@@ -28,7 +28,7 @@ from nem2 import util
 
 
 class NetworkType(enum.IntEnum):
-    """Identifier for the NEM network type."""
+    """Identifier for the network type."""
 
     MAIN_NET    = 0x68
     TEST_NET    = 0x98

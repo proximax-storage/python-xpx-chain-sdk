@@ -53,6 +53,8 @@ def factory(callback) -> tuple:
         def __init__(self, endpoint: str) -> None:
             self._host = callback(endpoint)
 
+        # TODO(ahuszagh) Need to have a Network type.
+
         @classmethod
         def from_host(cls, host: host.Host):
             """

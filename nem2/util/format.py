@@ -29,8 +29,8 @@ import typing
 class InterchangeFormat(enum.IntEnum):
     """Enumerations for the NEM interchange formats."""
 
-    DTO        = 0
-    CATBUFFER   = 1
+    DTO = 0
+    CATBUFFER = 1
 
     def description(self) -> str:
         """Describe enumerated values in detail."""
@@ -48,17 +48,41 @@ class InterchangeFormat(enum.IntEnum):
         return DESERIALIZE[self](data, value_type)
 
 
+def to_dto(value: typing.Any) -> typing.Any:
+    """Export value to DTO."""
+
+    return value.to_dto()
+
+
+def to_catbuffer(value: typing.Any) -> bytes:
+    """Export value to catbuffer."""
+
+    return value.to_catbuffer()
+
+
+def from_dto(data: typing.Any, value_type: type) -> typing.Any:
+    """Load value from DTO."""
+
+    return value_type.from_dto(data)
+
+
+def from_catbuffer(data: bytes, value_type: type) -> typing.Any:
+    """Load value from catbuffer."""
+
+    return value_type.from_catbuffer(data)[0]
+
+
 DESCRIPTION = {
     InterchangeFormat.DTO: "DTO",
     InterchangeFormat.CATBUFFER: "catbuffer",
 }
 
 SERIALIZE = {
-    InterchangeFormat.DTO: lambda x: x.to_dto(),
-    InterchangeFormat.CATBUFFER: lambda x: x.to_catbuffer(),
+    InterchangeFormat.DTO: to_dto,
+    InterchangeFormat.CATBUFFER: to_catbuffer,
 }
 
 DESERIALIZE = {
-    InterchangeFormat.DTO: lambda d, t: t.from_dto(d),
-    InterchangeFormat.CATBUFFER: lambda d, t: t.from_catbuffer(d)[0],
+    InterchangeFormat.DTO: from_dto,
+    InterchangeFormat.CATBUFFER: from_catbuffer,
 }
