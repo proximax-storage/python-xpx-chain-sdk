@@ -125,6 +125,6 @@ class MultisigAccountInfo(util.Tie):
 
     isCosignerOfMultisigAccount = util.undoc(is_cosigner_of_multisig_account)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()

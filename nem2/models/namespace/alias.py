@@ -78,6 +78,6 @@ class Alias(util.Tie):
 
     mosaicId = util.undoc(mosaic_id)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()

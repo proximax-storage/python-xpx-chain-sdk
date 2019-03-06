@@ -124,11 +124,11 @@ class MosaicProperties(util.Model):
         flags = to_flags(supply_mutable, transferable, levy_mutable)
         return MosaicProperties(flags, divisibility, duration)
 
-    @util.doc(util.Model.tie.__doc__)
+    @util.doc(util.Model.tie)
     def tie(self) -> tuple:
         return super().tie()
 
-    @util.doc(util.Model.to_dto.__doc__)
+    @util.doc(util.Model.to_dto)
     def to_dto(self) -> typing.Sequence[util.Uint64DtoType]:
         return [
             util.uint64_to_dto(self.flags),
@@ -136,7 +136,7 @@ class MosaicProperties(util.Model):
             util.uint64_to_dto(self.duration),
         ]
 
-    @util.doc(util.Model.from_dto.__doc__)
+    @util.doc(util.Model.from_dto)
     @classmethod
     def from_dto(cls, data: typing.Sequence[util.Uint64DtoType]) -> 'MosaicProperties':
         flags = util.dto_to_uint64(data[0])
@@ -144,13 +144,13 @@ class MosaicProperties(util.Model):
         duration = util.dto_to_uint64(data[2])
         return cls(flags, divisibility, duration)
 
-    @util.doc(util.Model.to_catbuffer.__doc__)
+    @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         data = struct.pack('<BBB', 1, self.flags, self.divisibility)
         properties = struct.pack('<BQ', DURATION_ID, self.duration)
         return data + properties
 
-    @util.doc(util.Model.from_catbuffer.__doc__)
+    @util.doc(util.Model.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> ('MosaicProperties', bytes):
         # Read the array count, property flags and divisibility.

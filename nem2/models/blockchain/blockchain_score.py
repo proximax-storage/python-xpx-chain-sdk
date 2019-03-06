@@ -56,7 +56,7 @@ class BlockchainScore(util.Tie):
 
     scoreHigh = util.undoc(score_high)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self):
         return super().tie()
 

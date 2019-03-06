@@ -1,8 +1,8 @@
 """
-    mosaic_id
-    =========
+    mosaic
+    ======
 
-    Description of a NEM asset.
+    Description of an asset.
 
     License
     -------
@@ -58,28 +58,28 @@ class Mosaic(util.Model):
         """Get mosaic quantity in the smallest unit possible."""
         return self._amount
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()
 
-    @util.doc(util.Model.to_dto.__doc__)
+    @util.doc(util.Model.to_dto)
     def to_dto(self) -> dict:
         return {
             'amount': util.uint64_to_dto(self.amount),
             'id': self.id.to_dto(),
         }
 
-    @util.doc(util.Model.from_dto.__doc__)
+    @util.doc(util.Model.from_dto)
     @classmethod
     def from_dto(cls, data: dict) -> 'Mosaic':
         amount = util.dto_to_uint64(data['amount'])
         return cls(MosaicId.from_dto(data['id']), amount)
 
-    @util.doc(util.Model.to_catbuffer.__doc__)
+    @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         return self.id.to_catbuffer() + struct.pack('<Q', self.amount)
 
-    @util.doc(util.Model.from_catbuffer.__doc__)
+    @util.doc(util.Model.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> ('Mosaic', bytes):
         assert len(data) >= 16

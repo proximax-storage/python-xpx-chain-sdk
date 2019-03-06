@@ -180,24 +180,24 @@ class Address(util.Model):
 
     isValid = util.undoc(is_valid)
 
-    @util.doc(util.Model.tie.__doc__)
+    @util.doc(util.Model.tie)
     def tie(self) -> tuple:
         return (self.address, self.network_type)
 
-    @util.doc(util.Model.to_dto.__doc__)
+    @util.doc(util.Model.to_dto)
     def to_dto(self) -> str:
         return self.address
 
-    @util.doc(util.Model.from_dto.__doc__)
+    @util.doc(util.Model.from_dto)
     @classmethod
     def from_dto(cls, data: str) -> 'Address':
         return cls.create_from_raw_address(data)
 
-    @util.doc(util.Model.to_catbuffer.__doc__)
+    @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         return self.encoded
 
-    @util.doc(util.Model.from_catbuffer.__doc__)
+    @util.doc(util.Model.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> ('Address', bytes):
         assert len(data) >= 25

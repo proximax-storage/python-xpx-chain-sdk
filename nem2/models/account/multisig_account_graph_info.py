@@ -65,6 +65,6 @@ class MultisigAccountGraphInfo(abc.MutableMapping, util.Tie):
     def __len__(self) -> int:
         return len(self._multisig_accounts)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()

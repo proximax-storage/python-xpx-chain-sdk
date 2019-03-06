@@ -155,6 +155,6 @@ class Account(util.Tie):
 
     signData = util.undoc(sign_data)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()

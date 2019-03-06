@@ -183,6 +183,6 @@ class NamespaceInfo(util.Tie):
             raise ValueError("Unable to get parent namespace ID of root namespace.")
         return self.parent_id
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()

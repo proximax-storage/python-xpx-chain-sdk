@@ -66,6 +66,6 @@ class BlockchainStorageInfo(util.Tie):
 
     numAccounts = util.undoc(num_accounts)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self):
         return super().tie()

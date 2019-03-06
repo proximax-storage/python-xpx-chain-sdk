@@ -77,24 +77,24 @@ class MosaicId(util.Model):
 
     createFromNonce = util.undoc(create_from_nonce)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()
 
-    @util.doc(util.Model.to_dto.__doc__)
+    @util.doc(util.Model.to_dto)
     def to_dto(self) -> util.Uint64DtoType:
         return util.uint64_to_dto(self.id)
 
-    @util.doc(util.Model.from_dto.__doc__)
+    @util.doc(util.Model.from_dto)
     @classmethod
     def from_dto(cls, data: util.Uint64DtoType) -> 'MosaicId':
         return cls(util.dto_to_uint64(data))
 
-    @util.doc(util.Model.to_catbuffer.__doc__)
+    @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         return struct.pack('<Q', self.id)
 
-    @util.doc(util.Model.from_catbuffer.__doc__)
+    @util.doc(util.Model.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> ('MosaicId', bytes):
         assert len(data) >= 8

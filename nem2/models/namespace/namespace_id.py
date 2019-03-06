@@ -68,6 +68,6 @@ class NamespaceId(util.Tie):
 
         return NamespaceId(int(data, 16))
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()

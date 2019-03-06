@@ -127,6 +127,6 @@ class AccountInfo(util.Tie):
 
     publicAccount = util.undoc(public_account)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()

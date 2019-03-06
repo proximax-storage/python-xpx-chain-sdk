@@ -111,6 +111,6 @@ class PublicAccount(util.Tie):
 
     verifySignature = util.undoc(verify_signature)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()

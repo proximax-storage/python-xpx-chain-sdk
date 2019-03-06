@@ -111,6 +111,11 @@ def wrap_staticmethod(f, callback):
 def doc(doc):
     """Wrap a callable, copying over all attributes with a new doc string."""
 
+    # Remove doc strings if we'd like to clone the doc string from an
+    # existing function.
+    if not isinstance(doc, str):
+        doc = doc.__doc__
+
     def decorator(f):
         callback = lambda x: doc_function(x, doc)
         if isproperty(f):

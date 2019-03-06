@@ -52,6 +52,6 @@ class NamespaceName(util.Tie):
         """Get the namespace name."""
         return self._name
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()

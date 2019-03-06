@@ -78,24 +78,24 @@ class MosaicNonce(util.Model):
 
     createFromHex = util.undoc(create_from_hex)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Model.tie)
     def tie(self) -> tuple:
         return super().tie()
 
-    @util.doc(util.Model.to_dto.__doc__)
+    @util.doc(util.Model.to_dto)
     def to_dto(self) -> util.Uint64DtoType:
         return list(self.nonce)
 
-    @util.doc(util.Model.from_dto.__doc__)
+    @util.doc(util.Model.from_dto)
     @classmethod
     def from_dto(cls, data: util.Uint64DtoType) -> 'MosaicNonce':
         return cls(bytes(data))
 
-    @util.doc(util.Model.to_catbuffer.__doc__)
+    @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         return self.nonce
 
-    @util.doc(util.Model.from_catbuffer.__doc__)
+    @util.doc(util.Model.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> ('MosaicNonce', bytes):
         assert len(data) >= 4

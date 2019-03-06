@@ -192,11 +192,11 @@ class BlockInfo(util.Dto, util.Tie):
 
     merkleTree = util.undoc(merkle_tree)
 
-    @util.doc(util.Tie.tie.__doc__)
+    @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()
 
-    @util.doc(util.Dto.to_dto.__doc__)
+    @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:
         data = {
             'meta': {
@@ -221,7 +221,7 @@ class BlockInfo(util.Dto, util.Tie):
             data['meta']['merkleTree'] = self.merkle_tree
         return data
 
-    @util.doc(util.Dto.from_dto.__doc__)
+    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: dict) -> 'BlockInfo':
         meta = data['meta']

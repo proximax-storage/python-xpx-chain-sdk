@@ -39,11 +39,11 @@ class MosaicSupplyType(util.enum_catbuffer(enum.IntEnum)):
 
         return DESCRIPTION[self]
 
-    @util.doc(util.Catbuffer.to_catbuffer.__doc__)
+    @util.doc(util.Catbuffer.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         return struct.pack('<B', int(self))
 
-    @util.doc(util.Catbuffer.from_catbuffer.__doc__)
+    @util.doc(util.Catbuffer.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> ('MosaicSupplyType', bytes):
         assert len(data) >= 1
