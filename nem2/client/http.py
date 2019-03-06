@@ -37,6 +37,8 @@
 
 __all__ = ['factory']
 
+import typing
+
 from nem2 import models
 from nem2 import util
 from . import documentation
@@ -44,7 +46,7 @@ from . import host
 from . import nis
 
 
-def factory(callback) -> tuple:
+def factory(callback: typing.Callable) -> tuple:
     """Factory to create the synchronous HTTP clients."""
 
     class HttpBase:
@@ -52,20 +54,29 @@ def factory(callback) -> tuple:
 
         def __init__(self, endpoint: str) -> None:
             self._host = callback(endpoint)
-
-        # TODO(ahuszagh) Need to have a Network type.
+            self._network_type = None
 
         @classmethod
-        def from_host(cls, host: host.Host):
+        def from_http(cls, http: 'HttpBase') -> 'HttpBase':
             """
-            Initialize AsyncHttp directly from existing host.
+            Initialize AsyncHttp directly from existing HTTP client.
             For internal use, do not use directly.
 
-            :param host: Wrapper for the HTTP client.
+            :param http: HTTP client.
             """
-            http = cls.__new__(cls)
-            http._host = host
-            return http
+            inst = cls.__new__(cls)
+            inst._host = http._host
+            inst._network_type = http._network_type
+            return inst
+
+        @property
+        def network_type(self) -> 'NetworkType':
+            """Get network type for client."""
+            if self._network_type is None:
+                network = NetworkHttp.from_http(self)
+                self._network_type = network.get_network_type()
+            return self._network_type
+
 
     class Http(HttpBase):
         """Main client for the synchronous NIS API."""
@@ -73,31 +84,36 @@ def factory(callback) -> tuple:
         @util.doc(documentation.INIT)
         def __init__(self, endpoint: str) -> None:
             super().__init__(endpoint)
-            self._account = AccountHttp.from_host(self._host)
-            self._blockchain = BlockchainHttp.from_host(self._host)
-
-        @classmethod
-        def from_host(cls, host: host.Host) -> 'Http':
-            """
-            Initialize Http directly from existing host.
-            For internal use, do not use directly.
-
-            :param host: Wrapper for the HTTP client.
-            """
-            http = super(Http, cls).from_host(host)
-            http._account = AccountHttp.from_host(http._host)
-            http._blockchain = BlockchainHttp.from_host(http._host)
-            return http
 
         @property
         def account(self) -> 'AccountHttp':
             """Get AccountHttp to the same endpoint."""
-            return self._account
+            return AccountHttp.from_http(self)
 
         @property
         def blockchain(self) -> 'BlockchainHttp':
             """Get BlockchainHttp to the same endpoint."""
-            return self._blockchain
+            return BlockchainHttp.from_http(self)
+
+        @property
+        def mosaic(self) -> 'MosaicHttp':
+            """Get MosaicHttp to the same endpoint."""
+            return MosaicHttp.from_http(self)
+
+        @property
+        def namespace(self) -> 'NamespaceHttp':
+            """Get NamespaceHttp to the same endpoint."""
+            return NamespaceHttp.from_http(self)
+
+        @property
+        def network(self) -> 'NetworkHttp':
+            """Get NetworkHttp to the same endpoint."""
+            return NetworkHttp.from_http(self)
+
+        @property
+        def transaction(self) -> 'TransactionHttp':
+            """Get TransactionHttp to the same endpoint."""
+            return TransactionHttp.from_http(self)
 
 
     class AccountHttp(HttpBase):
@@ -119,7 +135,7 @@ def factory(callback) -> tuple:
 
         @util.doc(documentation.GET_BLOCK_BY_HEIGHT)
         def get_block_by_height(self, height: int, timeout=None) -> 'BlockInfo':
-            return nis.get_block_by_height(self._host, height, timeout=timeout)
+            return nis.get_block_by_height[0](self._host, height, timeout=timeout)
 
         getBlockByHeight = util.undoc(get_block_by_height)
 
@@ -132,4 +148,50 @@ def factory(callback) -> tuple:
         # getDiagnosticStorage
         pass
 
-    return Http, AccountHttp, BlockchainHttp
+
+    class MosaicHttp(HttpBase):
+        """Mosaic client for the synchronous NIS API."""
+
+        @util.doc(documentation.INIT)
+        def __init__(self, endpoint: str) -> None:
+            super().__init__(endpoint)
+
+
+    class NamespaceHttp(HttpBase):
+        """Namespace client for the synchronous NIS API."""
+
+        @util.doc(documentation.INIT)
+        def __init__(self, endpoint: str) -> None:
+            super().__init__(endpoint)
+
+
+    class NetworkHttp(HttpBase):
+        """Network client for the synchronous NIS API."""
+
+        @util.doc(documentation.INIT)
+        def __init__(self, endpoint: str) -> None:
+            super().__init__(endpoint)
+
+        @util.doc(documentation.GET_NETWORK_TYPE)
+        def get_network_type(self, timeout=None) -> 'NetworkType':
+            return nis.get_network_type[0](self._host, timeout=timeout)
+
+        getNetworkType = util.undoc(get_network_type)
+
+
+    class TransactionHttp(HttpBase):
+        """Transaction client for the synchronous NIS API."""
+
+        @util.doc(documentation.INIT)
+        def __init__(self, endpoint: str) -> None:
+            super().__init__(endpoint)
+
+    return (
+        Http,
+        AccountHttp,
+        BlockchainHttp,
+        MosaicHttp,
+        NamespaceHttp,
+        NetworkHttp,
+        TransactionHttp,
+    )

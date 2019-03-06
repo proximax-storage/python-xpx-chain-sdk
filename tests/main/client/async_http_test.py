@@ -1,11 +1,25 @@
 import aiohttp
+import asyncio
 
 from nem2 import client
+from nem2 import models
 from tests.harness import AsyncTestCase
 from tests import responses
 
 
-class AsyncHttpTest(AsyncTestCase):
+class TestAsyncLoop(AsyncTestCase):
+
+    def __init__(self, methodName='runTest'):
+        super().__init__(methodName=methodName, loop=asyncio.new_event_loop())
+
+    async def test_loop(self):
+        http = client.AsyncHttp(responses.ENDPOINT, loop=self.loop)
+        with aiohttp.default_response(200, **responses.BLOCK_INFO["Ok"]):
+            block_info = await http.blockchain.get_block_by_height(1)
+            self.assertEqual(block_info.total_fee, 0)
+
+
+class TestAsyncHttp(AsyncTestCase):
 
     async def test_exceptions(self):
         http = client.AsyncBlockchainHttp(responses.ENDPOINT)
@@ -17,17 +31,22 @@ class AsyncHttpTest(AsyncTestCase):
             with aiohttp.default_exception(ConnectionRefusedError):
                 await http.get_block_by_height(1)
 
-    def test_from_host(self):
+    def test_from_http(self):
         http = client.AsyncHttp(responses.ENDPOINT)
-        copy = client.AsyncHttp.from_host(http._host)
+        copy = client.AsyncHttp.from_http(http)
         self.assertTrue(http._host is copy._host)
 
+    async def test_network_type(self):
+        http = client.AsyncHttp(responses.ENDPOINT)
+        with aiohttp.default_response(200, **responses.NETWORK_TYPE["MIJIN_TEST"]):
+            self.assertEqual(await http.network_type, models.NetworkType.MIJIN_TEST)
 
-class AsyncAccountHttpTest(AsyncTestCase):
+
+class TestAsyncAccountHttp(AsyncTestCase):
     pass
 
 
-class AsyncBlockchainHttpTest(AsyncTestCase):
+class TestAsyncBlockchainHttp(AsyncTestCase):
 
     async def test_get_block_by_height(self):
         http = client.AsyncBlockchainHttp(responses.ENDPOINT)
@@ -48,3 +67,22 @@ class AsyncBlockchainHttpTest(AsyncTestCase):
             self.assertEqual(block_info.previous_block_hash, "0000000000000000000000000000000000000000000000000000000000000000")
             self.assertEqual(block_info.block_transactions_hash, "54B187F7D6B1D45F133F06706566E832A9F325F1E62FE927C0B5C65DAC8A2C56")
 
+
+class TestAsyncMosaicHttp(AsyncTestCase):
+    # TODO(ahuszagh) Implement
+    pass
+
+
+class TestAsyncNamespaceHttp(AsyncTestCase):
+    # TODO(ahuszagh) Implement
+    pass
+
+
+class TestAsyncNetworkHttp(AsyncTestCase):
+    # TODO(ahuszagh) Implement
+    pass
+
+
+class TestAsyncTransactionHttp(AsyncTestCase):
+    # TODO(ahuszagh) Implement
+    pass

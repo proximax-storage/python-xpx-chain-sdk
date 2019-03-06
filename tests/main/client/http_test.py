@@ -6,7 +6,7 @@ from tests.harness import TestCase
 from tests import responses
 
 
-class HttpTest(TestCase):
+class TestHttp(TestCase):
 
     def test_exceptions(self):
         http = client.BlockchainHttp(responses.ENDPOINT)
@@ -18,17 +18,22 @@ class HttpTest(TestCase):
             with requests.default_exception(ConnectionRefusedError):
                 http.get_block_by_height(1)
 
-    def test_from_host(self):
+    def test_from_http(self):
         http = client.Http(responses.ENDPOINT)
-        copy = client.Http.from_host(http._host)
+        copy = client.Http.from_http(http)
         self.assertTrue(http._host is copy._host)
 
+    def test_network_type(self):
+        http = client.Http(responses.ENDPOINT)
+        with requests.default_response(200, **responses.NETWORK_TYPE["MIJIN_TEST"]):
+            self.assertEqual(http.network_type, models.NetworkType.MIJIN_TEST)
 
-class AccountHttpTest(TestCase):
+
+class TestAccountHttp(TestCase):
     pass
 
 
-class BlockchainHttpTest(TestCase):
+class TestBlockchainHttp(TestCase):
 
     def test_get_block_by_height(self):
         http = client.BlockchainHttp(responses.ENDPOINT)
@@ -50,3 +55,23 @@ class BlockchainHttpTest(TestCase):
             self.assertEqual(block_info.previous_block_hash, "0000000000000000000000000000000000000000000000000000000000000000")
             self.assertEqual(block_info.block_transactions_hash, "54B187F7D6B1D45F133F06706566E832A9F325F1E62FE927C0B5C65DAC8A2C56")
             self.assertEqual(block_info.merkle_tree[0], "smNSI9tFz7tOIc38NZ/n8iKm5fYADJnKnnKdsC5mYfU=")
+
+
+class TestMosaicHttp(TestCase):
+    # TODO(ahuszagh) Implement
+    pass
+
+
+class TestNamespaceHttp(TestCase):
+    # TODO(ahuszagh) Implement
+    pass
+
+
+class TestNetworkHttp(TestCase):
+    # TODO(ahuszagh) Implement
+    pass
+
+
+class TestTransactionHttp(TestCase):
+    # TODO(ahuszagh) Implement
+    pass

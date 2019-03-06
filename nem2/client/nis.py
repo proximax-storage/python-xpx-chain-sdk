@@ -74,132 +74,6 @@ def request(*args, **kwds):
     a = asynchronous_request(*args, **kwds)
     return s, a
 
-# TODO(ahuszagh) Remove all the commented-out code.
-# HTTP
-# ----
-
-## HEARTBEAT
-#
-#
-#def request_heartbeat(host, timeout=None):
-#    """
-#    Make "/heartbeat" request.
-#
-#    :param host: Host wrapper for client.
-#    :param timeout: (optional) Timeout for request (in seconds).
-#    """
-#
-#    return host.get("/heartbeat", timeout=timeout)
-#
-#
-#def process_heartbeat(status, json):
-#    """
-#    Process the "/heartbeat" HTTP response.
-#
-#    :param status: Status code for HTTP response.
-#    :param json: JSON data for response message.
-#    """
-#
-#    # /heartbeat always succeeds if the node is up.
-#    # If we get any other status code, return an unknown status: the node
-#    # is accepting requests but doesn't seem to recognize the request.
-#    if status == 200:
-#        return codes.Heartbeat.OK
-#    else:
-#        return codes.Heartbeat.UNKNOWN
-#
-#
-#HEARTBEAT_DOC = """
-#Determines if NIS is up and responsive.
-#
-#:param host: Host wrapper for client.
-#:param timeout: (optional) Timeout for request (in seconds).
-#"""
-#
-#heartbeat, async_heartbeat = request("heartbeat", HEARTBEAT_DOC)
-#
-## STATUS
-#
-#
-#def request_status(host, timeout=None):
-#    """
-#    Make "/status" request.
-#
-#    :param host: Host wrapper for client.
-#    :param timeout: (optional) Timeout for request (in seconds).
-#    """
-#
-#    return host.get("/status", timeout=timeout)
-#
-#
-#def process_status(status, json):
-#    """
-#    Process the "/status" HTTP response.
-#
-#    :param status: Status code for HTTP response.
-#    :param json: JSON data for response message.
-#    """
-#
-#    # /status always succeeds if the node is up and serving requests.
-#    # If we get any other status code, return an unknown status: the node
-#    # is accepting requests but doesn't seem to recognize the request.
-#    if status == 200:
-#        return codes.Status(json['code'])
-#    else:
-#        return codes.Status.UNKNOWN
-#
-#
-#STATUS_DOC = """
-#Determines the status of NIS.
-#
-#:param host: Host wrapper for client.
-#:param timeout: (optional) Timeout for request (in seconds).
-#"""
-#
-#status, async_status = request("status", STATUS_DOC)
-#
-## ACCOUNT HTTP
-## -------------
-#
-#def request_account_get(host, address, timeout=None):
-#    """
-#    Make "/account/get" request.
-#
-#    :param host: Host wrapper for client.
-#    :param address: Plain base32-encoded address of account.
-#    :param timeout: (optional) Timeout for request (in seconds).
-#    """
-#
-#    payload = {'address': address}
-#    return host.get("/account/get",
-#        params=payload,
-#        timeout=timeout
-#    )
-#
-#
-#def process_account_get(status, json):
-#    """
-#    Process the "/account/get" HTTP response.
-#
-#    :param status: Status code for HTTP response.
-#    :param json: JSON data for response message.
-#    """
-#
-#    import pdb; pdb.set_trace()
-#    # TODO(ahuszagh) Method succeeded, since we raise for error.
-#    # Need AccountInfo struct.
-#    raise NotImplementedError
-#
-#
-#ACCOUNT_GET_DOC = """
-#Gets an AccountMetaDataPair for an account..
-#
-#:param host: Host wrapper for client.
-#:param address: Plain base32-encoded address of account.
-#:param timeout: (optional) Timeout for request (in seconds).
-#"""
-#
-#account_get, async_account_get = request("account_get", ACCOUNT_GET_DOC, True)
 
 # BLOCKCHAIN HTTP
 # ---------------
@@ -228,7 +102,7 @@ def process_get_block_by_height(status: int, json: dict) -> 'BlockInfo':
     return models.BlockInfo.from_dto(json)
 
 
-get_block_by_height, async_get_block_by_height = request("get_block_by_height", "", True)
+get_block_by_height = request("get_block_by_height", "", True)
 
 # chain/height
 
@@ -241,21 +115,55 @@ get_block_by_height, async_get_block_by_height = request("get_block_by_height", 
 # NETWORK HTTP
 # ------------
 
-# TODO(ahuszagh) Implement...
+NETWORK_TYPE = {
+    # TODO(ahuszagh) Only the mijinTest variant is actually defined.
+    # The rest are borrowed from an outdated SDK.
+    'mijin': models.NetworkType.MIJIN,
+    'mijinTest': models.NetworkType.MIJIN_TEST,
+    'public': models.NetworkType.MAIN_NET,
+    'publicTest': models.NetworkType.TEST_NET,
+}
+
+def request_get_network_type(host: 'Host', timeout=None):
+    """
+    Make "/network" request.
+
+    :param host: Host wrapper for client.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return host.get("/network", timeout=timeout)
+
+
+def process_get_network_type(status: int, json: dict) -> 'NetworkType':
+    """
+    Process the "/network" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return NETWORK_TYPE[json['name']]
+
+
+get_network_type = request("get_network_type", "", True)
 
 # FORWARDERS
 # ----------
 
 REQUEST = {
-    #'heartbeat': request_heartbeat,
-    #'status': request_status,
-    #'account_get': request_account_get,
+    # BLOCKCHAIN
     'get_block_by_height': request_get_block_by_height,
+
+    # NETWORK
+    'get_network_type': request_get_network_type,
 }
 
 PROCESS = {
-    #'heartbeat': process_heartbeat,
-    #'status': process_status,
-    #'account_get': process_account_get,
+    # BLOCKCHAIN
     'get_block_by_height': process_get_block_by_height,
+
+    # NETWORK
+    'get_network_type': process_get_network_type,
 }

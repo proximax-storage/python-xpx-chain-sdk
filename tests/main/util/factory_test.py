@@ -1,6 +1,6 @@
 import functools
 
-from nem2.util import factory
+from nem2 import util
 from tests.harness import TestCase
 
 def create():
@@ -39,6 +39,10 @@ def create():
         def f(self):
             pass
 
+        @util.reify
+        def g(self):
+            return 5
+
     def c():
         return 5
 
@@ -56,7 +60,7 @@ def create():
 
 
 A1, B1, c1, d1 = create()
-A2, B2, c2, d2 = map(factory.defactorize, create())
+A2, B2, c2, d2 = map(util.defactorize, create())
 
 
 class DefactorizeTest(TestCase):
@@ -99,6 +103,10 @@ class DefactorizeTest(TestCase):
 
         self.assertEqual(B1.f.fdel.__qualname__, 'create.<locals>.B.f')
         self.assertEqual(B2.f.fdel.__qualname__, 'B.f')
+
+    def test_reify(self):
+        self.assertEqual(B1.g.fget.__qualname__, 'create.<locals>.B.g')
+        self.assertEqual(B2.g.fget.__qualname__, 'B.g')
 
     def test_function(self):
         self.assertEqual(c1.__qualname__, 'create.<locals>.c')

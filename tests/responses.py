@@ -39,3 +39,11 @@ def load_response(name):
 BLOCK_INFO = {
     'Ok': load_response('block_info.json'),
 }
+
+MOSAIC_INFO = {
+    'Ok': load_response('mosaic_info.json'),
+}
+
+NETWORK_TYPE = {
+    'MIJIN_TEST': load_response('network.json'),
+}

@@ -30,6 +30,8 @@ from .format import InterchangeFormat
 
 from .stdint import *
 
+from .asynchronous import *
+
 from .documentation import doc, undoc
 from .factory import defactorize
 from .reactive import observable
@@ -68,6 +70,12 @@ __all__ = [
     'uint128_low',
     'uint128_to_dto',
     'dto_to_uint128',
+
+    # Asynchronous
+    'LoopType',
+    'OptionalLoopType',
+    'get_event_loop',
+    'get_running_loop',
 
     # Decorators
     'doc',

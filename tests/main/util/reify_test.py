@@ -56,9 +56,9 @@ class TestReify(TestCase):
     def test_data_descriptor(self):
         obj = ReifiedObj()
         self.assertEqual(obj.value, 1)
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(TypeError):
             obj.value = 1
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(TypeError):
             del obj.value
 
         fget1 = lambda x: print('getter')
@@ -75,7 +75,7 @@ class TestReify(TestCase):
         self.assertEqual(r2.fset, None)
         self.assertEqual(r2.fdel, None)
 
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(TypeError):
             r2.setter(lambda x: print('setter'))
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(TypeError):
             r2.deleter(lambda x: print('deleter'))

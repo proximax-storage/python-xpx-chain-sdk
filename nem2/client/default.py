@@ -41,21 +41,45 @@ from . import http
 SYNC_SESSION = requests.Session()
 atexit.register(SYNC_SESSION.close)
 
-Sync = http.factory(lambda endpoint: host.Host(SYNC_SESSION, endpoint))
-Http = util.defactorize(Sync[0])
-AccountHttp = util.defactorize(Sync[1])
-BlockchainHttp = util.defactorize(Sync[2])
+def sync_callback(endpoint: str) -> 'Host':
+    """Callback for synchronous HTTP client."""
+    return host.Host(SYNC_SESSION, endpoint)
+
+(
+    Http,
+    AccountHttp,
+    BlockchainHttp,
+    MosaicHttp,
+    NamespaceHttp,
+    NetworkHttp,
+    TransactionHttp,
+) = map(util.defactorize, http.factory(sync_callback))
 
 # ASYNCHRONOUS
 
 ASYNC_SESSION = aiohttp.ClientSession()
 
 @atexit.register
-def close_session() -> None:
+def close_sessions() -> None:
     loop = asyncio.get_event_loop()
     loop.run_until_complete(ASYNC_SESSION.close())
 
-Async = async_http.factory(lambda endpoint: host.Host(ASYNC_SESSION, endpoint))
-AsyncHttp = util.defactorize(Async[0])
-AsyncAccountHttp = util.defactorize(Async[1])
-AsyncBlockchainHttp = util.defactorize(Async[2])
+def async_callback(endpoint: str, loop: util.OptionalLoopType = None) -> 'Host':
+    """Callback for asynchronous HTTP client."""
+
+    if loop is None:
+        return host.AsyncHost(ASYNC_SESSION, endpoint)
+
+    # Create a managed session with an internal loop
+    session = aiohttp.ClientSession(loop=loop)
+    return host.AsyncHost(session, endpoint, loop=loop)
+
+(
+    AsyncHttp,
+    AsyncAccountHttp,
+    AsyncBlockchainHttp,
+    AsyncMosaicHttp,
+    AsyncNamespaceHttp,
+    AsyncNetworkHttp,
+    AsyncTransactionHttp,
+) = map(util.defactorize, async_http.factory(async_callback))

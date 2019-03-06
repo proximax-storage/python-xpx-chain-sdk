@@ -106,3 +106,21 @@ class Host:
 
         path = self.endpoint + relative_path
         return self.session.delete(path, *args, **kwds)
+
+
+class AsyncHost(Host):
+    """Asynchronous host with a managed loop."""
+
+    def __init__(self, session, endpoint, loop=None) -> None:
+        """
+        :param session: Requests or aiohttp-like HTTP client session.
+        :param endpoint: Domain name and port for the endpoint.
+        :param loop: Event loop.
+        """
+        self.session = session
+        self.endpoint = endpoint
+        self.loop = loop
+
+    def __del__(self):
+        if self.loop is not None:
+            self.loop.run_until_complete(self.session.close())

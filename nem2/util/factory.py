@@ -27,6 +27,8 @@
 
 import inspect
 
+from .reify import reify
+
 
 def concat(*names: str) -> str:
     """Concatenate names to generate fully-qualified name."""
@@ -133,8 +135,8 @@ def defactorize(obj, module=None, qualname=None, special={'__init__'}):
     elif inspect.isfunction(obj):
         # Functions, methods, and static methods only.
         return defactorize_function(obj, module, qualname, special)
-    elif isinstance(obj, property):
-        # Properties only
+    elif isinstance(obj, (property, reify)):
+        # Properties and reified properties only
         return defactorize_property(obj, module, qualname, special)
     elif inspect.isclass(obj):
         # Classes only.

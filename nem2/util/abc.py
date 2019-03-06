@@ -27,7 +27,9 @@ import enum
 import inspect
 import sys
 import types
+
 from .format import InterchangeFormat
+from .reify import reify
 
 
 __all__ = [
@@ -84,7 +86,7 @@ def add_nonabc(cls: type, base: type) -> None:
             elif inspect.ismethod(value):
                 # Classmethods
                 setattr(cls, key, types.MethodType(value.__func__, cls))
-            elif isinstance(value, property):
+            elif isinstance(value, (property, reify)):
                 # Properties
                 setattr(cls, key, value)
             else:
@@ -238,22 +240,26 @@ class Catbuffer(abc.ABC):
 class Tie(abc.ABC):
     """Simplify the implementation of special methods through `tie()`."""
 
+    @property
+    def slots(self):
+        return tuple((i for i in self.__slots__ if not i.endswith('_')))
+
     @abc.abstractmethod
     def tie(self) -> tuple:
         """Create tuple from fields, for internal use only."""
 
-        return tuple(getattr(self, i) for i in self.__slots__)
+        return tuple(getattr(self, i) for i in self.slots)
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
-        slots = (i.lstrip('_') for i in self.__slots__)
+        slots = (i.lstrip('_') for i in self.slots)
         fields = ', '.join(i + '={!r}' for i in slots)
         string = f'{name}({fields})'
         return string.format(*self.tie())
 
     def __str__(self) -> str:
         name = self.__class__.__name__
-        slots = (i.lstrip('_') for i in self.__slots__)
+        slots = (i.lstrip('_') for i in self.slots)
         fields = ', '.join(i + '={!s}' for i in slots)
         string = f'{name}({fields})'
         return string.format(*self.tie())

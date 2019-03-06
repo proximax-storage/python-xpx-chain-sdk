@@ -45,27 +45,82 @@
 """
 
 try:
-    import asyncio
     import rx
     HAS_REACTIVE = True
 except ImportError:
     HAS_REACTIVE = False
 
+import asyncio
 import functools
+import inspect
 import typing
 
+from .asynchronous import *
 
-def observable(f: typing.Callable) -> typing.Callable:
-    """Wrap an `async def` function into an `Observable`."""
 
-    if not HAS_REACTIVE:
-        # Return the `async def` function if RxPy is not available.
-        return f
+if HAS_REACTIVE:
+    # RxPy available.
 
-    loop = asyncio.get_event_loop()
+    def wrap(coro: typing.Awaitable, loop: OptionalLoopType = None) -> typing.Awaitable:
+        """Wrap coroutine to generate rx.Observable."""
+
+        loop = get_event_loop(loop)
+        task = loop.create_task(coro)
+        return rx.Observable.from_future(task)
+
+else:
+    # RxPy not available, use asyncio for everything.
+
+    def wrap(coro: typing.Awaitable, loop: OptionalLoopType = None) -> typing.Awaitable:
+        """Wrap coroutine to generate awaitable object."""
+
+        if loop is None:
+            return coro
+        return loop.create_task(coro)
+
+
+def wrap_loop(loop: OptionalLoopType = None) -> typing.Callable:
+    """Wrap event loop to generate awaitable object."""
+
+    def decorator(f: typing.Callable) -> typing.Callable:
+        @functools.wraps(f)
+        def wrapper(*args, **kwds) -> typing.Awaitable:
+            return wrap(f(*args, **kwds), loop)
+        return wrapper
+    return decorator
+
+
+def wrap_method(f: typing.Callable):
+    """Wrap a method to generate awaitable object."""
 
     @functools.wraps(f)
-    def wrapper(*args, **kwds) -> rx.Observable:
-        return rx.Observable.from_future(loop.create_task(f(*args, **kwds)))
-
+    def wrapper(self, *args, **kwds) -> typing.Awaitable:
+        loop = getattr(self, "loop", None)
+        return wrap(f(self, *args, **kwds), loop)
     return wrapper
+
+
+def wrap_function(f: typing.Callable):
+    """Wrap a function to generate awaitable object."""
+
+    @functools.wraps(f)
+    def wrapper(*args, **kwds) -> typing.Awaitable:
+        return wrap(f(*args, **kwds), None)
+    return wrapper
+
+
+def observable(value: typing.Any):
+    """Wrap an `async def` function into an `Observable`."""
+
+    if value is None or isinstance(value, LoopType):
+        return wrap_loop(value)
+    elif callable(value):
+        # Have a callable function, we need to determine if this
+        # might have a custom event loop bound to the class.
+        args = inspect.getfullargspec(value).args
+        if args and args[0] == 'self':
+            return wrap_method(value)
+        else:
+            return wrap_function(value)
+    else:
+        raise TypeError("Observable must be created from event loop or asynchronous function.")

@@ -26,9 +26,8 @@ import typing
 
 from nem2 import util
 from .public_account import PublicAccount
-from ..mosaic import Mosaic
 
-MosaicListType = typing.Sequence[Mosaic]
+MosaicListType = typing.Sequence['Mosaic']
 
 
 class AccountInfo(util.Tie):
@@ -50,7 +49,7 @@ class AccountInfo(util.Tie):
         # THis isn't described even in the typescript SDK.
         # https://github.com/nemtech/nem2-sdk-typescript-javascript/blob/master/src/infrastructure/AccountHttp.ts
         meta,
-        address: Address,
+        address: 'Address',
         address_height: int,
         public_key: str,
         public_key_height: int,
@@ -84,7 +83,7 @@ class AccountInfo(util.Tie):
 #        return self._meta
 
     @property
-    def address(self) -> Address:
+    def address(self) -> 'Address':
         """Get address."""
         return self._address
 
@@ -127,7 +126,7 @@ class AccountInfo(util.Tie):
     importanceHeight = util.undoc(importance_height)
 
     @property
-    def public_account(self) -> PublicAccount:
+    def public_account(self) -> 'PublicAccount':
         """Get public account."""
         return PublicAccount(self.address, self.public_key)
 

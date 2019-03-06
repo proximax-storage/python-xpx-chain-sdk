@@ -85,7 +85,9 @@ class Address(util.Model):
 
     __slots__= (
         '_address',
-        '_network_type'
+        '_network_type',
+        # Internal
+        '_encoded_',
     )
 
     def __init__(self, address: str) -> None:
@@ -103,7 +105,7 @@ class Address(util.Model):
         """Get human readable (raw) address."""
         return self._address
 
-    @property
+    @util.reify
     def encoded(self) -> bytes:
         """Get encoded address."""
         return util.b32decode(self.address)

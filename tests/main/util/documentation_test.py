@@ -1,15 +1,15 @@
-from nem2.util import documentation
+from nem2 import util
 from tests.harness import TestCase
 
-@documentation.doc("""Function doc string.""")
+@util.doc("""Function doc string.""")
 def docfunc1():
     return 1
 
 
-docfunc2 = documentation.doc("""Function doc string.""")(docfunc1)
-undocfunc1 = documentation.undoc(docfunc1)
+docfunc2 = util.doc("""Function doc string.""")(docfunc1)
+undocfunc1 = util.undoc(docfunc1)
 
-@documentation.undoc
+@util.undoc
 def undocfunc2():
     """Function doc string (never appears)."""
 
@@ -21,45 +21,61 @@ class MyClass:
 
     # PROPERTY
 
-    @documentation.doc("""Property doc string.""")
+    @util.doc("""Property doc string.""")
     @property
     def docprop1(self):
         return 1
 
-    docprop2 = documentation.doc("""Property doc string.""")(docprop1)
-    undocprop1 = documentation.undoc(docprop1)
+    docprop2 = util.doc("""Property doc string.""")(docprop1)
+    undocprop1 = util.undoc(docprop1)
 
-    @documentation.undoc
+    @util.undoc
     @property
     def undocprop2(self):
         """Property doc string (never appears)."""
         return 1
 
+    # REIFIED PROPERTIES
+
+    @util.doc("""Reified property doc string.""")
+    @util.reify
+    def docrei1(self):
+        return 1
+
+    docrei2 = util.doc("""Reified property doc string.""")(docrei1)
+    undocrei1 = util.undoc(docrei1)
+
+    @util.undoc
+    @util.reify
+    def undocrei2(self):
+        """Reified property doc string (never appears)."""
+        return 1
+
     # METHOD
 
-    @documentation.doc("""Method doc string.""")
+    @util.doc("""Method doc string.""")
     def docmeth1(self):
         return 1
 
-    docmeth2 = documentation.doc("""Method doc string.""")(docmeth1)
-    undocmeth1 = documentation.undoc(docmeth1)
+    docmeth2 = util.doc("""Method doc string.""")(docmeth1)
+    undocmeth1 = util.undoc(docmeth1)
 
-    @documentation.undoc
+    @util.undoc
     def undocmeth2(self):
         """Method doc string (never appears)."""
         return 1
 
     # CLASSMETHOD
 
-    @documentation.doc("""Classmethod doc string.""")
+    @util.doc("""Classmethod doc string.""")
     @classmethod
     def docclsmeth1(cls):
         return 1
 
-    docclsmeth2 = documentation.doc("""Classmethod doc string.""")(docclsmeth1)
-    undocclsmeth1 = documentation.undoc(docclsmeth1)
+    docclsmeth2 = util.doc("""Classmethod doc string.""")(docclsmeth1)
+    undocclsmeth1 = util.undoc(docclsmeth1)
 
-    @documentation.undoc
+    @util.undoc
     @classmethod
     def undocclsmeth2(cls):
         """Classmethod doc string (never appears)."""
@@ -67,15 +83,15 @@ class MyClass:
 
     # STATICMETHOD
 
-    @documentation.doc("""Staticmethod doc string.""")
+    @util.doc("""Staticmethod doc string.""")
     @staticmethod
     def docstaticmeth1():
         return 1
 
-    docstaticmeth2 = documentation.doc("""Staticmethod doc string.""")(docstaticmeth1)
-    undocstaticmeth1 = documentation.undoc(docstaticmeth1)
+    docstaticmeth2 = util.doc("""Staticmethod doc string.""")(docstaticmeth1)
+    undocstaticmeth1 = util.undoc(docstaticmeth1)
 
-    @documentation.undoc
+    @util.undoc
     @staticmethod
     def undocstaticmeth2():
         """Staticmethod doc string (never appears)."""
@@ -106,6 +122,18 @@ class TestDocumentation(TestCase):
         self.assertEqual(inst.docprop2, 1)
         self.assertEqual(inst.undocprop1, 1)
         self.assertEqual(inst.undocprop2, 1)
+
+    def test_reify(self):
+        self.assertTrue(MyClass.docrei1.__doc__ is not None)
+        self.assertEqual(MyClass.docrei1.__doc__, MyClass.docrei2.__doc__)
+        self.assertTrue(MyClass.undocrei1.__doc__ is None)
+        self.assertTrue(MyClass.undocrei2.__doc__ is None)
+
+        inst = MyClass()
+        self.assertEqual(inst.docrei1, 1)
+        self.assertEqual(inst.docrei2, 1)
+        self.assertEqual(inst.undocrei1, 1)
+        self.assertEqual(inst.undocrei2, 1)
 
     def test_method(self):
         inst = MyClass()
