@@ -28,7 +28,7 @@
 import inspect
 
 
-def concat(*names):
+def concat(*names: str) -> str:
     """Concatenate names to generate fully-qualified name."""
 
     return '.'.join(names)

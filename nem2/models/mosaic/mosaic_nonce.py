@@ -36,7 +36,7 @@ class MosaicNonce(util.Model):
 
     __slots__ = ('_nonce',)
 
-    def __init__(self, nonce: bytes):
+    def __init__(self, nonce: bytes) -> None:
         """
         :param nonce: Mosaic nonce.
         """
@@ -45,7 +45,7 @@ class MosaicNonce(util.Model):
         self._nonce = nonce
 
     @property
-    def nonce(self):
+    def nonce(self) -> bytes:
         """Get mosaic nonce."""
         return self._nonce
 

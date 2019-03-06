@@ -1,4 +1,4 @@
-from functools import wraps
+import functools
 
 from nem2.util import factory
 from tests.harness import TestCase
@@ -43,7 +43,7 @@ def create():
         return 5
 
     def decorate(f):
-        @wraps(f)
+        @functools.wraps(f)
         def wrapper():
             return f()
         return wrapper

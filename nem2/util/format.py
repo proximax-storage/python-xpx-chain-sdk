@@ -23,6 +23,7 @@
 """
 
 import enum
+import typing
 
 
 class InterchangeFormat(enum.IntEnum):
@@ -31,17 +32,17 @@ class InterchangeFormat(enum.IntEnum):
     DTO        = 0
     CATBUFFER   = 1
 
-    def description(self):
+    def description(self) -> str:
         """Describe enumerated values in detail."""
 
         return DESCRIPTION[self]
 
-    def serialize(self, value):
+    def serialize(self, value: typing.Any) -> typing.Any:
         """Serialize model to data interchange format."""
 
         return SERIALIZE[self](value)
 
-    def deserialize(self, data, value_type):
+    def deserialize(self, data: typing.Any, value_type: type) -> typing.Any:
         """Deserialize model from data interchange format."""
 
         return DESERIALIZE[self](data, value_type)

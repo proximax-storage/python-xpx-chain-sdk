@@ -36,7 +36,7 @@ class MultisigAccountGraphInfo(abc.MutableMapping, util.Tie):
 
     __slots__ = ('_multisig_accounts',)
 
-    def __init__(self, *args, **kwds):
+    def __init__(self, *args, **kwds) -> None:
         """
         :param \*args: (optional) Positional arguments to initialize mapping.
         :param \**kwds: (optional) Keyword arguments to initialize mapping.
@@ -53,10 +53,10 @@ class MultisigAccountGraphInfo(abc.MutableMapping, util.Tie):
     def __getitem__(self, key: int) -> 'MultisigAccountInfo':
         return self._multisig_accounts[key]
 
-    def __setitem__(self, key: int, account: 'MultisigAccountInfo'):
+    def __setitem__(self, key: int, account: 'MultisigAccountInfo') -> None:
         self._multisig_accounts[key] = account
 
-    def __delitem__(self, key: int):
+    def __delitem__(self, key: int) -> None:
         del self._multisig_accounts[key]
 
     def __iter__(self) -> GraphIterType:

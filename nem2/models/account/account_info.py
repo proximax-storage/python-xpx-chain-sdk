@@ -57,7 +57,7 @@ class AccountInfo(util.Tie):
         mosaics: MosaicListType,
         importance: int,
         importance_height: int,
-    ):
+    ) -> None:
         """
         :param meta: Account metadata.
         :param address: Account address.
@@ -76,6 +76,12 @@ class AccountInfo(util.Tie):
         self._mosaics = mosaics
         self._importance = importance
         self._importance_height = importance_height
+
+# TODO(ahuszagh) Restore.
+#    @property
+#    def meta(self) -> Address:
+#        """Get account metadata."""
+#        return self._meta
 
     @property
     def address(self) -> Address:

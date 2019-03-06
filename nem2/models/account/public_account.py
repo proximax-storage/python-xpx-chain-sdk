@@ -51,7 +51,7 @@ class PublicAccount(util.Tie):
         self._public_key = public_key
 
     @property
-    def address(self) -> Address:
+    def address(self) -> 'Address':
         """Get address."""
         return self._address
 
@@ -63,14 +63,14 @@ class PublicAccount(util.Tie):
     publicKey = util.undoc(public_key)
 
     @property
-    def network_type(self) -> NetworkType:
+    def network_type(self) -> 'NetworkType':
         """Get network type."""
         return self.address.network_type
 
     networkType = util.undoc(network_type)
 
     @classmethod
-    def create_from_public_key(cls, public_key: str, network_type: NetworkType):
+    def create_from_public_key(cls, public_key: str, network_type: NetworkType) -> 'PublicAccount':
         """
         Create PublicAccount from the public key and network type.
 

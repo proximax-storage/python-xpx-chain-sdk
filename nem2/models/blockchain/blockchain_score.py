@@ -31,32 +31,32 @@ class BlockchainScore(util.Tie):
 
     __slots__ = ('_score',)
 
-    def __init__(self, score: int):
+    def __init__(self, score: int) -> None:
         """
         :param score: Blockchain score.
         """
         self._score = score
 
     @property
-    def score(self):
+    def score(self) -> int:
         """Get the blockchain score."""
         return self._score
 
     @property
-    def score_low(self):
+    def score_low(self) -> int:
         """Get the low 64-bits of the blockchain score."""
         return util.uint128_low(self.score)
 
     scoreLow = util.undoc(score_low)
 
     @property
-    def score_high(self):
+    def score_high(self) -> int:
         """Get the high 64-bits of the blockchain score."""
         return util.uint128_high(self.score)
 
     scoreHigh = util.undoc(score_high)
 
     @util.doc(util.Tie.tie)
-    def tie(self):
+    def tie(self) -> tuple:
         return super().tie()
 

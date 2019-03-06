@@ -45,13 +45,13 @@ __all__ = [
 # ------------
 
 
-def abc_enum_error(cls):
+def abc_enum_error(cls: type) -> None:
     """Raise TypeError for abstract enum without all methods implemented."""
 
     raise TypeError(f"Can't instantiate abstract class {cls.__name__} with abstract methods {', '.join(cls.__abstractmethods__)}")
 
 
-def check_abstractmethods(cls, base):
+def check_abstractmethods(cls: type, base: type) -> None:
     """Ensure all abstractmethods are defined in the cls."""
 
     # Check all abstract members are defined
@@ -72,7 +72,7 @@ def check_abstractmethods(cls, base):
                 abc_enum_error(base)
 
 
-def add_nonabc(cls, base):
+def add_nonabc(cls: type, base: type) -> None:
     """Add over all methods not present in abc.ABC from a base to a cls."""
 
     abc_dict = abc.ABC.__dict__
@@ -184,6 +184,12 @@ else:
 # ------
 
 
+def reciprocal_issubclass(lhs: type, rhs: type) -> bool:
+    """Check if lhs or rhs is a subclass of the other."""
+
+    return issubclass(lhs, rhs) or issubclass(rhs, lhs)
+
+
 class Dto(abc.ABC):
     """
     Classes that can be converted to and from DTO format.
@@ -253,7 +259,7 @@ class Tie(abc.ABC):
         return string.format(*self.tie())
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, type(self)):
+        if not reciprocal_issubclass(type(self), type(other)):
             return False
         return self.tie() == other.tie()
 

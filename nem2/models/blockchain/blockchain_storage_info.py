@@ -35,7 +35,7 @@ class BlockchainStorageInfo(util.Tie):
         '_num_accounts',
     )
 
-    def __init__(self, num_blocks: int, num_transactions: int, num_accounts: int):
+    def __init__(self, num_blocks: int, num_transactions: int, num_accounts: int) -> None:
         """
         :param num_blocks: Number of confirmed blocks.
         :param num_transactions: Number of confirmed transactions.
@@ -46,26 +46,26 @@ class BlockchainStorageInfo(util.Tie):
         self._num_accounts = num_accounts
 
     @property
-    def num_blocks(self):
+    def num_blocks(self) -> int:
         """Get the number of confirmed blocks."""
         return self._num_blocks
 
     numBlocks = util.undoc(num_blocks)
 
     @property
-    def num_transactions(self):
+    def num_transactions(self) -> int:
         """Get the number of confirmed transactions."""
         return self._num_transactions
 
     numTransactions = util.undoc(num_transactions)
 
     @property
-    def num_accounts(self):
+    def num_accounts(self) -> int:
         """Get the number accounts published in the blockchain."""
         return self._num_accounts
 
     numAccounts = util.undoc(num_accounts)
 
     @util.doc(util.Tie.tie)
-    def tie(self):
+    def tie(self) -> tuple:
         return super().tie()

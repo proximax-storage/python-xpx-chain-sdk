@@ -44,7 +44,7 @@ from . import host
 from . import nis
 
 
-def factory(callback):
+def factory(callback) -> tuple:
     """Factory to create the asynchronous HTTP clients."""
 
     class HttpBase:

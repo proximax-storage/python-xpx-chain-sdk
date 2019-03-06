@@ -69,7 +69,7 @@ class BlockInfo(util.Dto, util.Tie):
         previous_block_hash: str,
         block_transactions_hash: str,
         merkle_tree: OptionalMerkleTreeType = None
-    ):
+    ) -> None:
         """
         :param hash: Block hash.
         :param generation_hash: Generation hash.

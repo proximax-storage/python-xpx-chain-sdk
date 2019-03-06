@@ -51,10 +51,11 @@ try:
 except ImportError:
     HAS_REACTIVE = False
 
-from functools import wraps
+import functools
+import typing
 
 
-def observable(f):
+def observable(f: typing.Callable) -> typing.Callable:
     """Wrap an `async def` function into an `Observable`."""
 
     if not HAS_REACTIVE:
@@ -63,8 +64,8 @@ def observable(f):
 
     loop = asyncio.get_event_loop()
 
-    @wraps(f)
-    def wrapper(*args, **kwds):
+    @functools.wraps(f)
+    def wrapper(*args, **kwds) -> rx.Observable:
         return rx.Observable.from_future(loop.create_task(f(*args, **kwds)))
 
     return wrapper

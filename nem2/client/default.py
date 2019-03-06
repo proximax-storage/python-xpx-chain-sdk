@@ -51,7 +51,7 @@ BlockchainHttp = util.defactorize(Sync[2])
 ASYNC_SESSION = aiohttp.ClientSession()
 
 @atexit.register
-def close_session():
+def close_session() -> None:
     loop = asyncio.get_event_loop()
     loop.run_until_complete(ASYNC_SESSION.close())
 

@@ -30,7 +30,7 @@ from ..mosaic.mosaic_id import MosaicId
 class MosaicAlias(Alias):
     """Alias for NEM mosaic."""
 
-    def __init__(self, value: MosaicId):
+    def __init__(self, value: MosaicId) -> None:
         """
         :param value: NEM mosaic ID.
         """

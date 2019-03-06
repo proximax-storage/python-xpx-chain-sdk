@@ -23,7 +23,7 @@
 """
 
 
-def set(byte: int, index: int):
+def set(byte: int, index: int) -> int:
     """Set bit at index to 1."""
 
     assert 0 <= byte <= 255
@@ -32,7 +32,7 @@ def set(byte: int, index: int):
     return byte | (1 << index)
 
 
-def clear(byte: int, index: int):
+def clear(byte: int, index: int) -> int:
     """Set bit at index to 0."""
 
     assert 0 <= byte <= 255
@@ -45,7 +45,7 @@ def clear(byte: int, index: int):
     return byte & ~(1 << index)
 
 
-def assign(byte: int, index: int, value: bool):
+def assign(byte: int, index: int, value: bool) -> int:
     """Assign bit at index depending on value."""
 
     if value:
@@ -54,7 +54,7 @@ def assign(byte: int, index: int, value: bool):
         return clear(byte, index)
 
 
-def toggle(byte: int, index: int):
+def toggle(byte: int, index: int) -> int:
     """Toggle bit at index."""
 
     assert 0 <= byte <= 255
@@ -63,7 +63,7 @@ def toggle(byte: int, index: int):
     return byte ^ (1 << index)
 
 
-def get(byte: int, index: int):
+def get(byte: int, index: int) -> int:
     """Get bit at index."""
 
     assert 0 <= byte <= 255

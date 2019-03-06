@@ -11,9 +11,12 @@ from .blockchain.network_type import NetworkType
 
 from .mosaic.mosaic import Mosaic
 from .mosaic.mosaic_id import MosaicId
+from .mosaic.mosaic_info import MosaicInfo
 from .mosaic.mosaic_nonce import MosaicNonce
 from .mosaic.mosaic_properties import MosaicProperties
 from .mosaic.mosaic_supply_type import MosaicSupplyType
+from .mosaic.network_currency_mosaic import NetworkCurrencyMosaic
+from .mosaic.network_harvest_mosaic import NetworkHarvestMosaic
 
 from .namespace.address_alias import AddressAlias
 from .namespace.alias import Alias
@@ -45,9 +48,12 @@ __all__ = [
     # Mosaic
     'Mosaic',
     'MosaicId',
+    'MosaicInfo',
     'MosaicNonce',
     'MosaicProperties',
     'MosaicSupplyType',
+    'NetworkCurrencyMosaic',
+    'NetworkHarvestMosaic',
 
     # Namespace
     'AddressAlias',

@@ -61,7 +61,7 @@ class NamespaceInfo(util.Tie):
         start_height: int,
         end_height: int,
         alias: 'Alias',
-    ):
+    ) -> None:
         """
         :param active: Namespace is active.
         :param index: Namespace index.
@@ -105,7 +105,7 @@ class NamespaceInfo(util.Tie):
     metaID = util.undoc(meta_id)
 
     @property
-    def type(self) -> NamespaceType:
+    def type(self) -> 'NamespaceType':
         """Get the namespace type."""
         return self._type
 
@@ -120,7 +120,7 @@ class NamespaceInfo(util.Tie):
         return self._levels
 
     @property
-    def parent_id(self) -> NamespaceId:
+    def parent_id(self) -> 'NamespaceId':
         """Get the namespace parent ID."""
         return self._parent_id
 

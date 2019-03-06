@@ -36,7 +36,7 @@ from tornado.httpclient import AsyncHTTPClient, HTTPClient, HTTPRequest
 from tornado.httputil import url_concat, urlencode
 
 
-def format_request(url, method, **kwds):
+def format_request(url, method, **kwds) -> 'HTTPRequest':
     """Format a request to form a valid HTTPRequest."""
 
     # TODO(ahuszagh) Only add to the URL for a get request...
@@ -56,7 +56,7 @@ def format_request(url, method, **kwds):
 class SyncClient:
     """Wrapper for tornado.httpclient.HTTPClient()."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._client = HTTPClient()
 
     def get(self, url, **kwds):
@@ -69,7 +69,7 @@ class SyncClient:
 class AsyncClient:
     """Wrapper for tornado.httpclient.AsyncHTTPClient()."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._client = AsyncHTTPClient()
 
     def get(self, url, **kwds):

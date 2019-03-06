@@ -30,7 +30,7 @@ from ..account.address import Address
 class AddressAlias(Alias):
     """Alias for NEM address."""
 
-    def __init__(self, value: Address):
+    def __init__(self, value: Address) -> None:
         """
         :param value: NEM address.
         """

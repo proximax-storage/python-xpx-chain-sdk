@@ -1,5 +1,4 @@
 from nem2 import models
-from nem2.util import InterchangeFormat
 from tests.harness import TestCase
 
 
@@ -68,13 +67,13 @@ class TestMosaic(TestCase):
 
     def test_serialize(self):
         value = models.Mosaic(models.MosaicId(5), 1000)
-        self.assertEqual(value.serialize(InterchangeFormat.DTO), value.to_dto())
-        self.assertEqual(value.serialize(InterchangeFormat.CATBUFFER), value.to_catbuffer())
+        self.assertEqual(value.serialize(models.InterchangeFormat.DTO), value.to_dto())
+        self.assertEqual(value.serialize(models.InterchangeFormat.CATBUFFER), value.to_catbuffer())
 
     def test_deserialize(self):
         value = models.Mosaic(models.MosaicId(5), 1000)
-        self.assertEqual(models.Mosaic.deserialize(value.to_dto(), InterchangeFormat.DTO), value)
-        self.assertEqual(models.Mosaic.deserialize(value.to_catbuffer(), InterchangeFormat.CATBUFFER), value)
+        self.assertEqual(models.Mosaic.deserialize(value.to_dto(), models.InterchangeFormat.DTO), value)
+        self.assertEqual(models.Mosaic.deserialize(value.to_catbuffer(), models.InterchangeFormat.CATBUFFER), value)
 
 
 class TestMosaicId(TestCase):
@@ -147,13 +146,18 @@ class TestMosaicId(TestCase):
 
     def test_serialize(self):
         value = models.MosaicId(5)
-        self.assertEqual(value.serialize(InterchangeFormat.DTO), value.to_dto())
-        self.assertEqual(value.serialize(InterchangeFormat.CATBUFFER), value.to_catbuffer())
+        self.assertEqual(value.serialize(models.InterchangeFormat.DTO), value.to_dto())
+        self.assertEqual(value.serialize(models.InterchangeFormat.CATBUFFER), value.to_catbuffer())
 
     def test_deserialize(self):
         value = models.MosaicId(5)
-        self.assertEqual(models.MosaicId.deserialize(value.to_dto(), InterchangeFormat.DTO), value)
-        self.assertEqual(models.MosaicId.deserialize(value.to_catbuffer(), InterchangeFormat.CATBUFFER), value)
+        self.assertEqual(models.MosaicId.deserialize(value.to_dto(), models.InterchangeFormat.DTO), value)
+        self.assertEqual(models.MosaicId.deserialize(value.to_catbuffer(), models.InterchangeFormat.CATBUFFER), value)
+
+
+class TestMosaicInfo(TestCase):
+    # TODO(ahuszagh) Implement...
+    pass
 
 
 class TestMosaicNonce(TestCase):
@@ -221,12 +225,12 @@ class TestMosaicNonce(TestCase):
         self.assertEqual(rem, b'')
 
     def test_serialize(self):
-        self.assertEqual(self.nonce.serialize(InterchangeFormat.DTO), self.nonce.to_dto())
-        self.assertEqual(self.nonce.serialize(InterchangeFormat.CATBUFFER), self.nonce.to_catbuffer())
+        self.assertEqual(self.nonce.serialize(models.InterchangeFormat.DTO), self.nonce.to_dto())
+        self.assertEqual(self.nonce.serialize(models.InterchangeFormat.CATBUFFER), self.nonce.to_catbuffer())
 
     def test_deserialize(self):
-        self.assertEqual(models.MosaicNonce.deserialize(self.nonce.to_dto(), InterchangeFormat.DTO), self.nonce)
-        self.assertEqual(models.MosaicNonce.deserialize(self.nonce.to_catbuffer(), InterchangeFormat.CATBUFFER), self.nonce)
+        self.assertEqual(models.MosaicNonce.deserialize(self.nonce.to_dto(), models.InterchangeFormat.DTO), self.nonce)
+        self.assertEqual(models.MosaicNonce.deserialize(self.nonce.to_catbuffer(), models.InterchangeFormat.CATBUFFER), self.nonce)
 
 
 class TestMosaicProperties(TestCase):
@@ -291,12 +295,12 @@ class TestMosaicProperties(TestCase):
         self.assertEqual(rem, b'')
 
     def test_serialize(self):
-        self.assertEqual(self.properties.serialize(InterchangeFormat.DTO), self.properties.to_dto())
-        self.assertEqual(self.properties.serialize(InterchangeFormat.CATBUFFER), self.properties.to_catbuffer())
+        self.assertEqual(self.properties.serialize(models.InterchangeFormat.DTO), self.properties.to_dto())
+        self.assertEqual(self.properties.serialize(models.InterchangeFormat.CATBUFFER), self.properties.to_catbuffer())
 
     def test_deserialize(self):
-        self.assertEqual(models.MosaicProperties.deserialize(self.properties.to_dto(), InterchangeFormat.DTO), self.properties)
-        self.assertEqual(models.MosaicProperties.deserialize(self.properties.to_catbuffer(), InterchangeFormat.CATBUFFER), self.properties)
+        self.assertEqual(models.MosaicProperties.deserialize(self.properties.to_dto(), models.InterchangeFormat.DTO), self.properties)
+        self.assertEqual(models.MosaicProperties.deserialize(self.properties.to_catbuffer(), models.InterchangeFormat.CATBUFFER), self.properties)
 
 
 class TestMosaicSupplyType(TestCase):
@@ -321,11 +325,55 @@ class TestMosaicSupplyType(TestCase):
         self.assertEqual(self.increase.toCatbuffer(), b'\x01')
 
 
-class TestMosaicCurrencyMosaic(TestCase):
-    # TODO(ahuszagh) Implement...
-    pass
+class TestNetworkCurrencyMosaic(TestCase):
+
+    def test_init(self):
+        value = models.NetworkCurrencyMosaic(1)
+        self.assertEqual(value.id.id, 0x85BBEA6CC462B244)
+        self.assertEqual(value.amount, 1)
+
+    def test_class_variables(self):
+        cls = models.NetworkCurrencyMosaic
+        self.assertEqual(cls.NAMESPACE_ID, models.NamespaceId(0x85BBEA6CC462B244))
+        self.assertEqual(cls.DIVISIBILITY, 6)
+        self.assertEqual(cls.INITIAL_SUPPLY, 8999999998)
+        self.assertEqual(cls.TRANSFERABLE, True)
+        self.assertEqual(cls.SUPPLY_MUTABLE, False)
+        self.assertEqual(cls.LEVY_MUTABLE, False)
+
+    def test_create_relative(self):
+        value = models.NetworkCurrencyMosaic.create_relative(1)
+        self.assertEqual(value.amount, 1000000)
+        self.assertEqual(value, models.NetworkCurrencyMosaic.createRelative(1))
+
+    def test_create_absolute(self):
+        value = models.NetworkCurrencyMosaic.create_absolute(1)
+        self.assertEqual(value.amount, 1)
+        self.assertEqual(value, models.NetworkCurrencyMosaic.createAbsolute(1))
 
 
-class TestMosaicHarvestMosaic(TestCase):
-    # TODO(ahuszagh) Implement...
-    pass
+class TestNetworkHarvestMosaic(TestCase):
+
+    def test_init(self):
+        value = models.NetworkHarvestMosaic(1)
+        self.assertEqual(value.id.id, 0x941299B2B7E1291C)
+        self.assertEqual(value.amount, 1)
+
+    def test_class_variables(self):
+        cls = models.NetworkHarvestMosaic
+        self.assertEqual(cls.NAMESPACE_ID, models.NamespaceId(0x941299B2B7E1291C))
+        self.assertEqual(cls.DIVISIBILITY, 3)
+        self.assertEqual(cls.INITIAL_SUPPLY, 15000000)
+        self.assertEqual(cls.TRANSFERABLE, True)
+        self.assertEqual(cls.SUPPLY_MUTABLE, True)
+        self.assertEqual(cls.LEVY_MUTABLE, False)
+
+    def test_create_relative(self):
+        value = models.NetworkHarvestMosaic.create_relative(1)
+        self.assertEqual(value.amount, 1000)
+        self.assertEqual(value, models.NetworkHarvestMosaic.createRelative(1))
+
+    def test_create_absolute(self):
+        value = models.NetworkHarvestMosaic.create_absolute(1)
+        self.assertEqual(value.amount, 1)
+        self.assertEqual(value, models.NetworkHarvestMosaic.createAbsolute(1))

@@ -2,7 +2,6 @@ import base64
 import warnings
 
 from nem2 import models
-from nem2.util import InterchangeFormat
 from tests.harness import TestCase
 
 
@@ -215,13 +214,13 @@ class TestAddress(TestCase):
 
     def test_serialize(self):
         value = models.Address.create_from_raw_address(self.pretty)
-        self.assertEqual(value.serialize(InterchangeFormat.DTO), value.to_dto())
-        self.assertEqual(value.serialize(InterchangeFormat.CATBUFFER), value.to_catbuffer())
+        self.assertEqual(value.serialize(models.InterchangeFormat.DTO), value.to_dto())
+        self.assertEqual(value.serialize(models.InterchangeFormat.CATBUFFER), value.to_catbuffer())
 
     def test_deserialize(self):
         value = models.Address.create_from_raw_address(self.pretty)
-        self.assertEqual(models.Address.deserialize(value.to_dto(), InterchangeFormat.DTO), value)
-        self.assertEqual(models.Address.deserialize(value.to_catbuffer(), InterchangeFormat.CATBUFFER), value)
+        self.assertEqual(models.Address.deserialize(value.to_dto(), models.InterchangeFormat.DTO), value)
+        self.assertEqual(models.Address.deserialize(value.to_catbuffer(), models.InterchangeFormat.CATBUFFER), value)
 
 
 class TestMultisigAccountGraphInfo(TestCase):

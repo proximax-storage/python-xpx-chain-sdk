@@ -40,7 +40,7 @@ class Alias(util.Tie):
         '_value',
     )
 
-    def __init__(self, value: ValueType = None):
+    def __init__(self, value: ValueType = None) -> None:
         """
         :param value: Address or mosaic ID for alias.
         """

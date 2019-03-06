@@ -34,7 +34,7 @@ class NamespaceId(util.Tie):
 
     __slots__ = ('_id',)
 
-    def __init__(self, id: IdType):
+    def __init__(self, id: IdType) -> None:
         """
         :param id: Identifier or name for namespace.
         """
@@ -48,7 +48,7 @@ class NamespaceId(util.Tie):
             raise TypeError(f"Expected str or int for NamespaceId, got {name}")
 
     @property
-    def id(self):
+    def id(self) -> int:
         """Get raw identifier for namespace."""
         return self._id
 

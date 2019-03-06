@@ -61,7 +61,7 @@ class MosaicProperties(util.Model):
         '_duration',
     )
 
-    def __init__(self, flags: int, divisibility: int, duration: int = 0):
+    def __init__(self, flags: int, divisibility: int, duration: int = 0) -> None:
         """
         :param flags: Flags for the properties of the mosaic.
         :param divisibility: Determines the decimal place mosaic can be divided into (from 0-6).
@@ -72,7 +72,7 @@ class MosaicProperties(util.Model):
         self._duration = duration
 
     @property
-    def flags(self):
+    def flags(self) -> int:
         """Get raw flags for mosaic."""
         return self._flags
 

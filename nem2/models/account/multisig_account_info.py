@@ -51,7 +51,7 @@ class MultisigAccountInfo(util.Tie):
         min_removal: int,
         cosignatories: PublicAccountListType,
         multisig_accounts: PublicAccountListType,
-    ):
+    ) -> None:
         """
         :param account: Multisig public account.
         :param min_approval: Min number of cosignatories required to approve a transaction.

@@ -34,7 +34,7 @@ FQN = re.compile('\A[a-z0-9][a-z0-9-_]*\Z')
 NAMESPACE_MAX_DEPTH = 3
 
 
-def unpack_uint32(data: bytes):
+def unpack_uint32(data: bytes) -> typing.Generator[int, None, None]:
     """Unpack array of 32-bit integers from a byte array."""
 
     for value in struct.iter_unpack('<I', data):

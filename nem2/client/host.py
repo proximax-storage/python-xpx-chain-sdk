@@ -9,7 +9,7 @@
 class Host:
     """Host wrapper for an abstract HTTP session."""
 
-    def __init__(self, session, endpoint):
+    def __init__(self, session, endpoint) -> None:
         """
         :param session: Requests or aiohttp-like HTTP client session.
         :param endpoint: Domain name and port for the endpoint.
@@ -17,10 +17,10 @@ class Host:
         self.session = session
         self.endpoint = endpoint
 
-    def __enter__(self):
+    def __enter__(self) -> 'Host':
         return self
 
-    def __exit__(self):
+    def __exit__(self) -> None:
         self.session.close()
 
     def get(self, relative_path, *args, **kwds):

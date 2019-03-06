@@ -34,7 +34,7 @@ class NamespaceName(util.Tie):
         '_name',
     )
 
-    def __init__(self, namespace_id: 'NamespaceId', name: str):
+    def __init__(self, namespace_id: 'NamespaceId', name: str) -> None:
         """
         :param namespace_id: Namespace ID.
         :param name: Namespace name.
@@ -42,13 +42,25 @@ class NamespaceName(util.Tie):
         self._namespace_id = namespace_id
         self._name = name
 
+    @classmethod
+    def create_from_name(cls, name: str) -> 'NamespaceName':
+        """
+        Create namespace name and identifier from name.
+
+        :param name: Namespace name.
+        """
+        namespace_id = NamespaceId(name)
+        return cls(namespace_id, name)
+
     @property
-    def namespace_id(self):
+    def namespace_id(self) -> 'NamespaceId':
         """Get the namespace ID."""
         return self._namespace_id
 
+    namespaceId = util.undoc(namespace_id)
+
     @property
-    def name(self):
+    def name(self) -> str:
         """Get the namespace name."""
         return self._name
 
