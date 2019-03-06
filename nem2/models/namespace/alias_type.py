@@ -1,8 +1,8 @@
 """
-    types
-    =====
+    alias_type
+    ==========
 
-    Shared types for cryptographic hash functions.
+    Enumerations for alias types.
 
     License
     -------
@@ -22,7 +22,24 @@
     limitations under the License.
 """
 
-import typing
+import enum
 
-BytesType = typing.Union[bytes, bytearray]
-OptionalBytesType = typing.Optional[BytesType]
+
+class AliasType(enum.IntEnum):
+    """Alias type."""
+
+    NONE = 0
+    MOSAIC_ID = 1
+    ADDRESS = 2
+
+    def description(self) -> str:
+        """Describe enumerated values in detail."""
+
+        return DESCRIPTION[self]
+
+
+DESCRIPTION = {
+    AliasType.NONE: "No alias.",
+    AliasType.MOSAIC_ID: "Mosaic ID alias.",
+    AliasType.ADDRESS: "Address alias.",
+}

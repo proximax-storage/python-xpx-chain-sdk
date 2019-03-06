@@ -23,10 +23,10 @@
 """
 
 import base64
-from typing import Union
+import typing
 
-BasenType = Union[str, bytes, bytearray]
-BytesType = Union[bytes, bytearray]
+BasenType = typing.Union[str, bytes, bytearray]
+BytesType = typing.Union[bytes, bytearray]
 
 
 def b32encode(data: BytesType, with_suffix=True) -> str:

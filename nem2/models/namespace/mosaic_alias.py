@@ -1,8 +1,8 @@
 """
-    types
-    =====
+    mosaic_alias
+    ============
 
-    Shared types for cryptographic hash functions.
+    Aliases for NEM mosaics.
 
     License
     -------
@@ -22,7 +22,17 @@
     limitations under the License.
 """
 
-import typing
+from .alias import Alias
+from .alias_type import AliasType
+from ..mosaic.mosaic_id import MosaicId
 
-BytesType = typing.Union[bytes, bytearray]
-OptionalBytesType = typing.Optional[BytesType]
+
+class MosaicAlias(Alias):
+    """Alias for NEM mosaic."""
+
+    def __init__(self, value: MosaicId):
+        """
+        :param value: NEM mosaic ID.
+        """
+        self._type = AliasType.MOSAIC_ID
+        self._value = value

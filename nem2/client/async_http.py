@@ -51,9 +51,6 @@ def factory(callback):
         """Base class for HTTP clients."""
 
         def __init__(self, endpoint: str) -> None:
-            """
-            :param endpoint: Domain name and port for the endpoint.
-            """
             self._host = callback(endpoint)
 
         @classmethod
@@ -71,10 +68,8 @@ def factory(callback):
     class AsyncHttp(HttpBase):
         """Main client for the asynchronous NIS API."""
 
+        @util.doc(documentation.INIT)
         def __init__(self, endpoint: str) -> None:
-            """
-            :param endpoint: Domain name and port for the endpoint.
-            """
             super().__init__(endpoint)
             self._account = AsyncAccountHttp.from_host(self._host)
             self._blockchain = AsyncBlockchainHttp.from_host(self._host)
@@ -106,11 +101,19 @@ def factory(callback):
     class AsyncAccountHttp(HttpBase):
         """Account client for the asynchronous NIS API."""
 
+        @util.doc(documentation.INIT)
+        def __init__(self, endpoint: str) -> None:
+            super().__init__(endpoint)
+
         #TODO(ahuszagh) Implement...
 
 
     class AsyncBlockchainHttp(HttpBase):
         """Blockchain client for the asynchronous NIS API."""
+
+        @util.doc(documentation.INIT)
+        def __init__(self, endpoint: str) -> None:
+            super().__init__(endpoint)
 
         @util.doc(documentation.GET_BLOCK_BY_HEIGHT)
         @util.observable

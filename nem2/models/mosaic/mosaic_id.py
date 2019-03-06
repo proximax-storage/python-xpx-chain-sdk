@@ -23,26 +23,8 @@
 """
 
 import struct
-# TODO(ahuszagh) Remove.
-from typing import Sequence
 
 from nem2 import util
-
-
-def nonce_to_id(nonce: bytes, public_key: bytes) -> int:
-    """
-    Convert nonce to mosaic ID.
-
-    :param nonce: Mosaic nonce.
-    :param owner: Account of mosaic owner.
-    """
-
-    hasher = util.hashlib.sha3_256()
-    hasher.update(nonce)
-    hasher.update(public_key)
-    result = [i[0] for i in struct.iter_unpack('<I', hasher.digest())]
-
-    return util.dto_to_uint64((result[0], result[1] & 0x7FFFFFFF))
 
 
 class MosaicId(util.Model):
@@ -77,7 +59,7 @@ class MosaicId(util.Model):
         """
         Create instance of class from hex string.
 
-        :param data: Hex-encoded nonce data (with or without '0x' prefix).
+        :param data: Hex-encoded ID data (with or without '0x' prefix).
         """
 
         return MosaicId(int(data, 16))
@@ -91,7 +73,7 @@ class MosaicId(util.Model):
         :param owner: Account of mosaic owner.
         """
         key: bytes = util.unhexlify(owner.public_key)
-        return cls(nonce_to_id(nonce.nonce, key))
+        return cls(util.generate_mosaic_id(nonce.nonce, key))
 
     createFromNonce = util.undoc(create_from_nonce)
 
@@ -100,12 +82,12 @@ class MosaicId(util.Model):
         return super().tie()
 
     @util.doc(util.Model.to_dto.__doc__)
-    def to_dto(self) -> Sequence[int]:
+    def to_dto(self) -> util.Uint64DtoType:
         return util.uint64_to_dto(self.id)
 
     @util.doc(util.Model.from_dto.__doc__)
     @classmethod
-    def from_dto(cls, data: Sequence[int]) -> 'MosaicId':
+    def from_dto(cls, data: util.Uint64DtoType) -> 'MosaicId':
         return cls(util.dto_to_uint64(data))
 
     @util.doc(util.Model.to_catbuffer.__doc__)

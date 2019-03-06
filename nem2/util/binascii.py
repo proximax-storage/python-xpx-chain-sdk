@@ -23,10 +23,10 @@
 """
 
 import binascii
-from typing import Union
+import typing
 
-HexType = Union[str, bytes, bytearray]
-BytesType = Union[bytes, bytearray]
+HexType = typing.Union[str, bytes, bytearray]
+BytesType = typing.Union[bytes, bytearray]
 
 
 def hexlify(data: BytesType, with_prefix=False) -> str:

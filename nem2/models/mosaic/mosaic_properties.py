@@ -23,7 +23,7 @@
 """
 
 import struct
-from typing import cast, Dict, Sequence, Union
+import typing
 
 from nem2 import util
 
@@ -116,9 +116,9 @@ class MosaicProperties(util.Model):
         :param divisibility: Decimal place mosaic can be divided into.
         :param duration: Number of blocks the mosaic will be available.
         """
-        supply_mutable = cast(bool, kwds.get('supply_mutable', False))
-        transferable = cast(bool, kwds.get('transferable', True))
-        levy_mutable = cast(bool, kwds.get('levy_mutable', False))
+        supply_mutable = typing.cast(bool, kwds.get('supply_mutable', False))
+        transferable = typing.cast(bool, kwds.get('transferable', True))
+        levy_mutable = typing.cast(bool, kwds.get('levy_mutable', False))
         divisibility = kwds.get('divisibility', 0)
         duration = kwds.get('duration', 0)
         flags = to_flags(supply_mutable, transferable, levy_mutable)
@@ -129,7 +129,7 @@ class MosaicProperties(util.Model):
         return super().tie()
 
     @util.doc(util.Model.to_dto.__doc__)
-    def to_dto(self) -> Sequence[Sequence[int]]:
+    def to_dto(self) -> typing.Sequence[util.Uint64DtoType]:
         return [
             util.uint64_to_dto(self.flags),
             util.uint64_to_dto(self.divisibility),
@@ -138,7 +138,7 @@ class MosaicProperties(util.Model):
 
     @util.doc(util.Model.from_dto.__doc__)
     @classmethod
-    def from_dto(cls, data: Sequence[Sequence[int]]) -> 'MosaicProperties':
+    def from_dto(cls, data: typing.Sequence[util.Uint64DtoType]) -> 'MosaicProperties':
         flags = util.dto_to_uint64(data[0])
         divisibility = util.dto_to_uint64(data[1])
         duration = util.dto_to_uint64(data[2])

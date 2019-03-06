@@ -50,10 +50,6 @@ class MosaicSupplyType(util.enum_catbuffer(enum.IntEnum)):
         inst = cls(struct.unpack('<B', data[:1])[0])
         return inst, data[1:]
 
-    # TODO(ahuszagh) Need to_dto, from_dto
-    # Do I?
-
-
 DESCRIPTION = {
     MosaicSupplyType.DECREASE: "Decrease mosaic supply.",
     MosaicSupplyType.INCREASE: "Increase mosaic supply.",

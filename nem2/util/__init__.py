@@ -34,6 +34,8 @@ from .documentation import doc, undoc
 from .factory import defactorize
 from .reactive import observable
 
+from .identifier import generate_mosaic_id, generate_namespace_id
+
 from .base64 import b32encode, b32decode, b64encode, b64decode
 from .binascii import hexlify, unhexlify
 
@@ -71,6 +73,10 @@ __all__ = [
     'undoc',
     'defactorize',
     'observable',
+
+    # Identifiers
+    'generate_mosaic_id',
+    'generate_namespace_id',
 
     # Text utilities
     'b32encode',

@@ -5,7 +5,7 @@
     Patch objects defined in factories to avoid the factory scope.
 
     Patch the fully-qualified name and module of objects defined within
-    a local scope (IE, in class factories)...
+    a local scope (IE, in class factories).
 
     License
     -------

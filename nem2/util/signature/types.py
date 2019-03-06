@@ -22,7 +22,7 @@
     limitations under the License.
 """
 
-from typing import Callable, Union
+import typing
 
-BytesType = Union[bytes, bytearray]
-HashFuncType = Callable[[bytes], bytes]
+BytesType = typing.Union[bytes, bytearray]
+HashFuncType = typing.Callable[[bytes], bytes]

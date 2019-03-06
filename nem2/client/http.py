@@ -51,9 +51,6 @@ def factory(callback):
         """Base class for HTTP clients."""
 
         def __init__(self, endpoint: str) -> None:
-            """
-            :param endpoint: Domain name and port for the endpoint.
-            """
             self._host = callback(endpoint)
 
         @classmethod
@@ -71,10 +68,8 @@ def factory(callback):
     class Http(HttpBase):
         """Main client for the synchronous NIS API."""
 
+        @util.doc(documentation.INIT)
         def __init__(self, endpoint: str) -> None:
-            """
-            :param endpoint: Domain name and port for the endpoint.
-            """
             super().__init__(endpoint)
             self._account = AccountHttp.from_host(self._host)
             self._blockchain = BlockchainHttp.from_host(self._host)
@@ -106,11 +101,19 @@ def factory(callback):
     class AccountHttp(HttpBase):
         """Account client for the synchronous NIS API."""
 
+        @util.doc(documentation.INIT)
+        def __init__(self, endpoint: str) -> None:
+            super().__init__(endpoint)
+
         #TODO(ahuszagh) Implement...
 
 
     class BlockchainHttp(HttpBase):
         """Blockchain client for the synchronous NIS API."""
+
+        @util.doc(documentation.INIT)
+        def __init__(self, endpoint: str) -> None:
+            super().__init__(endpoint)
 
         @util.doc(documentation.GET_BLOCK_BY_HEIGHT)
         def get_block_by_height(self, height: int, timeout=None) -> 'BlockInfo':

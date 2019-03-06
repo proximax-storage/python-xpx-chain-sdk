@@ -27,7 +27,6 @@
 
 import os
 import struct
-from typing import Sequence
 
 from nem2 import util
 
@@ -84,12 +83,12 @@ class MosaicNonce(util.Model):
         return super().tie()
 
     @util.doc(util.Model.to_dto.__doc__)
-    def to_dto(self) -> Sequence[int]:
+    def to_dto(self) -> util.Uint64DtoType:
         return list(self.nonce)
 
     @util.doc(util.Model.from_dto.__doc__)
     @classmethod
-    def from_dto(cls, data: Sequence[int]) -> 'MosaicNonce':
+    def from_dto(cls, data: util.Uint64DtoType) -> 'MosaicNonce':
         return cls(bytes(data))
 
     @util.doc(util.Model.to_catbuffer.__doc__)

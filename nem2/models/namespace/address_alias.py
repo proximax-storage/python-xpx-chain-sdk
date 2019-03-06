@@ -1,8 +1,8 @@
 """
-    types
-    =====
+    address_alias
+    =============
 
-    Shared types for cryptographic hash functions.
+    Aliases for NEM addresses.
 
     License
     -------
@@ -22,7 +22,17 @@
     limitations under the License.
 """
 
-import typing
+from .alias import Alias
+from .alias_type import AliasType
+from ..account.address import Address
 
-BytesType = typing.Union[bytes, bytearray]
-OptionalBytesType = typing.Optional[BytesType]
+
+class AddressAlias(Alias):
+    """Alias for NEM address."""
+
+    def __init__(self, value: Address):
+        """
+        :param value: NEM address.
+        """
+        self._type = AliasType.ADDRESS
+        self._value = value

@@ -1,8 +1,8 @@
 """
-    types
-    =====
+    empty_alias
+    ===========
 
-    Shared types for cryptographic hash functions.
+    Empty alias without data.
 
     License
     -------
@@ -22,7 +22,13 @@
     limitations under the License.
 """
 
-import typing
+from .alias import Alias
+from .alias_type import AliasType
 
-BytesType = typing.Union[bytes, bytearray]
-OptionalBytesType = typing.Optional[BytesType]
+
+class EmptyAlias(Alias):
+    """Empty alias without data."""
+
+    def __init__(self):
+        self._type = AliasType.NONE
+        self._value = None

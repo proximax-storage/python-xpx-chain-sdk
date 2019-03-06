@@ -1,6 +1,6 @@
 """
     abc
-    ====
+    ===
 
     Abstract base classes for NEM models.
 
@@ -48,7 +48,7 @@ __all__ = [
 def abc_enum_error(cls):
     """Raise TypeError for abstract enum without all methods implemented."""
 
-    raise TypeError(f"Can't instantiate abstract class {cls.__name__} with abstract methods {set(cls.__abstractmethods__)}")
+    raise TypeError(f"Can't instantiate abstract class {cls.__name__} with abstract methods {', '.join(cls.__abstractmethods__)}")
 
 
 def check_abstractmethods(cls, base):
@@ -124,7 +124,7 @@ if sys.version_info < (3, 7):
         def __bases__(cls):
             return (*cls.abcs, cls.__base__,)
 
-        def __new__(mcls, *args, **kwds):
+        def __new__(mcls, name, bases, classdict, **kwds):
             # Sub Python 3.7, the default new uses the wrong constructor
             # for mixins. Since `__new__` effectively ingores the other bases,
             # we can simply remove all but the enumeration bases.
@@ -132,7 +132,6 @@ if sys.version_info < (3, 7):
             # to the Enum, while also raising a typeerror if any abstractmethods
             # are missing.
             # Validate the bases of our enumeration.
-            bases = args[1]
             abcs = tuple((i for i in bases if issubclass(i, abc.ABC)))
             enums = tuple((i for i in bases if issubclass(i, enum.Enum)))
             if len(abcs) + len(enums) != len(bases):
@@ -146,7 +145,7 @@ if sys.version_info < (3, 7):
                 add_nonabc(derived, base)
 
             # Instantiate the superclass
-            args = (args[0], (derived,), *args[2:])
+            args = (name, (derived,), classdict)
             cls = super().__new__(mcls, *args, **kwds)
             for base in abcs:
                 check_abstractmethods(cls, base)
@@ -168,8 +167,8 @@ else:
     class ABCEnumMeta(abc.ABCMeta, enum.EnumMeta):
         """Abstract metaclass that is both abstract and an enumeration."""
 
-        def __new__(mcls, *args, **kwds):
-            cls = super().__new__(mcls, *args, **kwds)
+        def __new__(mcls, name, bases, classdict, **kwds):
+            cls = super().__new__(mcls, name, bases, classdict, **kwds)
             abstractmethods = getattr(cls, "__abstractmethods__", None)
             if issubclass(cls, enum.Enum) and abstractmethods:
                 abc_enum_error(cls)

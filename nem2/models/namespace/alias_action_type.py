@@ -1,8 +1,8 @@
 """
-    types
-    =====
+    alias_action_type
+    =================
 
-    Shared types for cryptographic hash functions.
+    Enumerations for alias action types.
 
     License
     -------
@@ -22,7 +22,22 @@
     limitations under the License.
 """
 
-import typing
+import enum
 
-BytesType = typing.Union[bytes, bytearray]
-OptionalBytesType = typing.Optional[BytesType]
+
+class AliasActionType(enum.IntEnum):
+    """Alias action type."""
+
+    LINK = 0
+    UNLINK = 1
+
+    def description(self) -> str:
+        """Describe enumerated values in detail."""
+
+        return DESCRIPTION[self]
+
+
+DESCRIPTION = {
+    AliasActionType.LINK: "Link an alias.",
+    AliasActionType.UNLINK: "Unlink an alias.",
+}
