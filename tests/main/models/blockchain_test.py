@@ -225,3 +225,15 @@ class TestNetworkType(harness.TestCase):
 
         with self.assertRaises(KeyError):
             create("FD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54")
+
+    def test_to_dto(self):
+        self.assertEqual(self.main_net.to_dto(), 0x68)
+        self.assertEqual(self.test_net.to_dto(), 0x98)
+        self.assertEqual(self.mijin.to_dto(), 0x60)
+        self.assertEqual(self.mijin_test.toDto(), 0x90)
+
+    def test_from_dto(self):
+        self.assertEqual(self.main_net, models.NetworkType.from_dto(0x68))
+        self.assertEqual(self.test_net, models.NetworkType.fromDto(0x98))
+        self.assertEqual(self.mijin, models.NetworkType.from_dto(0x60))
+        self.assertEqual(self.mijin_test, models.NetworkType.from_dto(0x90))

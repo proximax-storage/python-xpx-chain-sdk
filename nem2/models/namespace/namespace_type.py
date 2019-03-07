@@ -24,8 +24,10 @@
 
 import enum
 
+from nem2 import util
 
-class NamespaceType(enum.IntEnum):
+
+class NamespaceType(util.enum_dto(enum.IntEnum)):
     """Namespace type."""
 
     ROOT_NAMESPACE = 0
@@ -35,6 +37,15 @@ class NamespaceType(enum.IntEnum):
         """Describe enumerated values in detail."""
 
         return DESCRIPTION[self]
+
+    @util.doc(util.Dto.to_dto)
+    def to_dto(self) -> int:
+        return int(self)
+
+    @util.doc(util.Dto.from_dto)
+    @classmethod
+    def from_dto(cls, data: int) -> 'NamespaceType':
+        return cls(data)
 
 
 DESCRIPTION = {

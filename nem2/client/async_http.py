@@ -174,6 +174,13 @@ def factory(callback: typing.Callable) -> tuple:
         def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
             super().__init__(endpoint, loop=loop)
 
+        @util.doc(documentation.GET_NAMESPACE)
+        @util.observable
+        async def get_namespace(self, namespace_id: 'NamespaceId', timeout=None) -> 'NamespaceInfo':
+            return await nis.get_namespace[1](self._host, namespace_id, timeout=timeout)
+
+        getNamespace = util.undoc(get_namespace)
+
         @util.doc(documentation.GET_NAMESPACE_NAMES)
         @util.observable
         async def get_namespace_names(self, ids: typing.Sequence['NamespaceId'], timeout=None) -> typing.Sequence['NamespaceName']:

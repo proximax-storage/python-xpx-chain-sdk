@@ -25,14 +25,17 @@
 import typing
 
 from nem2 import util
+from .alias import Alias
 from .alias_type import AliasType
 from .namespace_id import NamespaceId
 from .namespace_type import NamespaceType
+from ..account.address import Address
+from ..account.public_account import PublicAccount
 
 NamespaceIdListType = typing.Sequence['NamespaceId']
 
 
-class NamespaceInfo(util.Tie):
+class NamespaceInfo(util.Dto, util.Tie):
     """Information describing a namespace."""
 
     __slots__ = (
@@ -186,3 +189,59 @@ class NamespaceInfo(util.Tie):
     @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()
+
+    @util.doc(util.Dto.to_dto)
+    def to_dto(self) -> dict:
+        meta = {
+            'active': self.active,
+            'index': self.index,
+            'id': self.meta_id,
+        }
+        namespace = {
+            'type': self.type.to_dto(),
+            'depth': self.depth,
+            'parentId': self.parent_id.to_dto(),
+            'owner': self.owner.public_key,
+            'ownerAddress': util.hexlify(self.owner.address.encoded),
+            'startHeight': util.uint64_to_dto(self.start_height),
+            'endHeight': util.uint64_to_dto(self.end_height),
+        }
+
+        # levels => ('level0', 'level1', ...)
+        for i in range(self.depth):
+            key = f"level{i}"
+            namespace[key] = self.levels[i].to_dto()
+
+        # Optional alias.
+        alias = self.alias.to_dto()
+        if alias is not None:
+            namespace['alias'] = alias
+
+        return {
+            'meta': meta,
+            'namespace': namespace,
+        }
+
+    @util.doc(util.Dto.from_dto)
+    @classmethod
+    def from_dto(cls, data: dict) -> 'NamespaceInfo':
+        meta = data['meta']
+        namespace = data['namespace']
+        address = Address.create_from_encoded(util.unhexlify(namespace['ownerAddress']))
+        depth = namespace['depth']
+        levels = [NamespaceId.from_dto(namespace[f'level{i}']) for i in range(depth)]
+        alias = Alias.from_dto(namespace.get('alias'))
+
+        return cls(
+            active=meta['active'],
+            index=meta['index'],
+            meta_id=meta['id'],
+            type=NamespaceType.from_dto(namespace['type']),
+            depth=depth,
+            levels=levels,
+            parent_id=NamespaceId.from_dto(namespace['parentId']),
+            owner=PublicAccount(address, namespace['owner']),
+            start_height=util.dto_to_uint64(namespace['startHeight']),
+            end_height=util.dto_to_uint64(namespace['endHeight']),
+            alias=alias,
+        )

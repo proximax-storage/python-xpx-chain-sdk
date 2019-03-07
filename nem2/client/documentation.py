@@ -29,6 +29,13 @@ Get block information from the block height.
 
 # NAMESPACE
 
+GET_NAMESPACE = """
+Get namespace information from ID.
+
+:param id: Namespace ID.
+:return: Namespace information.
+"""
+
 GET_NAMESPACE_NAMES = """
 Get namespace names from IDs.
 

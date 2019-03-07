@@ -113,6 +113,34 @@ get_block_by_height = request("get_block_by_height", "", True)
 # NAMESPACE HTTP
 # --------------
 
+
+def request_get_namespace(host: 'Host', namespace_id: 'NamespaceId', timeout=None):
+    """
+    Make "/namespace/{namespace_id}" request.
+
+    :param host: Host wrapper for client.
+    :param id: Namespace ID.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return host.get("/namespace/{:x}".format(namespace_id), timeout=timeout)
+
+
+def process_get_namespace(status: int, json: dict) -> 'NamespaceInfo':
+    """
+    Process the "/namespace/{namespace_id}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return models.NamespaceInfo.from_dto(json)
+
+
+get_namespace = request("get_namespace", "", True)
+
+
 def request_get_namespace_names(host: 'Host', ids: typing.Sequence['NamespaceId'], timeout=None):
     """
     Make "/namespace/names" request.
@@ -186,6 +214,7 @@ REQUEST = {
 
     # NAMESPACE
     'get_namespace_names': request_get_namespace_names,
+    'get_namespace': request_get_namespace,
 
     # NETWORK
     'get_network_type': request_get_network_type,
@@ -197,6 +226,7 @@ PROCESS = {
 
     # NAMESPACE
     'get_namespace_names': process_get_namespace_names,
+    'get_namespace': process_get_namespace,
 
     # NETWORK
     'get_network_type': process_get_network_type,

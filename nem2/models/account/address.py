@@ -187,13 +187,16 @@ class Address(util.Model):
         return (self.address, self.network_type)
 
     @util.doc(util.Model.to_dto)
-    def to_dto(self) -> str:
-        return self.address
+    def to_dto(self) -> dict:
+        return {
+            'address': self.address,
+            'networkType': self.network_type.to_dto(),
+        }
 
     @util.doc(util.Model.from_dto)
     @classmethod
-    def from_dto(cls, data: str) -> 'Address':
-        return cls.create_from_raw_address(data)
+    def from_dto(cls, data: dict) -> 'Address':
+        return cls.create_from_raw_address(data['address'])
 
     @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:

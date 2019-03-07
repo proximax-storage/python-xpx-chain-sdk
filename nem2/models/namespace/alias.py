@@ -32,7 +32,7 @@ from ..mosaic.mosaic_id import MosaicId
 ValueType = typing.Optional[typing.Union['Address', 'MosaicId']]
 
 
-class Alias(util.Tie):
+class Alias(util.Dto, util.Tie):
     """Alias for type definitions."""
 
     __slots__ = (
@@ -81,3 +81,26 @@ class Alias(util.Tie):
     @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()
+
+    @util.doc(util.Dto.to_dto)
+    def to_dto(self) -> typing.Optional[dict]:
+        if self.type == AliasType.NONE:
+            return None
+        elif self.type == AliasType.ADDRESS:
+            return {'type': self.type.to_dto(), 'address': self.value.to_dto()}
+        elif self.type == AliasType.MOSAIC_ID:
+            return {'type': self.type.to_dto(), 'mosaicId': self.value.to_dto()}
+        raise ValueError("Invalid data for Alias.to_dto.")
+
+    @util.doc(util.Dto.from_dto)
+    @classmethod
+    def from_dto(cls, data: typing.Optional[dict]) -> 'Alias':
+        if data is None:
+            return cls()
+
+        type = AliasType.from_dto(data['type'])
+        if type == AliasType.ADDRESS:
+            return cls(Address.from_dto(data['address']))
+        elif type == AliasType.MOSAIC_ID:
+            return cls(MosaicId.from_dto(data['mosaicId']))
+        raise ValueError("Invalid data for Alias.from_dto.")

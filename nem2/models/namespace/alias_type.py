@@ -24,8 +24,10 @@
 
 import enum
 
+from nem2 import util
 
-class AliasType(enum.IntEnum):
+
+class AliasType(util.enum_dto(enum.IntEnum)):
     """Alias type."""
 
     NONE = 0
@@ -36,6 +38,15 @@ class AliasType(enum.IntEnum):
         """Describe enumerated values in detail."""
 
         return DESCRIPTION[self]
+
+    @util.doc(util.Dto.to_dto)
+    def to_dto(self) -> int:
+        return int(self)
+
+    @util.doc(util.Dto.from_dto)
+    @classmethod
+    def from_dto(cls, data: int) -> 'AliasType':
+        return cls(data)
 
 
 DESCRIPTION = {

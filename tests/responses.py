@@ -44,8 +44,12 @@ MOSAIC_INFO = {
     'Ok': load_response('mosaic_info.json'),
 }
 
+NAMESPACE_INFO = {
+    'nem': load_response('namespace.json'),
+}
+
 NAMESPACE_NAMES = {
-    'Ok': load_response('namespace_names.json'),
+    'nem': load_response('namespace_names.json'),
 }
 
 NETWORK_TYPE = {

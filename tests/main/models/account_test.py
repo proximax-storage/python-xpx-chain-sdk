@@ -190,15 +190,18 @@ class TestAddress(harness.TestCase):
 
     def test_to_dto(self):
         value = models.Address.create_from_raw_address(self.pretty)
-        self.assertEqual(value.to_dto(), self.plain)
+        dto = value.to_dto()
+        self.assertEqual(dto['address'], self.plain)
+        self.assertEqual(dto['networkType'], value.network_type)
         self.assertEqual(value, models.Address.createFromRawAddress(value.address))
         self.assertEqual(value.to_dto(), value.toDto())
 
     def test_from_dto(self):
-        value = models.Address.from_dto(self.plain)
+        value = models.Address.create_from_raw_address(self.plain)
         self.assertEqual(value.address, self.plain)
         self.assertEqual(value.network_type, models.NetworkType.MIJIN_TEST)
-        self.assertEqual(value, models.Address.fromDto(value.address))
+        self.assertEqual(value, models.Address.from_dto(value.to_dto()))
+        self.assertEqual(value, models.Address.fromDto(value.to_dto()))
 
     def test_to_catbuffer(self):
         value = models.Address.create_from_raw_address(self.plain)

@@ -24,6 +24,10 @@ class TestAddressAlias(harness.TestCase):
         with self.assertRaises(TypeError):
             value.mosaic_id
 
+        dto = {'type': 2, 'address': {'address': 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', 'networkType': 144}}
+        self.assertEqual(value.to_dto(), dto)
+        self.assertEqual(models.Alias.from_dto(dto), value)
+
 
 class TestAlias(harness.TestCase):
 
@@ -48,6 +52,9 @@ class TestAlias(harness.TestCase):
         with self.assertRaises(TypeError):
             value.mosaic_id
 
+        self.assertEqual(value.to_dto(), None)
+        self.assertEqual(models.Alias.from_dto(None), value)
+
     def test_address(self):
         value = models.Alias(self.address)
         self.assertEqual(value.type, models.AliasType.ADDRESS)
@@ -62,6 +69,10 @@ class TestAlias(harness.TestCase):
 
         with self.assertRaises(TypeError):
             value.mosaic_id
+
+        dto = {'type': 2, 'address': {'address': 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', 'networkType': 144}}
+        self.assertEqual(value.to_dto(), dto)
+        self.assertEqual(models.Alias.from_dto(dto), value)
 
     def test_mosaic_id(self):
         value = models.Alias(self.mosaic_id)
@@ -78,6 +89,10 @@ class TestAlias(harness.TestCase):
 
         with self.assertRaises(TypeError):
             value.address
+
+        dto = {'type': 1, 'mosaicId': [5, 0]}
+        self.assertEqual(value.to_dto(), dto)
+        self.assertEqual(models.Alias.from_dto(dto), value)
 
 
 class TestAliasActionType(harness.TestCase):
@@ -112,6 +127,17 @@ class TestAliasType(harness.TestCase):
         self.assertEqual(self.mosaic_id.description(), "Mosaic ID alias.")
         self.assertEqual(self.address.description(), "Address alias.")
 
+    def test_to_dto(self):
+        self.assertEqual(self.none.to_dto(), 0)
+        self.assertEqual(self.mosaic_id.to_dto(), 1)
+        self.assertEqual(self.address.to_dto(), 2)
+        self.assertEqual(self.none.toDto(), 0)
+
+    def test_from_dto(self):
+        self.assertEqual(self.none, models.AliasType.from_dto(0))
+        self.assertEqual(self.mosaic_id, models.AliasType.fromDto(1))
+        self.assertEqual(self.address, models.AliasType.from_dto(2))
+
 
 class TestEmptyAlias(harness.TestCase):
 
@@ -136,6 +162,9 @@ class TestEmptyAlias(harness.TestCase):
         with self.assertRaises(TypeError):
             value.mosaic_id
 
+        self.assertEqual(value.to_dto(), None)
+        self.assertEqual(models.Alias.from_dto(None), value)
+
 
 class TestMosaicAlias(harness.TestCase):
 
@@ -159,6 +188,10 @@ class TestMosaicAlias(harness.TestCase):
 
         with self.assertRaises(TypeError):
             value.address
+
+        dto = {'type': 1, 'mosaicId': [5, 0]}
+        self.assertEqual(value.to_dto(), dto)
+        self.assertEqual(models.Alias.from_dto(dto), value)
 
 
 class TestNamespaceId(harness.TestCase):
@@ -297,3 +330,12 @@ class TestNamespaceType(harness.TestCase):
     def test_description(self):
         self.assertEqual(self.root.description(), "Root namespace.")
         self.assertEqual(self.sub.description(), "Sub namespace.")
+
+    def test_to_dto(self):
+        self.assertEqual(self.root.to_dto(), 0)
+        self.assertEqual(self.sub.to_dto(), 1)
+        self.assertEqual(self.root.toDto(), 0)
+
+    def test_from_dto(self):
+        self.assertEqual(self.root, models.NamespaceType.from_dto(0))
+        self.assertEqual(self.sub, models.NamespaceType.fromDto(1))

@@ -198,28 +198,31 @@ class BlockInfo(util.Dto, util.Tie):
 
     @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:
-        data = {
-            'meta': {
-                'hash': self.hash,
-                'generationHash': self.generation_hash,
-                'totalFee': util.uint64_to_dto(self.total_fee),
-                'numTransactions': self.num_transactions,
-            },
-            'block': {
-                'signature': self.signature,
-                'signer': self.signer.public_key,
-                'version': self.version,
-                'type': self.type,
-                'height': util.uint64_to_dto(self.height),
-                'timestamp': util.uint64_to_dto(self.timestamp),
-                'difficulty': util.uint64_to_dto(self.difficulty),
-                'previousBlockHash': self.previous_block_hash,
-                'blockTransactionsHash': self.block_transactions_hash,
-            },
+        meta = {
+            'hash': self.hash,
+            'generationHash': self.generation_hash,
+            'totalFee': util.uint64_to_dto(self.total_fee),
+            'numTransactions': self.num_transactions,
         }
+        block = {
+            'signature': self.signature,
+            'signer': self.signer.public_key,
+            'version': self.version,
+            'type': self.type,
+            'height': util.uint64_to_dto(self.height),
+            'timestamp': util.uint64_to_dto(self.timestamp),
+            'difficulty': util.uint64_to_dto(self.difficulty),
+            'previousBlockHash': self.previous_block_hash,
+            'blockTransactionsHash': self.block_transactions_hash,
+        }
+
         if self.merkle_tree is not None:
-            data['meta']['merkleTree'] = self.merkle_tree
-        return data
+            meta['merkleTree'] = self.merkle_tree
+
+        return {
+            'meta': meta,
+            'block': block,
+        }
 
     @util.doc(util.Dto.from_dto)
     @classmethod
