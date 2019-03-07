@@ -2,7 +2,7 @@ import binascii
 
 from Crypto.Hash import SHA224, SHA256, SHA384, SHA512
 from nem2.util import hashlib
-from tests.harness import TestCase
+from tests import harness
 from .helper import *
 
 
@@ -12,7 +12,7 @@ def generate_testcase(bits, full_hexdigest):
     func = getattr(hashlib, name)
     func_c = globals()['SHA{}'.format(bits)].new
 
-    class Sha2Test(TestCase):
+    class Sha2Test(harness.TestCase):
 
         def test_init(self):
             actual = hexdigest(func(), b'Hello World!')

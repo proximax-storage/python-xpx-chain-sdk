@@ -84,6 +84,8 @@ def factory(callback: typing.Callable) -> tuple:
                 self._network_type = await network.get_network_type()
             return self._network_type
 
+        networkType = util.undoc(network_type)
+
 
     class AsyncHttp(HttpBase):
         """Main client for the asynchronous NIS API."""
@@ -144,6 +146,8 @@ def factory(callback: typing.Callable) -> tuple:
         @util.observable
         async def get_block_by_height(self, height: int, timeout=None) -> 'BlockInfo':
             return await nis.get_block_by_height[1](self._host, height, timeout=timeout)
+
+        getBlockByHeight = util.undoc(get_block_by_height)
 
         #TODO(ahuszagh) Implement...
         # getBlockByHeight

@@ -2,7 +2,7 @@ import abc
 import enum
 
 from nem2 import util
-from tests.harness import TestCase
+from tests import harness
 
 
 class Base(abc.ABC):
@@ -35,7 +35,7 @@ class DerivedEnum(Base, enum.IntEnum, metaclass=util.ABCEnumMeta):
         return super().bar()
 
 
-class TestABCEnumMeta(TestCase):
+class TestABCEnumMeta(harness.TestCase):
 
     def test_derived(self):
         self.assertEqual(DerivedEnum.SUCCESS, 0)

@@ -77,6 +77,8 @@ def factory(callback: typing.Callable) -> tuple:
                 self._network_type = network.get_network_type()
             return self._network_type
 
+        networkType = util.undoc(network_type)
+
 
     class Http(HttpBase):
         """Main client for the synchronous NIS API."""

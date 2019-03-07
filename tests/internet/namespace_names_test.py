@@ -6,14 +6,14 @@ from tests import responses
 
 class TestNamespaceNames(harness.TestCase):
 
-    @harness.create(__qualname__, client.NamespaceHttp, client.AsyncNamespaceHttp)
-    async def test(self, cls, func):
-        http = cls(responses.ENDPOINT)
+    @harness.test_case(
+        sync_data=client.NamespaceHttp,
+        async_data=client.AsyncNamespaceHttp
+    )
+    async def test_names(self, data, cb):
+        http = data(responses.ENDPOINT)
         ids = [models.NamespaceId.from_hex("84b3552d375ffa4b")]
 
-        result = await func(http.get_namespace_names(ids))
+        result = await cb(http.get_namespace_names(ids))
         if len(result):
             self.assertEqual(result[0].name, "nem")
-
-    test_sync = harness.new_sync(__qualname__)
-    test_async = harness.new_async(__qualname__)

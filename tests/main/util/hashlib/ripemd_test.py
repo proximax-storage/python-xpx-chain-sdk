@@ -2,11 +2,11 @@ import binascii
 
 from Crypto.Hash import RIPEMD160 as ripemd160_c
 from nem2.util import hashlib
-from tests.harness import TestCase
+from tests import harness
 from .helper import *
 
 
-class TestRipemd160(TestCase):
+class TestRipemd160(harness.TestCase):
 
     def setUp(self):
         self.full_hexdigest = '8476ee4631b9b30ac2754b0ee0c47e161d3f724c'

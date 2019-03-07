@@ -1,3 +1,5 @@
+import asyncio
+import aiohttp
 import requests
 
 from nem2 import client
@@ -6,81 +8,47 @@ from tests import harness
 from tests import responses
 
 
+class TestAsyncLoop(harness.TestCase):
+
+    def test_loop(self):
+        loop = asyncio.new_event_loop()
+        http = client.AsyncHttp(responses.ENDPOINT, loop=loop)
+        with aiohttp.default_response(200, **responses.BLOCK_INFO["Ok"]):
+            block_info = loop.run_until_complete(http.blockchain.get_block_by_height(1))
+            self.assertEqual(block_info.total_fee, 0)
+
+
 class TestHttp(harness.TestCase):
 
-    def test_exceptions(self):
-        http = client.BlockchainHttp(responses.ENDPOINT)
-
-        with self.assertRaises(requests.HTTPError):
-            with requests.default_exception(requests.HTTPError):
-                http.get_block_by_height(1)
+    @harness.test_case(
+        sync_data=(client.NetworkHttp, requests, requests.HTTPError),
+        async_data=(client.AsyncNetworkHttp, aiohttp, aiohttp.ClientResponseError)
+    )
+    async def test_exceptions(self, data, cb):
+        http = data[0](responses.ENDPOINT)
+        with self.assertRaises(data[2]):
+            with data[1].default_exception(data[2]):
+                await cb(http.get_network_type())
         with self.assertRaises(ConnectionRefusedError):
-            with requests.default_exception(ConnectionRefusedError):
-                http.get_block_by_height(1)
+            with data[1].default_exception(ConnectionRefusedError):
+                await cb(http.get_network_type())
 
-    def test_from_http(self):
-        http = client.Http(responses.ENDPOINT)
-        copy = client.Http.from_http(http)
+    @harness.test_case(
+        sync_data=client.Http,
+        async_data=client.AsyncHttp
+    )
+    async def test_from_http(self, data, _):
+        http = data(responses.ENDPOINT)
+        copy = data.from_http(http)
         self.assertTrue(http._host is copy._host)
+        self.assertEqual(http._network_type, copy._network_type)
 
-    def test_network_type(self):
-        http = client.Http(responses.ENDPOINT)
-        with requests.default_response(200, **responses.NETWORK_TYPE["MIJIN_TEST"]):
-            self.assertEqual(http.network_type, models.NetworkType.MIJIN_TEST)
-
-
-class TestAccountHttp(harness.TestCase):
-    # TODO(ahuszagh) Implement
-    pass
-
-
-class TestBlockchainHttp(harness.TestCase):
-
-    def test_get_block_by_height(self):
-        http = client.BlockchainHttp(responses.ENDPOINT)
-
-        with requests.default_response(200, **responses.BLOCK_INFO["Ok"]):
-            block_info = http.get_block_by_height(1)
-            self.assertEqual(block_info.hash, "3A2D7D82D9B7F2C12E1CD549BC0C515A9150698EC0ADBF94121AB5D1730CEAA1")
-            self.assertEqual(block_info.generation_hash, "80BB92D88ED9908CFD33E85E10DAA716F055C61997BEF3F2F6F711B5F3B66986")
-            self.assertEqual(block_info.total_fee, 0)
-            self.assertEqual(block_info.num_transactions, 25)
-            self.assertEqual(block_info.signature, "A9BB70EDB0E04A83829F3A32BA0C1361FD8E317243DF748EE00FA8A0E52D4A6793B41752A29FDD10407B1FAC96259AC0D6B489F7CC4ADF960B69103FF51D5A01")
-            self.assertEqual(block_info.signer.public_key, "7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808")
-            self.assertEqual(block_info.network_type, models.NetworkType.MIJIN_TEST)
-            self.assertEqual(block_info.version, 36867)
-            self.assertEqual(block_info.type, 32835)
-            self.assertEqual(block_info.height, 1)
-            self.assertEqual(block_info.timestamp, 0)
-            self.assertEqual(block_info.difficulty, 100000000000000)
-            self.assertEqual(block_info.previous_block_hash, "0000000000000000000000000000000000000000000000000000000000000000")
-            self.assertEqual(block_info.block_transactions_hash, "54B187F7D6B1D45F133F06706566E832A9F325F1E62FE927C0B5C65DAC8A2C56")
-            self.assertEqual(block_info.merkle_tree[0], "smNSI9tFz7tOIc38NZ/n8iKm5fYADJnKnnKdsC5mYfU=")
-
-
-class TestMosaicHttp(harness.TestCase):
-    # TODO(ahuszagh) Implement
-    pass
-
-
-class TestNamespaceHttp(harness.TestCase):
-
-    def test_get_namespace_names(self):
-        http = client.NamespaceHttp(responses.ENDPOINT)
-        ids = [models.NamespaceId.from_hex("84b3552d375ffa4b")]
-
-        with requests.default_response(200, **responses.NAMESPACE_NAMES["Ok"]):
-            namespace_names = http.get_namespace_names(ids)
-            self.assertEqual(len(namespace_names), 1)
-            self.assertEqual(namespace_names[0].namespace_id.id, 0x84b3552d375ffa4b)
-            self.assertEqual(namespace_names[0].name, "nem")
-
-
-class TestNetworkHttp(harness.TestCase):
-    # TODO(ahuszagh) Implement
-    pass
-
-
-class TestTransactionHttp(harness.TestCase):
-    # TODO(ahuszagh) Implement
-    pass
+    @harness.test_case(
+        sync_data=(client.Http, requests),
+        async_data=(client.AsyncHttp, aiohttp)
+    )
+    async def test_network_type(self, data, cb):
+        http = data[0](responses.ENDPOINT)
+        with data[1].default_response(200, **responses.NETWORK_TYPE["MIJIN_TEST"]):
+            self.assertEqual(await cb(http.network_type), models.NetworkType.MIJIN_TEST)
+            self.assertEqual(await cb(http.networkType), models.NetworkType.MIJIN_TEST)

@@ -2,7 +2,7 @@ import binascii
 
 from nem2.util.hashlib.keccak import crypto
 from nem2.util.hashlib.keccak import fallback
-from tests.harness import TestCase
+from tests import harness
 from .helper import *
 
 
@@ -12,7 +12,7 @@ def generate_testcase(bits, full_hexdigest):
     crypto_func = getattr(crypto, name)
     fallback_func = getattr(fallback, name)
 
-    class KeccakTest(TestCase):
+    class KeccakTest(harness.TestCase):
 
         def test_init(self):
             actual = hexdigest(fallback_func(), b'Hello World!')

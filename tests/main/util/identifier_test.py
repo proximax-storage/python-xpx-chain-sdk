@@ -1,8 +1,8 @@
 from nem2 import util
-from tests.harness import TestCase
+from tests import harness
 
 
-class TestIdentifier(TestCase):
+class TestIdentifier(harness.TestCase):
 
     def test_generate_mosaic_id(self):
         nonce = b'\x00\x00\x00\x00'

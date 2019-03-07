@@ -1,10 +1,10 @@
 import binascii
 
 from nem2 import util
-from tests.harness import TestCase
+from tests import harness
 
 
-class HexTest(TestCase):
+class HexTest(harness.TestCase):
 
     def test_hexlify(self):
         self.assertEqual(util.hexlify(b'5'), '35')

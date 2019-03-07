@@ -1,7 +1,7 @@
 import functools
 
 from nem2 import util
-from tests.harness import TestCase
+from tests import harness
 
 def create():
 
@@ -63,7 +63,7 @@ A1, B1, c1, d1 = create()
 A2, B2, c2, d2 = map(util.defactorize, create())
 
 
-class DefactorizeTest(TestCase):
+class DefactorizeTest(harness.TestCase):
 
     def test_empty_class(self):
         self.assertEqual(A1.__qualname__, 'create.<locals>.A')

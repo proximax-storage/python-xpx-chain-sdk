@@ -2,10 +2,10 @@ import base64
 import warnings
 
 from nem2 import models
-from tests.harness import TestCase
+from tests import harness
 
 
-class TestAccount(TestCase):
+class TestAccount(harness.TestCase):
 
     def setUp(self):
         self.private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
@@ -96,11 +96,11 @@ class TestAccount(TestCase):
         self.assertTrue(a3 == a3)
 
 
-class TestAccountInfo(TestCase):
+class TestAccountInfo(harness.TestCase):
     pass    # TODO(ahuszagh) Implement...
 
 
-class TestAddress(TestCase):
+class TestAddress(harness.TestCase):
 
     def setUp(self):
         self.plain = "SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54"
@@ -223,15 +223,15 @@ class TestAddress(TestCase):
         self.assertEqual(models.Address.deserialize(value.to_catbuffer(), models.InterchangeFormat.CATBUFFER), value)
 
 
-class TestMultisigAccountGraphInfo(TestCase):
+class TestMultisigAccountGraphInfo(harness.TestCase):
     pass    # TODO(ahuszagh) Implement...
 
 
-class TestMultisigAccountInfo(TestCase):
+class TestMultisigAccountInfo(harness.TestCase):
     pass    # TODO(ahuszagh) Implement...
 
 
-class TestPublicAccount(TestCase):
+class TestPublicAccount(harness.TestCase):
 
     def setUp(self):
         self.public_key = "1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955"

@@ -1,8 +1,8 @@
 from nem2.util import bit
-from tests.harness import TestCase
+from tests import harness
 
 
-class BitTest(TestCase):
+class BitTest(harness.TestCase):
 
     def test_set(self):
         x: int = 0b10110010

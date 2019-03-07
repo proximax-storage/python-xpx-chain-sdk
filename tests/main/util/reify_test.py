@@ -1,5 +1,5 @@
 from nem2 import util
-from tests.harness import TestCase
+from tests import harness
 
 
 class Obj:
@@ -40,7 +40,7 @@ class ReifiedObj:
         return self.increment()
 
 
-class TestReify(TestCase):
+class TestReify(harness.TestCase):
 
     def test_property(self):
         obj = Obj()

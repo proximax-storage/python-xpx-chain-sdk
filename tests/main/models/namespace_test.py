@@ -1,8 +1,8 @@
 from nem2 import models
-from tests.harness import TestCase
+from tests import harness
 
 
-class TestAddressAlias(TestCase):
+class TestAddressAlias(harness.TestCase):
 
     def setUp(self):
         self.mosaic_id = models.MosaicId(5)
@@ -25,7 +25,7 @@ class TestAddressAlias(TestCase):
             value.mosaic_id
 
 
-class TestAlias(TestCase):
+class TestAlias(harness.TestCase):
 
     def setUp(self):
         self.mosaic_id = models.MosaicId(5)
@@ -80,7 +80,7 @@ class TestAlias(TestCase):
             value.address
 
 
-class TestAliasActionType(TestCase):
+class TestAliasActionType(harness.TestCase):
 
     def setUp(self):
         self.link = models.AliasActionType.LINK
@@ -95,7 +95,7 @@ class TestAliasActionType(TestCase):
         self.assertEqual(self.unlink.description(), "Unlink an alias.")
 
 
-class TestAliasType(TestCase):
+class TestAliasType(harness.TestCase):
 
     def setUp(self):
         self.none = models.AliasType.NONE
@@ -113,7 +113,7 @@ class TestAliasType(TestCase):
         self.assertEqual(self.address.description(), "Address alias.")
 
 
-class TestEmptyAlias(TestCase):
+class TestEmptyAlias(harness.TestCase):
 
     def setUp(self):
         self.mosaic_id = models.MosaicId(5)
@@ -137,7 +137,7 @@ class TestEmptyAlias(TestCase):
             value.mosaic_id
 
 
-class TestMosaicAlias(TestCase):
+class TestMosaicAlias(harness.TestCase):
 
     def setUp(self):
         self.mosaic_id = models.MosaicId(5)
@@ -161,7 +161,7 @@ class TestMosaicAlias(TestCase):
             value.address
 
 
-class TestNamespaceId(TestCase):
+class TestNamespaceId(harness.TestCase):
 
     def test_init(self):
         value = models.NamespaceId(5)
@@ -230,12 +230,12 @@ class TestNamespaceId(TestCase):
         self.assertEqual(value, models.NamespaceId.fromDto(dto))
 
 
-class TestNamespaceInfo(TestCase):
+class TestNamespaceInfo(harness.TestCase):
     # TODO(ahuszagh) Implement...
     pass
 
 
-class TestNamespaceName(TestCase):
+class TestNamespaceName(harness.TestCase):
 
     def test_init(self):
         namespace_id = models.NamespaceId(0x88B64C3BE2F47144)
@@ -284,7 +284,7 @@ class TestNamespaceName(TestCase):
         self.assertEqual(value, models.NamespaceName.fromDto(dto))
 
 
-class TestNamespaceType(TestCase):
+class TestNamespaceType(harness.TestCase):
 
     def setUp(self):
         self.root = models.NamespaceType.ROOT_NAMESPACE

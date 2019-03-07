@@ -1,10 +1,10 @@
 import copy
 
 from nem2 import models
-from tests.harness import TestCase
+from tests import harness
 
 
-class TestBlockInfo(TestCase):
+class TestBlockInfo(harness.TestCase):
 
     def setUp(self):
         self.hash = "3A2D7D82D9B7F2C12E1CD549BC0C515A9150698EC0ADBF94121AB5D1730CEAA1"
@@ -164,17 +164,17 @@ class TestBlockInfo(TestCase):
         self.assertEqual(self.block_info, models.BlockInfo.from_dto(dto))
 
 
-class TestBlockchainScore(TestCase):
+class TestBlockchainScore(harness.TestCase):
     # TODO(ahuszagh) Implement
     pass
 
 
-class TestBlockchainStorageInfo(TestCase):
+class TestBlockchainStorageInfo(harness.TestCase):
     # TODO(ahuszagh) Implement
     pass
 
 
-class TestNetworkType(TestCase):
+class TestNetworkType(harness.TestCase):
 
     def setUp(self):
         self.main_net = models.NetworkType.MAIN_NET

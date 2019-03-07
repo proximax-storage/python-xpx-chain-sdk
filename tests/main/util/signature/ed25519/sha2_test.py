@@ -2,7 +2,7 @@ import binascii
 import warnings
 
 from nem2.util.signature.ed25519 import sha2 as ed25519
-from tests.harness import TestCase
+from tests import harness
 
 # DUMMY DATA
 # Never use this private key for real data.
@@ -12,7 +12,7 @@ MESSAGE = '68656c6c6f20776f726c64'
 SIGNATURE = 'bc8d4afa282164cee1f5179ef87c77b2923c6d7fef3c7175b49df765f7cf14a8810c5721716e557efd76e3cf08a2ca85b02dbaae4d010e3ba7a6d9cd2c68260f'
 
 
-class TestEd25519Sha2(TestCase):
+class TestEd25519Sha2(harness.TestCase):
 
     def setUp(self):
         self.signing_key = ed25519.SigningKey(binascii.unhexlify(SIGNING_KEY))

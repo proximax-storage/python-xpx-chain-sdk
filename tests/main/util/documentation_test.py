@@ -1,5 +1,5 @@
 from nem2 import util
-from tests.harness import TestCase
+from tests import harness
 
 @util.doc("""Function doc string.""")
 def docfunc1():
@@ -98,7 +98,7 @@ class MyClass:
         return 1
 
 
-class TestDocumentation(TestCase):
+class TestDocumentation(harness.TestCase):
 
     def test_function(self):
         self.assertTrue(docfunc1.__doc__ is not None)

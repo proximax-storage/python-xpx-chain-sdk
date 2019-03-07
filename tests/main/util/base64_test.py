@@ -1,10 +1,10 @@
 import binascii
 
 from nem2 import util
-from tests.harness import TestCase
+from tests import harness
 
 
-class Base32Test(TestCase):
+class Base32Test(harness.TestCase):
 
     def test_b32encode(self):
         self.assertEqual(util.b32encode(b'5'), 'GU======')
@@ -25,7 +25,7 @@ class Base32Test(TestCase):
             util.b32decode('GU')
 
 
-class Base64Test(TestCase):
+class Base64Test(harness.TestCase):
 
     def test_b64encode(self):
         self.assertEqual(util.b64encode(b'5'), 'NQ==')

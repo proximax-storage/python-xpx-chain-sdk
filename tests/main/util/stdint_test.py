@@ -1,8 +1,8 @@
 from nem2 import util
-from tests.harness import TestCase
+from tests import harness
 
 
-class TestUint64(TestCase):
+class TestUint64(harness.TestCase):
 
     def test_uint64_low(self):
         self.assertEqual(util.uint64_low(0x0), 0x0)

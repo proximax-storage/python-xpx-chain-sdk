@@ -1,7 +1,7 @@
 import asyncio
 
 from nem2 import util
-from tests.harness import TestCase
+from tests import harness
 
 LOOP = asyncio.get_event_loop()
 
@@ -18,7 +18,7 @@ async def bar():
     return await foo()
 
 
-class TestObservableDecorator(TestCase):
+class TestObservableDecorator(harness.TestCase):
 
     def test_asyncio(self):
         self.assertEqual(LOOP.run_until_complete(foo()), 3)

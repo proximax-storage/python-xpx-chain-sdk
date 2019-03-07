@@ -1,8 +1,8 @@
 from nem2 import models
-from tests.harness import TestCase
+from tests import harness
 
 
-class TestMosaic(TestCase):
+class TestMosaic(harness.TestCase):
 
     def test_init(self):
         value = models.Mosaic(models.MosaicId(5), 1000)
@@ -76,7 +76,7 @@ class TestMosaic(TestCase):
         self.assertEqual(models.Mosaic.deserialize(value.to_catbuffer(), models.InterchangeFormat.CATBUFFER), value)
 
 
-class TestMosaicId(TestCase):
+class TestMosaicId(harness.TestCase):
 
     def test_init(self):
         value = models.MosaicId(5)
@@ -160,17 +160,17 @@ class TestMosaicId(TestCase):
         self.assertEqual(models.MosaicId.deserialize(value.to_catbuffer(), models.InterchangeFormat.CATBUFFER), value)
 
 
-class TestMosaicInfo(TestCase):
+class TestMosaicInfo(harness.TestCase):
     # TODO(ahuszagh) Implement...
     pass
 
 
-class TestMosaicLevy(TestCase):
+class TestMosaicLevy(harness.TestCase):
     # TODO(ahuszagh) Implement...
     pass
 
 
-class TestMosaicLevyType(TestCase):
+class TestMosaicLevyType(harness.TestCase):
 
     def setUp(self):
         self.absolute = models.MosaicLevyType.ABSOLUTE
@@ -192,7 +192,7 @@ class TestMosaicLevyType(TestCase):
         self.assertEqual(self.calculated.toDto(), 2)
 
 
-class TestMosaicNonce(TestCase):
+class TestMosaicNonce(harness.TestCase):
 
     def setUp(self):
         self.data = b'\x00\x00\x00\x00'
@@ -278,7 +278,7 @@ class TestMosaicNonce(TestCase):
         self.assertEqual(models.MosaicNonce.deserialize(self.nonce.to_catbuffer(), models.InterchangeFormat.CATBUFFER), self.nonce)
 
 
-class TestMosaicProperties(TestCase):
+class TestMosaicProperties(harness.TestCase):
 
     def setUp(self):
         self.properties = models.MosaicProperties.create(
@@ -348,7 +348,7 @@ class TestMosaicProperties(TestCase):
         self.assertEqual(models.MosaicProperties.deserialize(self.properties.to_catbuffer(), models.InterchangeFormat.CATBUFFER), self.properties)
 
 
-class TestMosaicSupplyType(TestCase):
+class TestMosaicSupplyType(harness.TestCase):
 
     def setUp(self):
         self.decrease = models.MosaicSupplyType.DECREASE
@@ -370,7 +370,7 @@ class TestMosaicSupplyType(TestCase):
         self.assertEqual(self.increase.toCatbuffer(), b'\x01')
 
 
-class TestNetworkCurrencyMosaic(TestCase):
+class TestNetworkCurrencyMosaic(harness.TestCase):
 
     def test_init(self):
         value = models.NetworkCurrencyMosaic(1)
@@ -397,7 +397,7 @@ class TestNetworkCurrencyMosaic(TestCase):
         self.assertEqual(value, models.NetworkCurrencyMosaic.createAbsolute(1))
 
 
-class TestNetworkHarvestMosaic(TestCase):
+class TestNetworkHarvestMosaic(harness.TestCase):
 
     def test_init(self):
         value = models.NetworkHarvestMosaic(1)

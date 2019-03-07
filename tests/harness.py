@@ -23,6 +23,7 @@
 """
 
 import asyncio
+import functools
 import unittest
 
 
@@ -47,38 +48,26 @@ class TestCase(unittest.TestCase):
         return attr
 
 
-CACHE = {}
+def test_case(sync_data, async_data):
+    """
+    Generate synchronous and asynchronous tests from a single function.
 
-def create(qualname, sync_cls, async_cls):
-    """Generate synchronous and asynchronous tests from a single function."""
+    :param sync_data: Data to be passed to the synchronous test case.
+    :param async_data: Data to be passed to the asynchronous test case.
+    """
 
     def decorator(f):
-        assert f.__name__ == 'test'
-
-        async def sync_value(x):
+        async def sync_cb(x):
             return x
 
-        async def async_value(x):
+        async def async_cb(x):
             return await x
 
-        async def sync_wrap(self):
-            return await f(self, sync_cls, sync_value)
+        @functools.wraps(f)
+        async def wrapped(self):
+            await f(self, sync_data, sync_cb)
+            await f(self, async_data, async_cb)
 
-        async def async_wrap(self):
-            return await f(self, async_cls, async_value)
-
-        CACHE[qualname] = sync_wrap, async_wrap
+        return wrapped
 
     return decorator
-
-
-def new_sync(qualname):
-    """Implement the synchronous test case."""
-
-    return CACHE[qualname][0]
-
-
-def new_async(qualname):
-    """Implement the asynchronous test case."""
-
-    return CACHE[qualname][1]
