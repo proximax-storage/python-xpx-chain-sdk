@@ -2,11 +2,11 @@ import requests
 
 from nem2 import client
 from nem2 import models
-from tests.harness import TestCase
+from tests import harness
 from tests import responses
 
 
-class TestHttp(TestCase):
+class TestHttp(harness.TestCase):
 
     def test_exceptions(self):
         http = client.BlockchainHttp(responses.ENDPOINT)
@@ -29,11 +29,12 @@ class TestHttp(TestCase):
             self.assertEqual(http.network_type, models.NetworkType.MIJIN_TEST)
 
 
-class TestAccountHttp(TestCase):
+class TestAccountHttp(harness.TestCase):
+    # TODO(ahuszagh) Implement
     pass
 
 
-class TestBlockchainHttp(TestCase):
+class TestBlockchainHttp(harness.TestCase):
 
     def test_get_block_by_height(self):
         http = client.BlockchainHttp(responses.ENDPOINT)
@@ -57,21 +58,29 @@ class TestBlockchainHttp(TestCase):
             self.assertEqual(block_info.merkle_tree[0], "smNSI9tFz7tOIc38NZ/n8iKm5fYADJnKnnKdsC5mYfU=")
 
 
-class TestMosaicHttp(TestCase):
+class TestMosaicHttp(harness.TestCase):
     # TODO(ahuszagh) Implement
     pass
 
 
-class TestNamespaceHttp(TestCase):
+class TestNamespaceHttp(harness.TestCase):
+
+    def test_get_namespace_names(self):
+        http = client.NamespaceHttp(responses.ENDPOINT)
+        ids = [models.NamespaceId.from_hex("84b3552d375ffa4b")]
+
+        with requests.default_response(200, **responses.NAMESPACE_NAMES["Ok"]):
+            namespace_names = http.get_namespace_names(ids)
+            self.assertEqual(len(namespace_names), 1)
+            self.assertEqual(namespace_names[0].namespace_id.id, 0x84b3552d375ffa4b)
+            self.assertEqual(namespace_names[0].name, "nem")
+
+
+class TestNetworkHttp(harness.TestCase):
     # TODO(ahuszagh) Implement
     pass
 
 
-class TestNetworkHttp(TestCase):
-    # TODO(ahuszagh) Implement
-    pass
-
-
-class TestTransactionHttp(TestCase):
+class TestTransactionHttp(harness.TestCase):
     # TODO(ahuszagh) Implement
     pass

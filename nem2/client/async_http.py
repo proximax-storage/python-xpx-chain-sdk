@@ -170,6 +170,13 @@ def factory(callback: typing.Callable) -> tuple:
         def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
             super().__init__(endpoint, loop=loop)
 
+        @util.doc(documentation.GET_NAMESPACE_NAMES)
+        @util.observable
+        async def get_namespace_names(self, ids: typing.Sequence['NamespaceId'], timeout=None) -> typing.Sequence['NamespaceName']:
+            return await nis.get_namespace_names[1](self._host, ids, timeout=timeout)
+
+        getNamespaceNames = util.undoc(get_namespace_names)
+
 
     class AsyncNetworkHttp(HttpBase):
         """Network client for the asynchronous NIS API."""

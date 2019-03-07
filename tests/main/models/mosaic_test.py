@@ -97,6 +97,11 @@ class TestMosaicId(TestCase):
         value = models.MosaicId(5)
         self.assertEqual(hex(value), "0x5")
 
+    def test_format(self):
+        value = models.MosaicId(13)
+        self.assertEqual(f'{value:x}', 'd')
+        self.assertEqual(f'{value:X}', 'D')
+
     def test_create_from_nonce(self):
         nonce = models.MosaicNonce(b'\x00\x00\x00\x00')
         public_key = '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246'
@@ -205,6 +210,15 @@ class TestMosaicNonce(TestCase):
     def test_index(self):
         self.assertEqual(hex(self.nonce), "0x0")
 
+    def test_format(self):
+        value = models.MosaicNonce.create_from_int(5)
+        self.assertEqual(f'{value:x}', '5')
+        self.assertEqual(f'{value:X}', '5')
+
+        value = models.MosaicNonce.create_from_int(13)
+        self.assertEqual(f'{value:x}', 'd')
+        self.assertEqual(f'{value:X}', 'D')
+
     def test_create_random(self):
         def fake_entropy(size: int):
             return b'4' * size
@@ -217,6 +231,10 @@ class TestMosaicNonce(TestCase):
         data = '00000000'
         self.assertEqual(models.MosaicNonce.create_from_hex(data), self.nonce)
         self.assertEqual(models.MosaicNonce.createFromHex(data), self.nonce)
+
+    def test_create_from_int(self):
+        self.assertEqual(models.MosaicNonce.create_from_int(5).nonce, b'\x05\x00\x00\x00')
+        self.assertEqual(models.MosaicNonce.create_from_int(325).nonce, b'E\x01\x00\x00')
 
     def test_repr(self):
         self.assertEqual(repr(self.nonce), "MosaicNonce(nonce=b'\\x00\\x00\\x00\\x00')")

@@ -44,6 +44,10 @@ MOSAIC_INFO = {
     'Ok': load_response('mosaic_info.json'),
 }
 
+NAMESPACE_NAMES = {
+    'Ok': load_response('namespace_names.json'),
+}
+
 NETWORK_TYPE = {
     'MIJIN_TEST': load_response('network.json'),
 }

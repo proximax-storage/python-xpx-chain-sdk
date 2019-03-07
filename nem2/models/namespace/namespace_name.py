@@ -26,7 +26,7 @@ from nem2 import util
 from .namespace_id import NamespaceId
 
 
-class NamespaceName(util.Tie):
+class NamespaceName(util.Dto, util.Tie):
     """Namespace name and identifier."""
 
     __slots__ = (
@@ -67,3 +67,17 @@ class NamespaceName(util.Tie):
     @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()
+
+    @util.doc(util.Dto.to_dto)
+    def to_dto(self) -> dict:
+        return {
+            'namespaceId': self.namespace_id.to_dto(),
+            'name': self.name
+        }
+
+    @util.doc(util.Dto.from_dto)
+    @classmethod
+    def from_dto(cls, data: dict) -> 'Namespace':
+        namespace_id = NamespaceId.from_dto(data['namespaceId'])
+        name = data['name']
+        return cls(namespace_id, name)

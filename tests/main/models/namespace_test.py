@@ -187,6 +187,15 @@ class TestNamespaceId(TestCase):
         value = models.NamespaceId(5)
         self.assertEqual(hex(value), "0x5")
 
+    def test_format(self):
+        value = models.NamespaceId(5)
+        self.assertEqual(f'{value:x}', '5')
+        self.assertEqual(f'{value:X}', '5')
+
+        value = models.NamespaceId(13)
+        self.assertEqual(f'{value:x}', 'd')
+        self.assertEqual(f'{value:X}', 'D')
+
     def test_repr(self):
         value = models.NamespaceId(5)
         self.assertEqual(repr(value), "NamespaceId(id=5)")
@@ -206,6 +215,19 @@ class TestNamespaceId(TestCase):
         self.assertTrue(id2 == id2)
         self.assertFalse(id2 == id3)
         self.assertTrue(id3 == id3)
+
+    def test_to_dto(self):
+        value = models.NamespaceId(5)
+        dto = value.to_dto()
+        self.assertEqual(dto, [5, 0])
+
+        self.assertEqual(value.toDto(), dto)
+
+    def test_from_dto(self):
+        value = models.NamespaceId(5)
+        dto = value.to_dto()
+        self.assertEqual(value, models.NamespaceId.from_dto(dto))
+        self.assertEqual(value, models.NamespaceId.fromDto(dto))
 
 
 class TestNamespaceInfo(TestCase):
@@ -246,6 +268,20 @@ class TestNamespaceName(TestCase):
         self.assertTrue(n2 == n2)
         self.assertFalse(n2 == n3)
         self.assertTrue(n3 == n3)
+
+    def test_to_dto(self):
+        value = models.NamespaceName.create_from_name("sample")
+        dto = value.to_dto()
+        self.assertEqual(dto['namespaceId'], [3807670596, 2293648443])
+        self.assertEqual(dto['name'], 'sample')
+
+        self.assertEqual(value.toDto(), dto)
+
+    def test_from_dto(self):
+        value = models.NamespaceName.create_from_name("sample")
+        dto = value.to_dto()
+        self.assertEqual(value, models.NamespaceName.from_dto(dto))
+        self.assertEqual(value, models.NamespaceName.fromDto(dto))
 
 
 class TestNamespaceType(TestCase):

@@ -3,23 +3,21 @@ import asyncio
 
 from nem2 import client
 from nem2 import models
-from tests.harness import AsyncTestCase
+from tests import harness
 from tests import responses
 
 
-class TestAsyncLoop(AsyncTestCase):
+class TestAsyncLoop(harness.TestCase):
 
-    def __init__(self, methodName='runTest'):
-        super().__init__(methodName=methodName, loop=asyncio.new_event_loop())
-
-    async def test_loop(self):
-        http = client.AsyncHttp(responses.ENDPOINT, loop=self.loop)
+    def test_loop(self):
+        loop = asyncio.new_event_loop()
+        http = client.AsyncHttp(responses.ENDPOINT, loop=loop)
         with aiohttp.default_response(200, **responses.BLOCK_INFO["Ok"]):
-            block_info = await http.blockchain.get_block_by_height(1)
+            block_info = loop.run_until_complete(http.blockchain.get_block_by_height(1))
             self.assertEqual(block_info.total_fee, 0)
 
 
-class TestAsyncHttp(AsyncTestCase):
+class TestAsyncHttp(harness.TestCase):
 
     async def test_exceptions(self):
         http = client.AsyncBlockchainHttp(responses.ENDPOINT)
@@ -42,11 +40,12 @@ class TestAsyncHttp(AsyncTestCase):
             self.assertEqual(await http.network_type, models.NetworkType.MIJIN_TEST)
 
 
-class TestAsyncAccountHttp(AsyncTestCase):
+class TestAsyncAccountHttp(harness.TestCase):
+    # TODO(ahuszagh) Implement
     pass
 
 
-class TestAsyncBlockchainHttp(AsyncTestCase):
+class TestAsyncBlockchainHttp(harness.TestCase):
 
     async def test_get_block_by_height(self):
         http = client.AsyncBlockchainHttp(responses.ENDPOINT)
@@ -68,21 +67,29 @@ class TestAsyncBlockchainHttp(AsyncTestCase):
             self.assertEqual(block_info.block_transactions_hash, "54B187F7D6B1D45F133F06706566E832A9F325F1E62FE927C0B5C65DAC8A2C56")
 
 
-class TestAsyncMosaicHttp(AsyncTestCase):
+class TestAsyncMosaicHttp(harness.TestCase):
     # TODO(ahuszagh) Implement
     pass
 
 
-class TestAsyncNamespaceHttp(AsyncTestCase):
+class TestAsyncNamespaceHttp(harness.TestCase):
+
+    async def test_get_namespace_names(self):
+        http = client.AsyncNamespaceHttp(responses.ENDPOINT)
+        ids = [models.NamespaceId.from_hex("84b3552d375ffa4b")]
+
+        with aiohttp.default_response(200, **responses.NAMESPACE_NAMES["Ok"]):
+            namespace_names = await http.get_namespace_names(ids)
+            self.assertEqual(len(namespace_names), 1)
+            self.assertEqual(namespace_names[0].namespace_id.id, 0x84b3552d375ffa4b)
+            self.assertEqual(namespace_names[0].name, "nem")
+
+
+class TestAsyncNetworkHttp(harness.TestCase):
     # TODO(ahuszagh) Implement
     pass
 
 
-class TestAsyncNetworkHttp(AsyncTestCase):
-    # TODO(ahuszagh) Implement
-    pass
-
-
-class TestAsyncTransactionHttp(AsyncTestCase):
+class TestAsyncTransactionHttp(harness.TestCase):
     # TODO(ahuszagh) Implement
     pass

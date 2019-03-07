@@ -26,6 +26,7 @@
 """
 
 import inspect
+import typing
 
 from nem2 import models
 
@@ -112,6 +113,33 @@ get_block_by_height = request("get_block_by_height", "", True)
 # NAMESPACE HTTP
 # --------------
 
+def request_get_namespace_names(host: 'Host', ids: typing.Sequence['NamespaceId'], timeout=None):
+    """
+    Make "/namespace/names" request.
+
+    :param host: Host wrapper for client.
+    :param ids: Namespace IDs to request names for.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    json = {"namespaceIds": ["{:x}".format(i) for i in ids]}
+    return host.post("/namespace/names", json=json, timeout=timeout)
+
+
+def process_get_namespace_names(status: int, json: list) -> typing.Sequence['NamespaceName']:
+    """
+    Process the "/namespace/names" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return [models.NamespaceName.from_dto(i) for i in json]
+
+
+get_namespace_names = request("get_namespace_names", "", True)
+
 # NETWORK HTTP
 # ------------
 
@@ -156,6 +184,9 @@ REQUEST = {
     # BLOCKCHAIN
     'get_block_by_height': request_get_block_by_height,
 
+    # NAMESPACE
+    'get_namespace_names': request_get_namespace_names,
+
     # NETWORK
     'get_network_type': request_get_network_type,
 }
@@ -163,6 +194,9 @@ REQUEST = {
 PROCESS = {
     # BLOCKCHAIN
     'get_block_by_height': process_get_block_by_height,
+
+    # NAMESPACE
+    'get_namespace_names': process_get_namespace_names,
 
     # NETWORK
     'get_network_type': process_get_network_type,

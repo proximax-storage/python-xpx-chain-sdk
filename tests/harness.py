@@ -27,10 +27,6 @@ import unittest
 
 
 class TestCase(unittest.TestCase):
-    pass
-
-
-class AsyncTestCase(TestCase):
 
     def __init__(self, methodName='runTest', loop=None):
         self.loop = loop or asyncio.get_event_loop()
@@ -49,3 +45,40 @@ class AsyncTestCase(TestCase):
                 self._cache[item] = self.coroutine_function_decorator(attr)
             return self._cache[item]
         return attr
+
+
+CACHE = {}
+
+def create(qualname, sync_cls, async_cls):
+    """Generate synchronous and asynchronous tests from a single function."""
+
+    def decorator(f):
+        assert f.__name__ == 'test'
+
+        async def sync_value(x):
+            return x
+
+        async def async_value(x):
+            return await x
+
+        async def sync_wrap(self):
+            return await f(self, sync_cls, sync_value)
+
+        async def async_wrap(self):
+            return await f(self, async_cls, async_value)
+
+        CACHE[qualname] = sync_wrap, async_wrap
+
+    return decorator
+
+
+def new_sync(qualname):
+    """Implement the synchronous test case."""
+
+    return CACHE[qualname][0]
+
+
+def new_async(qualname):
+    """Implement the asynchronous test case."""
+
+    return CACHE[qualname][1]

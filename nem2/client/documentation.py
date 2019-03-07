@@ -27,6 +27,15 @@ Get block information from the block height.
 :return: Information describing block.
 """
 
+# NAMESPACE
+
+GET_NAMESPACE_NAMES = """
+Get namespace names from IDs.
+
+:param ids: Sequence of namespace IDs.
+:return: Namespace names for IDS.
+"""
+
 # NETWORK
 
 GET_NETWORK_TYPE = """

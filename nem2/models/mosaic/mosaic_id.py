@@ -50,8 +50,8 @@ class MosaicId(util.Model):
     def __index__(self) -> int:
         return self.__int__()
 
-    # TODO(ahuszagh) Likely should have to_hex function.
-    # TODO(ahuszagh) hex() isn't enough.
+    def __format__(self, format_spec: str):
+        return int(self).__format__(format_spec)
 
     @classmethod
     def from_hex(cls, data: str) -> 'MosaicId':

@@ -29,7 +29,7 @@ from nem2 import util
 IdType = typing.Union[str, int]
 
 
-class NamespaceId(util.Tie):
+class NamespaceId(util.Dto, util.Tie):
     """Identifier for a namespace."""
 
     __slots__ = ('_id',)
@@ -58,6 +58,9 @@ class NamespaceId(util.Tie):
     def __index__(self) -> int:
         return self.__int__()
 
+    def __format__(self, format_spec: str):
+        return int(self).__format__(format_spec)
+
     @classmethod
     def from_hex(cls, data: str) -> 'NamespaceId':
         """
@@ -71,3 +74,12 @@ class NamespaceId(util.Tie):
     @util.doc(util.Tie.tie)
     def tie(self) -> tuple:
         return super().tie()
+
+    @util.doc(util.Dto.to_dto)
+    def to_dto(self) -> util.Uint64DtoType:
+        return util.uint64_to_dto(self.id)
+
+    @util.doc(util.Dto.from_dto)
+    @classmethod
+    def from_dto(cls, data: util.Uint64DtoType) -> 'NamespaceId':
+        return cls(util.dto_to_uint64(data))

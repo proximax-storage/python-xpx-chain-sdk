@@ -1,24 +1,17 @@
 from nem2 import client
 from nem2 import models
-from tests.harness import AsyncTestCase, TestCase
+from tests import harness
 from tests import responses
 
 
-class NetworkTest(TestCase):
+class TestNetwork(harness.TestCase):
 
-    def test_sync(self):
-        http = client.Http(responses.ENDPOINT)
-        network = http.network
-        self.assertIsInstance(http.network_type, models.NetworkType)
-        self.assertIsInstance(network.get_network_type(), models.NetworkType)
-        self.assertIsInstance(network.getNetworkType(), models.NetworkType)
+    @harness.create(__qualname__, client.NetworkHttp, client.AsyncNetworkHttp)
+    async def test(self, cls, func):
+        http = cls(responses.ENDPOINT)
+        self.assertIsInstance(await func(http.network_type), models.NetworkType)
+        self.assertIsInstance(await func(http.get_network_type()), models.NetworkType)
+        self.assertIsInstance(await func(http.getNetworkType()), models.NetworkType)
 
-
-class AsyncNetworkTest(AsyncTestCase):
-
-    async def test_async(self):
-        http = client.AsyncHttp(responses.ENDPOINT)
-        network = http.network
-        self.assertIsInstance(await http.network_type, models.NetworkType)
-        self.assertIsInstance(await network.get_network_type(), models.NetworkType)
-        self.assertIsInstance(await network.getNetworkType(), models.NetworkType)
+    test_sync = harness.new_sync(__qualname__)
+    test_async = harness.new_async(__qualname__)

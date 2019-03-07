@@ -55,6 +55,9 @@ class MosaicNonce(util.Model):
     def __index__(self) -> int:
         return self.__int__()
 
+    def __format__(self, format_spec: str):
+        return int(self).__format__(format_spec)
+
     @classmethod
     def create_random(cls, entropy=os.urandom) -> 'MosaicNonce':
         """
@@ -77,6 +80,17 @@ class MosaicNonce(util.Model):
         return MosaicNonce(util.unhexlify(data))
 
     createFromHex = util.undoc(create_from_hex)
+
+    @classmethod
+    def create_from_int(cls, nonce: int) -> 'MosaicNonce':
+        """
+        Create mosaic nonce from 32-bit integer.
+
+        :param nonce: Nonce as 32-bit unsigned integer.
+        """
+        return MosaicNonce(struct.pack('<I', nonce))
+
+    createFromInt = util.undoc(create_from_int)
 
     @util.doc(util.Model.tie)
     def tie(self) -> tuple:
