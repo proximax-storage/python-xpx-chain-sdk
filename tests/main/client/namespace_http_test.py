@@ -9,6 +9,10 @@ from tests import responses
 
 class TestNamespaceHttp(harness.TestCase):
 
+    # TODO(ahuszagh) Implement...
+    # test_get_namespaces_from_account
+    # test_get_namespaces_from_accounts
+
     @harness.test_case(
         sync_data=(client.NamespaceHttp, requests),
         async_data=(client.AsyncNamespaceHttp, aiohttp)

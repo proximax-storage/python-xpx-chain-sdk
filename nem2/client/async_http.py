@@ -181,6 +181,20 @@ def factory(callback: typing.Callable) -> tuple:
 
         getNamespace = util.undoc(get_namespace)
 
+        @util.doc(documentation.GET_NAMESPACES_FROM_ACCOUNT)
+        @util.observable
+        async def get_namespaces_from_account(self, address: 'Address', timeout=None) -> typing.Sequence['NamespaceInfo']:
+            return await nis.get_namespaces_from_account[1](self._host, address, timeout=timeout)
+
+        getNamespacesFromAccount = util.undoc(get_namespaces_from_account)
+
+        @util.doc(documentation.GET_NAMESPACES_FROM_ACCOUNTS)
+        @util.observable
+        async def get_namespaces_from_accounts(self, addresses: typing.Sequence['Address'], timeout=None) -> typing.Sequence['NamespaceInfo']:
+            return await nis.get_namespaces_from_accounts[1](self._host, addresses, timeout=timeout)
+
+        getNamespacesFromAccounts = util.undoc(get_namespaces_from_accounts)
+
         @util.doc(documentation.GET_NAMESPACE_NAMES)
         @util.observable
         async def get_namespace_names(self, ids: typing.Sequence['NamespaceId'], timeout=None) -> typing.Sequence['NamespaceName']:

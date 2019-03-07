@@ -172,11 +172,27 @@ def factory(callback: typing.Callable) -> tuple:
 
         getNamespace = util.undoc(get_namespace)
 
+        @util.doc(documentation.GET_NAMESPACES_FROM_ACCOUNT)
+        def get_namespaces_from_account(self, address: 'Address', timeout=None) -> typing.Sequence['NamespaceInfo']:
+            return nis.get_namespaces_from_account[0](self._host, address, timeout=timeout)
+
+        getNamespacesFromAccount = util.undoc(get_namespaces_from_account)
+
+        @util.doc(documentation.GET_NAMESPACES_FROM_ACCOUNTS)
+        def get_namespaces_from_accounts(self, addresses: typing.Sequence['Address'], timeout=None) -> typing.Sequence['NamespaceInfo']:
+            return nis.get_namespaces_from_accounts[0](self._host, addresses, timeout=timeout)
+
+        getNamespacesFromAccounts = util.undoc(get_namespaces_from_accounts)
+
         @util.doc(documentation.GET_NAMESPACE_NAMES)
         def get_namespace_names(self, ids: typing.Sequence['NamespaceId'], timeout=None) -> typing.Sequence['NamespaceName']:
             return nis.get_namespace_names[0](self._host, ids, timeout=timeout)
 
         getNamespaceNames = util.undoc(get_namespace_names)
+
+        # TODO(ahuszagh) Implement...
+        # getLinkedMosaicId
+        # getLinkedAddress
 
 
     class NetworkHttp(HttpBase):

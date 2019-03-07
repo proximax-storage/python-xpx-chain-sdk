@@ -36,6 +36,20 @@ Get namespace information from ID.
 :return: Namespace information.
 """
 
+GET_NAMESPACES_FROM_ACCOUNT = """
+Get namespaces owned by account.
+
+:param address: Account address.
+:return: List of namespace information objects.
+"""
+
+GET_NAMESPACES_FROM_ACCOUNTS = """
+Get namespaces owned by accounts.
+
+:param addresses: Sequence of account addresses.
+:return: List of namespace information objects.
+"""
+
 GET_NAMESPACE_NAMES = """
 Get namespace names from IDs.
 

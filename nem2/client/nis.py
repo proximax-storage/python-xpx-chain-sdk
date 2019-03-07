@@ -113,7 +113,6 @@ get_block_by_height = request("get_block_by_height", "", True)
 # NAMESPACE HTTP
 # --------------
 
-
 def request_get_namespace(host: 'Host', namespace_id: 'NamespaceId', timeout=None):
     """
     Make "/namespace/{namespace_id}" request.
@@ -168,6 +167,61 @@ def process_get_namespace_names(status: int, json: list) -> typing.Sequence['Nam
 
 get_namespace_names = request("get_namespace_names", "", True)
 
+
+def request_get_namespaces_from_account(host: 'Host', address: 'Address', timeout=None):
+    """
+    Make "/account/{address}/namespaces" request.
+
+    :param host: Host wrapper for client.
+    :param address: Account address.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return host.get("/account/{}/namespaces".format(address.address), timeout=timeout)
+
+
+def process_get_namespaces_from_account(status: int, json: list) -> typing.Sequence['NamespaceInfo']:
+    """
+    Process the "/account/{address}/namespaces" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return [models.NamespaceInfo.from_dto(i) for i in json]
+
+
+get_namespaces_from_account = request("get_namespaces_from_account", "", True)
+
+
+def request_get_namespaces_from_accounts(host: 'Host', addresses: typing.Sequence['Address'], timeout=None):
+    """
+    Make "/account/namespaces" request.
+
+    :param host: Host wrapper for client.
+    :param address: Account address.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    json = {"addresses": [i.address for i in addresses]}
+    return host.post("/account/namespaces", json=json, timeout=timeout)
+
+
+def process_get_namespaces_from_accounts(status: int, json: list) -> typing.Sequence['NamespaceInfo']:
+    """
+    Process the "/account/namespaces" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return [models.NamespaceInfo.from_dto(i) for i in json]
+
+
+get_namespaces_from_accounts = request("get_namespaces_from_accounts", "", True)
+
 # NETWORK HTTP
 # ------------
 
@@ -213,8 +267,10 @@ REQUEST = {
     'get_block_by_height': request_get_block_by_height,
 
     # NAMESPACE
-    'get_namespace_names': request_get_namespace_names,
     'get_namespace': request_get_namespace,
+    'get_namespace_names': request_get_namespace_names,
+    'get_namespaces_from_account': request_get_namespaces_from_account,
+    'get_namespaces_from_accounts': request_get_namespaces_from_accounts,
 
     # NETWORK
     'get_network_type': request_get_network_type,
@@ -225,8 +281,10 @@ PROCESS = {
     'get_block_by_height': process_get_block_by_height,
 
     # NAMESPACE
-    'get_namespace_names': process_get_namespace_names,
     'get_namespace': process_get_namespace,
+    'get_namespace_names': process_get_namespace_names,
+    'get_namespaces_from_account': process_get_namespaces_from_account,
+    'get_namespaces_from_accounts': process_get_namespaces_from_accounts,
 
     # NETWORK
     'get_network_type': process_get_network_type,
