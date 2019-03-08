@@ -193,6 +193,20 @@ def factory(callback: typing.Callable) -> tuple:
 
         getNamespaceNames = util.undoc(get_namespace_names)
 
+        @util.doc(documentation.GET_LINKED_MOSAIC_ID)
+        @util.observable
+        async def get_linked_mosaic_id(self, namespace_id: 'NamespaceId', timeout=None) -> 'MosaicId':
+            return await nis.get_linked_mosaic_id[1](self._host, namespace_id, timeout=timeout)
+
+        getLinkedMosaicId = util.undoc(get_linked_mosaic_id)
+
+        @util.doc(documentation.GET_LINKED_ADDRESS)
+        @util.observable
+        async def get_linked_address(self, namespace_id: 'NamespaceId', timeout=None) -> 'Address':
+            return await nis.get_linked_address[1](self._host, namespace_id, timeout=timeout)
+
+        getLinkedAddress = util.undoc(get_linked_address)
+
     class AsyncNetworkHttp(HttpBase):
         """Network client for the asynchronous NIS API."""
 

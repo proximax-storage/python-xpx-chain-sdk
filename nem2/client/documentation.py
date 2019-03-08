@@ -57,6 +57,20 @@ Get namespace names from IDs.
 :return: Namespace names for IDS.
 """
 
+GET_LINKED_MOSAIC_ID = """
+Get mosaic ID from linked mosaic alias.
+
+:param id: Namespace ID.
+:return: Mosaic ID.
+"""
+
+GET_LINKED_ADDRESS = """
+Get address from linked address alias.
+
+:param id: Namespace ID.
+:return: Address object.
+"""
+
 # NETWORK
 
 GET_NETWORK_TYPE = """

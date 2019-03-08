@@ -65,13 +65,13 @@ class Alias(util.Dto, util.Tie):
     @property
     def address(self) -> 'Address':
         if self.type != AliasType.ADDRESS:
-            raise TypeError("Alias does not store address.")
+            raise ValueError("Alias does not store address.")
         return self.value
 
     @property
     def mosaic_id(self) -> 'MosaicId':
         if self.type != AliasType.MOSAIC_ID:
-            raise TypeError("Alias does not store mosaic ID.")
+            raise ValueError("Alias does not store mosaic ID.")
         return self.value
 
     mosaicId = util.undoc(mosaic_id)

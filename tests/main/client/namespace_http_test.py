@@ -9,10 +9,6 @@ from tests import responses
 
 class TestNamespaceHttp(harness.TestCase):
 
-    # TODO(ahuszagh) Implement...
-    # test_get_namespaces_from_account
-    # test_get_namespaces_from_accounts
-
     @harness.test_case(
         sync_data=(client.NamespaceHttp, requests),
         async_data=(client.AsyncNamespaceHttp, aiohttp)
@@ -21,7 +17,7 @@ class TestNamespaceHttp(harness.TestCase):
         http = data[0](responses.ENDPOINT)
         namespace_id = models.NamespaceId.from_hex("84b3552d375ffa4b")
 
-        with data[1].default_response(200, **responses.NAMESPACE_INFO["nem"]):
+        with data[1].default_response(200, **responses.NAMESPACE["nem"]):
             info = await cb(http.get_namespace(namespace_id))
             self.assertEqual(info.active, True)
             self.assertEqual(info.index, 0)
@@ -51,3 +47,49 @@ class TestNamespaceHttp(harness.TestCase):
             self.assertEqual(names[0].namespace_id.id, 0x84b3552d375ffa4b)
             self.assertEqual(names[0].name, "nem")
             self.assertEqual(names, await cb(http.getNamespaceNames(ids)))
+
+    @harness.test_case(
+        sync_data=(client.NamespaceHttp, requests),
+        async_data=(client.AsyncNamespaceHttp, aiohttp)
+    )
+    async def test_get_namespaces_from_account(self, data, cb):
+        http = data[0](responses.ENDPOINT)
+        address = models.Address.create_from_raw_address("SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM")
+        with data[1].default_response(200, **responses.NAMESPACES["nem"]):
+            infos = await cb(http.get_namespaces_from_account(address))
+            self.assertEqual(len(infos), 1)
+            self.assertEqual(infos[0].meta_id, '5C7C07005CC1FE000176FA2B')
+
+    @harness.test_case(
+        sync_data=(client.NamespaceHttp, requests),
+        async_data=(client.AsyncNamespaceHttp, aiohttp)
+    )
+    async def test_get_namespaces_from_accounts(self, data, cb):
+        http = data[0](responses.ENDPOINT)
+        addresses = [models.Address.create_from_raw_address("SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM")]
+        with data[1].default_response(200, **responses.NAMESPACES["nem"]):
+            infos = await cb(http.get_namespaces_from_accounts(addresses))
+            self.assertEqual(len(infos), 1)
+            self.assertEqual(infos[0].meta_id, '5C7C07005CC1FE000176FA2B')
+
+    @harness.test_case(
+        sync_data=(client.NamespaceHttp, requests),
+        async_data=(client.AsyncNamespaceHttp, aiohttp)
+    )
+    async def test_get_linked_mosaic_id(self, data, cb):
+        http = data[0](responses.ENDPOINT)
+        namespace_id = models.NamespaceId.from_hex("84b3552d375ffa4b")
+        with data[1].default_response(200, **responses.NAMESPACE["nem"]):
+            with self.assertRaises(ValueError):
+                await cb(http.get_linked_mosaic_id(namespace_id))
+
+    @harness.test_case(
+        sync_data=(client.NamespaceHttp, requests),
+        async_data=(client.AsyncNamespaceHttp, aiohttp)
+    )
+    async def test_get_linked_address(self, data, cb):
+        http = data[0](responses.ENDPOINT)
+        namespace_id = models.NamespaceId.from_hex("84b3552d375ffa4b")
+        with data[1].default_response(200, **responses.NAMESPACE["nem"]):
+            with self.assertRaises(ValueError):
+                await cb(http.get_linked_address(namespace_id))

@@ -21,7 +21,7 @@ class TestAddressAlias(harness.TestCase):
         self.assertEqual(value, models.Alias(self.address))
         self.assertNotEqual(value, models.Alias(self.mosaic_id))
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             value.mosaic_id
 
         dto = {'type': 2, 'address': {'address': 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', 'networkType': 144}}
@@ -47,9 +47,9 @@ class TestAlias(harness.TestCase):
         self.assertNotEqual(value, models.Alias(self.address))
         self.assertNotEqual(value, models.Alias(self.mosaic_id))
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             value.address
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             value.mosaic_id
 
         self.assertEqual(value.to_dto(), None)
@@ -67,7 +67,7 @@ class TestAlias(harness.TestCase):
         self.assertEqual(value, models.Alias(self.address))
         self.assertNotEqual(value, models.Alias(self.mosaic_id))
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             value.mosaic_id
 
         dto = {'type': 2, 'address': {'address': 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', 'networkType': 144}}
@@ -87,7 +87,7 @@ class TestAlias(harness.TestCase):
         self.assertNotEqual(value, models.Alias(self.address))
         self.assertEqual(value, models.Alias(self.mosaic_id))
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             value.address
 
         dto = {'type': 1, 'mosaicId': [5, 0]}
@@ -157,9 +157,9 @@ class TestEmptyAlias(harness.TestCase):
         self.assertNotEqual(value, models.Alias(self.address))
         self.assertNotEqual(value, models.Alias(self.mosaic_id))
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             value.address
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             value.mosaic_id
 
         self.assertEqual(value.to_dto(), None)
@@ -186,7 +186,7 @@ class TestMosaicAlias(harness.TestCase):
         self.assertNotEqual(value, models.Alias(self.address))
         self.assertEqual(value, models.Alias(self.mosaic_id))
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             value.address
 
         dto = {'type': 1, 'mosaicId': [5, 0]}

@@ -228,6 +228,60 @@ def process_get_namespaces_from_accounts(status: int, json: list) -> typing.Sequ
 
 get_namespaces_from_accounts = request("get_namespaces_from_accounts", "", True)
 
+
+def request_get_linked_mosaic_id(host: 'Host', namespace_id: 'NamespaceId', timeout=None):
+    """
+    Make "/namespace/{namespace_id}" request.
+
+    :param host: Host wrapper for client.
+    :param id: Namespace ID.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return request_get_namespace(host, namespace_id, timeout=timeout)
+
+
+def process_get_linked_mosaic_id(status: int, json: dict) -> 'MosaicId':
+    """
+    Process the "/namespace/{namespace_id}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    namespace_info = process_get_namespace(status, json)
+    return namespace_info.alias.mosaic_id
+
+
+get_linked_mosaic_id = request("get_linked_mosaic_id", "", True)
+
+
+def request_get_linked_address(host: 'Host', namespace_id: 'NamespaceId', timeout=None):
+    """
+    Make "/namespace/{namespace_id}" request.
+
+    :param host: Host wrapper for client.
+    :param id: Namespace ID.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return request_get_namespace(host, namespace_id, timeout=timeout)
+
+
+def process_get_linked_address(status: int, json: dict) -> 'Address':
+    """
+    Process the "/namespace/{namespace_id}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    namespace_info = process_get_namespace(status, json)
+    return namespace_info.alias.address
+
+
+get_linked_address = request("get_linked_address", "", True)
+
 # NETWORK HTTP
 # ------------
 
@@ -278,6 +332,8 @@ REQUEST = {
     'get_namespace_names': request_get_namespace_names,
     'get_namespaces_from_account': request_get_namespaces_from_account,
     'get_namespaces_from_accounts': request_get_namespaces_from_accounts,
+    'get_linked_mosaic_id': request_get_linked_mosaic_id,
+    'get_linked_address': request_get_linked_address,
 
     # NETWORK
     'get_network_type': request_get_network_type,
@@ -292,6 +348,8 @@ PROCESS = {
     'get_namespace_names': process_get_namespace_names,
     'get_namespaces_from_account': process_get_namespaces_from_account,
     'get_namespaces_from_accounts': process_get_namespaces_from_accounts,
+    'get_linked_mosaic_id': process_get_linked_mosaic_id,
+    'get_linked_address': process_get_linked_address,
 
     # NETWORK
     'get_network_type': process_get_network_type,

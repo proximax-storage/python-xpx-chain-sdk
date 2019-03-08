@@ -179,9 +179,17 @@ def factory(callback: typing.Callable) -> tuple:
 
         getNamespaceNames = util.undoc(get_namespace_names)
 
-        # TODO(ahuszagh) Implement...
-        # getLinkedMosaicId
-        # getLinkedAddress
+        @util.doc(documentation.GET_LINKED_MOSAIC_ID)
+        def get_linked_mosaic_id(self, namespace_id: 'NamespaceId', timeout=None) -> 'MosaicId':
+            return nis.get_linked_mosaic_id[0](self._host, namespace_id, timeout=timeout)
+
+        getLinkedMosaicId = util.undoc(get_linked_mosaic_id)
+
+        @util.doc(documentation.GET_LINKED_ADDRESS)
+        def get_linked_address(self, namespace_id: 'NamespaceId', timeout=None) -> 'Address':
+            return nis.get_linked_address[0](self._host, namespace_id, timeout=timeout)
+
+        getLinkedAddress = util.undoc(get_linked_address)
 
     class NetworkHttp(HttpBase):
         """Network client for the synchronous NIS API."""

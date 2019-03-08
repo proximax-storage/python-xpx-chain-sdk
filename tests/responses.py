@@ -45,8 +45,12 @@ MOSAIC_INFO = {
     'Ok': load_response('mosaic_info.json'),
 }
 
-NAMESPACE_INFO = {
+NAMESPACE = {
     'nem': load_response('namespace.json'),
+}
+
+NAMESPACES = {
+    'nem': load_response('namespaces.json'),
 }
 
 NAMESPACE_NAMES = {
