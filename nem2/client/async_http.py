@@ -129,6 +129,17 @@ def factory(callback: typing.Callable) -> tuple:
         def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
             super().__init__(endpoint, loop=loop)
 
+        # TODO(ahuszagh)
+        # getAccountInfo
+        # getAccountsInfo
+        # getMultisigAccountInfo
+        # getMultisigAccountGraphInfo
+        # transactions
+        # incomingTransactions
+        # outgoingTransactions
+        # unconfirmedTransactions
+        # aggregateBondedTransactions
+
     class AsyncBlockchainHttp(HttpBase):
         """Blockchain client for the asynchronous NIS API."""
 
@@ -143,7 +154,7 @@ def factory(callback: typing.Callable) -> tuple:
 
         getBlockByHeight = util.undoc(get_block_by_height)
 
-        # TODO(ahuszagh) Implement...
+        # TODO(ahuszagh)
         # getBlockTransactions
         # getBlocksByHeightWithLimit
 
@@ -174,6 +185,17 @@ def factory(callback: typing.Callable) -> tuple:
         @util.doc(documentation.ASYNC_INIT)
         def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
             super().__init__(endpoint, loop=loop)
+
+        @util.doc(documentation.GET_MOSAIC_NAMES)
+        @util.observable
+        async def get_mosaic_names(self, ids: typing.Sequence['MosaicId'], timeout=None) -> typing.Sequence['MosaicName']:
+            return await nis.get_mosaic_names[1](self._host, ids, timeout=timeout)
+
+        getMosaicNames = util.undoc(get_mosaic_names)
+
+        # TODO(ahuszagh)
+        # getMosaic
+        # getMosaics
 
     class AsyncNamespaceHttp(HttpBase):
         """Namespace client for the asynchronous NIS API."""
@@ -244,6 +266,16 @@ def factory(callback: typing.Callable) -> tuple:
         @util.doc(documentation.ASYNC_INIT)
         def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
             super().__init__(endpoint, loop=loop)
+
+        # TODO(ahuszagh)
+        # getTransaction
+        # getTransactions
+        # getTransactionStatus
+        # getTransactionsStatuses
+        # announce
+        # announceAggregateBonded
+        # announceAggregateBondedCosignature
+        # announceSync
 
     return (
         AsyncHttp,

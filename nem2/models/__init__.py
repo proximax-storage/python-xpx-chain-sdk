@@ -15,6 +15,7 @@ from .mosaic.mosaic_id import MosaicId
 from .mosaic.mosaic_info import MosaicInfo
 from .mosaic.mosaic_levy import MosaicLevy
 from .mosaic.mosaic_levy_type import MosaicLevyType
+from .mosaic.mosaic_name import MosaicName
 from .mosaic.mosaic_nonce import MosaicNonce
 from .mosaic.mosaic_properties import MosaicProperties
 from .mosaic.mosaic_supply_type import MosaicSupplyType
@@ -31,6 +32,8 @@ from .namespace.namespace_id import NamespaceId
 from .namespace.namespace_info import NamespaceInfo
 from .namespace.namespace_name import NamespaceName
 from .namespace.namespace_type import NamespaceType
+
+from .transaction.deadline import Deadline
 
 from nem2.util import InterchangeFormat
 
@@ -55,6 +58,7 @@ __all__ = [
     'MosaicInfo',
     'MosaicLevy',
     'MosaicLevyType',
+    'MosaicName',
     'MosaicNonce',
     'MosaicProperties',
     'MosaicSupplyType',
@@ -74,6 +78,7 @@ __all__ = [
     'NamespaceType',
 
     # Transaction
+    'Deadline',
 
     # Wallet
 

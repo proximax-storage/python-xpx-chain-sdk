@@ -192,6 +192,34 @@ get_diagnostic_storage = request("get_diagnostic_storage", "", True)
 # MOSAIC HTTP
 # -----------
 
+
+def request_get_mosaic_names(host: 'Host', ids: typing.Sequence['MosaicId'], timeout=None):
+    """
+    Make "/mosaic/names" request.
+
+    :param host: Host wrapper for client.
+    :param ids: Namespace IDs to request names for.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    json = {"mosaicIds": ["{:x}".format(i) for i in ids]}
+    return host.post("/mosaic/names", json=json, timeout=timeout)
+
+
+def process_get_mosaic_names(status: int, json: list) -> typing.Sequence['MosaicName']:
+    """
+    Process the "/mosaic/names" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return [models.MosaicName.from_dto(i) for i in json]
+
+
+get_mosaic_names = request("get_mosaic_names", "", True)
+
 # NAMESPACE HTTP
 # --------------
 
@@ -407,6 +435,9 @@ REQUEST = {
     'get_blockchain_score': request_get_blockchain_score,
     'get_diagnostic_storage': request_get_diagnostic_storage,
 
+    # MOSAIC
+    'get_mosaic_names': request_get_mosaic_names,
+
     # NAMESPACE
     'get_namespace': request_get_namespace,
     'get_namespace_names': request_get_namespace_names,
@@ -425,6 +456,9 @@ PROCESS = {
     'get_blockchain_height': process_get_blockchain_height,
     'get_blockchain_score': process_get_blockchain_score,
     'get_diagnostic_storage': process_get_diagnostic_storage,
+
+    # MOSAIC
+    'get_mosaic_names': process_get_mosaic_names,
 
     # NAMESPACE
     'get_namespace': process_get_namespace,

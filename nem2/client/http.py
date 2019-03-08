@@ -120,6 +120,17 @@ def factory(callback: typing.Callable) -> tuple:
         def __init__(self, endpoint: str) -> None:
             super().__init__(endpoint)
 
+        # TODO(ahuszagh)
+        # getAccountInfo
+        # getAccountsInfo
+        # getMultisigAccountInfo
+        # getMultisigAccountGraphInfo
+        # transactions
+        # incomingTransactions
+        # outgoingTransactions
+        # unconfirmedTransactions
+        # aggregateBondedTransactions
+
     class BlockchainHttp(HttpBase):
         """Blockchain client for the synchronous NIS API."""
 
@@ -133,7 +144,7 @@ def factory(callback: typing.Callable) -> tuple:
 
         getBlockByHeight = util.undoc(get_block_by_height)
 
-        # TODO(ahuszagh) Implement...
+        # TODO(ahuszagh)
         # getBlockTransactions
         # getBlocksByHeightWithLimit
 
@@ -161,6 +172,16 @@ def factory(callback: typing.Callable) -> tuple:
         @util.doc(documentation.INIT)
         def __init__(self, endpoint: str) -> None:
             super().__init__(endpoint)
+
+        @util.doc(documentation.GET_MOSAIC_NAMES)
+        def get_mosaic_names(self, ids: typing.Sequence['MosaicId'], timeout=None) -> typing.Sequence['MosaicName']:
+            return nis.get_mosaic_names[0](self._host, ids, timeout=timeout)
+
+        getMosaicNames = util.undoc(get_mosaic_names)
+
+        # TODO(ahuszagh)
+        # getMosaic
+        # getMosaics
 
     class NamespaceHttp(HttpBase):
         """Namespace client for the synchronous NIS API."""
@@ -224,6 +245,16 @@ def factory(callback: typing.Callable) -> tuple:
         @util.doc(documentation.INIT)
         def __init__(self, endpoint: str) -> None:
             super().__init__(endpoint)
+
+        # TODO(ahuszagh)
+        # getTransaction
+        # getTransactions
+        # getTransactionStatus
+        # getTransactionsStatuses
+        # announce
+        # announceAggregateBonded
+        # announceAggregateBondedCosignature
+        # announceSync
 
     return (
         Http,
