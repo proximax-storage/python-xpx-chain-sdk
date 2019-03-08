@@ -27,6 +27,24 @@ Get block information from the block height.
 :return: Information describing block.
 """
 
+GET_BLOCKCHAIN_HEIGHT = """
+Get current blockchain height.
+
+:return: Blockchain height.
+"""
+
+GET_BLOCKCHAIN_SCORE = """
+Get current blockchain score.
+
+:return: Blockchain score.
+"""
+
+GET_DIAGNOSTIC_STORAGE = """
+Get diagnostic storage information for blockchain.
+
+:return: Blockchain diagnostic storage information.
+"""
+
 # NAMESPACE
 
 GET_NAMESPACE = """

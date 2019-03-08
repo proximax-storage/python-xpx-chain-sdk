@@ -27,6 +27,7 @@
 
 import typing
 
+from nem2 import util
 from nem2 import models
 
 if typing.TYPE_CHECKING:
@@ -110,7 +111,83 @@ def process_get_block_by_height(status: int, json: dict) -> 'BlockInfo':
 
 get_block_by_height = request("get_block_by_height", "", True)
 
-# chain/height
+
+def request_get_blockchain_height(host: 'Host', timeout=None):
+    """
+    Make "/chain/height" request.
+
+    :param host: Host wrapper for client.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return host.get("/chain/height", timeout=timeout)
+
+
+def process_get_blockchain_height(status: int, json: dict) -> int:
+    """
+    Process the "/chain/height" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return util.dto_to_uint64(json['height'])
+
+
+get_blockchain_height = request("get_blockchain_height", "", True)
+
+
+def request_get_blockchain_score(host: 'Host', timeout=None):
+    """
+    Make "/chain/score" request.
+
+    :param host: Host wrapper for client.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return host.get("/chain/score", timeout=timeout)
+
+
+def process_get_blockchain_score(status: int, json: dict) -> 'BlockchainScore':
+    """
+    Process the "/chain/score" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return models.BlockchainScore.from_dto(json)
+
+
+get_blockchain_score = request("get_blockchain_score", "", True)
+
+
+def request_get_diagnostic_storage(host: 'Host', timeout=None):
+    """
+    Make "/diagnostic/storage" request.
+
+    :param host: Host wrapper for client.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return host.get("/diagnostic/storage", timeout=timeout)
+
+
+def process_get_diagnostic_storage(status: int, json: dict) -> 'BlockchainStorageInfo':
+    """
+    Process the "/diagnostic/storage" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return models.BlockchainStorageInfo.from_dto(json)
+
+
+get_diagnostic_storage = request("get_diagnostic_storage", "", True)
 
 # MOSAIC HTTP
 # -----------
@@ -326,6 +403,9 @@ get_network_type = request("get_network_type", "", True)
 REQUEST = {
     # BLOCKCHAIN
     'get_block_by_height': request_get_block_by_height,
+    'get_blockchain_height': request_get_blockchain_height,
+    'get_blockchain_score': request_get_blockchain_score,
+    'get_diagnostic_storage': request_get_diagnostic_storage,
 
     # NAMESPACE
     'get_namespace': request_get_namespace,
@@ -342,6 +422,9 @@ REQUEST = {
 PROCESS = {
     # BLOCKCHAIN
     'get_block_by_height': process_get_block_by_height,
+    'get_blockchain_height': process_get_blockchain_height,
+    'get_blockchain_score': process_get_blockchain_score,
+    'get_diagnostic_storage': process_get_diagnostic_storage,
 
     # NAMESPACE
     'get_namespace': process_get_namespace,

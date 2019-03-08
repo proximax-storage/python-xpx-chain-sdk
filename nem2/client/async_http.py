@@ -144,12 +144,29 @@ def factory(callback: typing.Callable) -> tuple:
         getBlockByHeight = util.undoc(get_block_by_height)
 
         # TODO(ahuszagh) Implement...
-        # getBlockByHeight
         # getBlockTransactions
         # getBlocksByHeightWithLimit
-        # getBlockchainHeight
-        # getBlockchainScore
-        # getDiagnosticStorage
+
+        @util.doc(documentation.GET_BLOCKCHAIN_HEIGHT)
+        @util.observable
+        async def get_blockchain_height(self, timeout=None) -> int:
+            return await nis.get_blockchain_height[1](self._host, timeout=timeout)
+
+        getBlockchainHeight = util.undoc(get_blockchain_height)
+
+        @util.doc(documentation.GET_BLOCKCHAIN_SCORE)
+        @util.observable
+        async def get_blockchain_score(self, timeout=None) -> 'BlockchainScore':
+            return await nis.get_blockchain_score[1](self._host, timeout=timeout)
+
+        getBlockchainScore = util.undoc(get_blockchain_score)
+
+        @util.doc(documentation.GET_DIAGNOSTIC_STORAGE)
+        @util.observable
+        async def get_diagnostic_storage(self, timeout=None) -> 'BlockchainStorageInfo':
+            return await nis.get_diagnostic_storage[1](self._host, timeout=timeout)
+
+        getDiagnosticStorage = util.undoc(get_diagnostic_storage)
 
     class AsyncMosaicHttp(HttpBase):
         """Mosaic client for the asynchronous NIS API."""

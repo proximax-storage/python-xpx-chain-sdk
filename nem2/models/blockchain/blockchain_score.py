@@ -25,8 +25,7 @@
 from nem2 import util
 
 
-# TODO(ahuszagh) Need Dto?
-class BlockchainScore(util.Tie):
+class BlockchainScore(util.Dto, util.Tie):
     """Blockchain score describing the block difficulty."""
 
     _score: int
@@ -55,3 +54,17 @@ class BlockchainScore(util.Tie):
         return util.uint128_high(self.score)
 
     scoreHigh = util.undoc(score_high)
+
+    @util.doc(util.Dto.to_dto)
+    def to_dto(self) -> dict:
+        return {
+            'scoreLow': util.uint64_to_dto(self.score_low),
+            'scoreHigh': util.uint64_to_dto(self.score_high),
+        }
+
+    @util.doc(util.Dto.from_dto)
+    @classmethod
+    def from_dto(cls, data: dict) -> 'BlockchainScore':
+        score_low = data['scoreLow']
+        score_high = data['scoreHigh']
+        return cls(util.dto_to_uint128([score_low, score_high]))

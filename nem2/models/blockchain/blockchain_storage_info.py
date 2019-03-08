@@ -25,8 +25,7 @@
 from nem2 import util
 
 
-# TODO(ahuszagh) Need Dto?
-class BlockchainStorageInfo(util.Tie):
+class BlockchainStorageInfo(util.Dto, util.Tie):
     """Blockchain information describing stored data."""
 
     _num_blocks: int
@@ -63,3 +62,19 @@ class BlockchainStorageInfo(util.Tie):
         return self._num_accounts
 
     numAccounts = util.undoc(num_accounts)
+
+    @util.doc(util.Dto.to_dto)
+    def to_dto(self) -> dict:
+        return {
+            "numBlocks": self.num_blocks,
+            "numTransactions": self.num_transactions,
+            "numAccounts": self.num_accounts
+        }
+
+    @util.doc(util.Dto.from_dto)
+    @classmethod
+    def from_dto(cls, data: dict) -> 'BlockchainStorageInfo':
+        num_blocks = data['numBlocks']
+        num_transactions = data['numTransactions']
+        num_accounts = data['numAccounts']
+        return cls(num_blocks, num_transactions, num_accounts)
