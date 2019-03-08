@@ -48,17 +48,16 @@ def generate_mosaic_id(nonce: bytes, public_key: bytes) -> int:
     :param nonce: Mosaic nonce.
     :param owner: Account of mosaic owner.
 
-    Example
-    -------
+    Example:
+        .. code-block:: python
 
-    .. code-block:: python
-        >>> nonce = b'\x00\x00\x00\x00'
-        >>> public_key = binascii.unhexlify(
-        ...     '7D08373CFFE4154E129E04F0827E5F3D'
-        ...     '6907587E348757B0F87D2F839BF88246'
-        ... )
-        >>> generate_mosaic_id(nonce, public_key)
-        3456466875032780966
+            >>> nonce = b'\x00\x00\x00\x00'
+            >>> public_key = binascii.unhexlify(
+            ...     '7D08373CFFE4154E129E04F0827E5F3D'
+            ...     '6907587E348757B0F87D2F839BF88246'
+            ... )
+            >>> generate_mosaic_id(nonce, public_key)
+            3456466875032780966
     """
 
     assert len(nonce) == 4
@@ -78,13 +77,12 @@ def generate_namespace_id(*names: str) -> typing.Sequence[int]:
 
     :param *names: Component names for a namespace.
 
-    Example
-    -------
+    Example:
+        .. code-block:: python
 
-    .. code-block:: python
-       >>> generate_namespace_id("sample")
-       >>> generate_namespace_id("sample", "subpath")
-       >>> generate_namespace_id("sample.subpath")
+           >>> generate_namespace_id("sample")
+           >>> generate_namespace_id("sample", "subpath")
+           >>> generate_namespace_id("sample.subpath")
     """
 
     name = '.'.join(names)

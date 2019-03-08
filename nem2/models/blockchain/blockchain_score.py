@@ -29,7 +29,7 @@ from nem2 import util
 class BlockchainScore(util.Tie):
     """Blockchain score describing the block difficulty."""
 
-    __slots__ = ('_score',)
+    _score: int
 
     def __init__(self, score: int) -> None:
         """
@@ -55,8 +55,3 @@ class BlockchainScore(util.Tie):
         return util.uint128_high(self.score)
 
     scoreHigh = util.undoc(score_high)
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()
-

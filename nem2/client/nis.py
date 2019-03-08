@@ -25,13 +25,17 @@
     limitations under the License.
 """
 
-import inspect
 import typing
 
 from nem2 import models
 
+if typing.TYPE_CHECKING:
+    from .host import Host
+    from nem2.models import *
+
 # BOILERPLATE
 # -----------
+
 
 def synchronous_request(name, doc, raise_for_status=False):
     """Generate wrappers for a synchronous request."""
@@ -44,11 +48,12 @@ def synchronous_request(name, doc, raise_for_status=False):
         json = response.json()
         return PROCESS[name](status, json)
 
-    f.__name__= name
-    f.__doc__= doc
+    f.__name__ = name
+    f.__doc__ = doc
     f.func_name = name
 
     return f
+
 
 def asynchronous_request(name, doc, raise_for_status=False):
     """Generate wrappers for an asynchronous request."""
@@ -61,8 +66,8 @@ def asynchronous_request(name, doc, raise_for_status=False):
             json = await response.json()
             return PROCESS[name](status, json)
 
-    f.__name__= "async_{}".format(name)
-    f.__doc__= doc
+    f.__name__ = "async_{}".format(name)
+    f.__doc__ = doc
     f.func_name = "async_{}".format(name)
 
     return f
@@ -112,6 +117,7 @@ get_block_by_height = request("get_block_by_height", "", True)
 
 # NAMESPACE HTTP
 # --------------
+
 
 def request_get_namespace(host: 'Host', namespace_id: 'NamespaceId', timeout=None):
     """
@@ -233,6 +239,7 @@ NETWORK_TYPE = {
     'public': models.NetworkType.MAIN_NET,
     'publicTest': models.NetworkType.TEST_NET,
 }
+
 
 def request_get_network_type(host: 'Host', timeout=None):
     """

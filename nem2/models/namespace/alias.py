@@ -35,10 +35,8 @@ ValueType = typing.Optional[typing.Union['Address', 'MosaicId']]
 class Alias(util.Dto, util.Tie):
     """Alias for type definitions."""
 
-    __slots__ = (
-        '_type',
-        '_value',
-    )
+    _type: 'AliasType'
+    _value: ValueType
 
     def __init__(self, value: ValueType = None) -> None:
         """
@@ -55,7 +53,7 @@ class Alias(util.Dto, util.Tie):
             raise TypeError("Got invalid value type for Alias.")
 
     @property
-    def type(self) -> AliasType:
+    def type(self) -> 'AliasType':
         """Get the value type."""
         return self._type
 
@@ -77,10 +75,6 @@ class Alias(util.Dto, util.Tie):
         return self.value
 
     mosaicId = util.undoc(mosaic_id)
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()
 
     @util.doc(util.Dto.to_dto)
     def to_dto(self) -> typing.Optional[dict]:

@@ -43,19 +43,17 @@ def to_flags(supply_mutable: bool, transferable: bool, levy_mutable: bool) -> in
 
 
 DURATION_ID = 2
-
 PROPERTIES = {
     DURATION_ID: 'duration'
 }
 
+
 class MosaicProperties(util.Model):
     """Properties of an asset."""
 
-    __slots__ = (
-        '_flags',
-        '_divisibility',
-        '_duration',
-    )
+    _flags: int
+    _divisibility: int
+    _duration: int
 
     def __init__(self, flags: int, divisibility: int, duration: int = 0) -> None:
         """
@@ -120,10 +118,6 @@ class MosaicProperties(util.Model):
         flags = to_flags(supply_mutable, transferable, levy_mutable)
         return MosaicProperties(flags, divisibility, duration)
 
-    @util.doc(util.Model.tie)
-    def tie(self) -> tuple:
-        return super().tie()
-
     @util.doc(util.Model.to_dto)
     def to_dto(self) -> typing.Sequence[util.Uint64DtoType]:
         return [
@@ -148,7 +142,7 @@ class MosaicProperties(util.Model):
 
     @util.doc(util.Model.from_catbuffer)
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> ('MosaicProperties', bytes):
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicProperties', bytes]:
         # Read the array count, property flags and divisibility.
         assert len(data) >= 3
         count, flags, divisibility = struct.unpack('<BBB', data[:3])

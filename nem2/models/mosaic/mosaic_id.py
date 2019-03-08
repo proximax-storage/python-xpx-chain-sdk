@@ -23,14 +23,18 @@
 """
 
 import struct
+import typing
 
 from nem2 import util
+
+if typing.TYPE_CHECKING:
+    from .mosaic_nonce import MosaicNonce
+    from ..account.public_account import PublicAccount
 
 
 class MosaicId(util.Model):
     """Mosaic identifier."""
 
-    __slots__ = ('_id',)
     _id: int
 
     def __init__(self, id: int) -> None:
@@ -76,10 +80,6 @@ class MosaicId(util.Model):
 
     createFromNonce = util.undoc(create_from_nonce)
 
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()
-
     @util.doc(util.Model.to_dto)
     def to_dto(self) -> util.Uint64DtoType:
         return util.uint64_to_dto(self.id)
@@ -95,7 +95,7 @@ class MosaicId(util.Model):
 
     @util.doc(util.Model.from_catbuffer)
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> ('MosaicId', bytes):
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicId', bytes]:
         assert len(data) >= 8
         inst = cls(struct.unpack('<Q', data[:8])[0])
         return inst, data[8:]

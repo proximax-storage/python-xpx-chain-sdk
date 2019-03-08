@@ -61,12 +61,11 @@ class NetworkCurrencyMosaic(Mosaic):
 
         :param amount: Mosaic quantity in relative units.
 
-        Example
-        -------
+        Example:
+            .. code-block:: python
 
-        .. code-block:: python
-            >>> NetworkCurrencyMosaic.create_relative(1).amount
-            1000000
+                >>> NetworkCurrencyMosaic.create_relative(1).amount
+                1000000
         """
         return NetworkCurrencyMosaic(amount * 10 ** cls.DIVISIBILITY)
 
@@ -79,12 +78,11 @@ class NetworkCurrencyMosaic(Mosaic):
 
         :param amount: Mosaic quantity in absolute units.
 
-        Example
-        -------
+        Example:
+            .. code-block:: python
 
-        .. code-block:: python
-            >>> NetworkCurrencyMosaic.create_relative(1).amount
-            1
+                >>> NetworkCurrencyMosaic.create_relative(1).amount
+                1
         """
         return NetworkCurrencyMosaic(amount)
 

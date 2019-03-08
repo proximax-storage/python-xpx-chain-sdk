@@ -11,7 +11,7 @@ import copy
 import datetime
 import json
 
-from urllib3.exceptions import HTTPError as BaseHTTPError
+from .exceptions import *
 
 __version__ = "2.21"
 
@@ -19,85 +19,6 @@ __version__ = "2.21"
 #   Need to add support for cookies.
 #   Need to add support for prep-prepared requests.
 #   Need to the request and redirects to the response object.
-
-class RequestException(IOError):
-    pass
-
-
-class HTTPError(RequestException):
-    pass
-
-
-class ConnectionError(RequestException):
-    pass
-
-
-class ProxyError(RequestException):
-    pass
-
-
-class SSLError(RequestException):
-    pass
-
-
-class Timeout(RequestException):
-    pass
-
-
-class ConnectTimeout(ConnectionError, Timeout):
-    pass
-
-
-class ReadTimeout(Timeout):
-    pass
-
-
-class URLRequired(RequestException):
-    pass
-
-
-class TooManyRedirects(RequestException):
-    pass
-
-
-class MissingSchema(RequestException, ValueError):
-    pass
-
-
-class InvalidSchema(RequestException, ValueError):
-    pass
-
-
-class InvalidURL(RequestException, ValueError):
-    pass
-
-
-class InvalidHeader(RequestException, ValueError):
-    pass
-
-
-class InvalidProxyURL(InvalidURL):
-    pass
-
-
-class ChunkedEncodingError(RequestException):
-    pass
-
-
-class ContentDecodingError(RequestException, BaseHTTPError):
-    pass
-
-
-class StreamConsumedError(RequestException, TypeError):
-    pass
-
-
-class RetryError(RequestException):
-    pass
-
-
-class UnrewindableBodyError(RequestException):
-    pass
 
 
 class CaseInsensitiveDict(dict):
@@ -169,10 +90,6 @@ class CaseInsensitiveDict(dict):
         return self.d.values()
 
     __hash__ = None
-
-
-#class Request:
-#    pass
 
 
 class Response:
@@ -335,6 +252,7 @@ def delete(url, **kwds):
 EXCEPTION = None
 RESPONSE = None
 
+
 @contextlib.contextmanager
 def default_exception(exception_type, *args, **kwds):
     """Set the global, default exception."""
@@ -345,6 +263,7 @@ def default_exception(exception_type, *args, **kwds):
         yield
     finally:
         EXCEPTION = None
+
 
 @contextlib.contextmanager
 def default_response(status_code=200, **kwds):

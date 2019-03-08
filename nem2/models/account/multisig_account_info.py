@@ -26,6 +26,9 @@ import typing
 
 from nem2 import util
 
+if typing.TYPE_CHECKING:
+    from .public_account import PublicAccount
+
 PublicAccountListType = typing.Sequence['PublicAccount']
 
 
@@ -37,13 +40,11 @@ class MultisigAccountInfo(util.Tie):
     operate as an entity, requiring a certain consensus for operations.
     """
 
-    __slots__ = (
-        '_account',
-        '_min_approval',
-        '_min_removal',
-        '_cosignatories',
-        '_multisig_accounts',
-    )
+    _account: 'PublicAccount'
+    _min_approval: int
+    _min_removal: int
+    _cosignatories: PublicAccountListType
+    _multisig_accounts: PublicAccountListType
 
     def __init__(self,
         account: 'PublicAccount',
@@ -124,7 +125,3 @@ class MultisigAccountInfo(util.Tie):
         return account in self.multisig_accounts
 
     isCosignerOfMultisigAccount = util.undoc(is_cosigner_of_multisig_account)
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()

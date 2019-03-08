@@ -5,12 +5,19 @@ from nem2.util import hashlib
 from tests import harness
 from .helper import *
 
+HASH = {
+    224: SHA3_224,
+    256: SHA3_256,
+    384: SHA3_384,
+    512: SHA3_512,
+}
+
 
 def generate_testcase(bits, full_hexdigest):
     name = "sha3_{}".format(bits)
     digest_size = bits // 8
     func = getattr(hashlib, name)
-    func_c = globals()['SHA3_{}'.format(bits)].new
+    func_c = HASH[bits].new
 
     class Sha3Test(harness.TestCase):
 

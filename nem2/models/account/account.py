@@ -22,20 +22,23 @@
     limitations under the License.
 """
 
+import typing
+
 from nem2 import util
 from nem2.util.signature import ed25519
 from .address import Address
 from .public_account import PublicAccount
 
+if typing.TYPE_CHECKING:
+    from ..blockchain.network_type import NetworkType
+
 
 class Account(util.Tie):
     """Describe account via private key, public key and account address."""
 
-    __slots__ = (
-        '_address',
-        '_public_key',
-        '_private_key',
-    )
+    _address: 'Address'
+    _public_key: str
+    _private_key: str
 
     def __init__(self, address: Address, public_key: str, private_key: str) -> None:
         """
@@ -150,7 +153,3 @@ class Account(util.Tie):
         return util.hexlify(key.sign(data))
 
     signData = util.undoc(sign_data)
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()

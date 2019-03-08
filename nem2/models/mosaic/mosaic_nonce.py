@@ -27,6 +27,7 @@
 
 import os
 import struct
+import typing
 
 from nem2 import util
 
@@ -34,7 +35,7 @@ from nem2 import util
 class MosaicNonce(util.Model):
     """Nonce for a mosaic."""
 
-    __slots__ = ('_nonce',)
+    _nonce: bytes
 
     def __init__(self, nonce: bytes) -> None:
         """
@@ -50,7 +51,7 @@ class MosaicNonce(util.Model):
         return self._nonce
 
     def __int__(self) -> int:
-        return struct.unpack('<I', self.nonce)[0]
+        return typing.cast(int, struct.unpack('<I', self.nonce)[0])
 
     def __index__(self) -> int:
         return self.__int__()
@@ -92,10 +93,6 @@ class MosaicNonce(util.Model):
 
     createFromInt = util.undoc(create_from_int)
 
-    @util.doc(util.Model.tie)
-    def tie(self) -> tuple:
-        return super().tie()
-
     @util.doc(util.Model.to_dto)
     def to_dto(self) -> util.Uint64DtoType:
         return list(self.nonce)
@@ -111,7 +108,7 @@ class MosaicNonce(util.Model):
 
     @util.doc(util.Model.from_catbuffer)
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> ('MosaicNonce', bytes):
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicNonce', bytes]:
         assert len(data) >= 4
         inst = cls(data[:4])
         return inst, data[4:]

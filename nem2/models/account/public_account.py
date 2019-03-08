@@ -31,12 +31,10 @@ from ..blockchain.network_type import NetworkType
 class PublicAccount(util.Tie):
     """Describe public account information via public key and account address."""
 
-    __slots__ = (
-        '_address',
-        '_public_key',
-    )
+    _address: 'Address'
+    _public_key: str
 
-    def __init__(self, address: Address, public_key: str) -> None:
+    def __init__(self, address: 'Address', public_key: str) -> None:
         """
         :param address: Address for the account.
         :param public_key: Hex-encoded public key (with or without '0x' prefix).
@@ -106,7 +104,3 @@ class PublicAccount(util.Tie):
             return False
 
     verifySignature = util.undoc(verify_signature)
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()

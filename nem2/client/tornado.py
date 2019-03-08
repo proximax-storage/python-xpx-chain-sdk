@@ -25,39 +25,33 @@
     limitations under the License.
 """
 
-__all__ = [
-    'Http',
-    'AccountHttp',
-    'AsyncHttp',
-    'AsyncAccountHttp',
-]
-
-from tornado.httpclient import AsyncHTTPClient, HTTPClient, HTTPRequest
-from tornado.httputil import url_concat, urlencode
+from tornado import httpclient
+# TODO(ahuszagh) Restore.
+# from tornado import httputil
 
 
-def format_request(url, method, **kwds) -> 'HTTPRequest':
-    """Format a request to form a valid HTTPRequest."""
-
-    # TODO(ahuszagh) Only add to the URL for a get request...
-    # TODO(ahuszagh) This is so annoying, so deal with it later.
-    params = kwds.pop('params', None)
-    if method == "GET":
-        url = url_concat(url, params)
-    elif method == "POST":
-        # TODO(only if it's a mapping object...)
-        body = urlencode(params)
-    timeout = kwds.pop('timeout', None)
-    # TODO(ahuszagh) Add more for other methods...
-
-    return HTTPRequest(url, method=method, request_timeout=timeout)
+# TODO(ahuszagh) Restore.
+# def format_request(url, method, **kwds) -> 'httpclient.HTTPRequest':
+#     """Format a request to form a valid HTTPRequest."""
+#
+#     # TODO(ahuszagh) Only add to the URL for a get request...
+#     # TODO(ahuszagh) This is so annoying, so deal with it later.
+#     params = kwds.pop('params', None)
+#     if method == "GET":
+#         url = httputil.url_concat(url, params)
+#     elif method == "POST":
+#         # TODO(only if it's a mapping object...)
+#         body = httputil.urlencode(params)
+#     timeout = kwds.pop('timeout', None)
+#
+#     return httpclient.HTTPRequest(url, method=method, request_timeout=timeout)
 
 
 class SyncClient:
     """Wrapper for tornado.httpclient.HTTPClient()."""
 
     def __init__(self) -> None:
-        self._client = HTTPClient()
+        self._client = httpclient.HTTPClient()
 
     def get(self, url, **kwds):
         raise NotImplementedError
@@ -70,7 +64,7 @@ class AsyncClient:
     """Wrapper for tornado.httpclient.AsyncHTTPClient()."""
 
     def __init__(self) -> None:
-        self._client = AsyncHTTPClient()
+        self._client = httpclient.AsyncHTTPClient()
 
     def get(self, url, **kwds):
         raise NotImplementedError
@@ -86,15 +80,6 @@ class SyncResponse:
 class AsyncResponse:
     pass
 
-# TODO(ahuszagh) Implement...
-#import atexit
-#from tornado.httpclient import AsyncHTTPClient, HTTPClient
-#
-#_HTTP_SESSION = HTTPClient()
-#atexit.register(_HTTP_SESSION.close)
-#
-#_ASYNC_HTTP_SESSION = AsyncHTTPClient()
-#atexit.register(_ASYNC_HTTP_SESSION.close)
 
 # TODO(ahuszagh) Need to think about restructuring this, since we may just
 # Want async and sync shared code, for tornado or non-tornado backends.

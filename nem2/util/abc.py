@@ -27,6 +27,7 @@ import enum
 import inspect
 import sys
 import types
+import typing
 
 from .format import InterchangeFormat
 from .reify import reify
@@ -37,23 +38,23 @@ __all__ = [
     'Dto',
     'Catbuffer',
     'Model',
+    'IntEnumDto',
+    'IntEnumCatbuffer',
+    'IntEnumModel',
     'Tie',
-    'enum_catbuffer',
-    'enum_dto',
-    'enum_model',
 ]
 
 # ABC ENU META
 # ------------
 
 
-def abc_enum_error(cls: type) -> None:
+def abc_enum_error(cls):
     """Raise TypeError for abstract enum without all methods implemented."""
 
     raise TypeError(f"Can't instantiate abstract class {cls.__name__} with abstract methods {', '.join(cls.__abstractmethods__)}")
 
 
-def check_abstractmethods(cls: type, base: type) -> None:
+def check_abstractmethods(cls, base):
     """Ensure all abstractmethods are defined in the cls."""
 
     # Check all abstract members are defined
@@ -74,7 +75,7 @@ def check_abstractmethods(cls: type, base: type) -> None:
                 abc_enum_error(base)
 
 
-def add_nonabc(cls: type, base: type) -> None:
+def add_nonabc(cls, base):
     """Add over all methods not present in abc.ABC from a base to a cls."""
 
     abc_dict = abc.ABC.__dict__
@@ -97,12 +98,12 @@ def add_nonabc(cls: type, base: type) -> None:
 if sys.version_info < (3, 7):
     # < Python 3.7, uses object.__new__ for enum subtype, must fake
     # inheritance.
-    class ABCEnumMeta(abc.ABCMeta, enum.EnumMeta):
+    class ABCEnumMeta(enum.EnumMeta, abc.ABCMeta):
         """Abstract metaclass that is both abstract and an enumeration."""
 
         # Store abstract base classes to fake inheritance for
         # Python <= 3.7.
-        abc_memo = {}
+        abc_memo: typing.Dict = {}
 
         @property
         def abcs(cls):
@@ -142,7 +143,8 @@ if sys.version_info < (3, 7):
             # Check abstract methods and add any non-abstract methods present.
             # Add an intermediary derived class so super() uses this, which
             # has all the nonabc methods.
-            class derived(*enums):  pass
+            class derived(*enums):
+                pass
             for base in abcs:
                 add_nonabc(derived, base)
 
@@ -166,7 +168,7 @@ if sys.version_info < (3, 7):
 
 else:
     # >= Python 3.7, uses proper __new__ for enum subtype.
-    class ABCEnumMeta(abc.ABCMeta, enum.EnumMeta):
+    class ABCEnumMeta(enum.EnumMeta, abc.ABCMeta):
         """Abstract metaclass that is both abstract and an enumeration."""
 
         def __new__(mcls, name, bases, classdict, **kwds):
@@ -186,7 +188,7 @@ else:
 # ------
 
 
-def reciprocal_issubclass(lhs: type, rhs: type) -> bool:
+def reciprocal_issubclass(lhs, rhs):
     """Check if lhs or rhs is a subclass of the other."""
 
     return issubclass(lhs, rhs) or issubclass(rhs, lhs)
@@ -229,7 +231,7 @@ class Catbuffer(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def from_catbuffer(cls, data: bytes):
+    def from_catbuffer(cls, data):
         """Deserialize object from catbuffer interchange format."""
 
     @classmethod
@@ -237,37 +239,39 @@ class Catbuffer(abc.ABC):
         return cls.from_catbuffer(data)
 
 
-class Tie(abc.ABC):
-    """Simplify the implementation of special methods through `tie()`."""
+class Tie:
+    """
+    Access all fields though `_fields_`, and all values through `_values_`.
+
+    Provides default implementations for `__repr__`, `__str__`, and `__eq__`
+    through field access.
+    """
 
     @property
-    def slots(self):
-        return tuple((i for i in self.__slots__ if not i.endswith('_')))
+    def _fields_(self) -> typing.Tuple[str, ...]:
+        filtered = filter(lambda x: not x.endswith('_'), self.__annotations__)
+        return tuple((i.lstrip('_') for i in filtered))
 
-    @abc.abstractmethod
-    def tie(self) -> tuple:
-        """Create tuple from fields, for internal use only."""
-
-        return tuple(getattr(self, i) for i in self.slots)
+    @property
+    def _values_(self) -> tuple:
+        return tuple(getattr(self, i) for i in self._fields_)
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
-        slots = (i.lstrip('_') for i in self.slots)
-        fields = ', '.join(i + '={!r}' for i in slots)
+        fields = ', '.join(i + '={!r}' for i in self._fields_)
         string = f'{name}({fields})'
-        return string.format(*self.tie())
+        return string.format(*self._values_)
 
     def __str__(self) -> str:
         name = self.__class__.__name__
-        slots = (i.lstrip('_') for i in self.slots)
-        fields = ', '.join(i + '={!s}' for i in slots)
+        fields = ', '.join(i + '={!s}' for i in self._fields_)
         string = f'{name}({fields})'
-        return string.format(*self.tie())
+        return string.format(*self._values_)
 
     def __eq__(self, other) -> bool:
         if not reciprocal_issubclass(type(self), type(other)):
             return False
-        return self.tie() == other.tie()
+        return typing.cast(bool, self._values_ == other._values_)
 
 
 class Model(Dto, Catbuffer, Tie):
@@ -287,6 +291,7 @@ class Model(Dto, Catbuffer, Tie):
 
 # ENUM MODELS
 # -----------
+
 
 def wrap_class(meta, *bases):
     """Wrap existing class to inject bases and a metaclass into the class."""
@@ -318,3 +323,15 @@ def enum_model(*bases):
     """Create a NEM model from an enumeration."""
 
     return wrap_class(ABCEnumMeta, Dto, Catbuffer, *bases)
+
+
+if typing.TYPE_CHECKING:
+    # MyPy doesn't work with dynamic bases, just ignore them.
+    IntEnumDto = enum.IntEnum
+    IntEnumCatbuffer = enum.IntEnum
+    IntEnumModel = enum.IntEnum
+else:
+    # Use the proper model with ABC.
+    IntEnumDto = enum_dto(enum.IntEnum)
+    IntEnumCatbuffer = enum_catbuffer(enum.IntEnum)
+    IntEnumModel = enum_catbuffer(enum.IntEnum)

@@ -1,4 +1,5 @@
 from .account.account import Account
+from .account.account_info import AccountInfo
 from .account.address import Address
 from .account.multisig_account_graph_info import MultisigAccountGraphInfo
 from .account.multisig_account_info import MultisigAccountInfo
@@ -36,6 +37,7 @@ from nem2.util import InterchangeFormat
 __all__ = [
     # Account
     'Account',
+    'AccountInfo',
     'Address',
     'MultisigAccountGraphInfo',
     'MultisigAccountInfo',

@@ -23,6 +23,7 @@
 """
 
 import struct
+import typing
 
 from nem2 import util
 from .mosaic_id import MosaicId
@@ -31,12 +32,10 @@ from .mosaic_id import MosaicId
 class Mosaic(util.Model):
     """Basic information describing a mosaic."""
 
-    __slots__ = (
-        '_id',
-        '_amount',
-    )
+    _id: 'MosaicId'
+    _amount: int
 
-    def __init__(self, id: MosaicId, amount: int) -> None:
+    def __init__(self, id: 'MosaicId', amount: int) -> None:
         """
         :param id: Identifier for mosaic.
         :param amount: Mosaic quantity in the smallest unit possible.
@@ -45,7 +44,7 @@ class Mosaic(util.Model):
         self._amount = amount
 
     @property
-    def id(self) -> MosaicId:
+    def id(self) -> 'MosaicId':
         """Get identifier for mosaic."""
         return self._id
 
@@ -53,10 +52,6 @@ class Mosaic(util.Model):
     def amount(self) -> int:
         """Get mosaic quantity in the smallest unit possible."""
         return self._amount
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()
 
     @util.doc(util.Model.to_dto)
     def to_dto(self) -> dict:
@@ -73,11 +68,13 @@ class Mosaic(util.Model):
 
     @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
-        return self.id.to_catbuffer() + struct.pack('<Q', self.amount)
+        id: bytes = self.id.to_catbuffer()
+        amount: bytes = struct.pack('<Q', self.amount)
+        return id + amount
 
     @util.doc(util.Model.from_catbuffer)
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> ('Mosaic', bytes):
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['Mosaic', bytes]:
         assert len(data) >= 16
         id = MosaicId.from_catbuffer(data)[0]
         amount = struct.unpack('<Q', data[8:16])[0]

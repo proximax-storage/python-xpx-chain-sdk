@@ -6,6 +6,7 @@
     into requests providing solely a relative path.
 """
 
+
 class Host:
     """Host wrapper for an abstract HTTP session."""
 

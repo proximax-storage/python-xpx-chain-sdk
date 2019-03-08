@@ -27,14 +27,16 @@ import typing
 
 from nem2 import util
 
-GraphType = typing.Mapping[int, 'MultisigAccountInfo']
-GraphIterType = typing.Iterable[GraphType]
+if typing.TYPE_CHECKING:
+    from .multisig_account_info import MultisigAccountInfo
+
+GraphType = typing.MutableMapping[int, 'MultisigAccountInfo']
 
 
 class MultisigAccountGraphInfo(abc.MutableMapping, util.Tie):
     """Graph info for multi-sig accounts."""
 
-    __slots__ = ('_multisig_accounts',)
+    _multisig_accounts: GraphType
 
     def __init__(self, *args, **kwds) -> None:
         """
@@ -59,12 +61,8 @@ class MultisigAccountGraphInfo(abc.MutableMapping, util.Tie):
     def __delitem__(self, key: int) -> None:
         del self._multisig_accounts[key]
 
-    def __iter__(self) -> GraphIterType:
+    def __iter__(self) -> typing.Iterator:
         return iter(self._multisig_accounts)
 
     def __len__(self) -> int:
         return len(self._multisig_accounts)
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()

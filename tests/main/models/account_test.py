@@ -1,4 +1,3 @@
-import base64
 import warnings
 
 from nem2 import models

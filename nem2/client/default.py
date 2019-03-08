@@ -25,10 +25,29 @@
     limitations under the License.
 """
 
+__all__ = [
+    # Synchronous
+    'Http',
+    'AccountHttp',
+    'BlockchainHttp',
+    'MosaicHttp',
+    'NamespaceHttp',
+    'NetworkHttp',
+    'TransactionHttp',
+
+    # Asynchronous
+    'AsyncHttp',
+    'AsyncAccountHttp',
+    'AsyncBlockchainHttp',
+    'AsyncMosaicHttp',
+    'AsyncNamespaceHttp',
+    'AsyncNetworkHttp',
+    'AsyncTransactionHttp',
+]
+
 import asyncio
 import atexit
 import aiohttp
-import inspect
 import requests
 
 from nem2 import util
@@ -41,9 +60,11 @@ from . import http
 SYNC_SESSION = requests.Session()
 atexit.register(SYNC_SESSION.close)
 
-def sync_callback(endpoint: str) -> 'Host':
+
+def sync_callback(endpoint: str) -> 'host.Host':
     """Callback for synchronous HTTP client."""
     return host.Host(SYNC_SESSION, endpoint)
+
 
 (
     Http,
@@ -59,12 +80,14 @@ def sync_callback(endpoint: str) -> 'Host':
 
 ASYNC_SESSION = aiohttp.ClientSession()
 
+
 @atexit.register
 def close_sessions() -> None:
     loop = asyncio.get_event_loop()
     loop.run_until_complete(ASYNC_SESSION.close())
 
-def async_callback(endpoint: str, loop: util.OptionalLoopType = None) -> 'Host':
+
+def async_callback(endpoint: str, loop: util.OptionalLoopType = None) -> 'host.Host':
     """Callback for asynchronous HTTP client."""
 
     if loop is None:
@@ -73,6 +96,7 @@ def async_callback(endpoint: str, loop: util.OptionalLoopType = None) -> 'Host':
     # Create a managed session with an internal loop
     session = aiohttp.ClientSession(loop=loop)
     return host.AsyncHost(session, endpoint, loop=loop)
+
 
 (
     AsyncHttp,

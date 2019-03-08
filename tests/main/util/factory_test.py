@@ -3,6 +3,7 @@ import functools
 from nem2 import util
 from tests import harness
 
+
 def create():
 
     class A:

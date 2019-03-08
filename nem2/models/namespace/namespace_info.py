@@ -38,19 +38,17 @@ NamespaceIdListType = typing.Sequence['NamespaceId']
 class NamespaceInfo(util.Dto, util.Tie):
     """Information describing a namespace."""
 
-    __slots__ = (
-        '_active',
-        '_index',
-        '_meta_id',
-        '_type',
-        '_depth',
-        '_levels',
-        '_parent_id',
-        '_owner',
-        '_start_height',
-        '_end_height',
-        '_alias',
-    )
+    _active: bool
+    _index: int
+    _meta_id: str
+    _type: 'NamespaceType'
+    _depth: int
+    _levels: NamespaceIdListType
+    _parent_id: 'NamespaceId'
+    _owner: 'PublicAccount'
+    _start_height: int
+    _end_height: int
+    _alias: 'Alias'
 
     def __init__(self,
         active: bool,
@@ -185,10 +183,6 @@ class NamespaceInfo(util.Dto, util.Tie):
         if self.is_root():
             raise ValueError("Unable to get parent namespace ID of root namespace.")
         return self.parent_id
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()
 
     @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:

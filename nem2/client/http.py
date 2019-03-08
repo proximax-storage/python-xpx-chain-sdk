@@ -7,15 +7,13 @@
     The core HTTP client shares a global session, to share a connection
     pool to speed up requests.
 
-    Example
-    -------
+    Example:
+        .. code-block:: python
 
-    .. code-block:: python
-
-       >>> from nem2.client import Http
-       >>> http = Http("http://176.9.68.110:7890/")
-       >>> http.heartbeat()
-       <Heartbeat.OK: 1>
+           >>> from nem2.client import Http
+           >>> http = Http("http://176.9.68.110:7890/")
+           >>> http.heartbeat()
+           <Heartbeat.OK: 1>
 
     License
     -------
@@ -35,15 +33,14 @@
     limitations under the License.
 """
 
-__all__ = ['factory']
-
 import typing
 
-from nem2 import models
 from nem2 import util
 from . import documentation
-from . import host
 from . import nis
+
+if typing.TYPE_CHECKING:
+    from nem2.models import *
 
 
 def factory(callback: typing.Callable) -> tuple:
@@ -78,7 +75,6 @@ def factory(callback: typing.Callable) -> tuple:
             return self._network_type
 
         networkType = util.undoc(network_type)
-
 
     class Http(HttpBase):
         """Main client for the synchronous NIS API."""
@@ -117,16 +113,12 @@ def factory(callback: typing.Callable) -> tuple:
             """Get TransactionHttp to the same endpoint."""
             return TransactionHttp.from_http(self)
 
-
     class AccountHttp(HttpBase):
         """Account client for the synchronous NIS API."""
 
         @util.doc(documentation.INIT)
         def __init__(self, endpoint: str) -> None:
             super().__init__(endpoint)
-
-        #TODO(ahuszagh) Implement...
-
 
     class BlockchainHttp(HttpBase):
         """Blockchain client for the synchronous NIS API."""
@@ -141,15 +133,13 @@ def factory(callback: typing.Callable) -> tuple:
 
         getBlockByHeight = util.undoc(get_block_by_height)
 
-        #TODO(ahuszagh) Implement...
+        # TODO(ahuszagh) Implement...
         # getBlockByHeight
         # getBlockTransactions
         # getBlocksByHeightWithLimit
         # getBlockchainHeight
         # getBlockchainScore
         # getDiagnosticStorage
-        pass
-
 
     class MosaicHttp(HttpBase):
         """Mosaic client for the synchronous NIS API."""
@@ -157,7 +147,6 @@ def factory(callback: typing.Callable) -> tuple:
         @util.doc(documentation.INIT)
         def __init__(self, endpoint: str) -> None:
             super().__init__(endpoint)
-
 
     class NamespaceHttp(HttpBase):
         """Namespace client for the synchronous NIS API."""
@@ -194,7 +183,6 @@ def factory(callback: typing.Callable) -> tuple:
         # getLinkedMosaicId
         # getLinkedAddress
 
-
     class NetworkHttp(HttpBase):
         """Network client for the synchronous NIS API."""
 
@@ -207,7 +195,6 @@ def factory(callback: typing.Callable) -> tuple:
             return nis.get_network_type[0](self._host, timeout=timeout)
 
         getNetworkType = util.undoc(get_network_type)
-
 
     class TransactionHttp(HttpBase):
         """Transaction client for the synchronous NIS API."""

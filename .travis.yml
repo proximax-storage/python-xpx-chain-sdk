@@ -1,10 +1,9 @@
 language: python
 python:
-  - "3.5"
-  - "3.5-dev"  # 3.5 development branch
   - "3.6"
-  - "3.6-dev"  # 3.6 development branch
-  - "3.7-dev"  # 3.7 development branch
+  - "3.6-dev"
+  - "3.7"
+  - "3.7-dev"
 
 env:
   - FEATURES=
@@ -16,8 +15,11 @@ env:
   - FEATURES=[crypto,reactive,tornado]
 
 install:
+  - pip install mypy
+  - pip install flake8
   - pip install .$FEATURES
 
 script:
   - python setup.py mypy
+  - python setup.py lint
   - python setup.py test

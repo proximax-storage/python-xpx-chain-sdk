@@ -35,23 +35,21 @@ OptionalMerkleTreeType = typing.Optional[MerkleTreeType]
 class BlockInfo(util.Dto, util.Tie):
     """Basic information describing a block."""
 
-    __slots__ = (
-        '_hash',
-        '_generation_hash',
-        '_total_fee',
-        '_num_transactions',
-        '_signature',
-        '_signer',
-        '_network_type',
-        '_version',
-        '_type',
-        '_height',
-        '_timestamp',
-        '_difficulty',
-        '_previous_block_hash',
-        '_block_transactions_hash',
-        '_merkle_tree',
-    )
+    _hash: str
+    _generation_hash: str
+    _total_fee: int
+    _num_transactions: int
+    _signature: str
+    _signer: 'PublicAccount'
+    _network_type: 'NetworkType'
+    _version: int
+    _type: int
+    _height: int
+    _timestamp: int
+    _difficulty: int
+    _previous_block_hash: str
+    _block_transactions_hash: str
+    _merkle_tree: OptionalMerkleTreeType
 
     def __init__(self,
         hash: str,
@@ -191,10 +189,6 @@ class BlockInfo(util.Dto, util.Tie):
         return self._merkle_tree
 
     merkleTree = util.undoc(merkle_tree)
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()
 
     @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:

@@ -32,7 +32,7 @@ IdType = typing.Union[str, int]
 class NamespaceId(util.Dto, util.Tie):
     """Identifier for a namespace."""
 
-    __slots__ = ('_id',)
+    _id: int
 
     def __init__(self, id: IdType) -> None:
         """
@@ -70,10 +70,6 @@ class NamespaceId(util.Dto, util.Tie):
         """
 
         return NamespaceId(int(data, 16))
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()
 
     @util.doc(util.Dto.to_dto)
     def to_dto(self) -> util.Uint64DtoType:

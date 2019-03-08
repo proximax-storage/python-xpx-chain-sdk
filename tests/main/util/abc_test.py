@@ -58,4 +58,3 @@ class TestABCEnumMeta(harness.TestCase):
         with self.assertRaises(TypeError):
             class PartiallyDerivedEnum(Base, enum.IntEnum, metaclass=util.ABCEnumMeta):
                 SUCCESS = 0
-

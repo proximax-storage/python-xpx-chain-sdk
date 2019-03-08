@@ -61,12 +61,11 @@ class NetworkHarvestMosaic(Mosaic):
 
         :param amount: Mosaic quantity in relative units.
 
-        Example
-        -------
+        Example:
+            .. code-block:: python
 
-        .. code-block:: python
-            >>> NetworkHarvestMosaic.create_relative(1).amount
-            1000
+                >>> NetworkHarvestMosaic.create_relative(1).amount
+                1000
         """
         return NetworkHarvestMosaic(amount * 10 ** cls.DIVISIBILITY)
 
@@ -79,12 +78,12 @@ class NetworkHarvestMosaic(Mosaic):
 
         :param amount: Mosaic quantity in absolute units.
 
-        Example
-        -------
 
-        .. code-block:: python
-            >>> NetworkHarvestMosaic.create_relative(1).amount
-            1
+        Example:
+            .. code-block:: python
+
+                >>> NetworkHarvestMosaic.create_relative(1).amount
+                1
         """
         return NetworkHarvestMosaic(amount)
 

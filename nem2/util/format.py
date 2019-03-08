@@ -25,6 +25,9 @@
 import enum
 import typing
 
+if typing.TYPE_CHECKING:
+    from . import abc
+
 
 class InterchangeFormat(enum.IntEnum):
     """Enumerations for the NEM interchange formats."""
@@ -37,36 +40,36 @@ class InterchangeFormat(enum.IntEnum):
 
         return DESCRIPTION[self]
 
-    def serialize(self, value: typing.Any) -> typing.Any:
+    def serialize(self, value):
         """Serialize model to data interchange format."""
 
         return SERIALIZE[self](value)
 
-    def deserialize(self, data: typing.Any, value_type: type) -> typing.Any:
+    def deserialize(self, data, value_type):
         """Deserialize model from data interchange format."""
 
         return DESERIALIZE[self](data, value_type)
 
 
-def to_dto(value: typing.Any) -> typing.Any:
+def to_dto(value: 'abc.Dto'):
     """Export value to DTO."""
 
     return value.to_dto()
 
 
-def to_catbuffer(value: typing.Any) -> bytes:
+def to_catbuffer(value: 'abc.Catbuffer'):
     """Export value to catbuffer."""
 
     return value.to_catbuffer()
 
 
-def from_dto(data: typing.Any, value_type: type) -> typing.Any:
+def from_dto(data, value_type: typing.Type['abc.Dto']):
     """Load value from DTO."""
 
     return value_type.from_dto(data)
 
 
-def from_catbuffer(data: bytes, value_type: type) -> typing.Any:
+def from_catbuffer(data, value_type: typing.Type['abc.Catbuffer']):
     """Load value from catbuffer."""
 
     return value_type.from_catbuffer(data)[0]

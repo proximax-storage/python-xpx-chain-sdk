@@ -23,7 +23,12 @@
 """
 
 try:
-    from ed25519 import BadSignatureError, SigningKey, VerifyingKey, create_keypair
+    from ed25519 import (
+        BadSignatureError,
+        SigningKey,
+        VerifyingKey,
+        create_keypair
+    )
 except ImportError:
     from nem2.util import hashlib
     from . import fallback
@@ -32,4 +37,9 @@ except ImportError:
     def hash512(data: BytesType):
         return hashlib.sha512(data).digest()
 
-    BadSignatureError, SigningKey, VerifyingKey, create_keypair = fallback.generate_api(hash512)
+    (
+        BadSignatureError,
+        SigningKey,
+        VerifyingKey,
+        create_keypair
+    ) = fallback.generate_api(hash512)

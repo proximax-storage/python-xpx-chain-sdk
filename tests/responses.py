@@ -36,6 +36,7 @@ def load_response(name):
         data['content'] = data['content'].encode('utf8')
         return data
 
+
 BLOCK_INFO = {
     'Ok': load_response('block_info.json'),
 }

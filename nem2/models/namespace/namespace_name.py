@@ -29,10 +29,8 @@ from .namespace_id import NamespaceId
 class NamespaceName(util.Dto, util.Tie):
     """Namespace name and identifier."""
 
-    __slots__ = (
-        '_namespace_id',
-        '_name',
-    )
+    _namespace_id: 'NamespaceId'
+    _name: str
 
     def __init__(self, namespace_id: 'NamespaceId', name: str) -> None:
         """
@@ -64,10 +62,6 @@ class NamespaceName(util.Dto, util.Tie):
         """Get the namespace name."""
         return self._name
 
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()
-
     @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:
         return {
@@ -77,7 +71,7 @@ class NamespaceName(util.Dto, util.Tie):
 
     @util.doc(util.Dto.from_dto)
     @classmethod
-    def from_dto(cls, data: dict) -> 'Namespace':
+    def from_dto(cls, data: dict) -> 'NamespaceName':
         namespace_id = NamespaceId.from_dto(data['namespaceId'])
         name = data['name']
         return cls(namespace_id, name)

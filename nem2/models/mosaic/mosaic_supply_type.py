@@ -22,13 +22,13 @@
     limitations under the License.
 """
 
-import enum
 import struct
+import typing
 
 from nem2 import util
 
 
-class MosaicSupplyType(util.enum_catbuffer(enum.IntEnum)):
+class MosaicSupplyType(util.IntEnumCatbuffer):
     """Mosaic supply type."""
 
     DECREASE = 0
@@ -45,10 +45,11 @@ class MosaicSupplyType(util.enum_catbuffer(enum.IntEnum)):
 
     @util.doc(util.Catbuffer.from_catbuffer)
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> ('MosaicSupplyType', bytes):
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicSupplyType', bytes]:
         assert len(data) >= 1
         inst = cls(struct.unpack('<B', data[:1])[0])
         return inst, data[1:]
+
 
 DESCRIPTION = {
     MosaicSupplyType.DECREASE: "Decrease mosaic supply.",

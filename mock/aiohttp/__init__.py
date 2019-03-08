@@ -18,6 +18,7 @@ __version__ = "3.5.4"
 #   Need to add support for prep-prepared requests.
 #   Need to the request and redirects to the response object.
 
+
 class ClientError(Exception):
     pass
 
@@ -165,10 +166,6 @@ class CaseInsensitiveDict(dict):
     __hash__ = None
 
 
-#class ClientRequest:
-#    pass
-
-
 class ClientResponse:
 
     def __init__(self):
@@ -234,6 +231,7 @@ class ClientResponse:
     def raise_for_status(self):
         if self.status >= 400:
             raise ClientResponseError("Error: {}".format(self.status))
+
 
 class AsyncContextManager:
 
@@ -327,6 +325,7 @@ class ClientSession:
 EXCEPTION = None
 RESPONSE = None
 
+
 @contextlib.contextmanager
 def default_exception(exception_type, *args, **kwds):
     """Set the global, default exception."""
@@ -338,6 +337,7 @@ def default_exception(exception_type, *args, **kwds):
     finally:
         EXCEPTION = None
 
+
 @contextlib.contextmanager
 def default_response(status=200, **kwds):
     """Set the global, default response."""
@@ -348,4 +348,3 @@ def default_response(status=200, **kwds):
         yield
     finally:
         RESPONSE = None
-

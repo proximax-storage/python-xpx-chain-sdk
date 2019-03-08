@@ -27,22 +27,24 @@ import typing
 from nem2 import util
 from .public_account import PublicAccount
 
+if typing.TYPE_CHECKING:
+    from .address import Address
+    from ..mosaic.mosaic import Mosaic      # noqa: F401
+
 MosaicListType = typing.Sequence['Mosaic']
 
 
 class AccountInfo(util.Tie):
     """Basic information describing an account."""
 
-    __slots__ = (
-        '_meta',
-        '_address',
-        '_address_height',
-        '_public_key',
-        '_public_key_height',
-        '_mosaics',
-        '_importance',
-        '_importance_height',
-    )
+    # _meta: any
+    _address: 'Address'
+    _address_height: int
+    _public_key: str
+    _public_key_height: int
+    _mosaics: MosaicListType
+    _importance: int
+    _importance_height: int
 
     def __init__(self,
         # TODO(ahuszagh) Need to describe the metadata structure.
@@ -131,7 +133,3 @@ class AccountInfo(util.Tie):
         return PublicAccount(self.address, self.public_key)
 
     publicAccount = util.undoc(public_account)
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()

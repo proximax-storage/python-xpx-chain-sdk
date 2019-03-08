@@ -7,17 +7,15 @@
     The core HTTP client shares a global session, to share a connection
     pool to speed up requests.
 
-    Example
-    -------
+    Example:
+        .. code-block:: python
 
-    .. code-block:: python
-
-       >>> from nem2.client import AsyncHttp
-       >>> import asyncio
-       >>> loop = asyncio.get_event_loop()
-       >>> http = AsyncHttp("http://176.9.68.110:7890/")
-       >>> loop.run_until_complete(http.heartbeat())
-       <Heartbeat.OK: 1>
+           >>> from nem2.client import AsyncHttp
+           >>> import asyncio
+           >>> loop = asyncio.get_event_loop()
+           >>> http = AsyncHttp("http://176.9.68.110:7890/")
+           >>> loop.run_until_complete(http.heartbeat())
+           <Heartbeat.OK: 1>
 
     License
     -------
@@ -39,11 +37,12 @@
 
 import typing
 
-from nem2 import models
 from nem2 import util
 from . import documentation
-from . import host
 from . import nis
+
+if typing.TYPE_CHECKING:
+    from nem2.models import *
 
 
 def factory(callback: typing.Callable) -> tuple:
@@ -86,7 +85,6 @@ def factory(callback: typing.Callable) -> tuple:
 
         networkType = util.undoc(network_type)
 
-
     class AsyncHttp(HttpBase):
         """Main client for the asynchronous NIS API."""
 
@@ -124,16 +122,12 @@ def factory(callback: typing.Callable) -> tuple:
             """Get AsyncTransactionHttp to the same endpoint."""
             return AsyncTransactionHttp.from_http(self)
 
-
     class AsyncAccountHttp(HttpBase):
         """Account client for the asynchronous NIS API."""
 
         @util.doc(documentation.ASYNC_INIT)
         def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
             super().__init__(endpoint, loop=loop)
-
-        #TODO(ahuszagh) Implement...
-
 
     class AsyncBlockchainHttp(HttpBase):
         """Blockchain client for the asynchronous NIS API."""
@@ -149,15 +143,13 @@ def factory(callback: typing.Callable) -> tuple:
 
         getBlockByHeight = util.undoc(get_block_by_height)
 
-        #TODO(ahuszagh) Implement...
+        # TODO(ahuszagh) Implement...
         # getBlockByHeight
         # getBlockTransactions
         # getBlocksByHeightWithLimit
         # getBlockchainHeight
         # getBlockchainScore
         # getDiagnosticStorage
-        pass
-
 
     class AsyncMosaicHttp(HttpBase):
         """Mosaic client for the asynchronous NIS API."""
@@ -165,7 +157,6 @@ def factory(callback: typing.Callable) -> tuple:
         @util.doc(documentation.ASYNC_INIT)
         def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
             super().__init__(endpoint, loop=loop)
-
 
     class AsyncNamespaceHttp(HttpBase):
         """Namespace client for the asynchronous NIS API."""
@@ -202,7 +193,6 @@ def factory(callback: typing.Callable) -> tuple:
 
         getNamespaceNames = util.undoc(get_namespace_names)
 
-
     class AsyncNetworkHttp(HttpBase):
         """Network client for the asynchronous NIS API."""
 
@@ -217,14 +207,12 @@ def factory(callback: typing.Callable) -> tuple:
 
         getNetworkType = util.undoc(get_network_type)
 
-
     class AsyncTransactionHttp(HttpBase):
         """Transaction client for the asynchronous NIS API."""
 
         @util.doc(documentation.ASYNC_INIT)
         def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
             super().__init__(endpoint, loop=loop)
-
 
     return (
         AsyncHttp,

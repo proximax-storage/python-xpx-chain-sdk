@@ -37,7 +37,6 @@
     limitations under the License.
 """
 
-import hashlib
 import os
 import typing
 import warnings
@@ -47,12 +46,12 @@ from ..types import HashFuncType
 
 # API
 
+
 def generate_api(hash512: HashFuncType):
     """Generate the ed25519 API from a hash function."""
 
     class BadSignatureError(Exception):
         pass
-
 
     class SigningKey:
         """Signing (secret) key."""
@@ -92,7 +91,6 @@ def generate_api(hash512: HashFuncType):
 
         __hash__ = None
 
-
     class VerifyingKey:
         """Verifying (public) key."""
 
@@ -118,7 +116,6 @@ def generate_api(hash512: HashFuncType):
                 raise BadSignatureError("Bad signature")
 
         __hash__ = None
-
 
     def create_keypair(entropy=os.urandom):
         """Generate signing/verifying keypair from entropy."""
@@ -164,18 +161,18 @@ def inv(z: int) -> int:
     """$= z^{-1} \mod q$, for z != 0"""
 
     # Adapted from curve25519_athlon.c in djb's Curve25519.
-    z2 = z * z % Q                              # 2
-    z9 = pow2(z2, 2) * z % Q                    # 9
-    z11 = z9 * z2 % Q                           # 11
-    z2_5_0 = (z11 * z11) % Q * z9 % Q           # 31 == 2^5 - 2^0
-    z2_10_0 = pow2(z2_5_0, 5) * z2_5_0 % Q      # 2^10 - 2^0
-    z2_20_0 = pow2(z2_10_0, 10) * z2_10_0 % Q   # ...
+    z2 = z * z % Q                                  # 2
+    z9 = pow2(z2, 2) * z % Q                        # 9
+    z11 = z9 * z2 % Q                               # 11
+    z2_5_0 = (z11 * z11) % Q * z9 % Q               # 31 == 2^5 - 2^0
+    z2_10_0 = pow2(z2_5_0, 5) * z2_5_0 % Q          # 2^10 - 2^0
+    z2_20_0 = pow2(z2_10_0, 10) * z2_10_0 % Q       # ...
     z2_40_0 = pow2(z2_20_0, 20) * z2_20_0 % Q
     z2_50_0 = pow2(z2_40_0, 10) * z2_10_0 % Q
     z2_100_0 = pow2(z2_50_0, 50) * z2_50_0 % Q
     z2_200_0 = pow2(z2_100_0, 100) * z2_100_0 % Q
-    z2_250_0 = pow2(z2_200_0, 50) * z2_50_0 % Q # 2^250 - 2^0
-    return pow2(z2_250_0, 5) * z11 % Q          # 2^255 - 2^5 + 11 = q - 2
+    z2_250_0 = pow2(z2_200_0, 50) * z2_50_0 % Q     # 2^250 - 2^0
+    return pow2(z2_250_0, 5) * z11 % Q              # 2^255 - 2^5 + 11 = q - 2
 
 
 D: int = -121665 * inv(121666) % Q

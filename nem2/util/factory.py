@@ -26,6 +26,7 @@
 """
 
 import inspect
+import typing
 
 from .reify import reify
 
@@ -49,7 +50,17 @@ def defactorize_function(func, module, qualname, special):
 
     func.__module__ = module
     func.__qualname__ = qualname
-    # Recursively patch wrapped functions.
+
+    if typing.TYPE_CHECKING:
+        # Update the annotations for any reference nonlocals.
+        # These must be returned too.
+        # This is very expensive, so only use it if we care about
+        # annotations.
+        closure_vars = inspect.getclosurevars(func)
+        for key, value in func.__annotations__.items():
+            if isinstance(value, str) and value in closure_vars.nonlocals:
+                func.__annotations__[key] = closure_vars.nonlocals[value]
+
     wrapped = getattr(func, '__wrapped__', None)
     if wrapped is not None:
         defactorize_function(wrapped, module, qualname, special)
@@ -84,7 +95,7 @@ def defactorize_class(cls, module, qualname, special):
     return cls
 
 
-def defactorize(obj, module=None, qualname=None, special={'__init__'}):
+def defactorize(obj, module=None, qualname=None, namespace=None, special={'__init__'}):
     """
     Patch an object to modify the qualified name and module.
 
@@ -94,9 +105,12 @@ def defactorize(obj, module=None, qualname=None, special={'__init__'}):
     This only does a 1-depth pass, and ignores all special and private
     members (unless explicitly included via the `special` argument).
 
+    This also only allows objects to be declared globally, anything
+    passed to this function must be at the global scope.
+
     :param obj: Object to remove the factory scope from.
     :param module: New module for object.
-    :param name: (Optional) New fully-qualified name for object.
+    :param qualname: (Optional) New fully-qualified name for object.
     :param special: (Optional) Set of special methods to patch.
 
     Warning
@@ -113,6 +127,7 @@ def defactorize(obj, module=None, qualname=None, special={'__init__'}):
         __module__: Name module function/class defined in. Writable.
         __func__: Internal function for an instance method. Read-only.
         __wrapped__: Points to the wrapped function object. Writable.
+        __annotations__: Type annotations for function parameters. Writable.
         fget: Internal function to get a value from a property. Writable.
         fset: Internal function to set a value from a property. Writable.
         fdel: Internal function to delete a value from a property. Writable.
@@ -141,6 +156,18 @@ def defactorize(obj, module=None, qualname=None, special={'__init__'}):
     elif inspect.isclass(obj):
         # Classes only.
         return defactorize_class(obj, module, qualname, special)
+    elif inspect.ismethoddescriptor(obj):
+        # Built-in method descriptor, ignore.
+        return obj
+    elif inspect.isdatadescriptor(obj):
+        # Built-in data descriptor, ignore.
+        return obj
+    elif inspect.isgetsetdescriptor(obj):
+        # Built-in get/set descriptor, ignore.
+        return obj
+    elif inspect.ismemberdescriptor(obj):
+        # Built-in member descriptor, ignore.
+        return obj
     else:
         # Error so we can handle other types without silently passing.
         raise NotImplementedError

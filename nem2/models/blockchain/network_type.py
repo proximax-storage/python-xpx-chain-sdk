@@ -22,12 +22,10 @@
     limitations under the License.
 """
 
-import enum
-
 from nem2 import util
 
 
-class NetworkType(util.enum_dto(enum.IntEnum)):
+class NetworkType(util.IntEnumDto):
     """Identifier for the network type."""
 
     MAIN_NET    = 0x68

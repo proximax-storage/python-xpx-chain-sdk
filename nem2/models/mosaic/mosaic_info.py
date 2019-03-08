@@ -28,6 +28,11 @@ from nem2 import util
 from .mosaic_id import MosaicId
 from ..account.public_account import PublicAccount
 
+if typing.TYPE_CHECKING:
+    from .mosaic_levy import MosaicLevy
+    from .mosaic_nonce import MosaicNonce
+    from .mosaic_properties import MosaicProperties
+
 OptionalMosaicLevyType = typing.Optional['MosaicLevy']
 
 
@@ -39,18 +44,16 @@ OptionalMosaicLevyType = typing.Optional['MosaicLevy']
 class MosaicInfo(util.Dto, util.Tie):
     """Information describing a mosaic."""
 
-    __slots__ = (
-        '_active',
-        '_index',
-        '_meta_id',
-        '_mosaic_id',
-        '_nonce',
-        '_supply',
-        '_height',
-        '_owner',
-        '_properties',
-        '_levy',
-    )
+    _active: bool
+    _index: int
+    _meta_id: str
+    _mosaic_id: 'MosaicId'
+    _nonce: 'MosaicNonce'
+    _supply: int
+    _height: int
+    _owner: 'PublicAccount'
+    _properties: 'MosaicProperties'
+    _levy: OptionalMosaicLevyType
 
     def __init__(self,
         active: bool,
@@ -62,7 +65,7 @@ class MosaicInfo(util.Dto, util.Tie):
         height: int,
         owner: 'PublicAccount',
         properties: 'MosaicProperties',
-        levy = OptionalMosaicLevyType,
+        levy: OptionalMosaicLevyType = None,
     ) -> None:
         """
         :param active: Mosaic is active.
@@ -168,43 +171,35 @@ class MosaicInfo(util.Dto, util.Tie):
 
     isLevyMutable = util.undoc(is_levy_mutable)
 
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()
-
     @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:
-        levy = self.levy.to_dto() if self.levy else {}
-        mosaic_id = MosaicId.create_from_nonce(self.nonce, self.owner)
         # TODO(ahuszagh) This differs, since it seems the old
         # way was a mosaic name.
-        #return {
-        #    'meta': {
-        #        'active': self.active,
-        #        'index': self.index,
-        #        'id': self.meta_id,
-        #    },
-        #    'mosaic': {
-        #        # TODO(ahuszagh)
-        #        #'namespaceId'
-        #        'mosaicId': self.mosaic_id.to_dto(),
-        #        'supply': util.uint64_to_dto(self.supply),
-        #        'height': util.uint64_to_dto(self.height),
-        #        'owner': self.owner.public_key,
-        #        'properties': self.properties.to_dto(),
-        #        'levy': levy,
-        #    },
-        #}
+        #
+        # levy = self.levy.to_dto() if self.levy else {}
+        # mosaic_id = MosaicId.create_from_nonce(self.nonce, self.owner)
+        # return {
+        #     'meta': {
+        #         'active': self.active,
+        #         'index': self.index,
+        #         'id': self.meta_id,
+        #     },
+        #     'mosaic': {
+        #         # TODO(ahuszagh)
+        #         #'namespaceId'
+        #         'mosaicId': self.mosaic_id.to_dto(),
+        #         'supply': util.uint64_to_dto(self.supply),
+        #         'height': util.uint64_to_dto(self.height),
+        #         'owner': self.owner.public_key,
+        #         'properties': self.properties.to_dto(),
+        #         'levy': levy,
+        #     },
+        # }
         raise NotImplementedError
 
     @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: dict) -> 'MosaicLevy':
-        meta = data['meta']
-        mosaic = data['mosaic']
-        levy = mosaic['levy']
-        levy = MosaicLevy.from_dto(levy) if levy else None
-        mosaic_id = MosaicId.from_dto(mosaic['mosaicId'])
         # Namespace ID is clearly the parent ID.
         # Nonce is clearly found somewhere???
         # TODO(ahuszagh) We obviously cannot get the nonce...
@@ -212,17 +207,23 @@ class MosaicInfo(util.Dto, util.Tie):
         # TODO(ahuszagh) need network type...
         # TODO(ahuszagh) This differs, since it seems the old
         # way was a mosaic name.
-        #return cls(
-        #    active=meta['active'],
-        #    index=meta['index'],
-        #    meta_id=meta['id'],
-        #    # TODO(ahuszagh) Likely remove.
-        #    #'nonce'
-        #    mosaic_id=mosaic_id,
-        #    supply=util.dto_to_uint64(mosaic['supply']),
-        #    height=util.dto_to_uint64(mosaic['height']),
-        #    owner=PublicAccount.create_from_public_key(mosaic['owner'], network_type),
-        #    properties=MosaicProperties.from_dto(mosaic['properties']),
-        #    levy=levy,
-        #)
+        #
+        # meta = data['meta']
+        # mosaic = data['mosaic']
+        # levy = mosaic['levy']
+        # levy = MosaicLevy.from_dto(levy) if levy else None
+        # mosaic_id = MosaicId.from_dto(mosaic['mosaicId'])
+        # return cls(
+        #     active=meta['active'],
+        #     index=meta['index'],
+        #     meta_id=meta['id'],
+        #     # TODO(ahuszagh) Likely remove.
+        #     #'nonce'
+        #     mosaic_id=mosaic_id,
+        #     supply=util.dto_to_uint64(mosaic['supply']),
+        #     height=util.dto_to_uint64(mosaic['height']),
+        #     owner=PublicAccount.create_from_public_key(mosaic['owner'], network_type),
+        #     properties=MosaicProperties.from_dto(mosaic['properties']),
+        #     levy=levy,
+        # )
         raise NotImplementedError

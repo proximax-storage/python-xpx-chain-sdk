@@ -63,6 +63,7 @@ def b64decode(data: BasenType, altchars=None, with_suffix=True) -> bytes:
     return base64.b64decode(data, altchars=altchars)
 
 
+@typing.no_type_check
 def add_suffix(data: BasenType, width: int) -> BasenType:
     """Add basen suffix to string ('=')."""
 

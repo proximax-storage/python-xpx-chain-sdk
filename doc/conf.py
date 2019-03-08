@@ -3,6 +3,8 @@ import inspect
 import os
 import re
 
+from sphinx.ext import autodoc
+
 # PROJECT INFORMATION
 
 project = 'nem2'
@@ -21,13 +23,20 @@ extensions = [
     'sphinx_autodoc_typehints',
 ]
 add_module_names = False
-autodoc_member_order = 'bysource'
-templates_path = ['_templates']
-source_suffix = '.rst'
-master_doc = 'index'
-language = None
+autoclass_content = 'both'
+autodoc_default_options = {
+    'members': None,
+    'inherited-members': None,
+    'undoc-members': None,
+    'member-order': 'bysource',
+}
 exclude_patterns = []
+language = None
+master_doc = 'index'
 pygments_style = None
+source_suffix = '.rst'
+templates_path = ['_templates']
+set_type_checking_flag = True
 
 # OPTIONS FOR HTML OUTPUT
 
@@ -76,13 +85,28 @@ epub_exclude_files = ['search.html']
 def autodoc_skip_member_handler(app, what, name, obj, skip, options):
     """Skip members using camel case."""
 
-    if inspect.ismodule(obj) or inspect.isclass(obj) or isinstance(obj, enum.Enum):
+    if inspect.ismodule(obj) or inspect.isclass(obj) or isinstance(obj, enum.EnumMeta):
         return skip
     # Skip all functions and properties with capital letters.
     return skip or re.search('[A-Z]', name) is not None
 
 
+def is_function_or_method(obj):
+    """Monkey-patch to skip classmethods and staticmethods in enums."""
+
+    return any((
+        autodoc.isfunction(obj),
+        autodoc.isbuiltin(obj),
+        inspect.ismethod(obj),
+        isinstance(obj, classmethod),
+        isinstance(obj, staticmethod),
+    ))
+
+
+autodoc.AttributeDocumenter.is_function_or_method = staticmethod(is_function_or_method)
+
 def setup(app):
     """Connect handlers."""
 
     app.connect('autodoc-skip-member', autodoc_skip_member_handler)
+

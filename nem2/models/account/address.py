@@ -40,7 +40,8 @@ def chunks(collection, n):
 def calculate_checksum(address: BytesType) -> bytes:
     """Calculate the checksum for the address."""
 
-    return util.hashlib.sha3_256(address[:21]).digest()[:4]
+    checksum = util.hashlib.sha3_256(address[:21]).digest()[:4]
+    return typing.cast(bytes, checksum)
 
 
 def public_key_to_address(public_key: bytes, network_type: 'NetworkType') -> bytes:
@@ -53,7 +54,7 @@ def public_key_to_address(public_key: bytes, network_type: 'NetworkType') -> byt
     """
 
     # step 1: keccak256 hash of the public key
-    public_key_hash: bytes = util.hashlib.sha3_256(public_key).digest();
+    public_key_hash: bytes = util.hashlib.sha3_256(public_key).digest()
 
     # step 2: ripemd160 hash of (1)
     ripemd_hash: bytes = util.hashlib.ripemd160(public_key_hash).digest()
@@ -72,7 +73,7 @@ def public_key_to_address(public_key: bytes, network_type: 'NetworkType') -> byt
 def is_valid_address(address: bytes) -> bool:
     """Check if address is valid."""
 
-    return calculate_checksum(address) == address[21:]
+    return typing.cast(bool, calculate_checksum(address) == address[21:])
 
 
 class Address(util.Model):
@@ -83,12 +84,9 @@ class Address(util.Model):
     uniquely identifies a NEM account.
     """
 
-    __slots__= (
-        '_address',
-        '_network_type',
-        # Internal
-        '_encoded_',
-    )
+    _address: str
+    _network_type: 'NetworkType'
+    _encoded_: bytes
 
     def __init__(self, address: str) -> None:
         """
@@ -182,10 +180,6 @@ class Address(util.Model):
 
     isValid = util.undoc(is_valid)
 
-    @util.doc(util.Model.tie)
-    def tie(self) -> tuple:
-        return (self.address, self.network_type)
-
     @util.doc(util.Model.to_dto)
     def to_dto(self) -> dict:
         return {
@@ -200,11 +194,11 @@ class Address(util.Model):
 
     @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
-        return self.encoded
+        return typing.cast(bytes, self.encoded)
 
     @util.doc(util.Model.from_catbuffer)
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> ('Address', bytes):
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['Address', bytes]:
         assert len(data) >= 25
         inst = cls.create_from_encoded(data[:25])
         return inst, data[25:]

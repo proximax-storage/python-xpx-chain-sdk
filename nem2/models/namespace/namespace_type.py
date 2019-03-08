@@ -22,12 +22,10 @@
     limitations under the License.
 """
 
-import enum
-
 from nem2 import util
 
 
-class NamespaceType(util.enum_dto(enum.IntEnum)):
+class NamespaceType(util.IntEnumDto):
     """Namespace type."""
 
     ROOT_NAMESPACE = 0

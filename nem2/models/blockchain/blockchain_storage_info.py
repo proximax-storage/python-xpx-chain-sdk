@@ -29,11 +29,9 @@ from nem2 import util
 class BlockchainStorageInfo(util.Tie):
     """Blockchain information describing stored data."""
 
-    __slots__ = (
-        '_num_blocks',
-        '_num_transactions',
-        '_num_accounts',
-    )
+    _num_blocks: int
+    _num_transactions: int
+    _num_accounts: int
 
     def __init__(self, num_blocks: int, num_transactions: int, num_accounts: int) -> None:
         """
@@ -65,7 +63,3 @@ class BlockchainStorageInfo(util.Tie):
         return self._num_accounts
 
     numAccounts = util.undoc(num_accounts)
-
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()

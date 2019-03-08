@@ -10,7 +10,6 @@
 """
 
 import functools
-import typing
 
 
 class reify:
@@ -22,7 +21,7 @@ class reify:
     :cvars fdel: Wrapped property del function (always None).
     """
 
-    def __init__(self, fget: typing.Any, doc=None):
+    def __init__(self, fget, doc=None):
         """
         :param fget: Getter function.
         """
@@ -30,7 +29,10 @@ class reify:
         self._name = "_{}_".format(fget.__name__)
         if doc is not None:
             self.__doc__ = doc
+
+        # Update signature and annotations.
         functools.update_wrapper(self, fget)
+        self.__get__.__func__.__annotations__ = fget.__annotations__
 
     @property
     def fset(self):
@@ -40,7 +42,7 @@ class reify:
     def fdel(self):
         return None
 
-    def __get__(self, inst: typing.Any, owner: typing.Any = None):
+    def __get__(self, inst, owner=None):
         # Skip if type is None.
         if inst is None:
             return self
@@ -54,17 +56,17 @@ class reify:
             setattr(inst, self._name, value)
             return value
 
-    def __set__(self, inst: typing.Any, value: typing.Any) -> None:
+    def __set__(self, inst, value):
         raise TypeError("reified property is read-only.")
 
-    def __delete__(self, inst: typing.Any) -> None:
+    def __delete__(self, inst):
         raise TypeError("reified property is read-only.")
 
-    def getter(self, fget: typing.Any) -> 'reify':
+    def getter(self, fget):
         return type(self)(fget, doc=self.__doc__)
 
-    def setter(self, fset: typing.Any) -> 'reify':
+    def setter(self, fset):
         raise TypeError("reified property is read-only.")
 
-    def deleter(self, fdel: typing.Any) -> 'reify':
+    def deleter(self, fdel):
         raise TypeError("reified property is read-only.")

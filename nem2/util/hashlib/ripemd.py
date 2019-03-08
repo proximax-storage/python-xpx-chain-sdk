@@ -28,6 +28,7 @@ from .types import OptionalBytesType
 
 # API
 
+
 def ripemd160(data: OptionalBytesType = None):
     """Returns a RIPEMD160 hash object; optionally initialized with a string."""
 

@@ -52,11 +52,11 @@ __all__ = [
     'Dto',
     'Catbuffer',
     'Model',
+    'IntEnumDto',
+    'IntEnumCatbuffer',
+    'IntEnumModel',
     'Tie',
     'InterchangeFormat',
-    'enum_catbuffer',
-    'enum_dto',
-    'enum_model',
 
     # DTO
     'Uint32DtoType',

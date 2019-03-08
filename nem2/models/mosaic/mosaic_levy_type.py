@@ -22,14 +22,12 @@
     limitations under the License.
 """
 
-import enum
-
 from nem2 import util
 
 
 # TODO(ahuszagh) This is not yet implemented in Catapult.
 # Subject to change
-class MosaicLevyType(util.enum_dto(enum.IntEnum)):
+class MosaicLevyType(util.IntEnumDto):
     """Mosaic levy type."""
 
     ABSOLUTE = 1
@@ -48,6 +46,7 @@ class MosaicLevyType(util.enum_dto(enum.IntEnum)):
     @classmethod
     def from_dto(cls, data: int) -> 'MosaicLevyType':
         return cls(data)
+
 
 DESCRIPTION = {
     MosaicLevyType.ABSOLUTE: "The levy is an absolute fee. The field 'fee' states how many sub-units of the specified mosaic will be transferred to the recipient.",

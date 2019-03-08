@@ -39,6 +39,7 @@ from ..types import BytesType, OptionalBytesType
 
 # API
 
+
 def keccak_224(data: OptionalBytesType = None) -> 'Keccak':
     """Returns a 224-bit keccak hash object; optionally initialized with a string."""
 
@@ -64,6 +65,7 @@ def keccak_512(data: OptionalBytesType = None) -> 'Keccak':
 
 # HASHER
 
+
 class KeccakError(Exception):
     """Custom error Class used in the Keccak implementation"""
 
@@ -88,7 +90,7 @@ class Keccak:
         self.b = r + c
         # b = 25*w
         self.w = self.b // 25
-         # 2**l = w
+        # 2**l = w
         self.l = int(math.log(self.w, 2))
 
         self.n_r = 12 + 2 * self.l
@@ -195,6 +197,7 @@ class Keccak:
 
 # UTILITY
 
+
 _ROUND_CONSTANTS = [
     0x0000000000000001,
     0x0000000000008082,
@@ -282,7 +285,7 @@ def _round(a, rc_fixed, w):
         for y in range(5):
             a[x][y] = b[x][y] ^ ((~b[(x + 1) % 5][y]) & b[(x + 2) % 5][y])
 
-    #Iota step
+    # Iota step
     a[0][0] = a[0][0] ^ rc_fixed
 
     return a
@@ -329,6 +332,7 @@ def _pad10star1(hex_string: bytes, n):
     :param n: hex length in bits (multiple of 8).
 
     .. code-block:: python
+
        >>>  _pad10star1(b'BA594E0FB9EBBD30', 8)
        b'BA594E0FB9EBBD93'
     """

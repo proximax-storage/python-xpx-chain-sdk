@@ -28,6 +28,7 @@ from .types import OptionalBytesType
 
 # API
 
+
 def sha224(data: OptionalBytesType = None):
     """Returns a sha224 hash object; optionally initialized with a string."""
 

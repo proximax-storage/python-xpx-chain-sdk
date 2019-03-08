@@ -22,9 +22,14 @@
     limitations under the License.
 """
 
+import typing
+
 from nem2 import util
 from .mosaic_levy_type import MosaicLevyType
 from ..account.address import Address
+
+if typing.TYPE_CHECKING:
+    from .mosaic_id import MosaicId
 
 
 # TODO(ahuszagh) This is not yet implemented in Catapult.
@@ -32,12 +37,10 @@ from ..account.address import Address
 class MosaicLevy(util.Dto, util.Tie):
     """Information describing a mosaic levy."""
 
-    __slots__ = (
-        '_type',
-        '_recipient',
-        '_mosaic_id',
-        '_fee',
-    )
+    _type: 'MosaicLevyType'
+    _recipient: 'Address'
+    _mosaic_id: 'MosaicId'
+    _fee: int
 
     def __init__(self,
         type: 'MosaicLevyType',
@@ -78,17 +81,13 @@ class MosaicLevy(util.Dto, util.Tie):
         """Get the fee amount for levy."""
         return self._fee
 
-    @util.doc(util.Tie.tie)
-    def tie(self) -> tuple:
-        return super().tie()
-
     @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:
         # TODO(ahuszagh) This differs, since it seems the old
         # way was a mosaic name.
         return {
             'type': self.type.to_dto(),
-            'recipient': self.address.to_dto(),
+            'recipient': self.recipient.to_dto(),
             'mosaicId': self.mosaic_id.to_dto(),
             'fee': self.fee
         }

@@ -1,6 +1,7 @@
 from nem2 import util
 from tests import harness
 
+
 @util.doc("""Function doc string.""")
 def docfunc1():
     return 1
@@ -8,6 +9,7 @@ def docfunc1():
 
 docfunc2 = util.doc("""Function doc string.""")(docfunc1)
 undocfunc1 = util.undoc(docfunc1)
+
 
 @util.undoc
 def undocfunc2():

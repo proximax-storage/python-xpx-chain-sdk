@@ -67,9 +67,18 @@ ENDPOINT = "http://localhost:3000"
 PROJECTDIR = os.path.dirname(os.path.realpath(__file__))
 MOCKDIR = os.path.join(PROJECTDIR, 'mock')
 COMMANDS = {
+    'doc': shell_command(
+        command=[sys.executable, "setup.py", "build_sphinx"],
+        short_description="Build project documentation.",
+        PYTHONPATH=MOCKDIR
+    ),
     'mypy': shell_command(
         command=[sys.executable, "-m", "mypy", "nem2"],
         short_description="Run mypy on project.",
+    ),
+    'lint': shell_command(
+        command=[sys.executable, "-m", "flake8"],
+        short_description="Run flake8 on project.",
     ),
     'test': shell_command(
         command=[sys.executable, "-m", "unittest", "discover", "-v", "-s", "tests.main", "-p", "*_test.py"],
@@ -85,6 +94,7 @@ COMMANDS = {
 
 setup(install_requires=REQUIRES,
     extras_require=EXTRAS_REQUIRE,
+    python_requires=">=3.6",
     tests_require=TESTS_REQUIRE,
     packages=PACKAGES,
     cmdclass=COMMANDS,

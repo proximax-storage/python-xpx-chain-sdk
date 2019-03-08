@@ -24,42 +24,41 @@
 
 import functools
 import inspect
-import typing
 
 from .reify import reify
 
 
-def isproperty(f: typing.Any) -> bool:
+def isproperty(f):
     """Check to see if a callable is a property."""
 
     return isinstance(f, property)
 
 
-def isreify(f: typing.Any) -> bool:
+def isreify(f):
     """Check to see if a callable is a reified property."""
 
     return isinstance(f, reify)
 
 
-def isfunction(f: typing.Any) -> bool:
+def isfunction(f):
     """Check to see if a callable is a function."""
 
     return inspect.isfunction(f)
 
 
-def isclassmethod(f: typing.Any) -> bool:
+def isclassmethod(f):
     """Check to see if a callable is a classmethod."""
 
     return isinstance(f, classmethod)
 
 
-def isstaticmethod(f: typing.Any) -> bool:
+def isstaticmethod(f):
     """Check to see if a callable is a staticmethod."""
 
     return isinstance(f, staticmethod)
 
 
-def doc_function(f: typing.Callable, doc: typing.Optional[str]) -> typing.Callable:
+def doc_function(f, doc):
     """Add documentation to a function."""
 
     @functools.wraps(f)
@@ -70,7 +69,7 @@ def doc_function(f: typing.Callable, doc: typing.Optional[str]) -> typing.Callab
     return wrapper
 
 
-def wrap_property(f: property, callback: typing.Callable) -> property:
+def wrap_property(f, callback):
     """Wrap and remove doc string from a property."""
 
     kwds = {'doc': None}
@@ -84,23 +83,23 @@ def wrap_property(f: property, callback: typing.Callable) -> property:
     return property(**kwds)
 
 
-def wrap_reify(f: reify, callback: typing.Callable) -> reify:
+def wrap_reify(f, callback):
     """Wrap and remove doc string from a reified property."""
 
-    kwds = {'doc': reify.__doc__}
+    kwds = {'doc': f.__doc__}
     if isfunction(f.fget):
         kwds['fget'] = wrap_function(f.fget, callback)
 
     return reify(**kwds)
 
 
-def wrap_function(f: typing.Callable, callback: typing.Callable) -> typing.Callable:
+def wrap_function(f, callback):
     """Wrap and remove doc string from a function."""
 
     return callback(f)
 
 
-def wrap_classmethod(f: classmethod, callback: typing.Callable) -> classmethod:
+def wrap_classmethod(f, callback):
     """Wrap and remove doc string from a classmethod."""
 
     value = classmethod(wrap_function(f.__func__, callback))
@@ -108,7 +107,7 @@ def wrap_classmethod(f: classmethod, callback: typing.Callable) -> classmethod:
     return value
 
 
-def wrap_staticmethod(f: staticmethod, callback: typing.Callable) -> staticmethod:
+def wrap_staticmethod(f, callback):
     """Wrap and remove doc string from a staticmethod."""
 
     value = staticmethod(wrap_function(f.__func__, callback))
@@ -116,10 +115,10 @@ def wrap_staticmethod(f: staticmethod, callback: typing.Callable) -> staticmetho
     return value
 
 
-def wrapper(doc: typing.Optional[str]) -> typing.Callable:
+def wrapper(doc):
     """Implied wrapper for both doc and undoc."""
 
-    def decorator(f: typing.Callable) -> typing.Any:
+    def decorator(f):
         callback = lambda x: doc_function(x, doc)
         if isproperty(f):
             # Properties
@@ -141,7 +140,7 @@ def wrapper(doc: typing.Optional[str]) -> typing.Callable:
     return decorator
 
 
-def doc(doc: typing.Any) -> typing.Callable:
+def doc(doc):
     """Wrap a callable, copying over all attributes with a new doc string."""
 
     # Remove doc strings if we'd like to clone the doc string from an
@@ -152,7 +151,7 @@ def doc(doc: typing.Any) -> typing.Callable:
     return wrapper(doc)
 
 
-def undoc(f: typing.Any) -> typing.Any:
+def undoc(f):
     """Wrap a callable, copying over all attributes except the doc string."""
 
     return wrapper(None)(f)

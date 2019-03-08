@@ -22,12 +22,10 @@
     limitations under the License.
 """
 
-import enum
-
 from nem2 import util
 
 
-class AliasType(util.enum_dto(enum.IntEnum)):
+class AliasType(util.IntEnumDto):
     """Alias type."""
 
     NONE = 0

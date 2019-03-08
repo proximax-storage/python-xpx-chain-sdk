@@ -46,6 +46,7 @@ def unhexlify(data: HexType, with_prefix=False) -> bytes:
     return binascii.unhexlify(data)
 
 
+@typing.no_type_check
 def remove_prefix(data: HexType) -> HexType:
     """Remove hexadecimal prefix from string ('0x', '0X')"""
 
