@@ -152,6 +152,36 @@ class TestPlainMessage(harness.TestCase):
         self.assertEqual(value.payload, b'Hello world!')
 
 
+class TestSecretProofTransaction(harness.TestCase):
+
+    def setUp(self):
+        self.deadline = models.Deadline.create()
+        self.hash_type = models.HashType.SHA3_256
+        self.proof = 'b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
+        self.secret = util.hashlib.sha3_256(util.unhexlify(self.proof)).hexdigest()
+        self.network_type = models.NetworkType.MIJIN_TEST
+        self.transaction = models.SecretProofTransaction.create(
+            deadline=self.deadline,
+            hash_type=self.hash_type,
+            secret=self.secret,
+            proof=self.proof,
+            network_type=self.network_type,
+        )
+        # TODO(ahuszagh) Need the signer...
+        self.catbuffer = b''
+
+    def test_init(self):
+        self.assertEqual(self.transaction.deadline, self.deadline)
+        self.assertEqual(self.transaction.hash_type, self.hash_type)
+        self.assertEqual(self.transaction.secret, self.secret)
+        self.assertEqual(self.transaction.proof, self.proof)
+        self.assertEqual(self.transaction.network_type, self.network_type)
+
+#    def test_catbuffer(self):
+#        import pdb; pdb.set_trace()
+#        catbuffer = self.transaction.to_catbuffer()
+
+
 class TestTransactionAnnounceResponse(harness.TestCase):
 
     def setUp(self):

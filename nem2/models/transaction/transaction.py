@@ -122,6 +122,9 @@ class Transaction(util.Model):
         # uint16_t type
         # uint64_t fee
         # uint64_t deadline
+        # TODO(ahuszagh) The signature and the signer should be null
+        # at this point... But we need them to generate the signed data..
+        # Catch-22?
         buffer = bytearray(self.shared_entity_size())
         buffer[0:4] = struct.pack('<I', size)
         buffer[4:68] = util.unhexlify(self.signature)
