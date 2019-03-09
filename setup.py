@@ -94,7 +94,7 @@ COMMANDS = {
 
 setup(install_requires=REQUIRES,
     extras_require=EXTRAS_REQUIRE,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     tests_require=TESTS_REQUIRE,
     packages=PACKAGES,
     cmdclass=COMMANDS,

@@ -41,107 +41,34 @@ OptionalMosaicLevyType = typing.Optional['MosaicLevy']
 #       nonce cannot be generated from the data provided.
 #           Mosaic ID is a hash of nonce + public key, cannot reverse.
 #       namespace ID is missing in info, not in DTO.
-class MosaicInfo(util.Dto, util.Tie):
-    """Information describing a mosaic."""
+@util.inherit_doc
+@util.dataclass(frozen=True, levy=None)
+class MosaicInfo(util.Dto):
+    """
+    Information describing a mosaic.
 
-    _active: bool
-    _index: int
-    _meta_id: str
-    _mosaic_id: 'MosaicId'
-    _nonce: 'MosaicNonce'
-    _supply: int
-    _height: int
-    _owner: 'PublicAccount'
-    _properties: 'MosaicProperties'
-    _levy: OptionalMosaicLevyType
+    :param active: Mosaic is active.
+    :param index: Mosaic index.
+    :param meta_id: Mosaic metadata ID.
+    :param mosaic_id: Mosaic ID.
+    :param nonce: Mosaic nonce.
+    :param supply: Mosaic supply.
+    :param height: Block height when mosaic was created.
+    :param owner: Account that owns mosaic.
+    :param properties: Mosaic properties.
+    :param levy: (Optional) Levy for mosaic.
+    """
 
-    def __init__(self,
-        active: bool,
-        index: int,
-        meta_id: str,
-        mosaic_id: 'MosaicId',
-        nonce: 'MosaicNonce',
-        supply: int,
-        height: int,
-        owner: 'PublicAccount',
-        properties: 'MosaicProperties',
-        levy: OptionalMosaicLevyType = None,
-    ) -> None:
-        """
-        :param active: Mosaic is active.
-        :param index: Mosaic index.
-        :param meta_id: Mosaic metadata ID.
-        :param mosaic_id: Mosaic ID.
-        :param nonce: Mosaic nonce.
-        :param supply: Mosaic supply.
-        :param height: Block height when mosaic was created.
-        :param owner: Account that owns mosaic.
-        :param properties: Mosaic properties.
-        :param levy: (Optional) Levy for mosaic.
-        """
-        self._active = active
-        self._index = index
-        self._meta_id = meta_id
-        self._mosaic_id = mosaic_id
-        self._nonce = nonce
-        self._supply = supply
-        self._height = height
-        self._owner = owner
-        self._properties = properties
-        self._levy = levy
-
-    # TODO(ahuszagh) Document and finish implementing...
-
-    @property
-    def active(self) -> bool:
-        """Get if mosaic is active."""
-        return self._active
-
-    @property
-    def index(self) -> int:
-        """Get the mosaic index."""
-        return self._index
-
-    @property
-    def meta_id(self) -> str:
-        """Get the mosaic metadata ID."""
-        return self._meta_id
-
-    @property
-    def mosaic_id(self) -> 'MosaicId':
-        """Get the mosaic ID."""
-        return self._mosaic_id
-
-    @property
-    def nonce(self) -> 'MosaicNonce':
-        """Get the mosaic nonce."""
-        return self._nonce
-
-    @property
-    def supply(self) -> int:
-        """Get the mosaic supply."""
-        return self._supply
-
-    @property
-    def height(self) -> int:
-        """Get the block height when mosaic was created."""
-        return self._height
-
-    @property
-    def owner(self) -> 'PublicAccount':
-        """Get the account that owns mosaic."""
-        return self._owner
-
-    @property
-    def properties(self) -> 'MosaicProperties':
-        """Get the mosaic properties."""
-        return self._properties
-
-    # TODO(ahuszagh) Add type annotations
-    @property
-    def levy(self) -> OptionalMosaicLevyType:
-        """Get the mosaic levy."""
-        return self._levy
+    active: bool
+    index: int
+    meta_id: str
+    mosaic_id: 'MosaicId'
+    nonce: 'MosaicNonce'
+    supply: int
+    height: int
+    owner: 'PublicAccount'
+    properties: 'MosaicProperties'
+    levy: OptionalMosaicLevyType
 
     @property
     def divisibility(self) -> int:
@@ -171,7 +98,6 @@ class MosaicInfo(util.Dto, util.Tie):
 
     isLevyMutable = util.undoc(is_levy_mutable)
 
-    @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:
         # TODO(ahuszagh) This differs, since it seems the old
         # way was a mosaic name.
@@ -197,7 +123,6 @@ class MosaicInfo(util.Dto, util.Tie):
         # }
         raise NotImplementedError
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: dict) -> 'MosaicLevy':
         # Namespace ID is clearly the parent ID.

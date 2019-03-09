@@ -25,21 +25,16 @@
 from nem2 import util
 
 
-class BlockchainScore(util.Dto, util.Tie):
-    """Blockchain score describing the block difficulty."""
+@util.inherit_doc
+@util.dataclass(frozen=True, score=0)
+class BlockchainScore(util.Dto):
+    """
+    Blockchain score describing the block difficulty.
 
-    _score: int
+    :param score: Blockchain score.
+    """
 
-    def __init__(self, score: int) -> None:
-        """
-        :param score: Blockchain score.
-        """
-        self._score = score
-
-    @property
-    def score(self) -> int:
-        """Get the blockchain score."""
-        return self._score
+    score: int
 
     @property
     def score_low(self) -> int:
@@ -55,14 +50,12 @@ class BlockchainScore(util.Dto, util.Tie):
 
     scoreHigh = util.undoc(score_high)
 
-    @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:
         return {
             'scoreLow': util.uint64_to_dto(self.score_low),
             'scoreHigh': util.uint64_to_dto(self.score_high),
         }
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: dict) -> 'BlockchainScore':
         score_low = data['scoreLow']

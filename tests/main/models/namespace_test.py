@@ -16,7 +16,7 @@ class TestAddressAlias(harness.TestCase):
         self.assertEqual(value.address, self.address)
 
         self.assertEqual(repr(value), "AddressAlias(type=<AliasType.ADDRESS: 2>, value=Address(address='SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', network_type=<NetworkType.MIJIN_TEST: 144>))")
-        self.assertEqual(str(value), "AddressAlias(type=AliasType.ADDRESS, value=Address(address=SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54, network_type=NetworkType.MIJIN_TEST))")
+        self.assertEqual(str(value), repr(value))
         self.assertNotEqual(value, models.Alias())
         self.assertEqual(value, models.Alias(self.address))
         self.assertNotEqual(value, models.Alias(self.mosaic_id))
@@ -42,7 +42,7 @@ class TestAlias(harness.TestCase):
         self.assertEqual(value.value, None)
 
         self.assertEqual(repr(value), 'Alias(type=<AliasType.NONE: 0>, value=None)')
-        self.assertEqual(str(value), 'Alias(type=AliasType.NONE, value=None)')
+        self.assertEqual(str(value), repr(value))
         self.assertEqual(value, models.Alias())
         self.assertNotEqual(value, models.Alias(self.address))
         self.assertNotEqual(value, models.Alias(self.mosaic_id))
@@ -62,7 +62,7 @@ class TestAlias(harness.TestCase):
         self.assertEqual(value.address, self.address)
 
         self.assertEqual(repr(value), "Alias(type=<AliasType.ADDRESS: 2>, value=Address(address='SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', network_type=<NetworkType.MIJIN_TEST: 144>))")
-        self.assertEqual(str(value), "Alias(type=AliasType.ADDRESS, value=Address(address=SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54, network_type=NetworkType.MIJIN_TEST))")
+        self.assertEqual(str(value), repr(value))
         self.assertNotEqual(value, models.Alias())
         self.assertEqual(value, models.Alias(self.address))
         self.assertNotEqual(value, models.Alias(self.mosaic_id))
@@ -82,7 +82,7 @@ class TestAlias(harness.TestCase):
         self.assertEqual(value.mosaicId, self.mosaic_id)
 
         self.assertEqual(repr(value), "Alias(type=<AliasType.MOSAIC_ID: 1>, value=MosaicId(id=5))")
-        self.assertEqual(str(value), "Alias(type=AliasType.MOSAIC_ID, value=MosaicId(id=5))")
+        self.assertEqual(str(value), repr(value))
         self.assertNotEqual(value, models.Alias())
         self.assertNotEqual(value, models.Alias(self.address))
         self.assertEqual(value, models.Alias(self.mosaic_id))
@@ -152,7 +152,7 @@ class TestEmptyAlias(harness.TestCase):
         self.assertEqual(value.value, None)
 
         self.assertEqual(repr(value), 'EmptyAlias(type=<AliasType.NONE: 0>, value=None)')
-        self.assertEqual(str(value), 'EmptyAlias(type=AliasType.NONE, value=None)')
+        self.assertEqual(str(value), repr(value))
         self.assertEqual(value, models.Alias())
         self.assertNotEqual(value, models.Alias(self.address))
         self.assertNotEqual(value, models.Alias(self.mosaic_id))
@@ -181,7 +181,7 @@ class TestMosaicAlias(harness.TestCase):
         self.assertEqual(value.mosaicId, self.mosaic_id)
 
         self.assertEqual(repr(value), "MosaicAlias(type=<AliasType.MOSAIC_ID: 1>, value=MosaicId(id=5))")
-        self.assertEqual(str(value), "MosaicAlias(type=AliasType.MOSAIC_ID, value=MosaicId(id=5))")
+        self.assertEqual(str(value), repr(value))
         self.assertNotEqual(value, models.Alias())
         self.assertNotEqual(value, models.Alias(self.address))
         self.assertEqual(value, models.Alias(self.mosaic_id))
@@ -288,7 +288,7 @@ class TestNamespaceName(harness.TestCase):
 
     def test_str(self):
         value = models.NamespaceName.create_from_name("sample")
-        self.assertEqual(str(value), "NamespaceName(namespace_id=NamespaceId(id=9851145055013990724), name=sample)")
+        self.assertEqual(str(value), repr(value))
 
     def test_eq(self):
         n1 = models.NamespaceName.create_from_name("sample")

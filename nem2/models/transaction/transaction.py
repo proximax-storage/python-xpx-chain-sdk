@@ -23,29 +23,30 @@
 """
 
 import typing
-
 from nem2 import util
 
 if typing.TYPE_CHECKING:
     from .aggregate_transaction_info import AggregateTransactionInfo
     from .deadling import Deadline
     from .transaction_info import TransactionInfo
-    from ..account.publicaccount import PublicAccount
+    from ..account.public_account import PublicAccount
     from ..blockchain.network_type import NetworkType
 
 
 # TODO(ahuszagh) Model??
+@util.inherit_doc
+@util.dataclass(frozen=True)
 class Transaction(util.Dto):
     """Abstract transaction base class."""
 
-    _type: int
-    _network_type: 'NetworkType'
-    _version: int
-    _deadline: 'Deadline'
-    _fee: int
-    _signature: typing.Optional[str]
-    _signer: typing.Optional['PublicAccount']
-    _transaction_info: typing.Union['TransactionInfo', 'AggregateTransactionInfo']
+    type: int
+    network_type: 'NetworkType'
+    version: int
+    deadline: 'Deadline'
+    fee: int
+    signature: typing.Optional[str]
+    signer: typing.Optional['PublicAccount']
+    transaction_info: typing.Union['TransactionInfo', 'AggregateTransactionInfo']
 
     # TODO(ahuszagh) Finish the implementation...
     # __init__

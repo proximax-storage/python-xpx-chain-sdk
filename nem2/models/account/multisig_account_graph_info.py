@@ -33,36 +33,32 @@ if typing.TYPE_CHECKING:
 GraphType = typing.MutableMapping[int, 'MultisigAccountInfo']
 
 
-class MultisigAccountGraphInfo(abc.MutableMapping, util.Tie):
-    """Graph info for multi-sig accounts."""
+@util.inherit_doc
+@util.dataclass(frozen=True, slots=False)
+class MultisigAccountGraphInfo(abc.MutableMapping):
+    """
+    Graph info for multi-sig accounts.
 
-    _multisig_accounts: GraphType
+    :param \*args: (optional) Positional arguments to initialize mapping.
+    :param \**kwds: (optional) Keyword arguments to initialize mapping.
+    """
+
+    multisig_accounts: GraphType
 
     def __init__(self, *args, **kwds) -> None:
-        """
-        :param \*args: (optional) Positional arguments to initialize mapping.
-        :param \**kwds: (optional) Keyword arguments to initialize mapping.
-        """
-        self._multisig_accounts = dict(*args, **kwds)
-
-    @property
-    def multisig_accounts(self) -> GraphType:
-        """Access raw mapping of multisig accounts."""
-        return self._multisig_accounts
-
-    multisigAccounts = util.undoc(multisig_accounts)
+        super().__init__(dict(*args, **kwds))
 
     def __getitem__(self, key: int) -> 'MultisigAccountInfo':
-        return self._multisig_accounts[key]
+        return self.multisig_accounts[key]
 
     def __setitem__(self, key: int, account: 'MultisigAccountInfo') -> None:
-        self._multisig_accounts[key] = account
+        self.multisig_accounts[key] = account
 
     def __delitem__(self, key: int) -> None:
-        del self._multisig_accounts[key]
+        del self.multisig_accounts[key]
 
     def __iter__(self) -> typing.Iterator:
-        return iter(self._multisig_accounts)
+        return iter(self.multisig_accounts)
 
     def __len__(self) -> int:
-        return len(self._multisig_accounts)
+        return len(self.multisig_accounts)

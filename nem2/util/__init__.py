@@ -25,19 +25,21 @@
 from . import hashlib
 from . import signature
 
-from .abc import *
-from .format import InterchangeFormat
-
-from .stdint import *
-
 from .asynchronous import *
 
-from .documentation import doc, undoc
+from .documentation import doc, inherit_doc, undoc
 from .factory import defactorize
 from .reactive import observable
 from .reify import reify
 
+from .stdint import *
+
 from .identifier import generate_mosaic_id, generate_namespace_id
+
+from .abc import *
+from .dataclasses import dataclass
+from .format import InterchangeFormat
+from .mixin import *
 
 from .base64 import b32encode, b32decode, b64encode, b64decode
 from .binascii import hexlify, unhexlify
@@ -47,21 +49,24 @@ __all__ = [
     'hashlib',
     'signature',
 
-    # Models
-    'ABCEnumMeta',
-    'Dto',
-    'Catbuffer',
-    'Model',
-    'IntEnumDto',
-    'IntEnumCatbuffer',
-    'IntEnumModel',
-    'Tie',
-    'InterchangeFormat',
+    # Asynchronous
+    'LoopType',
+    'OptionalLoopType',
+    'get_event_loop',
+    'get_running_loop',
+
+    # Decorators
+    'doc',
+    'inherit_doc',
+    'undoc',
+    'defactorize',
+    'observable',
+    'reify',
 
     # DTO
-    'Uint32DtoType',
-    'Uint64DtoType',
-    'Uint128DtoType',
+    'U32DTOType',
+    'U64DTOType',
+    'U128DTOType',
     'uint64_high',
     'uint64_low',
     'uint64_to_dto',
@@ -71,22 +76,18 @@ __all__ = [
     'uint128_to_dto',
     'dto_to_uint128',
 
-    # Asynchronous
-    'LoopType',
-    'OptionalLoopType',
-    'get_event_loop',
-    'get_running_loop',
-
-    # Decorators
-    'doc',
-    'undoc',
-    'defactorize',
-    'observable',
-    'reify',
-
     # Identifiers
     'generate_mosaic_id',
     'generate_namespace_id',
+
+    # Models
+    'dataclass',
+    'EnumMixin',
+    'IntMixin',
+    'Catbuffer',
+    'Dto',
+    'Model',
+    'InterchangeFormat',
 
     # Text utilities
     'b32encode',

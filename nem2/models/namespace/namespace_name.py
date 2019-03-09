@@ -26,19 +26,18 @@ from nem2 import util
 from .namespace_id import NamespaceId
 
 
-class NamespaceName(util.Dto, util.Tie):
-    """Namespace name and identifier."""
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class NamespaceName(util.Dto):
+    """
+    Namespace name and identifier.
 
-    _namespace_id: 'NamespaceId'
-    _name: str
+    :param namespace_id: Namespace ID.
+    :param name: Namespace name.
+    """
 
-    def __init__(self, namespace_id: 'NamespaceId', name: str) -> None:
-        """
-        :param namespace_id: Namespace ID.
-        :param name: Namespace name.
-        """
-        self._namespace_id = namespace_id
-        self._name = name
+    namespace_id: 'NamespaceId'
+    name: str
 
     @classmethod
     def create_from_name(cls, name: str) -> 'NamespaceName':
@@ -50,26 +49,12 @@ class NamespaceName(util.Dto, util.Tie):
         namespace_id = NamespaceId(name)
         return cls(namespace_id, name)
 
-    @property
-    def namespace_id(self) -> 'NamespaceId':
-        """Get the namespace ID."""
-        return self._namespace_id
-
-    namespaceId = util.undoc(namespace_id)
-
-    @property
-    def name(self) -> str:
-        """Get the namespace name."""
-        return self._name
-
-    @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:
         return {
             'namespaceId': self.namespace_id.to_dto(),
             'name': self.name
         }
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: dict) -> 'NamespaceName':
         namespace_id = NamespaceId.from_dto(data['namespaceId'])

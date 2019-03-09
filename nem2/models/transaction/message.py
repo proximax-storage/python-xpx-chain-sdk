@@ -1,8 +1,8 @@
 """
-    mosaic_alias
-    ============
+    message
+    =======
 
-    Aliases for mosaics.
+    Abstract message class as base for message types.
 
     License
     -------
@@ -22,16 +22,13 @@
     limitations under the License.
 """
 
-from .alias import Alias
-from ..mosaic.mosaic_id import MosaicId
+import abc
 
 
-class MosaicAlias(Alias):
-    """
-    Alias for mosaics.
+class Message(abc.ABC):
+    """Abstract message type."""
 
-    :param value: Mosaic ID.
-    """
+    _type: int
+    _payload: str
 
-    def __init__(self, value: MosaicId) -> None:
-        super().__init__(value)
+    # TODO(ahuszagh) Implement...

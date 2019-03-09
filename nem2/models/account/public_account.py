@@ -28,33 +28,24 @@ from .address import Address
 from ..blockchain.network_type import NetworkType
 
 
-class PublicAccount(util.Tie):
-    """Describe public account information via public key and account address."""
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class PublicAccount:
+    """
+    Describe public account information via public key and account address.
 
-    _address: 'Address'
-    _public_key: str
+    :param address: Address for the account.
+    :param public_key: Hex-encoded public key (with or without '0x' prefix).
+    """
+
+    address: 'Address'
+    public_key: str
 
     def __init__(self, address: 'Address', public_key: str) -> None:
-        """
-        :param address: Address for the account.
-        :param public_key: Hex-encoded public key (with or without '0x' prefix).
-        """
         if len(public_key) != 64:
             raise ValueError("Invalid public key length")
-        self._address = address
-        self._public_key = public_key
-
-    @property
-    def address(self) -> 'Address':
-        """Get address."""
-        return self._address
-
-    @property
-    def public_key(self) -> str:
-        """Get public key."""
-        return self._public_key
-
-    publicKey = util.undoc(public_key)
+        object.__setattr__(self, 'address', address)
+        object.__setattr__(self, 'public_key', public_key)
 
     @property
     def network_type(self) -> 'NetworkType':

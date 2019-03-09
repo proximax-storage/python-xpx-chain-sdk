@@ -48,56 +48,39 @@ PROPERTIES = {
 }
 
 
+@util.inherit_doc
+@util.dataclass(frozen=True, duration=0)
 class MosaicProperties(util.Model):
-    """Properties of an asset."""
+    """
+    Properties of an asset.
 
-    _flags: int
-    _divisibility: int
-    _duration: int
+    :param flags: Flags for the properties of the mosaic.
+    :param divisibility: Determines the decimal place mosaic can be divided into (from 0-6).
+    :param duration: Number of blocks the mosaic will be available.
+    """
 
-    def __init__(self, flags: int, divisibility: int, duration: int = 0) -> None:
-        """
-        :param flags: Flags for the properties of the mosaic.
-        :param divisibility: Determines the decimal place mosaic can be divided into (from 0-6).
-        :param duration: Number of blocks the mosaic will be available.
-        """
-        self._flags = flags
-        self._divisibility = divisibility
-        self._duration = duration
-
-    @property
-    def flags(self) -> int:
-        """Get raw flags for mosaic."""
-        return self._flags
+    flags: int
+    divisibility: int
+    duration: int
 
     @property
     def supply_mutable(self) -> bool:
         """Mosaic allows a supply change later on. Defaults to false."""
-        return (self._flags & 1) == 1
+        return (self.flags & 1) == 1
 
     supplyMutable = util.undoc(supply_mutable)
 
     @property
     def transferable(self) -> bool:
         """Allow transfer of funds from accounts other than the creator. Defaults to true."""
-        return (self._flags & 2) == 2
+        return (self.flags & 2) == 2
 
     @property
     def levy_mutable(self) -> bool:
         """Get if levy is mutable. Defaults to false."""
-        return (self._flags & 4) == 4
+        return (self.flags & 4) == 4
 
     levyMutable = util.undoc(levy_mutable)
-
-    @property
-    def divisibility(self) -> int:
-        """Get the decimal place mosaic can be divided into."""
-        return self._divisibility
-
-    @property
-    def duration(self) -> int:
-        """Get the number of blocks the mosaic will be available."""
-        return self._duration
 
     @classmethod
     def create(cls, **kwds) -> 'MosaicProperties':
@@ -118,29 +101,25 @@ class MosaicProperties(util.Model):
         flags = to_flags(supply_mutable, transferable, levy_mutable)
         return MosaicProperties(flags, divisibility, duration)
 
-    @util.doc(util.Model.to_dto)
-    def to_dto(self) -> typing.Sequence[util.Uint64DtoType]:
+    def to_dto(self) -> typing.Sequence[util.U64DTOType]:
         return [
             util.uint64_to_dto(self.flags),
             util.uint64_to_dto(self.divisibility),
             util.uint64_to_dto(self.duration),
         ]
 
-    @util.doc(util.Model.from_dto)
     @classmethod
-    def from_dto(cls, data: typing.Sequence[util.Uint64DtoType]) -> 'MosaicProperties':
+    def from_dto(cls, data: typing.Sequence[util.U64DTOType]) -> 'MosaicProperties':
         flags = util.dto_to_uint64(data[0])
         divisibility = util.dto_to_uint64(data[1])
         duration = util.dto_to_uint64(data[2])
         return cls(flags, divisibility, duration)
 
-    @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         data = struct.pack('<BBB', 1, self.flags, self.divisibility)
         properties = struct.pack('<BQ', DURATION_ID, self.duration)
         return data + properties
 
-    @util.doc(util.Model.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicProperties', bytes]:
         # Read the array count, property flags and divisibility.

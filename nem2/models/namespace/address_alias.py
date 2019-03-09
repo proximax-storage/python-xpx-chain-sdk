@@ -23,16 +23,15 @@
 """
 
 from .alias import Alias
-from .alias_type import AliasType
 from ..account.address import Address
 
 
 class AddressAlias(Alias):
-    """Alias for an address."""
+    """
+    Alias for an address.
+
+    :param value: Address object.
+    """
 
     def __init__(self, value: Address) -> None:
-        """
-        :param value: Address object.
-        """
-        self._type = AliasType.ADDRESS
-        self._value = value
+        super().__init__(value)

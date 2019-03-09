@@ -34,98 +34,30 @@ if typing.TYPE_CHECKING:
 MosaicListType = typing.Sequence['Mosaic']
 
 
-class AccountInfo(util.Tie):
-    """Basic information describing an account."""
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class AccountInfo:
+    """
+    Basic information describing an account.
 
-    # _meta: any
-    _address: 'Address'
-    _address_height: int
-    _public_key: str
-    _public_key_height: int
-    _mosaics: MosaicListType
-    _importance: int
-    _importance_height: int
+    :param meta: Account metadata.
+    :param address: Account address.
+    :param address_height: Chain height when address was published.
+    :param public_key: Account public key.
+    :param public_key_height: Chain height when public key was published.
+    :param mosaics: List of mosaics owned by account.
+    :param importance: Importance of the account.
+    :param importance_height: Importance height of the account.
+    """
 
-    def __init__(self,
-        # TODO(ahuszagh) Need to describe the metadata structure.
-        # THis isn't described even in the typescript SDK.
-        # https://github.com/nemtech/nem2-sdk-typescript-javascript/blob/master/src/infrastructure/AccountHttp.ts
-        meta,
-        address: 'Address',
-        address_height: int,
-        public_key: str,
-        public_key_height: int,
-        mosaics: MosaicListType,
-        importance: int,
-        importance_height: int,
-    ) -> None:
-        """
-        :param meta: Account metadata.
-        :param address: Account address.
-        :param address_height: Chain height when address was published.
-        :param public_key: Account public key.
-        :param public_key_height: Chain height when public key was published.
-        :param mosaics: List of mosaics owned by account.
-        :param importance: Importance of the account.
-        :param importance_height: Importance height of the account.
-        """
-        self._meta = meta
-        self._address = address
-        self._address_height = address_height
-        self._public_key = public_key
-        self._public_key_height = public_key_height
-        self._mosaics = mosaics
-        self._importance = importance
-        self._importance_height = importance_height
-
-# TODO(ahuszagh) Restore.
-#    @property
-#    def meta(self) -> Address:
-#        """Get account metadata."""
-#        return self._meta
-
-    @property
-    def address(self) -> 'Address':
-        """Get address."""
-        return self._address
-
-    @property
-    def address_height(self) -> int:
-        """Get chain height when address was published."""
-        return self._address_height
-
-    addressHeight = util.undoc(address_height)
-
-    @property
-    def public_key(self) -> str:
-        """Get public key."""
-        return self._public_key
-
-    publicKey = util.undoc(public_key)
-
-    @property
-    def public_key_height(self) -> int:
-        """Get chain height when public key was published."""
-        return self._public_key_height
-
-    publicKeyHeight = util.undoc(public_key_height)
-
-    @property
-    def mosaics(self) -> MosaicListType:
-        """Get list of mosaics owned by account."""
-        return self._mosaics
-
-    @property
-    def importance(self) -> int:
-        """Get account importance."""
-        return self._importance
-
-    @property
-    def importance_height(self) -> int:
-        """Get importance height of the account."""
-        return self._importance_height
-
-    importanceHeight = util.undoc(importance_height)
+    meta: typing.Any       # TODO(ahuszagh) Fix...
+    address: 'Address'
+    address_height: int
+    public_key: str
+    public_key_height: int
+    mosaics: MosaicListType
+    importance: int
+    importance_height: int
 
     @property
     def public_account(self) -> 'PublicAccount':

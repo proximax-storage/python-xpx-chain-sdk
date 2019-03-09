@@ -1,5 +1,3 @@
-import copy
-
 from nem2 import models
 from tests import harness
 
@@ -115,10 +113,9 @@ class TestBlockInfo(harness.TestCase):
         self.assertEqual(self.block_info.merkle_tree, self.merkle_tree)
 
     def test_eq(self):
-        bi1 = copy.copy(self.block_info)
-        bi2 = copy.copy(bi1)
-        bi3 = copy.copy(bi2)
-        bi3._num_transactions += 1
+        bi1 = self.block_info.replace()
+        bi2 = bi1.replace()
+        bi3 = bi2.replace(num_transactions=26)
 
         self.assertTrue(bi1 == bi1)
         self.assertTrue(bi1 == bi2)
@@ -151,17 +148,19 @@ class TestBlockInfo(harness.TestCase):
             },
         })
 
-        self.block_info._merkle_tree = None
-        dto = self.block_info.to_dto()
+        import dataclasses
+        block_info = dataclasses.replace(self.block_info, merkle_tree=None)
+        dto = block_info.to_dto()
         self.assertNotIn("merkleTree", dto['meta'])
 
     def test_from_dto(self):
         dto = self.block_info.to_dto()
         self.assertEqual(self.block_info, models.BlockInfo.from_dto(dto))
 
-        self.block_info._merkle_tree = None
-        dto = self.block_info.to_dto()
-        self.assertEqual(self.block_info, models.BlockInfo.from_dto(dto))
+        import dataclasses
+        block_info = dataclasses.replace(self.block_info, merkle_tree=None)
+        dto = block_info.to_dto()
+        self.assertEqual(block_info, models.BlockInfo.from_dto(dto))
 
 
 class TestBlockchainScore(harness.TestCase):

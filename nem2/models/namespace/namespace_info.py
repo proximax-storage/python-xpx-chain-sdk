@@ -35,121 +35,36 @@ from ..account.public_account import PublicAccount
 NamespaceIdListType = typing.Sequence['NamespaceId']
 
 
-class NamespaceInfo(util.Dto, util.Tie):
-    """Information describing a namespace."""
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class NamespaceInfo(util.Dto):
+    """
+    Information describing a namespace.
 
-    _active: bool
-    _index: int
-    _meta_id: str
-    _type: 'NamespaceType'
-    _depth: int
-    _levels: NamespaceIdListType
-    _parent_id: 'NamespaceId'
-    _owner: 'PublicAccount'
-    _start_height: int
-    _end_height: int
-    _alias: 'Alias'
+    :param active: Namespace is active.
+    :param index: Namespace index.
+    :param meta_id: Metadata ID.
+    :param type: Namespace type.
+    :param depth: Level of namespace.
+    :param levels: Namespace ID levels.
+    :param parent_id: Namespace parent ID.
+    :param owner: Account that owns namespace.
+    :param start_height: Block height at which ownership begins.
+    :param end_height: Block height at which ownership ends.
+    :param alias: Alias linked to a namespace.
+    """
 
-    def __init__(self,
-        active: bool,
-        index: int,
-        meta_id: str,
-        type: 'NamespaceType',
-        depth: int,
-        levels: NamespaceIdListType,
-        parent_id: 'NamespaceId',
-        owner: 'PublicAccount',
-        start_height: int,
-        end_height: int,
-        alias: 'Alias',
-    ) -> None:
-        """
-        :param active: Namespace is active.
-        :param index: Namespace index.
-        :param meta_id: Metadata ID.
-        :param type: Namespace type.
-        :param depth: Level of namespace.
-        :param levels: Namespace ID levels.
-        :param parent_id: Namespace parent ID.
-        :param owner: Account that owns namespace.
-        :param start_height: Block height at which ownership begins.
-        :param end_height: Block height at which ownership ends.
-        :param alias: Alias linked to a namespace.
-        """
-        self._active = active
-        self._index = index
-        self._meta_id = meta_id
-        self._type = type
-        self._depth = depth
-        self._levels = levels
-        self._parent_id = parent_id
-        self._owner = owner
-        self._start_height = start_height
-        self._end_height = end_height
-        self._alias = alias
-
-    @property
-    def active(self) -> bool:
-        """Get if namespace is active."""
-        return self._active
-
-    @property
-    def index(self) -> int:
-        """Get the namespace index."""
-        return self._index
-
-    @property
-    def meta_id(self) -> str:
-        """Get the metadata ID."""
-        return self._meta_id
-
-    metaID = util.undoc(meta_id)
-
-    @property
-    def type(self) -> 'NamespaceType':
-        """Get the namespace type."""
-        return self._type
-
-    @property
-    def depth(self) -> int:
-        """Get the level of namespace."""
-        return self._depth
-
-    @property
-    def levels(self) -> NamespaceIdListType:
-        """Get the namespace ID levels."""
-        return self._levels
-
-    @property
-    def parent_id(self) -> 'NamespaceId':
-        """Get the namespace parent ID."""
-        return self._parent_id
-
-    parentID = util.undoc(parent_id)
-
-    @property
-    def owner(self) -> 'PublicAccount':
-        """Get the account that owns the namespace."""
-        return self._owner
-
-    @property
-    def start_height(self) -> int:
-        """Get the block height at which ownership begins."""
-        return self._start_height
-
-    startHeight = util.undoc(start_height)
-
-    @property
-    def end_height(self) -> int:
-        """Get the block height at which ownership ends."""
-        return self._end_height
-
-    endHeight = util.undoc(end_height)
-
-    @property
-    def alias(self) -> 'Alias':
-        """Get the alias linked to namespace."""
-        return self._alias
+    active: bool
+    index: int
+    meta_id: str
+    type: 'NamespaceType'
+    depth: int
+    levels: NamespaceIdListType
+    parent_id: 'NamespaceId'
+    owner: 'PublicAccount'
+    start_height: int
+    end_height: int
+    alias: 'Alias'
 
     @property
     def id(self) -> 'NamespaceId':
@@ -184,7 +99,6 @@ class NamespaceInfo(util.Dto, util.Tie):
             raise ValueError("Unable to get parent namespace ID of root namespace.")
         return self.parent_id
 
-    @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:
         meta = {
             'active': self.active,
@@ -216,7 +130,6 @@ class NamespaceInfo(util.Dto, util.Tie):
             'namespace': namespace,
         }
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: dict) -> 'NamespaceInfo':
         meta = data['meta']

@@ -23,7 +23,6 @@
 """
 
 import typing
-
 from nem2 import util
 
 if typing.TYPE_CHECKING:
@@ -32,70 +31,27 @@ if typing.TYPE_CHECKING:
 PublicAccountListType = typing.Sequence['PublicAccount']
 
 
-class MultisigAccountInfo(util.Tie):
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class MultisigAccountInfo:
     """
     Information describing a multisig account.
 
     Multisig accounts allow multiple accounts, or signatories,
     operate as an entity, requiring a certain consensus for operations.
+
+    :param account: Multisig public account.
+    :param min_approval: Min number of cosignatories required to approve a transaction.
+    :param min_removal: Min number of cosignatories required to remove a cosignatory.
+    :param cosignatories: List of cosignatories.
+    :param multisig_accounts: List of multisig accounts this account cosigns.
     """
 
-    _account: 'PublicAccount'
-    _min_approval: int
-    _min_removal: int
-    _cosignatories: PublicAccountListType
-    _multisig_accounts: PublicAccountListType
-
-    def __init__(self,
-        account: 'PublicAccount',
-        min_approval: int,
-        min_removal: int,
-        cosignatories: PublicAccountListType,
-        multisig_accounts: PublicAccountListType,
-    ) -> None:
-        """
-        :param account: Multisig public account.
-        :param min_approval: Min number of cosignatories required to approve a transaction.
-        :param min_removal: Min number of cosignatories required to remove a cosignatory.
-        :param cosignatories: List of cosignatories.
-        :param multisig_accounts: List of multisig accounts this account cosigns.
-        """
-        self._account = account
-        self._min_approval = min_approval
-        self._min_removal = min_removal
-        self._cosignatories = cosignatories
-        self._multisig_accounts = multisig_accounts
-
-    @property
-    def account(self) -> 'PublicAccount':
-        """Get public account."""
-        return self._account
-
-    @property
-    def min_approval(self) -> int:
-        """Get min number of cosignatories required to approve a transaction."""
-        return self._min_approval
-
-    minApproval = util.undoc(min_approval)
-
-    @property
-    def min_removal(self) -> int:
-        """Get min number of cosignatories required to remove a cosignatory."""
-        return self._min_removal
-
-    minRemoval = util.undoc(min_removal)
-
-    @property
-    def cosignatories(self) -> PublicAccountListType:
-        """Get list of cosignatories."""
-        return self._cosignatories
-
-    @property
-    def multisig_accounts(self) -> PublicAccountListType:
-        """Get list of multisig accounts this account cosigns."""
-        return self._multisig_accounts
-
-    multisigAccounts = util.undoc(multisig_accounts)
+    account: 'PublicAccount'
+    min_approval: int
+    min_removal: int
+    cosignatories: PublicAccountListType
+    multisig_accounts: PublicAccountListType
 
     def is_multisig(self) -> bool:
         """Get if account is a multisig account."""

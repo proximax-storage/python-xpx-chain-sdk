@@ -76,44 +76,32 @@ def is_valid_address(address: bytes) -> bool:
     return typing.cast(bool, calculate_checksum(address) == address[21:])
 
 
+@util.inherit_doc
+@util.dataclass(frozen=True)
 class Address(util.Model):
     """
     Account address for network type.
 
     An address is derived from the public key and network type, and
     uniquely identifies a NEM account.
+
+    :param address: Base32-encoded, human-readable address.
     """
 
-    _address: str
-    _network_type: 'NetworkType'
-    _encoded_: bytes
+    address: str
+    network_type: 'NetworkType'
 
     def __init__(self, address: str) -> None:
-        """
-        :param address: Base32-encoded, human-readable address.
-        """
         plain = address.strip().upper().replace('-', '')
         if len(plain) != 40:
             raise ValueError("{} does not represent a valid raw address".format(address))
-        self._address = plain
-        self._network_type = NetworkType.create_from_raw_address(plain)
+        object.__setattr__(self, 'address', plain)
+        object.__setattr__(self, 'network_type', NetworkType.create_from_raw_address(plain))
 
     @property
-    def address(self) -> str:
-        """Get human readable (raw) address."""
-        return self._address
-
-    @util.reify
     def encoded(self) -> bytes:
         """Get encoded address."""
         return util.b32decode(self.address)
-
-    @property
-    def network_type(self) -> 'NetworkType':
-        """Get network type."""
-        return self._network_type
-
-    networkType = util.undoc(network_type)
 
     @classmethod
     def create_from_raw_address(cls, address: str) -> 'Address':
@@ -180,23 +168,19 @@ class Address(util.Model):
 
     isValid = util.undoc(is_valid)
 
-    @util.doc(util.Model.to_dto)
     def to_dto(self) -> dict:
         return {
             'address': self.address,
             'networkType': self.network_type.to_dto(),
         }
 
-    @util.doc(util.Model.from_dto)
     @classmethod
     def from_dto(cls, data: dict) -> 'Address':
         return cls.create_from_raw_address(data['address'])
 
-    @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         return typing.cast(bytes, self.encoded)
 
-    @util.doc(util.Model.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['Address', bytes]:
         assert len(data) >= 25

@@ -80,7 +80,7 @@ class TestAccount(harness.TestCase):
 
     def test_str(self):
         value = models.Account(self.address, self.public_key, self.private_key)
-        self.assertEqual(str(value), 'Account(address=Address(address=NAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGBSM5RH7, network_type=NetworkType.MAIN_NET), public_key=1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955, private_key=97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca)')
+        self.assertEqual(str(value), repr(value))
 
     def test_eq(self):
         a1 = models.Account(self.address, self.public_key, self.private_key)
@@ -173,7 +173,7 @@ class TestAddress(harness.TestCase):
 
     def test_str(self):
         value = models.Address.create_from_raw_address(self.plain)
-        self.assertEqual(str(value), "Address(address=SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54, network_type=NetworkType.MIJIN_TEST)")
+        self.assertEqual(str(value), repr(value))
 
     def test_eq(self):
         a1 = models.Address.create_from_raw_address(self.plain)
@@ -277,7 +277,7 @@ class TestPublicAccount(harness.TestCase):
 
     def test_str(self):
         value = models.PublicAccount(self.address, self.public_key)
-        self.assertEqual(str(value), "PublicAccount(address=Address(address=NAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGBSM5RH7, network_type=NetworkType.MAIN_NET), public_key=1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955)")
+        self.assertEqual(str(value), repr(value))
 
     def test_eq(self):
         a1 = models.PublicAccount(self.address, self.public_key)

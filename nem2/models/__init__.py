@@ -34,6 +34,7 @@ from .namespace.namespace_name import NamespaceName
 from .namespace.namespace_type import NamespaceType
 
 from .transaction.deadline import Deadline
+from .transaction.hash_type import HashType
 
 from nem2.util import InterchangeFormat
 
@@ -79,6 +80,7 @@ __all__ = [
 
     # Transaction
     'Deadline',
+    'HashType',
 
     # Wallet
 

@@ -22,10 +22,12 @@
     limitations under the License.
 """
 
+import enum
 from nem2 import util
 
 
-class AliasType(util.IntEnumDto):
+@util.inherit_doc
+class AliasType(util.Dto, util.EnumMixin, enum.IntEnum):
     """Alias type."""
 
     NONE = 0
@@ -33,15 +35,11 @@ class AliasType(util.IntEnumDto):
     ADDRESS = 2
 
     def description(self) -> str:
-        """Describe enumerated values in detail."""
-
         return DESCRIPTION[self]
 
-    @util.doc(util.Dto.to_dto)
     def to_dto(self) -> int:
         return int(self)
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: int) -> 'AliasType':
         return cls(data)

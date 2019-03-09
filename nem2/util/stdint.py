@@ -21,9 +21,9 @@ import typing
 
 __all__ = [
     # Typing
-    'Uint32DtoType',
-    'Uint64DtoType',
-    'Uint128DtoType',
+    'U32DTOType',
+    'U64DTOType',
+    'U128DTOType',
 
     # Helpers
     'uint64_high',
@@ -40,9 +40,9 @@ UINT32_MAX = 0xFFFFFFFF
 UINT64_MAX = 0xFFFFFFFFFFFFFFFF
 UINT128_MAX = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
-Uint32DtoType = int
-Uint64DtoType = typing.Sequence[Uint32DtoType]
-Uint128DtoType = typing.Sequence[Uint64DtoType]
+U32DTOType = int
+U64DTOType = typing.Sequence[U32DTOType]
+U128DTOType = typing.Sequence[U64DTOType]
 
 
 def uint64_high(value: int) -> int:
@@ -59,14 +59,14 @@ def uint64_low(value: int) -> int:
     return value & UINT32_MAX
 
 
-def uint64_to_dto(value: int) -> Uint64DtoType:
+def uint64_to_dto(value: int) -> U64DTOType:
     """Convert 64-bit int to DTO."""
 
     assert value <= UINT64_MAX
     return [uint64_low(value), uint64_high(value)]
 
 
-def dto_to_uint64(dto: Uint64DtoType) -> int:
+def dto_to_uint64(dto: U64DTOType) -> int:
     """Convert DTO to 64-bit int."""
 
     assert len(dto) == 2
@@ -91,7 +91,7 @@ def uint128_low(value: int) -> int:
     return value & UINT64_MAX
 
 
-def uint128_to_dto(value: int) -> Uint128DtoType:
+def uint128_to_dto(value: int) -> U128DTOType:
     """Convert 128-bit int to DTO."""
 
     assert value <= UINT128_MAX
@@ -100,7 +100,7 @@ def uint128_to_dto(value: int) -> Uint128DtoType:
     return [low, high]
 
 
-def dto_to_uint128(dto: Uint128DtoType) -> int:
+def dto_to_uint128(dto: U128DTOType) -> int:
     """Convert DTO to 128-bit int."""
 
     assert len(dto) == 2

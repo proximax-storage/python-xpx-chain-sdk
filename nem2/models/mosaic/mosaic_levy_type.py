@@ -22,27 +22,24 @@
     limitations under the License.
 """
 
+import enum
 from nem2 import util
 
 
-# TODO(ahuszagh) This is not yet implemented in Catapult.
-# Subject to change
-class MosaicLevyType(util.IntEnumDto):
+# TODO(ahuszagh) This is not yet implemented in Catapult. Subject to change
+@util.inherit_doc
+class MosaicLevyType(util.Dto, util.EnumMixin, enum.IntEnum):
     """Mosaic levy type."""
 
     ABSOLUTE = 1
     CALCULATED = 2
 
     def description(self) -> str:
-        """Describe enumerated values in detail."""
-
         return DESCRIPTION[self]
 
-    @util.doc(util.Dto.to_dto)
     def to_dto(self) -> int:
         return int(self)
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: int) -> 'MosaicLevyType':
         return cls(data)

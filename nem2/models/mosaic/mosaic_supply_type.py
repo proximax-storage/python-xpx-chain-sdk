@@ -22,28 +22,26 @@
     limitations under the License.
 """
 
+import enum
 import struct
 import typing
 
 from nem2 import util
 
 
-class MosaicSupplyType(util.IntEnumCatbuffer):
+@util.inherit_doc
+class MosaicSupplyType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
     """Mosaic supply type."""
 
     DECREASE = 0
     INCREASE = 1
 
     def description(self) -> str:
-        """Describe enumerated values in detail."""
-
         return DESCRIPTION[self]
 
-    @util.doc(util.Catbuffer.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         return struct.pack('<B', int(self))
 
-    @util.doc(util.Catbuffer.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicSupplyType', bytes]:
         assert len(data) >= 1

@@ -1,8 +1,8 @@
 """
-    mosaic_alias
-    ============
+    inner_transaction
+    =================
 
-    Aliases for mosaics.
+    Transaction with an embedded signer for aggregate transactions.
 
     License
     -------
@@ -22,16 +22,17 @@
     limitations under the License.
 """
 
-from .alias import Alias
-from ..mosaic.mosaic_id import MosaicId
+import typing
+
+from .transaction import Transaction
+
+if typing.TYPE_CHECKING:
+    from ..account.public_account import PublicAccount
 
 
-class MosaicAlias(Alias):
-    """
-    Alias for mosaics.
+class InnerTransaction(Transaction):
+    """Transaction with an embedded signer for aggregate transactions."""
 
-    :param value: Mosaic ID.
-    """
+    _public_account: 'PublicAccount'
 
-    def __init__(self, value: MosaicId) -> None:
-        super().__init__(value)
+    # TODO(ahuszagh) Implement...

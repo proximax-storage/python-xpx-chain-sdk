@@ -24,11 +24,12 @@
 
 import datetime
 import enum
-
+import typing
 from nem2 import util
 
 
-class ChronoUnit(enum.IntEnum):
+@util.inherit_doc
+class ChronoUnit(util.EnumMixin, enum.IntEnum):
     """Enumerations for time units."""
 
     MICROSECONDS = 0
@@ -38,8 +39,6 @@ class ChronoUnit(enum.IntEnum):
     HOURS = 4
 
     def description(self) -> str:
-        """Describe enumerated values in detail."""
-
         return DESCRIPTION[self]
 
     def to_timedelta(self, value: int) -> datetime.timedelta:
@@ -66,51 +65,48 @@ KEYWORDS = {
 }
 
 
-class Deadline(util.Dto, util.Tie):
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class Deadline(util.Dto):
     """
     Deadline of a transaction.
 
     The number of seconds since the creation of the nemesis block.
+    The number of seconds stored in the class are in local time, and
+    any conversions to or from data-transfer objects will implicitly
+    convert the data to UTC.
+
+    :param deadline: Datetime of deadline in local time.
     """
 
-    TIMESTAMP_NEMESIS_BLOCK: int = 1459468800
-    _deadline: int
+    TIMESTAMP_NEMESIS_BLOCK: typing.ClassVar[int] = 1459468800
+    deadline: datetime.datetime
 
-    def __init__(self, deadline: int) -> None:
-        """
-        :param deadline: Raw deadline as seconds since nemesis block.
-        """
-        self._deadline = deadline
-
-    @property
-    def deadline(self):
-        """Get raw deadline as seconds since nemesis block."""
-        return self._deadline
-
-    def create(deadline: int = 2, unit: ChronoUnit = ChronoUnit.HOURS):
+    @classmethod
+    def create(cls, deadline: int = 2, unit: ChronoUnit = ChronoUnit.HOURS):
         """
         :param deadline: Time for deadline after current time.
         :param chrono_unit: Unit for created deadline.
         """
 
-        seconds = unit.to_timedelta(deadline).total_seconds()
+        delta = unit.to_timedelta(deadline)
         day = datetime.timedelta(days=1).total_seconds()
-        if seconds <= 0:
-            raise ValueError(f"Deadline should be greater than 0, got {seconds}")
-        elif seconds >= day:
-            raise ValueError(f"Deadline should be less than 1 day, got {seconds}")
+        now = datetime.datetime.now()
+        delta_seconds = delta.total_seconds()
+        if delta_seconds <= 0:
+            raise ValueError(f"Deadline should be greater than 0, got {delta_seconds}")
+        elif delta_seconds >= day:
+            raise ValueError(f"Deadline should be less than 1 day, got {delta_seconds}")
 
-        # TODO(ahuszagh) here...
-        # Shouldn't this be... network time? UTC???
+        return cls(now + delta)
 
-        # timedelta(microseconds=-1)
-        raise NotImplementedError
+    def to_dto(self) -> util.U64DTOType:
+        utc = self.deadline.replace(tzinfo=datetime.timezone.utc)
+        return util.uint64_to_dto(int(utc.timestamp()))
 
-    @util.doc(util.Dto.to_dto)
-    def to_dto(self) -> util.Uint64DtoType:
-        return util.uint64_to_dto(self.deadine)
-
-    @util.doc(util.Dto.from_dto)
     @classmethod
-    def from_dto(cls, data: util.Uint64DtoType) -> 'Deadline':
-        return cls(util.dto_to_uint64(data))
+    def from_dto(cls, data: util.U64DTOType) -> 'Deadline':
+        timestamp = util.dto_to_uint64(data)
+        utc = datetime.datetime.fromtimestamp(timestamp, datetime.timezone.utc)
+        local = utc.replace(tzinfo=None)
+        return cls(local)

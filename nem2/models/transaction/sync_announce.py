@@ -26,37 +26,19 @@ from nem2 import util
 
 
 # TODO(ahuszagh) str or bytes??
-class SyncAnnounce(util.Tie):
-    """Signed transaction to announce and sync."""
+@util.dataclass(frozen=True)
+class SyncAnnounce:
+    """
+    Signed transaction to announce and sync.
 
-    _payload: bytes
-    _hash: bytes
-    _address: bytes
+    :param payload: Signed transaction data.
+    :param hash: Transaction hash.
+    :param address: Transaction address.
+    """
 
-    def __init__(self, _payload: bytes, hash: bytes, address: bytes):
-        """
-        :param payload: Signed transaction data.
-        :param hash: Transaction hash.
-        :param address: Transaction address.
-        """
-        self._payload = payload
-        self._hash = hash
-        self._address = address
-
-    @property
-    def payload(self) -> bytes:
-        """Get the signed transaction data."""
-        return self._payload
-
-    @property
-    def hash(self) -> bytes:
-        """Get the transaction hash."""
-        return self._hash
-
-    @property
-    def address(self) -> bytes:
-        """Get the transaction address."""
-        return self._address
+    payload: bytes
+    hash: bytes
+    address: bytes
 
     # TODO(ahuszagh) Implement
     # from_dto

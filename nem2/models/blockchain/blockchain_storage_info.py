@@ -25,45 +25,21 @@
 from nem2 import util
 
 
-class BlockchainStorageInfo(util.Dto, util.Tie):
-    """Blockchain information describing stored data."""
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class BlockchainStorageInfo(util.Dto):
+    """
+    Blockchain information describing stored data.
 
-    _num_blocks: int
-    _num_transactions: int
-    _num_accounts: int
+    :param num_blocks: Number of confirmed blocks.
+    :param num_transactions: Number of confirmed transactions.
+    :param num_accounts: Number accounts published in the blockchain.
+    """
 
-    def __init__(self, num_blocks: int, num_transactions: int, num_accounts: int) -> None:
-        """
-        :param num_blocks: Number of confirmed blocks.
-        :param num_transactions: Number of confirmed transactions.
-        :param num_accounts: Number accounts published in the blockchain.
-        """
-        self._num_blocks = num_blocks
-        self._num_transactions = num_transactions
-        self._num_accounts = num_accounts
+    num_blocks: int
+    num_transactions: int
+    num_accounts: int
 
-    @property
-    def num_blocks(self) -> int:
-        """Get the number of confirmed blocks."""
-        return self._num_blocks
-
-    numBlocks = util.undoc(num_blocks)
-
-    @property
-    def num_transactions(self) -> int:
-        """Get the number of confirmed transactions."""
-        return self._num_transactions
-
-    numTransactions = util.undoc(num_transactions)
-
-    @property
-    def num_accounts(self) -> int:
-        """Get the number accounts published in the blockchain."""
-        return self._num_accounts
-
-    numAccounts = util.undoc(num_accounts)
-
-    @util.doc(util.Dto.to_dto)
     def to_dto(self) -> dict:
         return {
             "numBlocks": self.num_blocks,
@@ -71,7 +47,6 @@ class BlockchainStorageInfo(util.Dto, util.Tie):
             "numAccounts": self.num_accounts
         }
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: dict) -> 'BlockchainStorageInfo':
         num_blocks = data['numBlocks']

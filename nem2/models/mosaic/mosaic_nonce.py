@@ -32,32 +32,29 @@ import typing
 from nem2 import util
 
 
-class MosaicNonce(util.Model):
-    """Nonce for a mosaic."""
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class MosaicNonce(util.IntMixin, util.Model):
+    """
+    Nonce for a mosaic.
 
-    _nonce: bytes
+    :param nonce: Mosaic nonce.
+    """
 
-    def __init__(self, nonce: bytes) -> None:
-        """
-        :param nonce: Mosaic nonce.
-        """
-        if len(nonce) != 4:
-            raise ValueError("Nonce length is incorrect.")
-        self._nonce = nonce
+    nonce: bytes
 
-    @property
-    def nonce(self) -> bytes:
-        """Get mosaic nonce."""
-        return self._nonce
+    def __init__(self, nonce: typing.Union[int, bytes]) -> None:
+        if isinstance(nonce, int):
+            object.__setattr__(self, 'nonce', struct.pack('<I', nonce))
+        elif isinstance(nonce, bytes):
+            if len(nonce) != 4:
+                raise ValueError("Nonce length is incorrect.")
+            object.__setattr__(self, 'nonce', nonce)
+        else:
+            raise TypeError(f"Invalid nonce type, got {type(nonce)}.")
 
     def __int__(self) -> int:
         return typing.cast(int, struct.unpack('<I', self.nonce)[0])
-
-    def __index__(self) -> int:
-        return self.__int__()
-
-    def __format__(self, format_spec: str):
-        return int(self).__format__(format_spec)
 
     @classmethod
     def create_random(cls, entropy=os.urandom) -> 'MosaicNonce':
@@ -89,24 +86,20 @@ class MosaicNonce(util.Model):
 
         :param nonce: Nonce as 32-bit unsigned integer.
         """
-        return MosaicNonce(struct.pack('<I', nonce))
+        return MosaicNonce(nonce)
 
     createFromInt = util.undoc(create_from_int)
 
-    @util.doc(util.Model.to_dto)
-    def to_dto(self) -> util.Uint64DtoType:
+    def to_dto(self) -> util.U64DTOType:
         return list(self.nonce)
 
-    @util.doc(util.Model.from_dto)
     @classmethod
-    def from_dto(cls, data: util.Uint64DtoType) -> 'MosaicNonce':
+    def from_dto(cls, data: util.U64DTOType) -> 'MosaicNonce':
         return cls(bytes(data))
 
-    @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         return self.nonce
 
-    @util.doc(util.Model.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicNonce', bytes]:
         assert len(data) >= 4

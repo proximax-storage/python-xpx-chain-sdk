@@ -11,4 +11,4 @@ Models
 ------
 
 .. automodule:: nem2.models
-   :exclude-members: mro
+   :exclude-members: abcs, asdict, replace

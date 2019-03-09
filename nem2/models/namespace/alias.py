@@ -32,35 +32,28 @@ from ..mosaic.mosaic_id import MosaicId
 ValueType = typing.Optional[typing.Union['Address', 'MosaicId']]
 
 
-class Alias(util.Dto, util.Tie):
-    """Alias for type definitions."""
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class Alias(util.Dto):
+    """
+    Alias for type definitions.
 
-    _type: 'AliasType'
-    _value: ValueType
+    :param value: Address or mosaic ID for alias.
+    """
+
+    type: 'AliasType'
+    value: ValueType
 
     def __init__(self, value: ValueType = None) -> None:
-        """
-        :param value: Address or mosaic ID for alias.
-        """
-        self._value = value
+        object.__setattr__(self, "value", value)
         if isinstance(value, Address):
-            self._type = AliasType.ADDRESS
+            object.__setattr__(self, "type", AliasType.ADDRESS)
         elif isinstance(value, MosaicId):
-            self._type = AliasType.MOSAIC_ID
+            object.__setattr__(self, "type", AliasType.MOSAIC_ID)
         elif value is None:
-            self._type = AliasType.NONE
+            object.__setattr__(self, "type", AliasType.NONE)
         else:
             raise TypeError("Got invalid value type for Alias.")
-
-    @property
-    def type(self) -> 'AliasType':
-        """Get the value type."""
-        return self._type
-
-    @property
-    def value(self) -> ValueType:
-        """Get the value."""
-        return self._value
 
     @property
     def address(self) -> 'Address':
@@ -76,7 +69,11 @@ class Alias(util.Dto, util.Tie):
 
     mosaicId = util.undoc(mosaic_id)
 
-    @util.doc(util.Dto.to_dto)
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Alias):
+            return False
+        return self.astuple() == other.astuple()
+
     def to_dto(self) -> typing.Optional[dict]:
         if self.type == AliasType.NONE:
             return None
@@ -86,7 +83,6 @@ class Alias(util.Dto, util.Tie):
             return {'type': self.type.to_dto(), 'mosaicId': self.value.to_dto()}
         raise ValueError("Invalid data for Alias.to_dto.")
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: typing.Optional[dict]) -> 'Alias':
         if data is None:

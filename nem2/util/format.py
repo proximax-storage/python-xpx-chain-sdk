@@ -25,19 +25,21 @@
 import enum
 import typing
 
+from .documentation import inherit_doc
+from .mixin import EnumMixin
+
 if typing.TYPE_CHECKING:
     from . import abc
 
 
-class InterchangeFormat(enum.IntEnum):
+@inherit_doc
+class InterchangeFormat(EnumMixin, enum.IntEnum):
     """Enumerations for the NEM interchange formats."""
 
     DTO = 0
     CATBUFFER = 1
 
     def description(self) -> str:
-        """Describe enumerated values in detail."""
-
         return DESCRIPTION[self]
 
     def serialize(self, value):

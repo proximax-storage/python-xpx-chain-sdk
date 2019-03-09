@@ -32,6 +32,7 @@ class NetworkCurrencyMosaic(Mosaic):
     """
     Per-network currency mosaic.
 
+    :param amount: Mosaic quantity in the smallest unit possible.
     :cvar NAMESPACE_ID: Namespace identifier for asset.
     :cvar DIVISIBILITY: Decimal place mosaic can be divided into.
     :cvar INITIAL_SUPPLY: Initial supply of asset.
@@ -48,9 +49,6 @@ class NetworkCurrencyMosaic(Mosaic):
     LEVY_MUTABLE: bool = False
 
     def __init__(self, amount: int) -> None:
-        """
-        :param amount: Mosaic quantity in the smallest unit possible.
-        """
         mosaic_id = MosaicId(self.NAMESPACE_ID.id)
         super().__init__(mosaic_id, amount)
 

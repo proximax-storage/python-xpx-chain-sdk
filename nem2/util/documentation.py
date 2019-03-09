@@ -155,3 +155,24 @@ def undoc(f):
     """Wrap a callable, copying over all attributes except the doc string."""
 
     return wrapper(None)(f)
+
+
+def inherit_doc(cls):
+    """Inherit documentation from a base class."""
+
+    # Ignore anything coming from Python internally, or that
+    # is private to begin with.
+    bases = [i for i in cls.__bases__ if i is not object]
+    members = inspect.getmembers(cls, inspect.isroutine)
+    members = ((k, v) for k, v in members if not k.startswith('_') and v.__doc__ is None)
+    for key, func in members:
+        for base in bases:
+            doc = getattr(getattr(base, key, None), '__doc__', None)
+            if doc is not None:
+                # Methods use a property to get the doc.
+                if inspect.ismethod(func):
+                    func.__func__.__doc__ = doc
+                else:
+                    func.__doc__ = doc
+
+    return cls

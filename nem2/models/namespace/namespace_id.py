@@ -23,59 +23,38 @@
 """
 
 import typing
-
 from nem2 import util
 
 IdType = typing.Union[str, int]
 
 
-class NamespaceId(util.Dto, util.Tie):
-    """Identifier for a namespace."""
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class NamespaceId(util.IntMixin, util.Dto):
+    """
+    Identifier for a namespace.
 
-    _id: int
+    :param id: Identifier or name for namespace.
+    """
+
+    id: int
 
     def __init__(self, id: IdType) -> None:
-        """
-        :param id: Identifier or name for namespace.
-        """
         if isinstance(id, int):
-            self._id = id
+            object.__setattr__(self, 'id', id)
         elif isinstance(id, str):
             ids = util.generate_namespace_id(id) or [0]
-            self._id = ids[-1]
+            object.__setattr__(self, 'id', ids[-1])
         else:
             name = type(id).__name__
             raise TypeError(f"Expected str or int for NamespaceId, got {name}")
 
-    @property
-    def id(self) -> int:
-        """Get raw identifier for namespace."""
-        return self._id
-
     def __int__(self) -> int:
         return self.id
 
-    def __index__(self) -> int:
-        return self.__int__()
-
-    def __format__(self, format_spec: str):
-        return int(self).__format__(format_spec)
-
-    @classmethod
-    def from_hex(cls, data: str) -> 'NamespaceId':
-        """
-        Create instance of class from hex string.
-
-        :param data: Hex-encoded ID data (with or without '0x' prefix).
-        """
-
-        return NamespaceId(int(data, 16))
-
-    @util.doc(util.Dto.to_dto)
-    def to_dto(self) -> util.Uint64DtoType:
+    def to_dto(self) -> util.U64DTOType:
         return util.uint64_to_dto(self.id)
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
-    def from_dto(cls, data: util.Uint64DtoType) -> 'NamespaceId':
+    def from_dto(cls, data: util.U64DTOType) -> 'NamespaceId':
         return cls(util.dto_to_uint64(data))

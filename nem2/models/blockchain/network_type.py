@@ -22,10 +22,12 @@
     limitations under the License.
 """
 
+import enum
 from nem2 import util
 
 
-class NetworkType(util.IntEnumDto):
+@util.inherit_doc
+class NetworkType(util.Dto, util.EnumMixin, enum.IntEnum):
     """Identifier for the network type."""
 
     MAIN_NET    = 0x68
@@ -34,8 +36,6 @@ class NetworkType(util.IntEnumDto):
     MIJIN_TEST  = 0x90
 
     def description(self) -> str:
-        """Describe enumerated values in detail."""
-
         return DESCRIPTION[self]
 
     def identifier(self) -> bytes:
@@ -69,11 +69,9 @@ class NetworkType(util.IntEnumDto):
 
     createFromRawAddress = util.undoc(create_from_raw_address)
 
-    @util.doc(util.Dto.to_dto)
     def to_dto(self) -> int:
         return int(self)
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: int) -> 'NetworkType':
         return cls(data)

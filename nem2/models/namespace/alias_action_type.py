@@ -23,17 +23,17 @@
 """
 
 import enum
+from nem2 import util
 
 
-class AliasActionType(enum.IntEnum):
+@util.inherit_doc
+class AliasActionType(util.EnumMixin, enum.IntEnum):
     """Alias action type."""
 
     LINK = 0
     UNLINK = 1
 
     def description(self) -> str:
-        """Describe enumerated values in detail."""
-
         return DESCRIPTION[self]
 
 

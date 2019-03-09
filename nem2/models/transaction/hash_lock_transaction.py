@@ -1,8 +1,8 @@
 """
-    mosaic_alias
-    ============
+    hash_lock_transaction
+    =====================
 
-    Aliases for mosaics.
+    Alias for `LockFundsTransaction`.
 
     License
     -------
@@ -22,16 +22,9 @@
     limitations under the License.
 """
 
-from .alias import Alias
-from ..mosaic.mosaic_id import MosaicId
+from .lock_funds_transaction import LockFundsTransaction
 
 
-class MosaicAlias(Alias):
-    """
-    Alias for mosaics.
-
-    :param value: Mosaic ID.
-    """
-
-    def __init__(self, value: MosaicId) -> None:
-        super().__init__(value)
+class HashLockTransaction(LockFundsTransaction):
+    # TODO(ahuszagh) Implement
+    pass

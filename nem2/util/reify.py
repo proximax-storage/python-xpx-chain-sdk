@@ -21,12 +21,12 @@ class reify:
     :cvars fdel: Wrapped property del function (always None).
     """
 
-    def __init__(self, fget, doc=None):
+    def __init__(self, fget, key=None, doc=None):
         """
         :param fget: Getter function.
         """
         self.fget = fget
-        self._name = "_{}_".format(fget.__name__)
+        self._key = key or "_{}_".format(fget.__name__)
         if doc is not None:
             self.__doc__ = doc
 
@@ -50,10 +50,10 @@ class reify:
         # Try to return the memoized value, and if not present,
         # call the wrapped function.
         try:
-            return getattr(inst, self._name)
+            return getattr(inst, self._key)
         except AttributeError:
             value = self.fget(inst)
-            setattr(inst, self._name, value)
+            setattr(inst, self._key, value)
             return value
 
     def __set__(self, inst, value):
@@ -63,7 +63,7 @@ class reify:
         raise TypeError("reified property is read-only.")
 
     def getter(self, fget):
-        return type(self)(fget, doc=self.__doc__)
+        return type(self)(fget, key=self._key, doc=self.__doc__)
 
     def setter(self, fset):
         raise TypeError("reified property is read-only.")

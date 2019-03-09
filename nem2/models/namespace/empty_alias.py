@@ -23,12 +23,10 @@
 """
 
 from .alias import Alias
-from .alias_type import AliasType
 
 
 class EmptyAlias(Alias):
     """Empty alias without data."""
 
     def __init__(self) -> None:
-        self._type = AliasType.NONE
-        self._value = None
+        super().__init__()

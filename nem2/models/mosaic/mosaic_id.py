@@ -32,40 +32,19 @@ if typing.TYPE_CHECKING:
     from ..account.public_account import PublicAccount
 
 
-class MosaicId(util.Model):
-    """Mosaic identifier."""
+@util.inherit_doc
+@util.dataclass(frozen=True, id=0)
+class MosaicId(util.IntMixin, util.Model):
+    """
+    Mosaic identifier.
 
-    _id: int
+    :param id: Raw identifier for mosaic.
+    """
 
-    def __init__(self, id: int) -> None:
-        """
-        :param id: Raw identifier for mosaic.
-        """
-        self._id = id
-
-    @property
-    def id(self) -> int:
-        """Get raw identifier for mosaic."""
-        return self._id
+    id: int
 
     def __int__(self) -> int:
         return self.id
-
-    def __index__(self) -> int:
-        return self.__int__()
-
-    def __format__(self, format_spec: str):
-        return int(self).__format__(format_spec)
-
-    @classmethod
-    def from_hex(cls, data: str) -> 'MosaicId':
-        """
-        Create instance of class from hex string.
-
-        :param data: Hex-encoded ID data (with or without '0x' prefix).
-        """
-
-        return MosaicId(int(data, 16))
 
     @classmethod
     def create_from_nonce(cls, nonce: 'MosaicNonce', owner: 'PublicAccount') -> 'MosaicId':
@@ -80,20 +59,16 @@ class MosaicId(util.Model):
 
     createFromNonce = util.undoc(create_from_nonce)
 
-    @util.doc(util.Model.to_dto)
-    def to_dto(self) -> util.Uint64DtoType:
+    def to_dto(self) -> util.U64DTOType:
         return util.uint64_to_dto(self.id)
 
-    @util.doc(util.Model.from_dto)
     @classmethod
-    def from_dto(cls, data: util.Uint64DtoType) -> 'MosaicId':
+    def from_dto(cls, data: util.U64DTOType) -> 'MosaicId':
         return cls(util.dto_to_uint64(data))
 
-    @util.doc(util.Model.to_catbuffer)
     def to_catbuffer(self) -> bytes:
         return struct.pack('<Q', self.id)
 
-    @util.doc(util.Model.from_catbuffer)
     @classmethod
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicId', bytes]:
         assert len(data) >= 8

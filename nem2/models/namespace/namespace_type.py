@@ -22,25 +22,23 @@
     limitations under the License.
 """
 
+import enum
 from nem2 import util
 
 
-class NamespaceType(util.IntEnumDto):
+@util.inherit_doc
+class NamespaceType(util.Dto, util.EnumMixin, enum.IntEnum):
     """Namespace type."""
 
     ROOT_NAMESPACE = 0
     SUB_NAMESPACE = 1
 
     def description(self) -> str:
-        """Describe enumerated values in detail."""
-
         return DESCRIPTION[self]
 
-    @util.doc(util.Dto.to_dto)
     def to_dto(self) -> int:
         return int(self)
 
-    @util.doc(util.Dto.from_dto)
     @classmethod
     def from_dto(cls, data: int) -> 'NamespaceType':
         return cls(data)
