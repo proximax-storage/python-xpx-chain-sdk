@@ -44,10 +44,12 @@ class MosaicSupplyType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
 
     @classmethod
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicSupplyType', bytes]:
-        assert len(data) >= 1
-        inst = cls(struct.unpack('<B', data[:1])[0])
-        return inst, data[1:]
+        assert len(data) >= cls.CATBUFFER_SIZE
+        inst = cls(struct.unpack('<B', data[:cls.CATBUFFER_SIZE])[0])
+        return inst, data[cls.CATBUFFER_SIZE:]
 
+
+MosaicSupplyType.CATBUFFER_SIZE: typing.ClassVar[int] = 1
 
 DESCRIPTION = {
     MosaicSupplyType.DECREASE: "Decrease mosaic supply.",

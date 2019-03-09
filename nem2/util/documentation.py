@@ -70,7 +70,7 @@ def doc_function(f, doc):
 
 
 def wrap_property(f, callback):
-    """Wrap and remove doc string from a property."""
+    """Wrap and modify doc string on a property."""
 
     kwds = {'doc': None}
     if isfunction(f.fget):
@@ -84,7 +84,7 @@ def wrap_property(f, callback):
 
 
 def wrap_reify(f, callback):
-    """Wrap and remove doc string from a reified property."""
+    """Wrap and modify doc string on a reified property."""
 
     kwds = {'doc': f.__doc__}
     if isfunction(f.fget):
@@ -94,13 +94,13 @@ def wrap_reify(f, callback):
 
 
 def wrap_function(f, callback):
-    """Wrap and remove doc string from a function."""
+    """Wrap and modify doc string on a function."""
 
     return callback(f)
 
 
 def wrap_classmethod(f, callback):
-    """Wrap and remove doc string from a classmethod."""
+    """Wrap and modify doc string on a classmethod."""
 
     value = classmethod(wrap_function(f.__func__, callback))
     value.__doc__ = f.__func__.__doc__
@@ -108,7 +108,7 @@ def wrap_classmethod(f, callback):
 
 
 def wrap_staticmethod(f, callback):
-    """Wrap and remove doc string from a staticmethod."""
+    """Wrap and modify doc string on a staticmethod."""
 
     value = staticmethod(wrap_function(f.__func__, callback))
     value.__doc__ = f.__func__.__doc__

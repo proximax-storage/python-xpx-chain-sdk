@@ -24,7 +24,9 @@
 
 import datetime
 import enum
+import struct
 import typing
+
 from nem2 import util
 
 
@@ -67,7 +69,7 @@ KEYWORDS = {
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class Deadline(util.Dto):
+class Deadline(util.Model):
     """
     Deadline of a transaction.
 
@@ -79,8 +81,9 @@ class Deadline(util.Dto):
     :param deadline: Datetime of deadline in local time.
     """
 
-    TIMESTAMP_NEMESIS_BLOCK: typing.ClassVar[int] = 1459468800
     deadline: datetime.datetime
+    CATBUFFER_SIZE: typing.ClassVar[int] = 8
+    TIMESTAMP_NEMESIS_BLOCK: typing.ClassVar[int] = 1459468800
 
     @classmethod
     def create(cls, deadline: int = 2, unit: ChronoUnit = ChronoUnit.HOURS):
@@ -102,10 +105,18 @@ class Deadline(util.Dto):
 
         return cls(now + delta)
 
+    def to_timestamp(self) -> int:
+        """Export deadline to UTC timestamp."""
+
+        utc = self.deadline.replace(tzinfo=datetime.timezone.utc)
+        return int(utc.timestamp())
+
+    toTimestamp = util.undoc(to_timestamp)
+
     @classmethod
-    def create_from_timestamp(cls, timestamp: int) -> 'Deadline':
+    def from_timestamp(cls, timestamp: int) -> 'Deadline':
         """
-        Create deadline from timestamp.
+        Create deadline from UTC timestamp.
 
         :param timestamp: Timestamp in UTC timezone.
         """
@@ -113,12 +124,20 @@ class Deadline(util.Dto):
         local = utc.replace(tzinfo=None)
         return cls(local)
 
-    createFromTimestamp = util.undoc(create_from_timestamp)
+    fromTimestamp = util.undoc(from_timestamp)
 
     def to_dto(self) -> util.U64DTOType:
-        utc = self.deadline.replace(tzinfo=datetime.timezone.utc)
-        return util.uint64_to_dto(int(utc.timestamp()))
+        return util.uint64_to_dto(self.to_timestamp())
 
     @classmethod
     def from_dto(cls, data: util.U64DTOType) -> 'Deadline':
-        return cls.create_from_timestamp(util.dto_to_uint64(data))
+        return cls.from_timestamp(util.dto_to_uint64(data))
+
+    def to_catbuffer(self) -> bytes:
+        return struct.pack('<Q', self.to_timestamp())
+
+    @classmethod
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['Deadline', bytes]:
+        assert len(data) >= cls.CATBUFFER_SIZE
+        inst = cls.from_timestamp(struct.unpack('<Q', data[:cls.CATBUFFER_SIZE])[0])
+        return inst, data[cls.CATBUFFER_SIZE:]

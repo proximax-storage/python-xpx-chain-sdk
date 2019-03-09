@@ -90,6 +90,7 @@ class Address(util.Model):
 
     address: str
     network_type: 'NetworkType'
+    CATBUFFER_SIZE: typing.ClassVar[int] = 25
 
     def __init__(self, address: str) -> None:
         plain = address.strip().upper().replace('-', '')
@@ -183,6 +184,6 @@ class Address(util.Model):
 
     @classmethod
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['Address', bytes]:
-        assert len(data) >= 25
-        inst = cls.create_from_encoded(data[:25])
-        return inst, data[25:]
+        assert len(data) >= cls.CATBUFFER_SIZE
+        inst = cls.create_from_encoded(data[:cls.CATBUFFER_SIZE])
+        return inst, data[cls.CATBUFFER_SIZE:]

@@ -41,6 +41,7 @@ class Mosaic(util.Model):
 
     id: 'MosaicId'
     amount: int
+    CATBUFFER_SIZE: typing.ClassVar[int] = 16
 
     def to_dto(self) -> dict:
         return {
@@ -60,8 +61,8 @@ class Mosaic(util.Model):
 
     @classmethod
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['Mosaic', bytes]:
-        assert len(data) >= 16
+        assert len(data) >= cls.CATBUFFER_SIZE
         id = MosaicId.from_catbuffer(data)[0]
-        amount = struct.unpack('<Q', data[8:16])[0]
+        amount = struct.unpack('<Q', data[id.CATBUFFER_SIZE:cls.CATBUFFER_SIZE])[0]
         inst = cls(id, amount)
-        return inst, data[16:]
+        return inst, data[cls.CATBUFFER_SIZE:]

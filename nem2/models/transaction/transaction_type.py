@@ -23,6 +23,9 @@
 """
 
 import enum
+import struct
+import typing
+
 from nem2 import util
 
 
@@ -47,6 +50,17 @@ class TransactionType(util.EnumMixin, enum.IntEnum):
     def description(self) -> str:
         return DESCRIPTION[self]
 
+    def to_catbuffer(self) -> bytes:
+        return struct.pack('<H', int(self))
+
+    @classmethod
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['TransactionType', bytes]:
+        assert len(data) >= cls.CATBUFFER_SIZE
+        inst = cls(struct.unpack('<H', data[:cls.CATBUFFER_SIZE])[0])
+        return inst, data[cls.CATBUFFER_SIZE:]
+
+
+TransactionType.CATBUFFER_SIZE: typing.ClassVar[int] = 2
 
 DESCRIPTION = {
     TransactionType.TRANSFER: "Transfer Transaction transaction type.",

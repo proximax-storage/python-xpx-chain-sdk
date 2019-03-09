@@ -42,6 +42,7 @@ class MosaicNonce(util.IntMixin, util.Model):
     """
 
     nonce: bytes
+    CATBUFFER_SIZE: typing.ClassVar[int] = 4
 
     def __init__(self, nonce: typing.Union[int, bytes]) -> None:
         if isinstance(nonce, int):
@@ -102,6 +103,6 @@ class MosaicNonce(util.IntMixin, util.Model):
 
     @classmethod
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicNonce', bytes]:
-        assert len(data) >= 4
-        inst = cls(data[:4])
-        return inst, data[4:]
+        assert len(data) >= cls.CATBUFFER_SIZE
+        inst = cls(data[:cls.CATBUFFER_SIZE])
+        return inst, data[cls.CATBUFFER_SIZE:]

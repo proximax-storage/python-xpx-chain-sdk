@@ -22,6 +22,7 @@
     limitations under the License.
 """
 
+import typing
 from .format import InterchangeFormat
 
 __all__ = [
@@ -60,9 +61,11 @@ class Catbuffer:
     """Future format of the catbuffer class."""
 
     __slots__ = ()
+    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def to_catbuffer(self):
         """Serialize object to catbuffer interchange format."""
+        raise NotImplementedError
 
     def toCatbuffer(self):
         return self.to_catbuffer()
@@ -70,6 +73,7 @@ class Catbuffer:
     @classmethod
     def from_catbuffer(cls, data):
         """Deserialize object from catbuffer interchange format."""
+        raise NotImplementedError
 
     @classmethod
     def fromCatbuffer(cls, data):

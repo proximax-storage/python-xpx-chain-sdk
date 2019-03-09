@@ -42,6 +42,7 @@ class MosaicId(util.IntMixin, util.Model):
     """
 
     id: int
+    CATBUFFER_SIZE: typing.ClassVar[int] = 8
 
     def __int__(self) -> int:
         return self.id
@@ -71,6 +72,6 @@ class MosaicId(util.IntMixin, util.Model):
 
     @classmethod
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicId', bytes]:
-        assert len(data) >= 8
-        inst = cls(struct.unpack('<Q', data[:8])[0])
-        return inst, data[8:]
+        assert len(data) >= cls.CATBUFFER_SIZE
+        inst = cls(struct.unpack('<Q', data[:cls.CATBUFFER_SIZE])[0])
+        return inst, data[cls.CATBUFFER_SIZE:]

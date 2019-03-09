@@ -1,8 +1,8 @@
 """
-    inner_transaction
-    =================
+    transaction_announce_response
+    =============================
 
-    Transaction with an embedded signer for aggregate transactions.
+    Response from announcing a transaction.
 
     License
     -------
@@ -22,14 +22,21 @@
     limitations under the License.
 """
 
-import typing
-from .transaction import Transaction
-
-if typing.TYPE_CHECKING:
-    from ..account.public_account import PublicAccount
+from nem2 import util
 
 
-class InnerTransaction(Transaction):
-    """Transaction with an embedded signer for aggregate transactions."""
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class TransactionAnnounceResponse(util.Dto):
+    """Response from announcing a transaction."""
 
-    signer: 'PublicAccount'
+    message: str
+
+    def to_dto(self) -> dict:
+        return {
+            'message': self.message,
+        }
+
+    @classmethod
+    def from_dto(cls, data: dict) -> 'TransactionAnnounceResponse':
+        return cls(data['message'])

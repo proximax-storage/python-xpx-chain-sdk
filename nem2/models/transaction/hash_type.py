@@ -24,9 +24,13 @@
 
 import enum
 import string
+import struct
+import typing
+
+from nem2 import util
 
 
-class HashType(enum.IntEnum):
+class HashType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
     """Enumerations for support hash types."""
 
     SHA3_256 = 0
@@ -35,9 +39,11 @@ class HashType(enum.IntEnum):
     HASH_256 = 3
 
     def description(self) -> str:
-        """Describe enumerated values in detail."""
-
         return DESCRIPTION[self]
+
+    def hash_length(self) -> int:
+        """Calculate the expected hash length."""
+        return LENGTH[self]
 
     def validate(self, input: str) -> bool:
         """
@@ -46,9 +52,20 @@ class HashType(enum.IntEnum):
         :param input: Hex-encoded hash data.
         """
         if all(i in string.hexdigits for i in input):
-            return LENGTH[self] == len(input)
+            return self.hash_length() == len(input)
         return False
 
+    def to_catbuffer(self) -> bytes:
+        return struct.pack('<B', int(self))
+
+    @classmethod
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['HashType', bytes]:
+        assert len(data) >= cls.CATBUFFER_SIZE
+        inst = cls(struct.unpack('<B', data[:cls.CATBUFFER_SIZE])[0])
+        return inst, data[cls.CATBUFFER_SIZE:]
+
+
+HashType.CATBUFFER_SIZE: typing.ClassVar[int] = 1
 
 DESCRIPTION = {
     HashType.SHA3_256: "SHA3-256 (default).",

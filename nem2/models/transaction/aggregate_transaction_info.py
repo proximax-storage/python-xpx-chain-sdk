@@ -1,8 +1,8 @@
 """
-    transaction_info
-    ================
+    aggregate_transaction_info
+    ==========================
 
-    Transaction metadata.
+    Aggregate transaction metadata.
 
     License
     -------
@@ -22,28 +22,26 @@
     limitations under the License.
 """
 
-import typing
 from nem2 import util
 
 
 @util.inherit_doc
-@util.dataclass(frozen=True, hash=None, merkle_component_hash=None)
-class TransactionInfo(util.Dto):
-    """Transaction metadata."""
+@util.dataclass(frozen=True)
+class AggregateTransactionInfo(util.Dto):
+    """Aggregate transaction metadata."""
 
     height: int
     index: int
     id: str
-    hash: typing.Optional[str]
-    merkle_component_hash: typing.Optional[str]
+    aggregate_hash: str
+    aggregate_id: str
 
     def is_unconfirmed(self):
         """Is transaction pending to be included."""
 
         return all((
             self.height == 0,
-            self.hash is None,
-            self.merkle_component_hash is None
+            self.aggregate_hash == self.aggregate_id,
         ))
 
     isUnconfirmed = util.undoc(is_unconfirmed)
@@ -58,22 +56,19 @@ class TransactionInfo(util.Dto):
         """Does the transaction have missing signatures."""
         return all((
             self.height == 0,
-            self.hash != self.merkle_component_hash,
+            self.aggregate_hash != self.aggregate_id,
         ))
 
     hasMissingSignatures = util.undoc(has_missing_signatures)
 
     def to_dto(self) -> dict:
-        data = {
+        return {
             'height': util.uint64_to_dto(self.height),
             'index': self.index,
             'id': self.id,
+            'aggregateHash': self.aggregate_hash,
+            'aggregateId': self.aggregate_id,
         }
-        if self.hash is not None:
-            data['hash'] = self.hash
-        if self.merkle_component_hash is not None:
-            data['merkleComponentHash'] = self.merkle_component_hash
-        return data
 
     @classmethod
     def from_dto(cls, data: dict) -> 'TransactionInfo':
@@ -81,6 +76,6 @@ class TransactionInfo(util.Dto):
             height=util.dto_to_uint64(data['height']),
             index=data['index'],
             id=data['id'],
-            hash=data.get('hash'),
-            merkle_component_hash=data.get('merkleComponentHash'),
+            aggregate_hash=data['aggregateHash'],
+            aggregate_id=data['aggregateId'],
         )

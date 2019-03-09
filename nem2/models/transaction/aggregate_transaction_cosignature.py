@@ -1,8 +1,8 @@
 """
-    inner_transaction
-    =================
+    transaction
+    ===========
 
-    Transaction with an embedded signer for aggregate transactions.
+    Abstract base class for transactions.
 
     License
     -------
@@ -23,13 +23,13 @@
 """
 
 import typing
-from .transaction import Transaction
-
-if typing.TYPE_CHECKING:
-    from ..account.public_account import PublicAccount
+from nem2 import util
 
 
-class InnerTransaction(Transaction):
-    """Transaction with an embedded signer for aggregate transactions."""
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class AggregateTransactionCosignature:
+    """Aggregate transaction signer and signature."""
 
+    signature: str
     signer: 'PublicAccount'

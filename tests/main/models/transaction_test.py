@@ -10,6 +10,36 @@ def psuedo_entropy(size: int) -> bytes:
     return bytes([random.randint(0, 255) for _ in range(size)])
 
 
+class TestAggregateTransactionInfo(harness.TestCase):
+
+    def setUp(self):
+        self.transaction_info = models.AggregateTransactionInfo(
+            height=18160,
+            index=0,
+            id="5A0069D83F17CF0001777E56",
+            aggregate_hash="3D28C804EDD07D5A728E5C5FFEC01AB07AFA5766AE6997B38526D36015A4D006",
+            aggregate_id="5A0069D83F17CF0001777E55",
+        )
+        self.dto = {
+            "height": [18160, 0],
+            "aggregateHash": "3D28C804EDD07D5A728E5C5FFEC01AB07AFA5766AE6997B38526D36015A4D006",
+            "aggregateId": "5A0069D83F17CF0001777E55",
+            "index": 0,
+            "id": "5A0069D83F17CF0001777E56"
+        }
+
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.transaction_info.__dict__
+
+    def test_to_dto(self):
+        self.assertEqual(self.transaction_info.to_dto(), self.dto)
+
+    def test_from_dto(self):
+        value = models.AggregateTransactionInfo.from_dto(self.dto)
+        self.assertEqual(value, self.transaction_info)
+
+
 class TestDeadline(harness.TestCase):
 
     def setUp(self):
@@ -122,6 +152,24 @@ class TestPlainMessage(harness.TestCase):
         self.assertEqual(value.payload, b'Hello world!')
 
 
+class TestTransactionAnnounceResponse(harness.TestCase):
+
+    def setUp(self):
+        self.response = models.TransactionAnnounceResponse('Hello world!')
+        self.dto = {'message': 'Hello world!'}
+
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.response.__dict__
+
+    def test_to_dto(self):
+        self.assertEqual(self.response.to_dto(), self.dto)
+
+    def test_from_dto(self):
+        value = models.TransactionAnnounceResponse.from_dto(self.dto)
+        self.assertEqual(value, self.response)
+
+
 class TestTransactionInfo(harness.TestCase):
 
     def setUp(self):
@@ -164,7 +212,7 @@ class TestTransactionStatus(harness.TestCase):
             group=models.TransactionStatusGroup.CONFIRMED,
             status="Success",
             hash="B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
-            deadline=models.Deadline.create_from_timestamp(1),
+            deadline=models.Deadline.from_timestamp(1),
             height=1
         )
         self.dto = {

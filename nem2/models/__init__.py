@@ -33,11 +33,18 @@ from .namespace.namespace_info import NamespaceInfo
 from .namespace.namespace_name import NamespaceName
 from .namespace.namespace_type import NamespaceType
 
+from .transaction.aggregate_transaction_cosignature import AggregateTransactionCosignature
+from .transaction.aggregate_transaction_info import AggregateTransactionInfo
 from .transaction.deadline import ChronoUnit, Deadline
 from .transaction.hash_type import HashType
+from .transaction.inner_transaction import InnerTransaction
 from .transaction.message import Message
 from .transaction.message_type import MessageType
 from .transaction.plain_message import PlainMessage
+from .transaction.secret_proof_transaction import SecretProofTransaction
+from .transaction.signed_transaction import SignedTransaction
+from .transaction.transaction import Transaction
+from .transaction.transaction_announce_response import TransactionAnnounceResponse
 from .transaction.transaction_info import TransactionInfo
 from .transaction.transaction_status import TransactionStatus
 from .transaction.transaction_status_group import TransactionStatusGroup
@@ -87,12 +94,19 @@ __all__ = [
     'NamespaceType',
 
     # Transaction
+    'AggregateTransactionCosignature',
+    'AggregateTransactionInfo',
     'ChronoUnit',
     'Deadline',
     'HashType',
+    'InnerTransaction',
     'Message',
     'MessageType',
     'PlainMessage',
+    'SecretProofTransaction',
+    'SignedTransaction',
+    'Transaction',
+    'TransactionAnnounceResponse',
     'TransactionInfo',
     'TransactionStatus',
     'TransactionStatusGroup',
