@@ -29,9 +29,8 @@ import typing
 from nem2 import util
 
 
-# TODO(ahuszagh) Almost certainly will need DTO/Catbuffer support.
 @util.inherit_doc
-class TransactionType(util.EnumMixin, enum.IntEnum):
+class TransactionType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
     """Transaction type."""
 
     TRANSFER = 0x4154
@@ -46,6 +45,7 @@ class TransactionType(util.EnumMixin, enum.IntEnum):
     LOCK = 0x4148
     SECRET_LOCK = 0x4152
     SECRET_PROOF = 0x4252
+    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def description(self) -> str:
         return DESCRIPTION[self]
@@ -60,7 +60,7 @@ class TransactionType(util.EnumMixin, enum.IntEnum):
         return inst, data[cls.CATBUFFER_SIZE:]
 
 
-TransactionType.CATBUFFER_SIZE: typing.ClassVar[int] = 2
+TransactionType.CATBUFFER_SIZE = 2
 
 DESCRIPTION = {
     TransactionType.TRANSFER: "Transfer Transaction transaction type.",

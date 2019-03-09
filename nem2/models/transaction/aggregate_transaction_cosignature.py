@@ -25,6 +25,9 @@
 import typing
 from nem2 import util
 
+if typing.TYPE_CHECKING:
+    from ..account.public_account import PublicAccount
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)

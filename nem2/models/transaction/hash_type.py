@@ -37,6 +37,7 @@ class HashType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
     KECCAK_256 = 1
     HASH_160 = 2
     HASH_256 = 3
+    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def description(self) -> str:
         return DESCRIPTION[self]
@@ -65,7 +66,7 @@ class HashType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
         return inst, data[cls.CATBUFFER_SIZE:]
 
 
-HashType.CATBUFFER_SIZE: typing.ClassVar[int] = 1
+HashType.CATBUFFER_SIZE = 1
 
 DESCRIPTION = {
     HashType.SHA3_256: "SHA3-256 (default).",

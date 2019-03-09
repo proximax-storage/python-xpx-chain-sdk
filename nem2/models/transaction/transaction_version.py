@@ -29,7 +29,6 @@ import typing
 from nem2 import util
 
 
-# TODO(ahuszagh) Almost certainly will need DTO/Catbuffer support.
 @util.inherit_doc
 class TransactionVersion(util.Catbuffer, enum.IntEnum):
     """Transaction version."""
@@ -46,6 +45,7 @@ class TransactionVersion(util.Catbuffer, enum.IntEnum):
     SECRET_PROOF = 1
     ADDRESS_ALIAS = 1
     MOSAIC_ALIAS = 1
+    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def to_catbuffer(self) -> bytes:
         return struct.pack('<B', int(self))
@@ -57,4 +57,4 @@ class TransactionVersion(util.Catbuffer, enum.IntEnum):
         return inst, data[cls.CATBUFFER_SIZE:]
 
 
-TransactionVersion.CATBUFFER_SIZE: typing.ClassVar[int] = 1
+TransactionVersion.CATBUFFER_SIZE = 1

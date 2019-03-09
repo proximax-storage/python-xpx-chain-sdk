@@ -35,6 +35,7 @@ class MosaicSupplyType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
 
     DECREASE = 0
     INCREASE = 1
+    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def description(self) -> str:
         return DESCRIPTION[self]
@@ -49,7 +50,7 @@ class MosaicSupplyType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
         return inst, data[cls.CATBUFFER_SIZE:]
 
 
-MosaicSupplyType.CATBUFFER_SIZE: typing.ClassVar[int] = 1
+MosaicSupplyType.CATBUFFER_SIZE = 1
 
 DESCRIPTION = {
     MosaicSupplyType.DECREASE: "Decrease mosaic supply.",

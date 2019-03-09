@@ -23,17 +23,21 @@
 """
 
 import enum
+import struct
+import typing
+
 from nem2 import util
 
 
 @util.inherit_doc
-class NetworkType(util.Dto, util.EnumMixin, enum.IntEnum):
+class NetworkType(util.Model, util.EnumMixin, enum.IntEnum):
     """Identifier for the network type."""
 
     MAIN_NET    = 0x68
     TEST_NET    = 0x98
     MIJIN       = 0x60
     MIJIN_TEST  = 0x90
+    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def description(self) -> str:
         return DESCRIPTION[self]
@@ -76,6 +80,17 @@ class NetworkType(util.Dto, util.EnumMixin, enum.IntEnum):
     def from_dto(cls, data: int) -> 'NetworkType':
         return cls(data)
 
+    def to_catbuffer(self) -> bytes:
+        return struct.pack('<B', int(self))
+
+    @classmethod
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['NetworkType', bytes]:
+        assert len(data) >= cls.CATBUFFER_SIZE
+        inst = cls(struct.unpack('<B', data[:cls.CATBUFFER_SIZE])[0])
+        return inst, data[cls.CATBUFFER_SIZE:]
+
+
+NetworkType.CATBUFFER_SIZE = 1
 
 DESCRIPTION = {
     NetworkType.MAIN_NET: "Main network",

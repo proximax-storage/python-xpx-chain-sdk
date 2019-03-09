@@ -22,16 +22,18 @@
     limitations under the License.
 """
 
+import struct
 import typing
 
 from nem2 import util
+from .hash_type import HashType
+from .inner_transaction import InnerTransaction
 from .transaction import Transaction
 from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
 
 if typing.TYPE_CHECKING:
     from .deadline import Deadline
-    from .hash_type import HashType
     from .transaction_info import TransactionInfo
     from ..account.public_account import PublicAccount
     from ..blockchain.network_type import NetworkType
@@ -114,20 +116,40 @@ class SecretProofTransaction(Transaction):
             proof
         )
 
-    def entity_size(self, embedded=False) -> int:
+    def entity_size(self) -> int:
         # extra 3 bytes, 1 for hash_type, 2 for proof size.
-        shared_size = self.shared_entity_size(embedded)
-        secret_size = len(self.secret) / 2
-        proof_size = len(self.proof) / 2
+        shared_size = self.shared_entity_size()
+        secret_size = len(self.secret) // 2
+        proof_size = len(self.proof) // 2
 
         return shared_size + secret_size + proof_size + 3
 
     def to_catbuffer_specific(self) -> bytes:
-        proof_size = len(self.proof) / 2
+        proof_size = len(self.proof) // 2
         hash_type = self.hash_type.to_catbuffer()
         secret = util.unhexlify(self.secret)
         proof = struct.pack('<H', proof_size) + util.unhexlify(self.proof)
         return hash_type + secret + proof
 
-    def from_catbuffer(cls, embedded=False) -> 'SecretProofTransaction':
-        raise NotImplementedError
+    def load_catbuffer_specific(self, data: bytes) -> bytes:
+        """Load transaction-specific data data from catbuffer."""
+
+        hash_type, data = HashType.from_catbuffer(data)
+        hash_length = hash_type.hash_length() // 2
+        secret = util.hexlify(data[:hash_length])
+        proof_size = struct.unpack('<H', data[hash_length: hash_length + 2])[0]
+        proof = util.hexlify(data[hash_length + 2: hash_length + proof_size + 2])
+
+        object.__setattr__(self, 'hash_type', hash_type)
+        object.__setattr__(self, 'secret', secret)
+        object.__setattr__(self, 'proof', proof)
+
+        return data[hash_length + proof_size + 2:]
+
+    # TODO(ahuszagh) needs to inner
+
+
+class SecretProofInnerTransaction(InnerTransaction, SecretProofTransaction):
+    """Embedded secret proof transaction."""
+
+    # TODO(ahuszagh) Implement...

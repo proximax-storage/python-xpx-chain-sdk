@@ -71,7 +71,7 @@ class AggregateTransactionInfo(util.Dto):
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'TransactionInfo':
+    def from_dto(cls, data: dict) -> 'AggregateTransactionInfo':
         return cls(
             height=util.dto_to_uint64(data['height']),
             index=data['index'],
