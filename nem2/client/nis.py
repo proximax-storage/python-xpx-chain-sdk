@@ -67,9 +67,9 @@ def asynchronous_request(name, doc, raise_for_status=False):
             json = await response.json()
             return PROCESS[name](status, json)
 
-    f.__name__ = "async_{}".format(name)
+    f.__name__ = f"async_{name}"
     f.__doc__ = doc
-    f.func_name = "async_{}".format(name)
+    f.func_name = f"async_{name}"
 
     return f
 
@@ -85,7 +85,7 @@ def request(*args, **kwds):
 # BLOCKCHAIN HTTP
 # ---------------
 
-def request_get_block_by_height(host: 'Host', height: int, timeout=None):
+def request_get_block_by_height(host: 'Host', height: int, **kwds):
     """
     Make "/block/{height}" request.
 
@@ -94,7 +94,7 @@ def request_get_block_by_height(host: 'Host', height: int, timeout=None):
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/block/{}".format(height), timeout=timeout)
+    return host.get(f"/block/{height}", **kwds)
 
 
 def process_get_block_by_height(status: int, json: dict) -> 'BlockInfo':
@@ -112,7 +112,7 @@ def process_get_block_by_height(status: int, json: dict) -> 'BlockInfo':
 get_block_by_height = request("get_block_by_height", "", True)
 
 
-def request_get_blockchain_height(host: 'Host', timeout=None):
+def request_get_blockchain_height(host: 'Host', **kwds):
     """
     Make "/chain/height" request.
 
@@ -120,7 +120,7 @@ def request_get_blockchain_height(host: 'Host', timeout=None):
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/chain/height", timeout=timeout)
+    return host.get("/chain/height", **kwds)
 
 
 def process_get_blockchain_height(status: int, json: dict) -> int:
@@ -138,7 +138,7 @@ def process_get_blockchain_height(status: int, json: dict) -> int:
 get_blockchain_height = request("get_blockchain_height", "", True)
 
 
-def request_get_blockchain_score(host: 'Host', timeout=None):
+def request_get_blockchain_score(host: 'Host', **kwds):
     """
     Make "/chain/score" request.
 
@@ -146,7 +146,7 @@ def request_get_blockchain_score(host: 'Host', timeout=None):
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/chain/score", timeout=timeout)
+    return host.get("/chain/score", **kwds)
 
 
 def process_get_blockchain_score(status: int, json: dict) -> 'BlockchainScore':
@@ -164,7 +164,7 @@ def process_get_blockchain_score(status: int, json: dict) -> 'BlockchainScore':
 get_blockchain_score = request("get_blockchain_score", "", True)
 
 
-def request_get_diagnostic_storage(host: 'Host', timeout=None):
+def request_get_diagnostic_storage(host: 'Host', **kwds):
     """
     Make "/diagnostic/storage" request.
 
@@ -172,7 +172,7 @@ def request_get_diagnostic_storage(host: 'Host', timeout=None):
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/diagnostic/storage", timeout=timeout)
+    return host.get("/diagnostic/storage", **kwds)
 
 
 def process_get_diagnostic_storage(status: int, json: dict) -> 'BlockchainStorageInfo':
@@ -193,7 +193,7 @@ get_diagnostic_storage = request("get_diagnostic_storage", "", True)
 # -----------
 
 
-def request_get_mosaic_names(host: 'Host', ids: typing.Sequence['MosaicId'], timeout=None):
+def request_get_mosaic_names(host: 'Host', ids: typing.Sequence['MosaicId'], **kwds):
     """
     Make "/mosaic/names" request.
 
@@ -202,8 +202,8 @@ def request_get_mosaic_names(host: 'Host', ids: typing.Sequence['MosaicId'], tim
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    json = {"mosaicIds": ["{:x}".format(i) for i in ids]}
-    return host.post("/mosaic/names", json=json, timeout=timeout)
+    json = {"mosaicIds": [f"{i:x}" for i in ids]}
+    return host.post("/mosaic/names", json=json, **kwds)
 
 
 def process_get_mosaic_names(status: int, json: list) -> typing.Sequence['MosaicName']:
@@ -224,7 +224,7 @@ get_mosaic_names = request("get_mosaic_names", "", True)
 # --------------
 
 
-def request_get_namespace(host: 'Host', namespace_id: 'NamespaceId', timeout=None):
+def request_get_namespace(host: 'Host', namespace_id: 'NamespaceId', **kwds):
     """
     Make "/namespace/{namespace_id}" request.
 
@@ -233,7 +233,7 @@ def request_get_namespace(host: 'Host', namespace_id: 'NamespaceId', timeout=Non
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/namespace/{:x}".format(namespace_id), timeout=timeout)
+    return host.get(f"/namespace/{namespace_id:x}", **kwds)
 
 
 def process_get_namespace(status: int, json: dict) -> 'NamespaceInfo':
@@ -251,7 +251,7 @@ def process_get_namespace(status: int, json: dict) -> 'NamespaceInfo':
 get_namespace = request("get_namespace", "", True)
 
 
-def request_get_namespace_names(host: 'Host', ids: typing.Sequence['NamespaceId'], timeout=None):
+def request_get_namespace_names(host: 'Host', ids: typing.Sequence['NamespaceId'], **kwds):
     """
     Make "/namespace/names" request.
 
@@ -260,8 +260,8 @@ def request_get_namespace_names(host: 'Host', ids: typing.Sequence['NamespaceId'
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    json = {"namespaceIds": ["{:x}".format(i) for i in ids]}
-    return host.post("/namespace/names", json=json, timeout=timeout)
+    json = {"namespaceIds": [f"{i:x}" for i in ids]}
+    return host.post("/namespace/names", json=json, **kwds)
 
 
 def process_get_namespace_names(status: int, json: list) -> typing.Sequence['NamespaceName']:
@@ -279,7 +279,7 @@ def process_get_namespace_names(status: int, json: list) -> typing.Sequence['Nam
 get_namespace_names = request("get_namespace_names", "", True)
 
 
-def request_get_namespaces_from_account(host: 'Host', address: 'Address', timeout=None):
+def request_get_namespaces_from_account(host: 'Host', address: 'Address', **kwds):
     """
     Make "/account/{address}/namespaces" request.
 
@@ -288,7 +288,7 @@ def request_get_namespaces_from_account(host: 'Host', address: 'Address', timeou
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/account/{}/namespaces".format(address.address), timeout=timeout)
+    return host.get(f"/account/{address.address}/namespaces", **kwds)
 
 
 def process_get_namespaces_from_account(status: int, json: list) -> typing.Sequence['NamespaceInfo']:
@@ -306,7 +306,7 @@ def process_get_namespaces_from_account(status: int, json: list) -> typing.Seque
 get_namespaces_from_account = request("get_namespaces_from_account", "", True)
 
 
-def request_get_namespaces_from_accounts(host: 'Host', addresses: typing.Sequence['Address'], timeout=None):
+def request_get_namespaces_from_accounts(host: 'Host', addresses: typing.Sequence['Address'], **kwds):
     """
     Make "/account/namespaces" request.
 
@@ -316,7 +316,7 @@ def request_get_namespaces_from_accounts(host: 'Host', addresses: typing.Sequenc
     """
 
     json = {"addresses": [i.address for i in addresses]}
-    return host.post("/account/namespaces", json=json, timeout=timeout)
+    return host.post("/account/namespaces", json=json, **kwds)
 
 
 def process_get_namespaces_from_accounts(status: int, json: list) -> typing.Sequence['NamespaceInfo']:
@@ -334,7 +334,7 @@ def process_get_namespaces_from_accounts(status: int, json: list) -> typing.Sequ
 get_namespaces_from_accounts = request("get_namespaces_from_accounts", "", True)
 
 
-def request_get_linked_mosaic_id(host: 'Host', namespace_id: 'NamespaceId', timeout=None):
+def request_get_linked_mosaic_id(host: 'Host', namespace_id: 'NamespaceId', **kwds):
     """
     Make "/namespace/{namespace_id}" request.
 
@@ -343,7 +343,7 @@ def request_get_linked_mosaic_id(host: 'Host', namespace_id: 'NamespaceId', time
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return request_get_namespace(host, namespace_id, timeout=timeout)
+    return request_get_namespace(host, namespace_id, **kwds)
 
 
 def process_get_linked_mosaic_id(status: int, json: dict) -> 'MosaicId':
@@ -361,7 +361,7 @@ def process_get_linked_mosaic_id(status: int, json: dict) -> 'MosaicId':
 get_linked_mosaic_id = request("get_linked_mosaic_id", "", True)
 
 
-def request_get_linked_address(host: 'Host', namespace_id: 'NamespaceId', timeout=None):
+def request_get_linked_address(host: 'Host', namespace_id: 'NamespaceId', **kwds):
     """
     Make "/namespace/{namespace_id}" request.
 
@@ -370,7 +370,7 @@ def request_get_linked_address(host: 'Host', namespace_id: 'NamespaceId', timeou
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return request_get_namespace(host, namespace_id, timeout=timeout)
+    return request_get_namespace(host, namespace_id, **kwds)
 
 
 def process_get_linked_address(status: int, json: dict) -> 'Address':
@@ -400,7 +400,7 @@ NETWORK_TYPE = {
 }
 
 
-def request_get_network_type(host: 'Host', timeout=None):
+def request_get_network_type(host: 'Host', **kwds):
     """
     Make "/network" request.
 
@@ -408,7 +408,7 @@ def request_get_network_type(host: 'Host', timeout=None):
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/network", timeout=timeout)
+    return host.get("/network", **kwds)
 
 
 def process_get_network_type(status: int, json: dict) -> 'NetworkType':
@@ -424,6 +424,36 @@ def process_get_network_type(status: int, json: dict) -> 'NetworkType':
 
 
 get_network_type = request("get_network_type", "", True)
+
+# TRANSACTION HTTP
+# ----------------
+
+
+def request_get_transaction_status(host: 'Host', hash: str, **kwds):
+    """
+    Make "/transaction/{hash}/status" request.
+
+    :param host: Host wrapper for client.
+    :param hash: Transaction hash.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return host.get(f"/transaction/{hash}/status", **kwds)
+
+
+def process_get_transaction_status(status: int, json: dict) -> 'TransactionStatus':
+    """
+    Process the "/transaction/{hash}/status" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return models.TransactionStatus.from_dto(json)
+
+
+get_transaction_status = request("get_transaction_status", "", True)
 
 # FORWARDERS
 # ----------
@@ -448,6 +478,9 @@ REQUEST = {
 
     # NETWORK
     'get_network_type': request_get_network_type,
+
+    # TRANSACTOON
+    'get_transaction_status': request_get_transaction_status,
 }
 
 PROCESS = {
@@ -470,4 +503,7 @@ PROCESS = {
 
     # NETWORK
     'get_network_type': process_get_network_type,
+
+    # TRANSACTOON
+    'get_transaction_status': process_get_transaction_status,
 }

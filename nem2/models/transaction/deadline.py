@@ -103,7 +103,7 @@ class Deadline(util.Dto):
         return cls(now + delta)
 
     @classmethod
-    def create_from_timestamp(cls, timestamp: int):
+    def create_from_timestamp(cls, timestamp: int) -> 'Deadline':
         """
         Create deadline from timestamp.
 

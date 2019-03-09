@@ -23,6 +23,7 @@
 """
 
 import enum
+import typing
 from nem2 import util
 
 
@@ -38,7 +39,7 @@ class TransactionStatusGroup(util.Dto, util.EnumMixin, str, enum.Enum):
         return DESCRIPTION[self]
 
     def to_dto(self) -> str:
-        return self.value
+        return typing.cast(str, self.value)
 
     @classmethod
     def from_dto(cls, data: str) -> 'TransactionStatusGroup':
