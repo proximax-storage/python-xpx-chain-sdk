@@ -31,6 +31,8 @@ __all__ = [
 class EnumMixin:
     """Mixin defining shared methods for enumerations."""
 
+    __slots__ = ()
+
     def description(self) -> str:
         """Describe enumerated values in detail."""
         raise NotImplementedError

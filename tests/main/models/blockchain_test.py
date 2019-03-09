@@ -95,6 +95,10 @@ class TestBlockInfo(harness.TestCase):
             merkle_tree=self.merkle_tree,
         )
 
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.block_info.__dict__
+
     def test_properties(self):
         self.assertEqual(self.block_info.hash, self.hash)
         self.assertEqual(self.block_info.generation_hash, self.generation_hash)
@@ -148,8 +152,7 @@ class TestBlockInfo(harness.TestCase):
             },
         })
 
-        import dataclasses
-        block_info = dataclasses.replace(self.block_info, merkle_tree=None)
+        block_info = self.block_info.replace(merkle_tree=None)
         dto = block_info.to_dto()
         self.assertNotIn("merkleTree", dto['meta'])
 
@@ -157,20 +160,52 @@ class TestBlockInfo(harness.TestCase):
         dto = self.block_info.to_dto()
         self.assertEqual(self.block_info, models.BlockInfo.from_dto(dto))
 
-        import dataclasses
-        block_info = dataclasses.replace(self.block_info, merkle_tree=None)
+        block_info = self.block_info.replace(merkle_tree=None)
         dto = block_info.to_dto()
         self.assertEqual(block_info, models.BlockInfo.from_dto(dto))
 
 
 class TestBlockchainScore(harness.TestCase):
-    # TODO(ahuszagh) Implement
-    pass
+
+    def test_properties(self):
+        value = models.BlockchainScore(554597137692201874146690593473)
+        self.assertEqual(value.score_low, 117790623335183041)
+        self.assertEqual(value.score_high, 30064771077)
+
+    def test_slots(self):
+        value = models.BlockchainScore(554597137692201874146690593473)
+        with self.assertRaises(TypeError):
+            value.__dict__
+
+    def test_to_dto(self):
+        value = models.BlockchainScore(554597137692201874146690593473)
+        dto = {'scoreLow': [2781082305, 27425266], 'scoreHigh': [5, 7]}
+        self.assertEqual(value.to_dto(), dto)
+
+    def test_from_dto(self):
+        dto = {'scoreLow': [2781082305, 27425266], 'scoreHigh': [5, 7]}
+        value = models.BlockchainScore.from_dto(dto)
+        self.assertEqual(value.score, 554597137692201874146690593473)
 
 
 class TestBlockchainStorageInfo(harness.TestCase):
-    # TODO(ahuszagh) Implement
-    pass
+
+    def test_slots(self):
+        value = models.BlockchainStorageInfo(11459, 25, 25)
+        with self.assertRaises(TypeError):
+            value.__dict__
+
+    def test_to_dto(self):
+        value = models.BlockchainStorageInfo(11459, 25, 25)
+        dto = {'numBlocks': 11459, 'numTransactions': 25, 'numAccounts': 25}
+        self.assertEqual(value.to_dto(), dto)
+
+    def test_from_dto(self):
+        dto = {'numBlocks': 11459, 'numTransactions': 25, 'numAccounts': 25}
+        value = models.BlockchainStorageInfo.from_dto(dto)
+        self.assertEqual(value.num_blocks, 11459)
+        self.assertEqual(value.num_transactions, 25)
+        self.assertEqual(value.num_accounts, 25)
 
 
 class TestNetworkType(harness.TestCase):

@@ -22,6 +22,8 @@
     limitations under the License.
 """
 
+import typing
+
 from nem2 import util
 from .mosaic import Mosaic
 from .mosaic_id import MosaicId
@@ -41,12 +43,13 @@ class NetworkHarvestMosaic(Mosaic):
     :cvar LEVY_MUTABLE: If levy is mutable.
     """
 
-    NAMESPACE_ID: 'NamespaceId' = NamespaceId("cat.harvest")
-    DIVISIBILITY: int = 3
-    INITIAL_SUPPLY: int = 15000000
-    TRANSFERABLE: bool = True
-    SUPPLY_MUTABLE: bool = True
-    LEVY_MUTABLE: bool = False
+    __slots__ = ()
+    NAMESPACE_ID: typing.ClassVar['NamespaceId'] = NamespaceId("cat.harvest")
+    DIVISIBILITY: typing.ClassVar[int] = 3
+    INITIAL_SUPPLY: typing.ClassVar[int] = 15000000
+    TRANSFERABLE: typing.ClassVar[bool] = True
+    SUPPLY_MUTABLE: typing.ClassVar[bool] = True
+    LEVY_MUTABLE: typing.ClassVar[bool] = False
 
     def __init__(self, amount: int) -> None:
         mosaic_id = MosaicId(self.NAMESPACE_ID.id)

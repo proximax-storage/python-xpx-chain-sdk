@@ -33,8 +33,16 @@ from .namespace.namespace_info import NamespaceInfo
 from .namespace.namespace_name import NamespaceName
 from .namespace.namespace_type import NamespaceType
 
-from .transaction.deadline import Deadline
+from .transaction.deadline import ChronoUnit, Deadline
 from .transaction.hash_type import HashType
+from .transaction.message import Message
+from .transaction.message_type import MessageType
+from .transaction.plain_message import PlainMessage
+from .transaction.transaction_info import TransactionInfo
+from .transaction.transaction_status import TransactionStatus
+from .transaction.transaction_status_group import TransactionStatusGroup
+from .transaction.transaction_type import TransactionType
+from .transaction.transaction_version import TransactionVersion
 
 from nem2.util import InterchangeFormat
 
@@ -79,8 +87,17 @@ __all__ = [
     'NamespaceType',
 
     # Transaction
+    'ChronoUnit',
     'Deadline',
     'HashType',
+    'Message',
+    'MessageType',
+    'PlainMessage',
+    'TransactionInfo',
+    'TransactionStatus',
+    'TransactionStatusGroup',
+    'TransactionType',
+    'TransactionVersion',
 
     # Wallet
 

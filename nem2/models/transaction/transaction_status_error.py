@@ -1,8 +1,8 @@
 """
-    empty_alias
-    ===========
+    transaction_status_error
+    ========================
 
-    Empty alias without data.
+    Transaction status and error potentially raised during transactions.
 
     License
     -------
@@ -22,13 +22,8 @@
     limitations under the License.
 """
 
-from .alias import Alias
 
+class TransactionStatusError(Exception):
+    """Base exception for transaction errors."""
 
-class EmptyAlias(Alias):
-    """Empty alias without data."""
-
-    __slots__ = ()
-
-    def __init__(self) -> None:
-        super().__init__()
+    # TODO(ahuszagh) Implement...

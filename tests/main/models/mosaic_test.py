@@ -9,6 +9,11 @@ class TestMosaic(harness.TestCase):
         self.assertEqual(value.id, models.MosaicId(5))
         self.assertEqual(value.amount, 1000)
 
+    def test_slots(self):
+        value = models.Mosaic(models.MosaicId(5), 1000)
+        with self.assertRaises(TypeError):
+            value.__dict__
+
     def test_properties(self):
         value = models.Mosaic(models.MosaicId(5), 1000)
         self.assertEqual(value.id, models.MosaicId(5))
@@ -81,6 +86,11 @@ class TestMosaicId(harness.TestCase):
     def test_init(self):
         value = models.MosaicId(5)
         self.assertEqual(value.id, 5)
+
+    def test_slots(self):
+        value = models.MosaicId(5)
+        with self.assertRaises(TypeError):
+            value.__dict__
 
     def test_properties(self):
         value = models.MosaicId(5)
@@ -198,6 +208,10 @@ class TestMosaicNonce(harness.TestCase):
         self.data = b'\x00\x00\x00\x00'
         self.nonce = models.MosaicNonce(self.data)
 
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.nonce.__dict__
+
     def test_properties(self):
         self.assertEqual(self.nonce.nonce, self.data)
 
@@ -289,6 +303,10 @@ class TestMosaicProperties(harness.TestCase):
             duration=100,
         )
 
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.properties.__dict__
+
     def test_properties(self):
         self.assertEqual(self.properties.flags, 3)
         self.assertEqual(self.properties.supply_mutable, True)
@@ -377,6 +395,11 @@ class TestNetworkCurrencyMosaic(harness.TestCase):
         self.assertEqual(value.id.id, 0x85BBEA6CC462B244)
         self.assertEqual(value.amount, 1)
 
+    def test_slots(self):
+        value = models.NetworkCurrencyMosaic(1)
+        with self.assertRaises(TypeError):
+            value.__dict__
+
     def test_class_variables(self):
         cls = models.NetworkCurrencyMosaic
         self.assertEqual(cls.NAMESPACE_ID, models.NamespaceId(0x85BBEA6CC462B244))
@@ -403,6 +426,11 @@ class TestNetworkHarvestMosaic(harness.TestCase):
         value = models.NetworkHarvestMosaic(1)
         self.assertEqual(value.id.id, 0x941299B2B7E1291C)
         self.assertEqual(value.amount, 1)
+
+    def test_slots(self):
+        value = models.NetworkHarvestMosaic(1)
+        with self.assertRaises(TypeError):
+            value.__dict__
 
     def test_class_variables(self):
         cls = models.NetworkHarvestMosaic

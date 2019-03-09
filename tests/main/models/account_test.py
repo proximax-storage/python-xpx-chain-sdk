@@ -18,6 +18,11 @@ class TestAccount(harness.TestCase):
         self.assertEqual(value.public_key, self.public_key)
         self.assertEqual(value.private_key, self.private_key)
 
+    def test_slots(self):
+        value = models.Account(self.address, self.public_key, self.private_key)
+        with self.assertRaises(TypeError):
+            value.__dict__
+
     def test_properties(self):
         value = models.Account(self.address, self.public_key, self.private_key)
         self.assertEqual(value.address.address, "NAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGBSM5RH7")
@@ -110,6 +115,11 @@ class TestAddress(harness.TestCase):
         value = models.Address(self.pretty)
         self.assertEqual(value.address, self.plain)
         self.assertEqual(value.network_type, models.NetworkType.MIJIN_TEST)
+
+    def test_slots(self):
+        value = models.Address(self.pretty)
+        with self.assertRaises(TypeError):
+            value.__dict__
 
     def test_properties(self):
         value = models.Address(self.pretty)
@@ -244,6 +254,11 @@ class TestPublicAccount(harness.TestCase):
         value = models.PublicAccount(self.address, self.public_key)
         self.assertEqual(value.address, self.address)
         self.assertEqual(value.public_key, self.public_key)
+
+    def test_slots(self):
+        value = models.PublicAccount(self.address, self.public_key)
+        with self.assertRaises(TypeError):
+            value.__dict__
 
     def test_properties(self):
         value = models.PublicAccount(self.address, self.public_key)

@@ -33,5 +33,7 @@ class AddressAlias(Alias):
     :param value: Address object.
     """
 
+    __slots__ = ()
+
     def __init__(self, value: Address) -> None:
         super().__init__(value)

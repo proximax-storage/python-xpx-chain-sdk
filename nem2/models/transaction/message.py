@@ -22,13 +22,26 @@
     limitations under the License.
 """
 
-import abc
+import typing
+from nem2 import util
+
+if typing.TYPE_CHECKING:
+    from .message_type import MessageType
 
 
-class Message(abc.ABC):
-    """Abstract message type."""
+@util.dataclass(frozen=True)
+class Message(util.Dto):
+    """
+    Abstract message type.
 
-    _type: int
-    _payload: str
+    :param type: Message type.
+    :param payload: Message data, in bytes.
+    """
 
-    # TODO(ahuszagh) Implement...
+    type: 'MessageType'
+    payload: bytes
+
+    @classmethod
+    def create(cls, data: bytes) -> 'Message':
+        """Create a message from raw bytes."""
+        raise NotImplementedError

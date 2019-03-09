@@ -1,8 +1,8 @@
 """
-    empty_alias
-    ===========
+    transaction_version
+    ===================
 
-    Empty alias without data.
+    Enumerations for transaction versions.
 
     License
     -------
@@ -22,13 +22,24 @@
     limitations under the License.
 """
 
-from .alias import Alias
+import enum
+from nem2 import util
 
 
-class EmptyAlias(Alias):
-    """Empty alias without data."""
+# TODO(ahuszagh) Almost certainly will need DTO/Catbuffer support.
+@util.inherit_doc
+class TransactionVersion(enum.IntEnum):
+    """Transaction version."""
 
-    __slots__ = ()
-
-    def __init__(self) -> None:
-        super().__init__()
+    TRANSFER = 3
+    REGISTER_NAMESPACE = 2
+    MOSAIC_DEFINITION = 3
+    MOSAIC_SUPPLY_CHANGE = 2
+    MODIFY_MULTISIG_ACCOUNT = 3
+    AGGREGATE_COMPLETE = 2
+    AGGREGATE_BONDED = 2
+    LOCK = 1
+    SECRET_LOCK = 1
+    SECRET_PROOF = 1
+    ADDRESS_ALIAS = 1
+    MOSAIC_ALIAS = 1

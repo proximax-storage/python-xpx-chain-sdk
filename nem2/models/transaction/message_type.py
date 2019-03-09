@@ -1,8 +1,8 @@
 """
-    empty_alias
-    ===========
+    message_type
+    ============
 
-    Empty alias without data.
+    Enumerations for message types.
 
     License
     -------
@@ -22,13 +22,20 @@
     limitations under the License.
 """
 
-from .alias import Alias
+import enum
+from nem2 import util
 
 
-class EmptyAlias(Alias):
-    """Empty alias without data."""
+@util.inherit_doc
+class MessageType(util.EnumMixin, enum.IntEnum):
+    """Message type."""
 
-    __slots__ = ()
+    PLAIN = 0
 
-    def __init__(self) -> None:
-        super().__init__()
+    def description(self) -> str:
+        return DESCRIPTION[self]
+
+
+DESCRIPTION = {
+    MessageType.PLAIN: "Plain message.",
+}

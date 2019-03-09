@@ -33,5 +33,7 @@ class MosaicAlias(Alias):
     :param value: Mosaic ID.
     """
 
+    __slots__ = ()
+
     def __init__(self, value: MosaicId) -> None:
         super().__init__(value)

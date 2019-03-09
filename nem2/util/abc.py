@@ -79,6 +79,8 @@ class Catbuffer:
 class Model(Dto, Catbuffer):
     """Base class for NEM models."""
 
+    __slots__ = ()
+
     def serialize(self, format: InterchangeFormat):
         """Serialize data to interchange format."""
 
@@ -89,21 +91,3 @@ class Model(Dto, Catbuffer):
         """Deserialize data from interchange format."""
 
         return format.deserialize(data, cls)
-
-
-# ENUM MODELS
-# -----------
-
-
-def wrap_class(meta, *bases):
-    """Wrap existing class to inject bases and a metaclass into the class."""
-
-    class metaclass(type):
-        def __new__(cls, name, b, d):
-            return meta(name, bases, d)
-
-        @classmethod
-        def __prepare__(cls, name, b):
-            return meta.__prepare__(name, bases)
-
-    return type.__new__(metaclass, 'tmp', (), {})

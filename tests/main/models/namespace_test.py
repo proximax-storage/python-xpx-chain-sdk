@@ -28,6 +28,11 @@ class TestAddressAlias(harness.TestCase):
         self.assertEqual(value.to_dto(), dto)
         self.assertEqual(models.Alias.from_dto(dto), value)
 
+    def test_slots(self):
+        value = models.AddressAlias(self.address)
+        with self.assertRaises(TypeError):
+            value.__dict__
+
 
 class TestAlias(harness.TestCase):
 
@@ -51,6 +56,8 @@ class TestAlias(harness.TestCase):
             value.address
         with self.assertRaises(ValueError):
             value.mosaic_id
+        with self.assertRaises(TypeError):
+            value.__dict__
 
         self.assertEqual(value.to_dto(), None)
         self.assertEqual(models.Alias.from_dto(None), value)
@@ -69,6 +76,8 @@ class TestAlias(harness.TestCase):
 
         with self.assertRaises(ValueError):
             value.mosaic_id
+        with self.assertRaises(TypeError):
+            value.__dict__
 
         dto = {'type': 2, 'address': {'address': 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', 'networkType': 144}}
         self.assertEqual(value.to_dto(), dto)
@@ -89,6 +98,8 @@ class TestAlias(harness.TestCase):
 
         with self.assertRaises(ValueError):
             value.address
+        with self.assertRaises(TypeError):
+            value.__dict__
 
         dto = {'type': 1, 'mosaicId': [5, 0]}
         self.assertEqual(value.to_dto(), dto)
@@ -146,6 +157,11 @@ class TestEmptyAlias(harness.TestCase):
         public_key = '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246'
         self.address = models.Address.create_from_public_key(public_key, models.NetworkType.MIJIN_TEST)
 
+    def test_slots(self):
+        value = models.EmptyAlias()
+        with self.assertRaises(TypeError):
+            value.__dict__
+
     def test_init(self):
         value = models.EmptyAlias()
         self.assertEqual(value.type, models.AliasType.NONE)
@@ -172,6 +188,11 @@ class TestMosaicAlias(harness.TestCase):
         self.mosaic_id = models.MosaicId(5)
         public_key = '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246'
         self.address = models.Address.create_from_public_key(public_key, models.NetworkType.MIJIN_TEST)
+
+    def test_slots(self):
+        value = models.MosaicAlias(self.mosaic_id)
+        with self.assertRaises(TypeError):
+            value.__dict__
 
     def test_init(self):
         value = models.MosaicAlias(self.mosaic_id)
@@ -211,6 +232,11 @@ class TestNamespaceId(harness.TestCase):
 
         value = models.NamespaceId("sample.sub.full")
         self.assertEqual(value.id, 0x8BC7011B0B344C54)
+
+    def test_slots(self):
+        value = models.NamespaceId(5)
+        with self.assertRaises(TypeError):
+            value.__dict__
 
     def test_int(self):
         value = models.NamespaceId(5)
@@ -276,6 +302,11 @@ class TestNamespaceName(harness.TestCase):
         self.assertEqual(value.namespace_id, namespace_id)
         self.assertEqual(value.name, "sample")
         self.assertEqual(value.namespaceId, value.namespace_id)
+
+    def test_slots(self):
+        value = models.NamespaceName.create_from_name("sample")
+        with self.assertRaises(TypeError):
+            value.__dict__
 
     def test_create_from_name(self):
         value = models.NamespaceName.create_from_name("sample")

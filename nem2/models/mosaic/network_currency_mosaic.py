@@ -22,6 +22,8 @@
     limitations under the License.
 """
 
+import typing
+
 from nem2 import util
 from .mosaic import Mosaic
 from .mosaic_id import MosaicId
@@ -41,12 +43,13 @@ class NetworkCurrencyMosaic(Mosaic):
     :cvar LEVY_MUTABLE: If levy is mutable.
     """
 
-    NAMESPACE_ID: 'NamespaceId' = NamespaceId("cat.currency")
-    DIVISIBILITY: int = 6
-    INITIAL_SUPPLY: int = 8999999998
-    TRANSFERABLE: bool = True
-    SUPPLY_MUTABLE: bool = False
-    LEVY_MUTABLE: bool = False
+    __slots__ = ()
+    NAMESPACE_ID: typing.ClassVar['NamespaceId'] = NamespaceId("cat.currency")
+    DIVISIBILITY: typing.ClassVar[int] = 6
+    INITIAL_SUPPLY: typing.ClassVar[int] = 8999999998
+    TRANSFERABLE: typing.ClassVar[bool] = True
+    SUPPLY_MUTABLE: typing.ClassVar[bool] = False
+    LEVY_MUTABLE: typing.ClassVar[bool] = False
 
     def __init__(self, amount: int) -> None:
         mosaic_id = MosaicId(self.NAMESPACE_ID.id)

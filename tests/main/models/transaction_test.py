@@ -16,8 +16,22 @@ class TestDeadline(harness.TestCase):
         self.datetime = datetime.datetime(2019, 3, 8, 0, 18, 57)
         self.dto = [1552004337, 0]
 
+    def test_slots(self):
+        value = models.Deadline(self.datetime)
+        with self.assertRaises(TypeError):
+            value.__dict__
+
     def test_create(self):
-        pass
+        with self.assertRaises(ValueError):
+            models.Deadline.create(0)
+        with self.assertRaises(ValueError):
+            models.Deadline.create(-1)
+        with self.assertRaises(ValueError):
+            models.Deadline.create(24, models.ChronoUnit.HOURS)
+
+        models.Deadline.create(2000, models.ChronoUnit.SECONDS)
+        models.Deadline.create(200, models.ChronoUnit.MINUTES)
+        models.Deadline.create(23, models.ChronoUnit.HOURS)
 
     def test_to_dto(self):
         value = models.Deadline(self.datetime)
@@ -62,3 +76,137 @@ class TestHashType(harness.TestCase):
         for enum in self.digest_40:
             self.assertFalse(enum.validate(hash_40))
             self.assertFalse(enum.validate(hash_64))
+
+
+class TestMessage(harness.TestCase):
+
+    def test_create(self):
+        with self.assertRaises(NotImplementedError):
+            models.Message.create(b'Hello world!')
+
+    def test_dto(self):
+        with self.assertRaises(NotImplementedError):
+            models.Message.from_dto(b'Hello world!')
+
+
+class TestMessageType(harness.TestCase):
+
+    def test_description(self):
+        self.assertEqual(models.MessageType.PLAIN.description(), 'Plain message.')
+
+
+class TestPlainMessage(harness.TestCase):
+
+    def test_init(self):
+        value = models.PlainMessage(b'Hello world!')
+        self.assertEqual(value.type, models.MessageType.PLAIN)
+        self.assertEqual(value.payload, b'Hello world!')
+
+    def test_slots(self):
+        value = models.PlainMessage.create(b'Hello world!')
+        with self.assertRaises(TypeError):
+            value.__dict__
+
+    def test_create(self):
+        value = models.PlainMessage.create(b'Hello world!')
+        self.assertEqual(value.type, models.MessageType.PLAIN)
+        self.assertEqual(value.payload, b'Hello world!')
+
+    def test_to_dto(self):
+        value = models.PlainMessage.create(b'Hello world!')
+        self.assertEqual(value.to_dto(), '48656c6c6f20776f726c6421')
+
+    def test_from_dto(self):
+        value = models.PlainMessage.from_dto('48656c6c6f20776f726c6421')
+        self.assertEqual(value.type, models.MessageType.PLAIN)
+        self.assertEqual(value.payload, b'Hello world!')
+
+
+class TestTransactionInfo(harness.TestCase):
+
+    def setUp(self):
+        self.transaction_info = models.TransactionInfo(
+            height=1,
+            index=0,
+            id="5C7C06FF5CC1FE000176FA12",
+            hash="B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
+            merkle_component_hash="B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
+        )
+        self.dto = {
+            "height": [1, 0],
+            "hash": "B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
+            "merkleComponentHash": "B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
+            "index": 0,
+            "id": "5C7C06FF5CC1FE000176FA12"
+        }
+
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.transaction_info.__dict__
+
+    def test_init(self):
+        models.TransactionInfo(1, 0, "5C7C06FF5CC1FE000176FA12")
+        models.TransactionInfo(1, 0, "5C7C06FF5CC1FE000176FA12", None)
+        models.TransactionInfo(1, 0, "5C7C06FF5CC1FE000176FA12", None, None)
+
+    def test_to_dto(self):
+        self.assertEqual(self.transaction_info.to_dto(), self.dto)
+
+    def test_from_dto(self):
+        value = models.TransactionInfo.from_dto(self.dto)
+        self.assertEqual(value, self.transaction_info)
+
+
+class TestTransactionStatus(harness.TestCase):
+
+    def setUp(self):
+        self.transaction_status = models.TransactionStatus(
+            group=models.TransactionStatusGroup.CONFIRMED,
+            status="Success",
+            hash="B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
+            deadline=models.Deadline.create_from_timestamp(1),
+            height=1
+        )
+        self.dto = {
+            "group": "confirmed",
+            "status": "Success",
+            "hash": "B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
+            "deadline": [1, 0],
+            "height": [1, 0]
+        }
+
+    def test_to_dto(self):
+        self.assertEqual(self.transaction_status.to_dto(), self.dto)
+
+    def test_from_dto(self):
+        value = models.TransactionStatus.from_dto(self.dto)
+        self.assertEqual(value, self.transaction_status)
+
+
+class TestTransactionStatusGroup(harness.TestCase):
+
+    def setUp(self):
+        self.failed = models.TransactionStatusGroup.FAILED
+        self.unconfirmed = models.TransactionStatusGroup.UNCONFIRMED
+        self.confirmed = models.TransactionStatusGroup.CONFIRMED
+
+    def test_description(self):
+        self.assertEqual(self.failed.description(), 'Transaction failed.')
+
+    def test_to_dto(self):
+        self.assertEqual(self.failed.to_dto(), "failed")
+        self.assertEqual(self.unconfirmed.to_dto(), "unconfirmed")
+        self.assertEqual(self.confirmed.to_dto(), "confirmed")
+
+    def test_from_dto(self):
+        value = models.TransactionStatusGroup.from_dto("failed")
+        self.assertEqual(self.failed, value)
+
+
+class TestTransactionType(harness.TestCase):
+
+    def setUp(self):
+        self.transfer = models.TransactionType.TRANSFER
+
+    def test_description(self):
+        self.assertEqual(self.transfer.description(), "Transfer Transaction transaction type.")

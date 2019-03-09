@@ -85,6 +85,8 @@ class Deadline(util.Dto):
     @classmethod
     def create(cls, deadline: int = 2, unit: ChronoUnit = ChronoUnit.HOURS):
         """
+        Create deadline relative to current local time.
+
         :param deadline: Time for deadline after current time.
         :param chrono_unit: Unit for created deadline.
         """
@@ -100,13 +102,23 @@ class Deadline(util.Dto):
 
         return cls(now + delta)
 
+    @classmethod
+    def create_from_timestamp(cls, timestamp: int):
+        """
+        Create deadline from timestamp.
+
+        :param timestamp: Timestamp in UTC timezone.
+        """
+        utc = datetime.datetime.fromtimestamp(timestamp, datetime.timezone.utc)
+        local = utc.replace(tzinfo=None)
+        return cls(local)
+
+    createFromTimestamp = util.undoc(create_from_timestamp)
+
     def to_dto(self) -> util.U64DTOType:
         utc = self.deadline.replace(tzinfo=datetime.timezone.utc)
         return util.uint64_to_dto(int(utc.timestamp()))
 
     @classmethod
     def from_dto(cls, data: util.U64DTOType) -> 'Deadline':
-        timestamp = util.dto_to_uint64(data)
-        utc = datetime.datetime.fromtimestamp(timestamp, datetime.timezone.utc)
-        local = utc.replace(tzinfo=None)
-        return cls(local)
+        return cls.create_from_timestamp(util.dto_to_uint64(data))
