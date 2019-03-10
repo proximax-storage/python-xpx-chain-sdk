@@ -41,6 +41,8 @@ class InnerTransaction(Transaction):
     Produces embedded transactions.
     """
 
+    __slots__ = ()
+
     @staticmethod
     def shared_entity_size() -> int:
         return 40
@@ -77,11 +79,10 @@ class InnerTransaction(Transaction):
         # uint8_t network_type
         # uint16_t type
         total_size = struct.unpack('<I', data[:4])[0]
-        public_key = util.hexlify(data[4:36])
+        public_key = data[4:36]
         version = TransactionVersion.from_catbuffer(data[36:37])[0]
         network_type = NetworkType.from_catbuffer(data[37:38])[0]
         type = TransactionType.from_catbuffer(data[38:40])[0]
-        signer = PublicAccount.create_from_public_key(public_key, network_type)
 
         object.__setattr__(self, 'type', type)
         object.__setattr__(self, 'network_type', network_type)
@@ -89,6 +90,11 @@ class InnerTransaction(Transaction):
         object.__setattr__(self, 'deadline', None)
         object.__setattr__(self, 'fee', None)
         object.__setattr__(self, 'signature', None)
+        if public_key != bytes(32):
+            signer = PublicAccount.create_from_public_key(hexlify(public_key), network_type)
+            object.__setattr__(self, 'signer', signer)
+        else:
+            object.__setattr__(self, 'signer', None)
         object.__setattr__(self, 'signer', signer)
         object.__setattr__(self, 'transaction_info', signer)
 

@@ -22,6 +22,7 @@
     limitations under the License.
 """
 
+import contextlib
 import copy
 import dataclasses
 import inspect
@@ -92,6 +93,7 @@ def fix_annotations(cls, clsdict, global_vars):
 def set_slots(cls, clsdict, slots):
     """Set default __slots__ implementation."""
 
+    # TODO(ahuszagh) Need to update the slots
     if not slots or '__slots__' in clsdict:
         return
     annotations = clsdict['__annotations__']
@@ -250,6 +252,44 @@ def wrap_dataclass(
     return mcls.__new__(mcls, name, bases, clsdict)
 
 
+def update_closure(cls, new_cls):
+    """
+    Due to our dynamic creation of a new class, our old class may still
+    be present in some closures, and injected later on, through __class__.
+    Most notably, this is pernicious with super(), especially in __init__.
+    To rectify this, we can check if '__class__' is in nonlocal vars
+    for the function (`func.__code__.co_freevars`), and if it is,
+    and the old class is bound, update it.
+
+    This is all well-documented in the Python data model:
+        __code__: Contains compiled function bytecode.
+        co_freevars: Contains free variables referenced inside closure.
+        __closure__: None or tuple of cells for the functions free variables.
+        cell_contents: Get value of cell.
+
+    Since we want a value injected locally (a free variable), with the
+    name `__class__`, we can use these attributes to determine if the old
+    class is bound to `__class__`, and if so, overwrite it.
+    """
+
+    funcs = inspect.getmembers(new_cls, inspect.isroutine)
+    for _, func in funcs:
+        # Unwrap method if applicable.
+        func = getattr(func, '__func__', func)
+        with contextlib.suppress(AttributeError):
+            # Builtin functions won't have __code__.
+            code = func.__code__
+            closure = func.__closure__
+            freevars = code.co_freevars
+            if closure and freevars and '__class__' in freevars:
+                # Have a specified class in freevars, must fix in closure.
+                # Only change if the cell_contents is the old cls,
+                # which we need to replace with the new cls.
+                for cell in closure:
+                    if cell.cell_contents is cls:
+                        cell.cell_contents = new_cls
+
+
 def dataclass(
     cls=None,
     *,
@@ -296,6 +336,7 @@ def dataclass(
         base = wrap_dataclass(cls, global_vars, **wrap_kwds)
         new_cls = dataclasses.dataclass(**dataclass_kwds)(base)
         set_defaults(new_cls, defaults)
+        update_closure(cls, new_cls)
         return new_cls
 
     if cls is None:

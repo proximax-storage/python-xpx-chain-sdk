@@ -74,9 +74,31 @@ class Transaction(util.Model):
 
         :param account: Account to sign transaction.
         """
-        # buffer = self.to_catbuffer()
+        # TODO(ahuszagh) Implement...
+        buffer = self.to_catbuffer()
         # signTransaction
         # SignedTransaction
+#        /**
+#         * @param {KeyPair } keyPair KeyPair instance
+#         * @returns {module:model/TransactionPayload} - Signed Transaction Payload
+#         */
+#        signTransaction(keyPair) {
+#            const byteBuffer = this.serialize();
+#            const signingBytes = byteBuffer.slice(4 + 64 + 32);
+#            const keyPairEncoded = KeyPair.createKeyPairFromPrivateKeyString(keyPair.privateKey);
+#            const signature = Array.from(KeyPair.sign(keyPair, new Uint8Array(signingBytes)));
+#            const signedTransactionBuffer = byteBuffer
+#                .splice(0, 4)
+#                .concat(signature)
+#                .concat(Array.from(keyPairEncoded.publicKey))
+#                .concat(byteBuffer
+#                    .splice(64 + 32, byteBuffer.length));
+#            const payload = convert.uint8ToHex(signedTransactionBuffer);
+#            return {
+#                payload,
+#                hash: VerifiableTransaction.createTransactionHash(payload)
+#            };
+#        }
         raise NotImplementedError
 
     signWith = util.undoc(sign_with)
@@ -114,6 +136,9 @@ class Transaction(util.Model):
         :param size: Entity size.
         """
 
+        assert self.signer is None
+        assert self.signature is None
+
         # uint32_t size
         # uint8_t[64] signature
         # uint8_t[32] signer
@@ -122,13 +147,16 @@ class Transaction(util.Model):
         # uint16_t type
         # uint64_t fee
         # uint64_t deadline
-        # TODO(ahuszagh) The signature and the signer should be null
-        # at this point... But we need them to generate the signed data..
-        # Catch-22?
         buffer = bytearray(self.shared_entity_size())
         buffer[0:4] = struct.pack('<I', size)
-        buffer[4:68] = util.unhexlify(self.signature)
-        buffer[68:100] = util.unhexlify(self.signer.public_key)
+        if self.signer is not None and self.signature is not None:
+            # Transaction is signed.
+            buffer[4:68] = util.unhexlify(self.signature)
+            buffer[68:100] = util.unhexlify(self.self.signer.public_key)
+        else:
+            # Transaction is not signed, write 0 bytes.
+            buffer[4:68] = bytes(64)
+            buffer[68:100] = bytes(32)
         buffer[100:101] = self.version.to_catbuffer()
         buffer[101:102] = self.network_type.to_catbuffer()
         buffer[102:104] = self.type.to_catbuffer()
@@ -159,22 +187,30 @@ class Transaction(util.Model):
         # uint64_t fee
         # uint64_t deadline
         total_size = struct.unpack('<I', data[:4])[0]
-        signature = util.hexlify(data[4:68])
-        public_key = util.hexlify(data[68:100])
+        signature = data[4:68]
+        public_key = data[68:100]
         version = TransactionVersion.from_catbuffer(data[100:101])[0]
         network_type = NetworkType.from_catbuffer(data[101:102])[0]
         type = TransactionType.from_catbuffer(data[102:104])[0]
         fee = struct.unpack('<Q', data[104:112])[0]
         deadline = Deadline.from_catbuffer(data[112:])[0]
-        signer = PublicAccount.create_from_public_key(public_key, network_type)
 
         object.__setattr__(self, 'type', type)
         object.__setattr__(self, 'network_type', network_type)
         object.__setattr__(self, 'version', version)
         object.__setattr__(self, 'deadline', deadline)
         object.__setattr__(self, 'fee', fee)
-        object.__setattr__(self, 'signature', signature)
-        object.__setattr__(self, 'signer', signer)
+        if signature != bytes(64) and public_key != bytes(32):
+            # Transaction is signed.
+            object.__setattr__(self, 'signature', util.hexlify(signature))
+            signer = PublicAccount.create_from_public_key(hexlify(public_key), network_type)
+            object.__setattr__(self, 'signer', signer)
+        else:
+            # Transaction is not signed.
+            # All zero bytes for public key and hash, impossible, must be
+            # dummy data.
+            object.__setattr__(self, 'signature', None)
+            object.__setattr__(self, 'signer', None)
         object.__setattr__(self, 'transaction_info', None)
 
         return total_size, data[self.shared_entity_size():]
@@ -208,9 +244,6 @@ class Transaction(util.Model):
 
     def to_aggregate(self, signer: 'PublicAccount') -> 'InnerTransaction':
         """Convert transaction to inner transaction."""
-        # TODO(ahuszagh) How do I do this??
-        # Need to copy over methods.
-        # Metaclass??? Lols fun...
         raise NotImplementedError
 
     toAggregate = util.undoc(to_aggregate)

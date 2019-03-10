@@ -155,7 +155,7 @@ class TestPlainMessage(harness.TestCase):
 class TestSecretProofTransaction(harness.TestCase):
 
     def setUp(self):
-        self.deadline = models.Deadline.create()
+        self.deadline = models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57))
         self.hash_type = models.HashType.SHA3_256
         self.proof = 'b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
         self.secret = util.hashlib.sha3_256(util.unhexlify(self.proof)).hexdigest()
@@ -167,8 +167,8 @@ class TestSecretProofTransaction(harness.TestCase):
             proof=self.proof,
             network_type=self.network_type,
         )
-        # TODO(ahuszagh) Need the signer...
-        self.catbuffer = b''
+        self.catbuffer = 'bb000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
+        self.embedded = '6b0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501905242009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
 
     def test_init(self):
         self.assertEqual(self.transaction.deadline, self.deadline)
@@ -177,9 +177,22 @@ class TestSecretProofTransaction(harness.TestCase):
         self.assertEqual(self.transaction.proof, self.proof)
         self.assertEqual(self.transaction.network_type, self.network_type)
 
-#    def test_catbuffer(self):
-#        import pdb; pdb.set_trace()
-#        catbuffer = self.transaction.to_catbuffer()
+    def test_catbuffer(self):
+        catbuffer = self.transaction.to_catbuffer()
+        self.assertEqual(self.catbuffer, util.hexlify(catbuffer))
+
+    def test_to_aggregate(self):
+        private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
+        public_key = "1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955"
+        network_type = models.NetworkType.MAIN_NET
+        address = models.Address.create_from_public_key(public_key, network_type)
+        signer = models.Account(address, public_key, private_key)
+        inner = self.transaction.to_aggregate(signer)
+        catbuffer = inner.to_catbuffer()
+        self.assertEqual(self.embedded, util.hexlify(catbuffer))
+
+        with self.assertRaises(TypeError):
+            inner.__dict__
 
 
 class TestTransactionAnnounceResponse(harness.TestCase):

@@ -40,6 +40,7 @@ if typing.TYPE_CHECKING:
 
 
 @util.inherit_doc
+@util.dataclass(frozen=True)
 class SecretProofTransaction(Transaction):
     """
     Secret-proof transaction.
@@ -125,6 +126,12 @@ class SecretProofTransaction(Transaction):
         return shared_size + secret_size + proof_size + 3
 
     def to_catbuffer_specific(self) -> bytes:
+        """Export secret proof-specific data to catbuffer."""
+
+        # uint8_t hash_type
+        # uint8_t[32] secret
+        # uint16_t proof_size
+        # uint8_t[proof_size] proof
         proof_size = len(self.proof) // 2
         hash_type = self.hash_type.to_catbuffer()
         secret = util.unhexlify(self.secret)
@@ -132,8 +139,12 @@ class SecretProofTransaction(Transaction):
         return hash_type + secret + proof
 
     def load_catbuffer_specific(self, data: bytes) -> bytes:
-        """Load transaction-specific data data from catbuffer."""
+        """Load secret proof-specific data data from catbuffer."""
 
+        # uint8_t hash_type
+        # uint8_t[32] secret
+        # uint16_t proof_size
+        # uint8_t[proof_size] proof
         hash_type, data = HashType.from_catbuffer(data)
         hash_length = hash_type.hash_length() // 2
         secret = util.hexlify(data[:hash_length])
@@ -146,10 +157,16 @@ class SecretProofTransaction(Transaction):
 
         return data[hash_length + proof_size + 2:]
 
-    # TODO(ahuszagh) needs to inner
+    def to_aggregate(self, signer: 'PublicAccount') -> 'SecretProofInnerTransaction':
+        """Convert transaction to inner transaction."""
+
+        data = self.asdict()
+        data['signer'] = signer
+        data.pop('type')
+        return SecretProofInnerTransaction(**data)
 
 
 class SecretProofInnerTransaction(InnerTransaction, SecretProofTransaction):
     """Embedded secret proof transaction."""
 
-    # TODO(ahuszagh) Implement...
+    __slots__ = ()
