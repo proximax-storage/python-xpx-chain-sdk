@@ -43,16 +43,20 @@ __all__ = [
     'AsyncNamespaceHttp',
     'AsyncNetworkHttp',
     'AsyncTransactionHttp',
+
+    # Websockets
+    'Listener',
 ]
 
 import asyncio
 import atexit
 import aiohttp
 import requests
+import websockets
 
 from nem2 import util
 from . import abc
-from . import host
+from . import client
 
 # SYNCHRONOUS
 
@@ -65,7 +69,7 @@ class HttpBase(abc.HttpBase):
     """Abstract base class for synchronous HTTP clients."""
 
     def __init__(self, endpoint: str) -> None:
-        self._host = host.Host(SYNC_SESSION, endpoint)
+        self._client = client.Client(SYNC_SESSION, endpoint)
         self._index = 0
 
     @property
@@ -151,10 +155,10 @@ class AsyncHttpBase(abc.AsyncHttpBase):
         self._index = 1
         self._loop = loop
         if loop is None:
-            self._host = host.AsyncHost(ASYNC_SESSION, endpoint)
+            self._client = client.AsyncClient(ASYNC_SESSION, endpoint)
         else:
             session = aiohttp.ClientSession(loop=loop)
-            self._host = host.AsyncHost(session, endpoint, loop=loop)
+            self._client = client.AsyncClient(session, endpoint, loop=loop)
 
     @property
     def root(self):
@@ -218,3 +222,23 @@ class AsyncNetworkHttp(AsyncHttpBase, abc.NetworkHttp):
 @util.inherit_doc
 class AsyncTransactionHttp(AsyncHttpBase, abc.TransactionHttp):
     """Transaction client for the asynchronous NIS API."""
+
+
+# WEBSOCKETS
+
+
+@util.inherit_doc
+class Listener(abc.Listener):
+    """Asynchronous websockets-based listener."""
+
+    def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
+        self._loop = loop
+        url = client.parse_ws_url(endpoint)
+        session = websockets.WebSocketClientProtocol(
+            host=url.host,
+            port=url.port,
+            loop=loop,
+            secure=url.scheme == 'wss',
+        )
+        session.path = url.path or '/'
+        self._client = client.WebsocketClient(session, loop=loop)

@@ -2,7 +2,7 @@
     abc
     ===
 
-    Abstract base classes for HTTP clients.
+    Abstract base classes for HTTP and websocket clients.
 
     License
     -------
@@ -22,18 +22,22 @@
     limitations under the License.
 """
 
+import json
 import typing
 
 from nem2 import util
 from . import nis
 
 if typing.TYPE_CHECKING:
-    from .host import Host
+    from .client import Client, WebsocketClient
     from nem2.models import *
 
 T = typing.TypeVar('T')
 Cb = typing.Callable[..., T]
 Cbs = typing.Tuple[Cb, Cb]
+
+# HTTP
+# ----
 
 
 class HttpBase:
@@ -43,17 +47,14 @@ class HttpBase:
     :param endpoint: Domain name and port for the endpoint.
     """
 
-    _host: 'Host'
+    _client: 'Client'
     _index: int
     _network_type: typing.Optional['NetworkType'] = None
-
-    def __init__(self, endpoint: str) -> None:
-        raise NotImplementedError
 
     def __call__(self, cbs: Cbs, *args, **kwds) -> T:
         """Invoke the NIS callback."""
         cb: Cb = cbs[self.index]
-        return typing.cast(T, cb(self.host, *args, **kwds))
+        return typing.cast(T, cb(self.client, *args, **kwds))
 
     @classmethod
     def from_http(cls: typing.Type[T], http) -> T:
@@ -64,15 +65,15 @@ class HttpBase:
         :param http: HTTP client.
         """
         inst = cls.__new__(cls)
-        inst._host = http._host
+        inst._client = http._client
         inst._index = http._index
         inst._network_type = http._network_type
         return typing.cast(T, inst)
 
     @property
-    def host(self) -> 'Host':
-        """Get host for HTTP client."""
-        return self._host
+    def client(self) -> 'Client':
+        """Get client wrapper for HTTP client."""
+        return self._client
 
     @property
     def index(self) -> int:
@@ -108,9 +109,6 @@ class AsyncHttpBase(HttpBase):
     """
 
     _loop: util.OptionalLoopType
-
-    def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
-        raise NotImplementedError
 
     @classmethod
     def from_http(cls: typing.Type[T], http) -> T:
@@ -343,12 +341,134 @@ class NetworkHttp(HttpBase):
 class TransactionHttp(HttpBase):
     """Abstract base class for the transaction HTTP client."""
 
+    def get_transaction(self, hash: str):
+        """
+        Get transaction info by hash.
+
+        :param hash: Transaction hash.
+        :return: Transaction info.
+        """
+        return self(nis.get_transaction, **kwds)
+
+    getTransaction = util.undoc(get_transaction)
+
+    def get_transactions(self, hashes: typing.Sequence[str]):
+        """
+        Get transaction info by hash.
+
+        :param hashes: Sequence of transaction hashes.
+        :return: Transaction info.
+        """
+        return self(nis.get_transactions, **kwds)
+
+    getTransactions = util.undoc(get_transactions)
+
+    def get_transaction_status(self, hash: str):
+        """
+        Get transaction status by hash.
+
+        :param hash: Transaction hash.
+        :return: Transaction status.
+        """
+        return self(nis.get_transaction_status, **kwds)
+
+    getTransactionStatus = util.undoc(get_transaction_status)
+
+    def get_transaction_statuses(self, hashes: typing.Sequence[str]):
+        """
+        Get transaction status by sequence of hashes.
+
+        :param hashes: Sequence of transaction hashes.
+        :return: List of transaction statuses.
+        """
+        return self(nis.get_transaction_statuses, **kwds)
+
+    getTransactionStatuses = util.undoc(get_transaction_statuses)
+
     # TODO(ahuszagh)
-    # getTransaction
-    # getTransactions
-    # getTransactionStatus
-    # getTransactionsStatuses
     # announce
     # announceAggregateBonded
     # announceAggregateBondedCosignature
     # announceSync
+
+
+# WEBSOCKET
+# ---------
+
+
+class Listener:
+    """
+    Abstract base class for the websockets-based listener.
+
+    :param endpoint: Domain name and port for the endpoint.
+    """
+
+    _client: 'WebsocketClient'
+    _loop: util.OptionalLoopType
+    _uid: typing.Optional[str] = None
+
+    @property
+    async def uid(self) -> str:
+        """Get UUID (unique identifier) for WS requests."""
+
+        if self._uid is None:
+            self._uid = json.loads(await self._client.recv())['uid']
+        return self._uid
+
+    # TODO(ahuszagh)
+    #   Make them observables...
+    #   Implement all the methods.
+    #   Document everything.
+
+    async def new_block(self):
+        message = json.dumps({
+            'uid': await self.uid,
+            'subscribe': 'block'
+        })
+        # TODO(ahuszagh) Need to process something...
+        await self._client.send(message)
+
+    async def confirmed(self, address: 'Address'):
+        message = json.dumps({
+            'uid': await self.uid,
+            'subscribe': f'confirmedAdded/{address.address}'
+        })
+        # TODO(ahuszagh) Need to process something...
+        await self._client.send(message)
+
+    confirmed_added = confirmed
+    confirmedAdded = util.undoc(confirmed_added)
+
+    async def unconfirmed_added(self, address: 'Address'):
+        raise NotImplementedError
+
+    unconfirmedAdded = util.undoc(unconfirmed_added)
+
+    async def unconfirmed_removed(self, address: 'Address'):
+        raise NotImplementedError
+
+    unconfirmedRemoved = util.undoc(unconfirmed_removed)
+
+    async def aggregate_bonded_added(self, address: 'Address'):
+        raise NotImplementedError
+
+    aggregateBondedAdded = util.undoc(aggregate_bonded_added)
+
+    async def aggregate_bonded_removed(self, address: 'Address'):
+        raise NotImplementedError
+
+    aggregateBondedRemoved = util.undoc(aggregate_bonded_removed)
+
+    async def status(self, address: 'Address'):
+        """
+        Get status updates each time a transaction contains an error.
+
+        :param address: Account to monitor.
+        :return:    # TODO(ahuszagh) Add
+        """
+        message = json.dumps({
+            'uid': await self.uid,
+            'subscribe': f'status/{address.address}'
+        })
+        # TODO(ahuszagh) Need to process something...
+        await self._client.send(message)

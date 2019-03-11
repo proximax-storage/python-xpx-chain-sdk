@@ -37,11 +37,10 @@ class TestHttp(harness.TestCase):
         sync_data=client.Http,
         async_data=client.AsyncHttp
     )
-    async def test_from_http(self, data, _):
+    async def test_from_http(self, data, cb):
         http = data(responses.ENDPOINT)
         copy = data.from_http(http)
-        self.assertTrue(http._host is copy._host)
-        self.assertEqual(http._network_type, copy._network_type)
+        self.assertTrue(http.client is copy.client)
 
     @harness.test_case(
         sync_data=(client.Http, requests),

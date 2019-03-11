@@ -48,6 +48,7 @@ PACKAGES = find_packages()
 REQUIRES = [
     'aiohttp>=3.5',
     'requests>=2.21',
+    'websockets>=7.0',
 ]
 
 TESTS_REQUIRE = [

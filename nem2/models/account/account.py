@@ -112,15 +112,24 @@ class Account:
 
     generateNewAccount = util.undoc(generate_new_account)
 
-    def sign(self, transaction):
+    def sign(self, transaction: bytes) -> bytes:
         """
         Sign transaction using private key.
 
         :param transaction: Transaction data to sign.
         :return: Signed transaction data.
         """
-        # TODO(ahuszagh) Implement and annotate the function....
-        raise NotImplementedError
+
+        # Skip first 100 bytes.
+        # uint32_t size
+        # uint8_t[64] signature
+        # uint8_t[32] signer
+        signing_bytes = transaction[100:]
+        signature = util.unhexlify(self.sign_data(signing_bytes))
+        public_key = util.unhexlify(self.public_key)
+        size = transaction[:4]
+
+        return size + signature + public_key + signing_bytes
 
     def sign_data(self, data: bytes) -> str:
         """

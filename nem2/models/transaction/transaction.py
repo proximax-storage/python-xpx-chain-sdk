@@ -27,6 +27,7 @@ import typing
 
 from nem2 import util
 from .deadline import Deadline
+from .signed_transaction import SignedTransaction
 from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
@@ -35,7 +36,6 @@ from ..blockchain.network_type import NetworkType
 if typing.TYPE_CHECKING:
     from .aggregate_transaction_info import AggregateTransactionInfo
     from .inner_transaction import InnerTransaction
-    from .signed_transaction import SignedTransaction
     from .transaction_info import TransactionInfo
     from ..account.account import Account
 
@@ -74,34 +74,29 @@ class Transaction(util.Model):
 
         :param account: Account to sign transaction.
         """
-        # TODO(ahuszagh) Implement...
-        buffer = self.to_catbuffer()
-        # signTransaction
-        # SignedTransaction
-#        /**
-#         * @param {KeyPair } keyPair KeyPair instance
-#         * @returns {module:model/TransactionPayload} - Signed Transaction Payload
-#         */
-#        signTransaction(keyPair) {
-#            const byteBuffer = this.serialize();
-#            const signingBytes = byteBuffer.slice(4 + 64 + 32);
-#            const keyPairEncoded = KeyPair.createKeyPairFromPrivateKeyString(keyPair.privateKey);
-#            const signature = Array.from(KeyPair.sign(keyPair, new Uint8Array(signingBytes)));
-#            const signedTransactionBuffer = byteBuffer
-#                .splice(0, 4)
-#                .concat(signature)
-#                .concat(Array.from(keyPairEncoded.publicKey))
-#                .concat(byteBuffer
-#                    .splice(64 + 32, byteBuffer.length));
-#            const payload = convert.uint8ToHex(signedTransactionBuffer);
-#            return {
-#                payload,
-#                hash: VerifiableTransaction.createTransactionHash(payload)
-#            };
-#        }
-        raise NotImplementedError
+
+        transaction = self.to_catbuffer()
+        payload = account.sign(transaction)
+        hash = self.transaction_hash(payload)
+        return SignedTransaction(
+            payload,
+            hash,
+            account.public_key,
+            self.type,
+            self.network_type
+        )
 
     signWith = util.undoc(sign_with)
+
+    @staticmethod
+    def transaction_hash(transaction: bytes) -> str:
+        """Generate transaction hash from signed transaction payload."""
+
+        signature_half = transaction[4: 36]
+        signer = transaction[68: 100]
+        rest = transaction[100:]
+        data = signature_half + signer + rest
+        return util.hashlib.sha3_256(data).hexdigest()
 
     @staticmethod
     def shared_entity_size() -> int:
@@ -135,9 +130,6 @@ class Transaction(util.Model):
 
         :param size: Entity size.
         """
-
-        assert self.signer is None
-        assert self.signature is None
 
         # uint32_t size
         # uint8_t[64] signature

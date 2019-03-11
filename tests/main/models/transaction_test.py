@@ -167,7 +167,15 @@ class TestSecretProofTransaction(harness.TestCase):
             proof=self.proof,
             network_type=self.network_type,
         )
+        private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
+        network_type = models.NetworkType.MIJIN_TEST
+        self.signer = models.Account.create_from_private_key(private_key, network_type)
+        # TODO(ahuszagh)
+        # self.catbuffer is correct.
+        # Is embedded correct?
         self.catbuffer = 'bb000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
+        self.payload = 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
+        self.hash = 'd8949c87755cfd2c003fec4e1bd4aadb00b3f4838fc5ce7ffeded9385805fcdd'
         self.embedded = '6b0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501905242009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
 
     def test_init(self):
@@ -181,13 +189,17 @@ class TestSecretProofTransaction(harness.TestCase):
         catbuffer = self.transaction.to_catbuffer()
         self.assertEqual(self.catbuffer, util.hexlify(catbuffer))
 
+    def test_sign_with(self):
+        signed_transaction = self.transaction.sign_with(self.signer)
+        self.assertEqual(util.hexlify(signed_transaction.payload), self.payload)
+        self.assertEqual(signed_transaction.hash, self.hash)
+        self.assertEqual(signed_transaction.signer, self.signer.public_key)
+        self.assertEqual(signed_transaction.type, models.TransactionType.SECRET_PROOF)
+        self.assertEqual(signed_transaction.network_type, self.signer.network_type)
+
     def test_to_aggregate(self):
-        private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
-        public_key = "1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955"
-        network_type = models.NetworkType.MAIN_NET
-        address = models.Address.create_from_public_key(public_key, network_type)
-        signer = models.Account(address, public_key, private_key)
-        inner = self.transaction.to_aggregate(signer)
+
+        inner = self.transaction.to_aggregate(self.signer)
         catbuffer = inner.to_catbuffer()
         self.assertEqual(self.embedded, util.hexlify(catbuffer))
 

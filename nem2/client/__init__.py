@@ -19,4 +19,7 @@ __all__ = [
     'AsyncNamespaceHttp',
     'AsyncNetworkHttp',
     'AsyncTransactionHttp',
+
+    # Websockets
+    'Listener',
 ]

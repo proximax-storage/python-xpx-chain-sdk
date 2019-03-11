@@ -429,6 +429,64 @@ get_network_type = request("get_network_type", "", True)
 # ----------------
 
 
+def request_get_transaction(host: 'Host', hash: str, **kwds):
+    """
+    Make "/transaction/{hash}" request.
+
+    :param host: Host wrapper for client.
+    :param hash: Transaction hash.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return host.get(f"/transaction/{hash}", **kwds)
+
+
+# TODO(ahuszagh) Annotate
+def process_get_transaction(status: int, json: dict):
+    """
+    Process the "/transaction/{hash}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    # TODO(ahuszagh) Implement..
+    raise NotImplementedError
+
+
+get_transaction = request("get_transaction", "", True)
+
+
+def request_get_transactions(host: 'Host', hashes: typing.Sequence[str], **kwds):
+    """
+    Make "/transaction/{hash}" request.
+
+    :param host: Host wrapper for client.
+    :param hashes: Sequence of transaction hashes.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    return host.get(f"/transaction/{hash}", **kwds)
+
+
+# TODO(ahuszagh) Annotate
+def process_get_transactions(status: int, json: list):
+    """
+    Process the "/transaction/{hash}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    # TODO(ahuszagh) Implement..
+    raise NotImplementedError
+
+
+get_transactions = request("get_transactions", "", True)
+
+
 def request_get_transaction_status(host: 'Host', hash: str, **kwds):
     """
     Make "/transaction/{hash}/status" request.
@@ -455,6 +513,34 @@ def process_get_transaction_status(status: int, json: dict) -> 'TransactionStatu
 
 get_transaction_status = request("get_transaction_status", "", True)
 
+
+def request_get_transaction_statuses(host: 'Host', hashes: typing.Sequence[str], **kwds):
+    """
+    Make "/transaction/statuses" request.
+
+    :param host: Host wrapper for client.
+    :param hashes: Sequence of transaction hashes.
+    :param timeout: (optional) Timeout for request (in seconds).
+    """
+
+    json = {'hashes': list(hashes)}
+    return host.post(f"/transaction/statuses", json=json, **kwds)
+
+
+def process_get_transaction_statuses(status: int, json: list) -> typing.Sequence['TransactionStatus']:
+    """
+    Process the "/transaction/statuses" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return [models.TransactionStatus.from_dto(i) for i in json]
+
+
+get_transaction_statuses = request("get_transaction_statuses", "", True)
+
 # FORWARDERS
 # ----------
 
@@ -480,7 +566,10 @@ REQUEST = {
     'get_network_type': request_get_network_type,
 
     # TRANSACTOON
+    'get_transaction': request_get_transaction,
+    'get_transactions': request_get_transactions,
     'get_transaction_status': request_get_transaction_status,
+    'get_transaction_statuses': request_get_transaction_statuses,
 }
 
 PROCESS = {
@@ -505,5 +594,8 @@ PROCESS = {
     'get_network_type': process_get_network_type,
 
     # TRANSACTOON
+    'get_transaction': process_get_transaction,
+    'get_transactions': process_get_transactions,
     'get_transaction_status': process_get_transaction_status,
+    'get_transaction_statuses': process_get_transaction_statuses,
 }

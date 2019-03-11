@@ -38,7 +38,7 @@ class SignedTransaction:
 
     :param payload: Serialized transaction data.
     :param hash: Transaction hash.
-    :param signer: Transaction signer.
+    :param signer: Transaction signer (public key).
     :param type: Transaction type.
     :param network_type: Signer network type.
     """
