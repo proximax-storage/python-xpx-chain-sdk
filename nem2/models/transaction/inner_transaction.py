@@ -91,7 +91,7 @@ class InnerTransaction(Transaction):
         object.__setattr__(self, 'fee', None)
         object.__setattr__(self, 'signature', None)
         if public_key != bytes(32):
-            signer = PublicAccount.create_from_public_key(hexlify(public_key), network_type)
+            signer = PublicAccount.create_from_public_key(util.hexlify(public_key), network_type)
             object.__setattr__(self, 'signer', signer)
         else:
             object.__setattr__(self, 'signer', None)

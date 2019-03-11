@@ -33,8 +33,11 @@ from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
 
 if typing.TYPE_CHECKING:
+    # We dynamically resolve the forward references which are used
+    # in an auto-generate __init__ outside of the module.
+    # Silence the lint warnings.
     from .deadline import Deadline
-    from .transaction_info import TransactionInfo
+    from .transaction_info import TransactionInfo       # noqa
     from ..account.public_account import PublicAccount
     from ..blockchain.network_type import NetworkType
 
@@ -119,8 +122,10 @@ class SecretProofTransaction(Transaction):
 
     def entity_size(self) -> int:
         # extra 3 bytes, 1 for hash_type, 2 for proof size.
+        # The proof size is always 32, even if HASH_160 is used.
+        # The hash is just 0-padded to 32 bytes.
         shared_size = self.shared_entity_size()
-        secret_size = len(self.secret) // 2
+        secret_size = 32
         proof_size = len(self.proof) // 2
 
         return shared_size + secret_size + proof_size + 3
@@ -135,6 +140,7 @@ class SecretProofTransaction(Transaction):
         proof_size = len(self.proof) // 2
         hash_type = self.hash_type.to_catbuffer()
         secret = util.unhexlify(self.secret)
+        secret = secret + b'\x00' * (32 - len(secret))
         proof = struct.pack('<H', proof_size) + util.unhexlify(self.proof)
         return hash_type + secret + proof
 

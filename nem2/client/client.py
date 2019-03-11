@@ -7,7 +7,7 @@
 """
 
 import typing
-import urllib
+import urllib.error
 import urllib3
 
 # UTILITY
@@ -71,7 +71,7 @@ class Client:
     def __exit__(self) -> None:
         self.close()
 
-    def close(self) -> None:
+    def close(self):
         """Close the client session."""
         self._closed = True
         self._session.close()
@@ -190,20 +190,20 @@ class AsyncClient(Client):
         return self
 
     async def __aexit__(self) -> None:
-        return await self.close()
+        await self.close()
 
     def __del__(self):
         if self._loop is not None and not self.closed:
             self._loop.run_until_complete(self.close())
 
-    async def close(self) -> None:
+    async def close(self):
         """Close the client session."""
         await self._session.close()
 
     @property
     def closed(self) -> bool:
         """Get if client session has been closed."""
-        return self._session.closed
+        return typing.cast(bool, self._session.closed)
 
 
 # WEBSOCKETS
@@ -229,7 +229,8 @@ class WebsocketClient:
         return await self.close()
 
     async def __aiter__(self) -> typing.AsyncIterator[typing.AnyStr]:
-        return await self._session.__aiter__()
+        async for message in self._session:
+            yield typing.cast(typing.AnyStr, message)
 
     def __del__(self) -> None:
         if self._loop is not None:
@@ -242,20 +243,23 @@ class WebsocketClient:
     @property
     def closed(self) -> bool:
         """Get if client session has been closed."""
-        return self._session.closed
+        result = self._session.closed
+        return typing.cast(bool, result)
 
     async def recv(self) -> typing.AnyStr:
         """Receive next message."""
-        return await self._session.recv()
+        result = await self._session.recv()
+        return typing.cast(typing.AnyStr, result)
 
     async def send(self, data: typing.AnyStr) -> None:
         """Send message."""
-        return await self._session.send(data)
+        await self._session.send(data)
 
     async def ping(self, data: typing.Optional[bytes] = None) -> typing.Awaitable[None]:
         """Send websocket a ping."""
-        return await self._session.ping(data)
+        result = await self._session.ping(data)
+        return typing.cast(typing.Awaitable[None], result)
 
     async def pong(self, data: bytes = b'') -> None:
         """Send websocket a pong."""
-        return await self._session.pong(data)
+        await self._session.pong(data)

@@ -25,6 +25,7 @@
 import json
 import typing
 
+from nem2 import models
 from nem2 import util
 from . import nis
 
@@ -33,8 +34,12 @@ if typing.TYPE_CHECKING:
     from nem2.models import *
 
 T = typing.TypeVar('T')
-Cb = typing.Callable[..., T]
-Cbs = typing.Tuple[Cb, Cb]
+MessageType = typing.Union[
+    'BlockInfo',
+    'CosignatureSignedTransaction',
+    'TransactionStatusError',
+    str
+]
 
 # HTTP
 # ----
@@ -51,7 +56,7 @@ class HttpBase:
     _index: int
     _network_type: typing.Optional['NetworkType'] = None
 
-    def __call__(self, cbs: Cbs, *args, **kwds) -> T:
+    def __call__(self, cbs, *args, **kwds):
         """Invoke the NIS callback."""
         cb: Cb = cbs[self.index]
         return typing.cast(T, cb(self.client, *args, **kwds))
@@ -109,6 +114,14 @@ class AsyncHttpBase(HttpBase):
     """
 
     _loop: util.OptionalLoopType
+
+    def __call__(self, cbs, *args, **kwds):
+        return self.call(cbs, *args, **kwds)
+
+    @util.observable
+    async def call(self, cbs, *args, **kwds):
+        """Invoke callback and wrap it in an observable."""
+        return await super().__call__(cbs, *args, **kwds)
 
     @classmethod
     def from_http(cls: typing.Type[T], http) -> T:
@@ -189,7 +202,7 @@ class AccountHttp(HttpBase):
 class BlockchainHttp(HttpBase):
     """Abstract base class for the blockchain HTTP client."""
 
-    def get_block_by_height(self, height: int, **kwds) -> 'BlockInfo':
+    def get_block_by_height(self, height: int, **kwds):
         """
         Get block information from the block height.
 
@@ -341,47 +354,47 @@ class NetworkHttp(HttpBase):
 class TransactionHttp(HttpBase):
     """Abstract base class for the transaction HTTP client."""
 
-    def get_transaction(self, hash: str):
+    def get_transaction(self, hash: str, **kwds):
         """
         Get transaction info by hash.
 
         :param hash: Transaction hash.
         :return: Transaction info.
         """
-        return self(nis.get_transaction, **kwds)
+        return self(nis.get_transaction, hash, **kwds)
 
     getTransaction = util.undoc(get_transaction)
 
-    def get_transactions(self, hashes: typing.Sequence[str]):
+    def get_transactions(self, hashes: typing.Sequence[str], **kwds):
         """
         Get transaction info by hash.
 
         :param hashes: Sequence of transaction hashes.
         :return: Transaction info.
         """
-        return self(nis.get_transactions, **kwds)
+        return self(nis.get_transactions, hashes, **kwds)
 
     getTransactions = util.undoc(get_transactions)
 
-    def get_transaction_status(self, hash: str):
+    def get_transaction_status(self, hash: str, **kwds):
         """
         Get transaction status by hash.
 
         :param hash: Transaction hash.
         :return: Transaction status.
         """
-        return self(nis.get_transaction_status, **kwds)
+        return self(nis.get_transaction_status, hash, **kwds)
 
     getTransactionStatus = util.undoc(get_transaction_status)
 
-    def get_transaction_statuses(self, hashes: typing.Sequence[str]):
+    def get_transaction_statuses(self, hashes: typing.Sequence[str], **kwds):
         """
         Get transaction status by sequence of hashes.
 
         :param hashes: Sequence of transaction hashes.
         :return: List of transaction statuses.
         """
-        return self(nis.get_transaction_statuses, **kwds)
+        return self(nis.get_transaction_statuses, hashes, **kwds)
 
     getTransactionStatuses = util.undoc(get_transaction_statuses)
 
@@ -396,6 +409,14 @@ class TransactionHttp(HttpBase):
 # ---------
 
 
+@util.dataclass(frozen=True)
+class ListenerMessage:
+    """Message from a listener."""
+
+    channel_name: str
+    message: MessageType
+
+
 class Listener:
     """
     Abstract base class for the websockets-based listener.
@@ -407,6 +428,27 @@ class Listener:
     _loop: util.OptionalLoopType
     _uid: typing.Optional[str] = None
 
+    def __enter__(self) -> 'Listener':
+        raise TypeError("Only use async with.")
+
+    def __exit__(self) -> None:
+        pass
+
+    async def __aenter__(self) -> 'Listener':
+        return self
+
+    async def __aexit__(self) -> None:
+        return await self.close()
+
+    async def close(self) -> None:
+        """Close the client session."""
+        await self._client.close()
+
+    @property
+    def closed(self) -> bool:
+        """Get if client session has been closed."""
+        return self._client.closed
+
     @property
     async def uid(self) -> str:
         """Get UUID (unique identifier) for WS requests."""
@@ -415,60 +457,94 @@ class Listener:
             self._uid = json.loads(await self._client.recv())['uid']
         return self._uid
 
-    # TODO(ahuszagh)
-    #   Make them observables...
-    #   Implement all the methods.
-    #   Document everything.
+    @util.observable
+    async def __aiter__(self) -> typing.AsyncIterator[ListenerMessage]:
+        """Iterate over subscribed messages."""
 
-    async def new_block(self):
-        message = json.dumps({
-            'uid': await self.uid,
-            'subscribe': 'block'
-        })
-        # TODO(ahuszagh) Need to process something...
-        await self._client.send(message)
+        async for message in self._client:
+            data = json.loads(message)
+            if 'uid' in data:
+                # UID reset.
+                self._uid = data['uid']
+            elif 'transaction' in data:
+                channel_name = typing.cast(str, data['meta'].pop('channelName'))
+                # TODO(ahuszagh) Implement.
+                # Requires implementing a general deserializer for the transaction
+                raise NotImplementedError
+            elif 'block' in data:
+                # New block info.
+                yield ListenerMessage('block', models.BlockInfo.from_dto(data))
+            elif 'status' in data:
+                # New transaction status error.
+                yield ListenerMessage('status', models.TransactionStatusError.from_dto(data))
+            elif 'meta' in data:
+                channel_name = typing.cast(str, data['meta']['channelName'])
+                hash = typing.cast(str, data['meta']['hash'])
+                yield ListenerMessage(channel_name, hash)
+            elif 'parentHash' in data:
+                yield ListenerMessage('cosignature', models.CosignatureSignedTransaction.from_dto(data))
+            else:
+                # Unknown data information, don't pollute the message,
+                # only send the information's keys.
+                raise ValueError(f"Unknown message from Listener subscription, keys are {data.keys()}.")
 
-    async def confirmed(self, address: 'Address'):
-        message = json.dumps({
-            'uid': await self.uid,
-            'subscribe': f'confirmedAdded/{address.address}'
-        })
-        # TODO(ahuszagh) Need to process something...
-        await self._client.send(message)
+    async def new_block(self) -> None:
+        """Emit message when new blocks are added to chain."""
+        await self.subscribe('block')
+
+    async def confirmed(self, address: 'Address') -> None:
+        """Emit message when new transactions are confirmed for a given address."""
+        await self.subscribe(f'confirmedAdded/{address.address}')
 
     confirmed_added = confirmed
     confirmedAdded = util.undoc(confirmed_added)
 
-    async def unconfirmed_added(self, address: 'Address'):
-        raise NotImplementedError
+    async def unconfirmed_added(self, address: 'Address') -> None:
+        """Emit message when new, unconfirmed transactions are announced for a given address."""
+        await self.subscribe(f'confirmedAdded/{address.address}')
 
     unconfirmedAdded = util.undoc(unconfirmed_added)
 
-    async def unconfirmed_removed(self, address: 'Address'):
-        raise NotImplementedError
+    async def unconfirmed_removed(self, address: 'Address') -> None:
+        """Emit message when unconfirmed transactions change state for a given address."""
+        await self.subscribe(f'unconfirmedRemoved/{address.address}')
 
     unconfirmedRemoved = util.undoc(unconfirmed_removed)
 
-    async def aggregate_bonded_added(self, address: 'Address'):
-        raise NotImplementedError
+    async def aggregate_bonded_added(self, address: 'Address') -> None:
+        """Emit message when new, unconfirmed, aggregate transactions are announced for a given address."""
+        await self.subscribe(f'partialAdded/{address.address}')
 
     aggregateBondedAdded = util.undoc(aggregate_bonded_added)
 
-    async def aggregate_bonded_removed(self, address: 'Address'):
-        raise NotImplementedError
+    async def aggregate_bonded_removed(self, address: 'Address') -> None:
+        """Emit message when unconfirmed, aggregate transactions change state for a given address."""
+        await self.subscribe(f'partialRemoved/{address.address}')
 
     aggregateBondedRemoved = util.undoc(aggregate_bonded_removed)
 
-    async def status(self, address: 'Address'):
-        """
-        Get status updates each time a transaction contains an error.
+    async def status(self, address: 'Address') -> None:
+        """Emit message each time a transaction contains an error for a given address."""
+        await self.subscribe(f'status/{address.address}')
 
-        :param address: Account to monitor.
-        :return:    # TODO(ahuszagh) Add
-        """
+    async def cosignature_added(self, address: 'Address') -> None:
+        """Emit message each time a cosigner signs a message initiated by the given address."""
+        await self.subscribe(f'cosignature/{address.address}')
+
+    async def subscribe(self, channel: str) -> None:
+        """Subscribe to websockets channel."""
+
         message = json.dumps({
             'uid': await self.uid,
-            'subscribe': f'status/{address.address}'
+            'subscribe': channel
         })
-        # TODO(ahuszagh) Need to process something...
+        await self._client.send(message)
+
+    async def unsubscribe(self, channel: str) -> None:
+        """Unsubscribe from websockets channel."""
+
+        message = json.dumps({
+            'uid': await self.uid,
+            'unsubscribe': channel
+        })
         await self._client.send(message)

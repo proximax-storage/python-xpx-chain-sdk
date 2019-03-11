@@ -104,10 +104,12 @@ class BlockInfo(util.Dto):
         block = data['block']
         version = block['version']
         network_type = NetworkType(version >> 8)
+        # totalFee and merkleHash aren't provided in all interfaces,
+        # such as the websockets listener.
         return cls(
             hash=meta['hash'],
             generation_hash=meta['generationHash'],
-            total_fee=util.dto_to_uint64(meta['totalFee']),
+            total_fee=util.dto_to_uint64(meta.get('totalFee', [0, 0])),
             num_transactions=meta['numTransactions'],
             signature=block['signature'],
             signer=PublicAccount.create_from_public_key(block['signer'], network_type),

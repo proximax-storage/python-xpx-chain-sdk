@@ -105,18 +105,23 @@ def wrap_function(f):
     return wrapper
 
 
+def wrap_callable(f):
+    """Wrap function or method to generate awaitable object."""
+
+    args = inspect.getfullargspec(f).args
+    if args and args[0] == 'self':
+        return wrap_method(f)
+    return wrap_function(f)
+
+
 def observable(value):
     """Wrap an `async def` function into an `Observable`."""
 
-    if value is None or isinstance(value, LoopType):
+    if value is None:
+        return wrap_callable
+    if isinstance(value, LoopType):
         return wrap_loop(value)
     elif callable(value):
-        # Have a callable function, we need to determine if this
-        # might have a custom event loop bound to the class.
-        args = inspect.getfullargspec(value).args
-        if args and args[0] == 'self':
-            return wrap_method(value)
-        else:
-            return wrap_function(value)
+        return wrap_callable(value)
     else:
         raise TypeError("Observable must be created from event loop or asynchronous function.")

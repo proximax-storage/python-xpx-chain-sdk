@@ -34,15 +34,16 @@ from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
 if typing.TYPE_CHECKING:
-    from .aggregate_transaction_info import AggregateTransactionInfo
-    from .inner_transaction import InnerTransaction
-    from .transaction_info import TransactionInfo
+    # We dynamically resolve the forward references which are used
+    # in an auto-generate __init__ outside of the module.
+    # Silence the lint warnings.
+    from .aggregate_transaction_info import AggregateTransactionInfo    # noqa
+    from .transaction_info import TransactionInfo                       # noqa
     from ..account.account import Account
 
 TransactionInfoType = typing.Union['TransactionInfo', 'AggregateTransactionInfo']
 
 
-# TODO(ahuszagh) Model??
 @util.inherit_doc
 @util.dataclass(frozen=True)
 class Transaction(util.Model):
@@ -96,7 +97,8 @@ class Transaction(util.Model):
         signer = transaction[68: 100]
         rest = transaction[100:]
         data = signature_half + signer + rest
-        return util.hashlib.sha3_256(data).hexdigest()
+        hash = util.hashlib.sha3_256(data).hexdigest()
+        return typing.cast(str, hash)
 
     @staticmethod
     def shared_entity_size() -> int:
@@ -144,7 +146,7 @@ class Transaction(util.Model):
         if self.signer is not None and self.signature is not None:
             # Transaction is signed.
             buffer[4:68] = util.unhexlify(self.signature)
-            buffer[68:100] = util.unhexlify(self.self.signer.public_key)
+            buffer[68:100] = util.unhexlify(self.signer.public_key)
         else:
             # Transaction is not signed, write 0 bytes.
             buffer[4:68] = bytes(64)
@@ -195,7 +197,7 @@ class Transaction(util.Model):
         if signature != bytes(64) and public_key != bytes(32):
             # Transaction is signed.
             object.__setattr__(self, 'signature', util.hexlify(signature))
-            signer = PublicAccount.create_from_public_key(hexlify(public_key), network_type)
+            signer = PublicAccount.create_from_public_key(util.hexlify(public_key), network_type)
             object.__setattr__(self, 'signer', signer)
         else:
             # Transaction is not signed.
@@ -234,7 +236,7 @@ class Transaction(util.Model):
 
     aggregateTransaction = util.undoc(aggregate_transaction)
 
-    def to_aggregate(self, signer: 'PublicAccount') -> 'InnerTransaction':
+    def to_aggregate(self, signer: 'PublicAccount'):
         """Convert transaction to inner transaction."""
         raise NotImplementedError
 

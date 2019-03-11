@@ -1,8 +1,8 @@
 """
-    transaction
-    ===========
+    aggregate_transaction_cosignature
+    =================================
 
-    Abstract base class for transactions.
+    Aggregate transaction signer and signature.
 
     License
     -------
@@ -32,7 +32,12 @@ if typing.TYPE_CHECKING:
 @util.inherit_doc
 @util.dataclass(frozen=True)
 class AggregateTransactionCosignature:
-    """Aggregate transaction signer and signature."""
+    """
+    Aggregate transaction signer and signature.
+
+    :param signature: Signature of aggregate transaction done by cosigner.
+    :param signer: Cosigner account
+    """
 
     signature: str
     signer: 'PublicAccount'

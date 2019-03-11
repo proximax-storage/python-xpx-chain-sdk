@@ -31,7 +31,7 @@ from nem2 import util
 from nem2 import models
 
 if typing.TYPE_CHECKING:
-    from .host import Host
+    from .client import Client
     from nem2.models import *
 
 # BOILERPLATE
@@ -85,16 +85,16 @@ def request(*args, **kwds):
 # BLOCKCHAIN HTTP
 # ---------------
 
-def request_get_block_by_height(host: 'Host', height: int, **kwds):
+def request_get_block_by_height(client: 'Client', height: int, **kwds):
     """
     Make "/block/{height}" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param height: Height of block.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get(f"/block/{height}", **kwds)
+    return client.get(f"/block/{height}", **kwds)
 
 
 def process_get_block_by_height(status: int, json: dict) -> 'BlockInfo':
@@ -112,15 +112,15 @@ def process_get_block_by_height(status: int, json: dict) -> 'BlockInfo':
 get_block_by_height = request("get_block_by_height", "", True)
 
 
-def request_get_blockchain_height(host: 'Host', **kwds):
+def request_get_blockchain_height(client: 'Client', **kwds):
     """
     Make "/chain/height" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/chain/height", **kwds)
+    return client.get("/chain/height", **kwds)
 
 
 def process_get_blockchain_height(status: int, json: dict) -> int:
@@ -138,15 +138,15 @@ def process_get_blockchain_height(status: int, json: dict) -> int:
 get_blockchain_height = request("get_blockchain_height", "", True)
 
 
-def request_get_blockchain_score(host: 'Host', **kwds):
+def request_get_blockchain_score(client: 'Client', **kwds):
     """
     Make "/chain/score" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/chain/score", **kwds)
+    return client.get("/chain/score", **kwds)
 
 
 def process_get_blockchain_score(status: int, json: dict) -> 'BlockchainScore':
@@ -164,15 +164,15 @@ def process_get_blockchain_score(status: int, json: dict) -> 'BlockchainScore':
 get_blockchain_score = request("get_blockchain_score", "", True)
 
 
-def request_get_diagnostic_storage(host: 'Host', **kwds):
+def request_get_diagnostic_storage(client: 'Client', **kwds):
     """
     Make "/diagnostic/storage" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/diagnostic/storage", **kwds)
+    return client.get("/diagnostic/storage", **kwds)
 
 
 def process_get_diagnostic_storage(status: int, json: dict) -> 'BlockchainStorageInfo':
@@ -193,17 +193,17 @@ get_diagnostic_storage = request("get_diagnostic_storage", "", True)
 # -----------
 
 
-def request_get_mosaic_names(host: 'Host', ids: typing.Sequence['MosaicId'], **kwds):
+def request_get_mosaic_names(client: 'Client', ids: typing.Sequence['MosaicId'], **kwds):
     """
     Make "/mosaic/names" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param ids: Namespace IDs to request names for.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
     json = {"mosaicIds": [f"{i:x}" for i in ids]}
-    return host.post("/mosaic/names", json=json, **kwds)
+    return client.post("/mosaic/names", json=json, **kwds)
 
 
 def process_get_mosaic_names(status: int, json: list) -> typing.Sequence['MosaicName']:
@@ -224,16 +224,16 @@ get_mosaic_names = request("get_mosaic_names", "", True)
 # --------------
 
 
-def request_get_namespace(host: 'Host', namespace_id: 'NamespaceId', **kwds):
+def request_get_namespace(client: 'Client', namespace_id: 'NamespaceId', **kwds):
     """
     Make "/namespace/{namespace_id}" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param id: Namespace ID.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get(f"/namespace/{namespace_id:x}", **kwds)
+    return client.get(f"/namespace/{namespace_id:x}", **kwds)
 
 
 def process_get_namespace(status: int, json: dict) -> 'NamespaceInfo':
@@ -251,17 +251,17 @@ def process_get_namespace(status: int, json: dict) -> 'NamespaceInfo':
 get_namespace = request("get_namespace", "", True)
 
 
-def request_get_namespace_names(host: 'Host', ids: typing.Sequence['NamespaceId'], **kwds):
+def request_get_namespace_names(client: 'Client', ids: typing.Sequence['NamespaceId'], **kwds):
     """
     Make "/namespace/names" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param ids: Namespace IDs to request names for.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
     json = {"namespaceIds": [f"{i:x}" for i in ids]}
-    return host.post("/namespace/names", json=json, **kwds)
+    return client.post("/namespace/names", json=json, **kwds)
 
 
 def process_get_namespace_names(status: int, json: list) -> typing.Sequence['NamespaceName']:
@@ -279,16 +279,16 @@ def process_get_namespace_names(status: int, json: list) -> typing.Sequence['Nam
 get_namespace_names = request("get_namespace_names", "", True)
 
 
-def request_get_namespaces_from_account(host: 'Host', address: 'Address', **kwds):
+def request_get_namespaces_from_account(client: 'Client', address: 'Address', **kwds):
     """
     Make "/account/{address}/namespaces" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param address: Account address.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get(f"/account/{address.address}/namespaces", **kwds)
+    return client.get(f"/account/{address.address}/namespaces", **kwds)
 
 
 def process_get_namespaces_from_account(status: int, json: list) -> typing.Sequence['NamespaceInfo']:
@@ -306,17 +306,17 @@ def process_get_namespaces_from_account(status: int, json: list) -> typing.Seque
 get_namespaces_from_account = request("get_namespaces_from_account", "", True)
 
 
-def request_get_namespaces_from_accounts(host: 'Host', addresses: typing.Sequence['Address'], **kwds):
+def request_get_namespaces_from_accounts(client: 'Client', addresses: typing.Sequence['Address'], **kwds):
     """
     Make "/account/namespaces" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param address: Account address.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
     json = {"addresses": [i.address for i in addresses]}
-    return host.post("/account/namespaces", json=json, **kwds)
+    return client.post("/account/namespaces", json=json, **kwds)
 
 
 def process_get_namespaces_from_accounts(status: int, json: list) -> typing.Sequence['NamespaceInfo']:
@@ -334,16 +334,16 @@ def process_get_namespaces_from_accounts(status: int, json: list) -> typing.Sequ
 get_namespaces_from_accounts = request("get_namespaces_from_accounts", "", True)
 
 
-def request_get_linked_mosaic_id(host: 'Host', namespace_id: 'NamespaceId', **kwds):
+def request_get_linked_mosaic_id(client: 'Client', namespace_id: 'NamespaceId', **kwds):
     """
     Make "/namespace/{namespace_id}" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param id: Namespace ID.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return request_get_namespace(host, namespace_id, **kwds)
+    return request_get_namespace(client, namespace_id, **kwds)
 
 
 def process_get_linked_mosaic_id(status: int, json: dict) -> 'MosaicId':
@@ -361,16 +361,16 @@ def process_get_linked_mosaic_id(status: int, json: dict) -> 'MosaicId':
 get_linked_mosaic_id = request("get_linked_mosaic_id", "", True)
 
 
-def request_get_linked_address(host: 'Host', namespace_id: 'NamespaceId', **kwds):
+def request_get_linked_address(client: 'Client', namespace_id: 'NamespaceId', **kwds):
     """
     Make "/namespace/{namespace_id}" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param id: Namespace ID.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return request_get_namespace(host, namespace_id, **kwds)
+    return request_get_namespace(client, namespace_id, **kwds)
 
 
 def process_get_linked_address(status: int, json: dict) -> 'Address':
@@ -400,15 +400,15 @@ NETWORK_TYPE = {
 }
 
 
-def request_get_network_type(host: 'Host', **kwds):
+def request_get_network_type(client: 'Client', **kwds):
     """
     Make "/network" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get("/network", **kwds)
+    return client.get("/network", **kwds)
 
 
 def process_get_network_type(status: int, json: dict) -> 'NetworkType':
@@ -429,16 +429,16 @@ get_network_type = request("get_network_type", "", True)
 # ----------------
 
 
-def request_get_transaction(host: 'Host', hash: str, **kwds):
+def request_get_transaction(client: 'Client', hash: str, **kwds):
     """
     Make "/transaction/{hash}" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param hash: Transaction hash.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get(f"/transaction/{hash}", **kwds)
+    return client.get(f"/transaction/{hash}", **kwds)
 
 
 # TODO(ahuszagh) Annotate
@@ -458,16 +458,16 @@ def process_get_transaction(status: int, json: dict):
 get_transaction = request("get_transaction", "", True)
 
 
-def request_get_transactions(host: 'Host', hashes: typing.Sequence[str], **kwds):
+def request_get_transactions(client: 'Client', hashes: typing.Sequence[str], **kwds):
     """
     Make "/transaction/{hash}" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param hashes: Sequence of transaction hashes.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get(f"/transaction/{hash}", **kwds)
+    return client.get(f"/transaction/{hash}", **kwds)
 
 
 # TODO(ahuszagh) Annotate
@@ -487,16 +487,16 @@ def process_get_transactions(status: int, json: list):
 get_transactions = request("get_transactions", "", True)
 
 
-def request_get_transaction_status(host: 'Host', hash: str, **kwds):
+def request_get_transaction_status(client: 'Client', hash: str, **kwds):
     """
     Make "/transaction/{hash}/status" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param hash: Transaction hash.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
-    return host.get(f"/transaction/{hash}/status", **kwds)
+    return client.get(f"/transaction/{hash}/status", **kwds)
 
 
 def process_get_transaction_status(status: int, json: dict) -> 'TransactionStatus':
@@ -514,17 +514,17 @@ def process_get_transaction_status(status: int, json: dict) -> 'TransactionStatu
 get_transaction_status = request("get_transaction_status", "", True)
 
 
-def request_get_transaction_statuses(host: 'Host', hashes: typing.Sequence[str], **kwds):
+def request_get_transaction_statuses(client: 'Client', hashes: typing.Sequence[str], **kwds):
     """
     Make "/transaction/statuses" request.
 
-    :param host: Host wrapper for client.
+    :param client: Wrapper for client.
     :param hashes: Sequence of transaction hashes.
     :param timeout: (optional) Timeout for request (in seconds).
     """
 
     json = {'hashes': list(hashes)}
-    return host.post(f"/transaction/statuses", json=json, **kwds)
+    return client.post(f"/transaction/statuses", json=json, **kwds)
 
 
 def process_get_transaction_statuses(status: int, json: list) -> typing.Sequence['TransactionStatus']:

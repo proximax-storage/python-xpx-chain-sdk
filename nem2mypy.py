@@ -136,6 +136,7 @@ class Nem2Plugin(Plugin):
             return add_dict_hook
         return None
 
+
 def plugin(version: str) -> 'Plugin':
     """Get the application plugin."""
 
