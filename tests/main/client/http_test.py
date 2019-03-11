@@ -21,8 +21,8 @@ class TestAsyncLoop(harness.TestCase):
 class TestHttp(harness.TestCase):
 
     @harness.test_case(
-        sync_data=(client.NetworkHttp, requests, requests.HTTPError),
-        async_data=(client.AsyncNetworkHttp, aiohttp, aiohttp.ClientResponseError)
+        sync_data=(client.NetworkHttp, requests, client.HTTPError),
+        async_data=(client.AsyncNetworkHttp, aiohttp, client.AsyncHTTPError)
     )
     async def test_exceptions(self, data, cb):
         http = data[0](responses.ENDPOINT)

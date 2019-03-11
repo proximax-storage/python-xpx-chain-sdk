@@ -194,7 +194,7 @@ class ClientResponse:
     async def __aexit__(self, *args):
         await self.close()
 
-    def close(self):
+    async def close(self):
         self._closed = True
 
     def release(self):

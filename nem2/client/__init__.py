@@ -1,4 +1,3 @@
-# TODO(ahuszagh) Needs to support Tornado or default.
 from .default import *
 
 __all__ = [
@@ -22,4 +21,8 @@ __all__ = [
 
     # Websockets
     'Listener',
+
+    # Exceptions
+    'HTTPError',
+    'AsyncHTTPError',
 ]

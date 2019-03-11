@@ -10,6 +10,8 @@ import typing
 import urllib.error
 import urllib3
 
+from nem2 import util
+
 # UTILITY
 
 
@@ -60,6 +62,10 @@ class Client:
     :param endpoint: Domain name and port for the endpoint.
     """
 
+    _session: typing.Any
+    _endpoint: str
+    _closed: bool
+
     def __init__(self, session, endpoint) -> None:
         self._session = session
         self._endpoint = parse_http_url(endpoint).url
@@ -80,6 +86,18 @@ class Client:
     def closed(self) -> bool:
         """Get if client session has been closed."""
         return self._closed
+
+    def delete(self, relative_path, *args, **kwds):
+        """
+        Make DELETE request from relative path.
+
+        :param relative_path: Relative path from endpoint prefixed with "/".
+        :param \*args: Optional positional arguments for request.
+        :param \**kwds: Optional keyword arguments for request.
+        """
+
+        path = self._endpoint + relative_path
+        return self._session.delete(path, *args, **kwds)
 
     def get(self, relative_path, *args, **kwds):
         """
@@ -153,18 +171,6 @@ class Client:
         path = self._endpoint + relative_path
         return self._session.put(path, *args, **kwds)
 
-    def delete(self, relative_path, *args, **kwds):
-        """
-        Make DELETE request from relative path.
-
-        :param relative_path: Relative path from endpoint prefixed with "/".
-        :param \*args: Optional positional arguments for request.
-        :param \**kwds: Optional keyword arguments for request.
-        """
-
-        path = self._endpoint + relative_path
-        return self._session.delete(path, *args, **kwds)
-
 
 class AsyncClient(Client):
     """
@@ -174,6 +180,8 @@ class AsyncClient(Client):
     :param endpoint: Domain name and port for the endpoint.
     :param loop: Event loop.
     """
+
+    _loop: util.OptionalLoopType
 
     def __init__(self, session, endpoint, loop=None) -> None:
         self._session = session
@@ -211,6 +219,9 @@ class AsyncClient(Client):
 
 class WebsocketClient:
     """Asynchronous host using websockets."""
+
+    _session: typing.Any
+    _loop: util.OptionalLoopType
 
     def __init__(self, session, loop=None) -> None:
         self._session = session

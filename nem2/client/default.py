@@ -25,6 +25,16 @@
     limitations under the License.
 """
 
+import asyncio
+import atexit
+import aiohttp
+import requests
+import websockets
+
+from nem2 import util
+from . import abc
+from . import client
+
 __all__ = [
     # Synchronous
     'Http',
@@ -46,17 +56,16 @@ __all__ = [
 
     # Websockets
     'Listener',
+
+    # Exceptions
+    'HTTPError',
+    'AsyncHTTPError',
 ]
 
-import asyncio
-import atexit
-import aiohttp
-import requests
-import websockets
+# EXCEPTIONS
 
-from nem2 import util
-from . import abc
-from . import client
+HTTPError = requests.HTTPError
+AsyncHTTPError = aiohttp.ClientResponseError
 
 # SYNCHRONOUS
 
