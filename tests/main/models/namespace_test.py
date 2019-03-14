@@ -120,6 +120,16 @@ class TestAliasActionType(harness.TestCase):
         self.assertEqual(self.link.description(), "Link an alias.")
         self.assertEqual(self.unlink.description(), "Unlink an alias.")
 
+    def test_to_catbuffer(self):
+        self.assertEqual(self.link.to_catbuffer(), b'\x00')
+        self.assertEqual(self.unlink.to_catbuffer(), b'\x01')
+        self.assertEqual(self.link.toCatbuffer(), self.link.to_catbuffer())
+
+    def test_from_catbuffer(self):
+        value = models.AliasActionType.from_catbuffer(b'\x00')[0]
+        self.assertEqual(value, self.link)
+        self.assertEqual(value, models.AliasActionType.fromCatbuffer(b'\x00')[0])
+
 
 class TestAliasType(harness.TestCase):
 

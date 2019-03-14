@@ -1,6 +1,6 @@
 """
-    host
-    ====
+    client
+    ======
 
     HTTP client wrapper to inject the proper host (schema, domain and port)
     into requests providing solely a relative path.

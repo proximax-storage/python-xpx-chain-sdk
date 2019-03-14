@@ -23,19 +23,34 @@
 """
 
 import enum
+import struct
+import typing
+
 from nem2 import util
 
 
 @util.inherit_doc
-class AliasActionType(util.EnumMixin, enum.IntEnum):
+class AliasActionType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
     """Alias action type."""
 
     LINK = 0
     UNLINK = 1
+    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def description(self) -> str:
         return DESCRIPTION[self]
 
+    def to_catbuffer(self) -> bytes:
+        return struct.pack('<B', int(self))
+
+    @classmethod
+    def from_catbuffer(cls, data: bytes) -> typing.Tuple['AliasActionType', bytes]:
+        assert len(data) >= cls.CATBUFFER_SIZE
+        inst = cls(struct.unpack('<B', data[:cls.CATBUFFER_SIZE])[0])
+        return inst, data[cls.CATBUFFER_SIZE:]
+
+
+AliasActionType.CATBUFFER_SIZE = 1
 
 DESCRIPTION = {
     AliasActionType.LINK: "Link an alias.",

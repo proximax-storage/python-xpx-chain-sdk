@@ -36,7 +36,7 @@ class AggregateTransactionCosignature:
     Aggregate transaction signer and signature.
 
     :param signature: Signature of aggregate transaction done by cosigner.
-    :param signer: Cosigner account
+    :param signer: Cosigner account.
     """
 
     signature: str

@@ -33,6 +33,7 @@ from .namespace.namespace_info import NamespaceInfo
 from .namespace.namespace_name import NamespaceName
 from .namespace.namespace_type import NamespaceType
 
+from .transaction.address_alias_transaction import AddressAliasInnerTransaction, AddressAliasTransaction
 from .transaction.aggregate_transaction_cosignature import AggregateTransactionCosignature
 from .transaction.aggregate_transaction_info import AggregateTransactionInfo
 from .transaction.cosignature_signed_transaction import CosignatureSignedTransaction
@@ -43,7 +44,7 @@ from .transaction.message import Message
 from .transaction.message_type import MessageType
 from .transaction.mosaic_cosignatory_modification_type import MultisigCosignatoryModificationType
 from .transaction.plain_message import PlainMessage
-from .transaction.secret_proof_transaction import SecretProofTransaction
+from .transaction.secret_proof_transaction import SecretProofInnerTransaction, SecretProofTransaction
 from .transaction.signed_transaction import SignedTransaction
 from .transaction.transaction import Transaction
 from .transaction.transaction_announce_response import TransactionAnnounceResponse
@@ -53,6 +54,7 @@ from .transaction.transaction_status_error import TransactionStatusError
 from .transaction.transaction_status_group import TransactionStatusGroup
 from .transaction.transaction_type import TransactionType
 from .transaction.transaction_version import TransactionVersion
+from .transaction.transfer_transaction import TransferInnerTransaction, TransferTransaction
 
 from nem2.util import InterchangeFormat
 
@@ -97,6 +99,8 @@ __all__ = [
     'NamespaceType',
 
     # Transaction
+    'AddressAliasInnerTransaction'
+    'AddressAliasTransaction'
     'AggregateTransactionCosignature',
     'AggregateTransactionInfo',
     'ChronoUnit',
@@ -108,6 +112,7 @@ __all__ = [
     'MessageType',
     'MultisigCosignatoryModificationType',
     'PlainMessage',
+    'SecretProofInnerTransaction',
     'SecretProofTransaction',
     'SignedTransaction',
     'Transaction',
@@ -118,6 +123,8 @@ __all__ = [
     'TransactionStatusGroup',
     'TransactionType',
     'TransactionVersion',
+    'TransferInnerTransaction',
+    'TransferTransaction',
 
     # Wallet
 

@@ -102,3 +102,17 @@ class InnerTransaction(Transaction):
         object.__setattr__(self, 'transaction_info', signer)
 
         return total_size, data[self.shared_entity_size():]
+
+    @classmethod
+    def from_transaction(cls, transaction: 'Transaction', signer: 'PublicAccount') -> 'InnerTransaction':
+        """
+        Generate aggregate transaction from regular transaction.
+
+        :param transaction: Non-aggregate transaction.
+        :param signer: Account of transaction signer.
+        """
+
+        data = transaction.asdict()
+        data['signer'] = signer
+        data.pop('type')
+        return cls(**data)

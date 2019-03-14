@@ -165,11 +165,8 @@ class SecretProofTransaction(Transaction):
 
     def to_aggregate(self, signer: 'PublicAccount') -> 'SecretProofInnerTransaction':
         """Convert transaction to inner transaction."""
-
-        data = self.asdict()
-        data['signer'] = signer
-        data.pop('type')
-        return SecretProofInnerTransaction(**data)
+        inst = SecretProofInnerTransaction.from_transaction(self, signer)
+        return typing.cast(SecretProofInnerTransaction, inst)
 
 
 class SecretProofInnerTransaction(InnerTransaction, SecretProofTransaction):
