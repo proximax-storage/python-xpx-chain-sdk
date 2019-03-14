@@ -26,7 +26,7 @@ import struct
 import typing
 
 from nem2 import util
-from .transaction import Transaction
+from .transaction import Hooks, Transaction
 from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
@@ -42,6 +42,9 @@ class InnerTransaction(Transaction):
     """
 
     __slots__ = ()
+    # Override the base-implementation, so any classmethods
+    # inheriting from (InnerTransaction, cls) use the derived hooks.
+    HOOKS: typing.ClassVar[Hooks] = {}
 
     @staticmethod
     def shared_entity_size() -> int:

@@ -39,8 +39,8 @@ class MultisigAccountGraphInfo(abc.MutableMapping):
     """
     Graph info for multi-sig accounts.
 
-    :param \*args: (optional) Positional arguments to initialize mapping.
-    :param \**kwds: (optional) Keyword arguments to initialize mapping.
+    :param \\*args: (Optional) positional arguments to initialize mapping.
+    :param \\**kwds: (Optional) keyword arguments to initialize mapping.
     """
 
     multisig_accounts: GraphType

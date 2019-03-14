@@ -91,7 +91,7 @@ def request_get_block_by_height(client: 'Client', height: int, **kwds):
 
     :param client: Wrapper for client.
     :param height: Height of block.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return client.get(f"/block/{height}", **kwds)
@@ -117,7 +117,7 @@ def request_get_blockchain_height(client: 'Client', **kwds):
     Make "/chain/height" request.
 
     :param client: Wrapper for client.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return client.get("/chain/height", **kwds)
@@ -143,7 +143,7 @@ def request_get_blockchain_score(client: 'Client', **kwds):
     Make "/chain/score" request.
 
     :param client: Wrapper for client.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return client.get("/chain/score", **kwds)
@@ -169,7 +169,7 @@ def request_get_diagnostic_storage(client: 'Client', **kwds):
     Make "/diagnostic/storage" request.
 
     :param client: Wrapper for client.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return client.get("/diagnostic/storage", **kwds)
@@ -199,7 +199,7 @@ def request_get_mosaic_names(client: 'Client', ids: typing.Sequence['MosaicId'],
 
     :param client: Wrapper for client.
     :param ids: Namespace IDs to request names for.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     json = {"mosaicIds": [f"{i:x}" for i in ids]}
@@ -230,7 +230,7 @@ def request_get_namespace(client: 'Client', namespace_id: 'NamespaceId', **kwds)
 
     :param client: Wrapper for client.
     :param id: Namespace ID.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return client.get(f"/namespace/{namespace_id:x}", **kwds)
@@ -257,7 +257,7 @@ def request_get_namespace_names(client: 'Client', ids: typing.Sequence['Namespac
 
     :param client: Wrapper for client.
     :param ids: Namespace IDs to request names for.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     json = {"namespaceIds": [f"{i:x}" for i in ids]}
@@ -285,7 +285,7 @@ def request_get_namespaces_from_account(client: 'Client', address: 'Address', **
 
     :param client: Wrapper for client.
     :param address: Account address.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return client.get(f"/account/{address.address}/namespaces", **kwds)
@@ -312,7 +312,7 @@ def request_get_namespaces_from_accounts(client: 'Client', addresses: typing.Seq
 
     :param client: Wrapper for client.
     :param address: Account address.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     json = {"addresses": [i.address for i in addresses]}
@@ -340,7 +340,7 @@ def request_get_linked_mosaic_id(client: 'Client', namespace_id: 'NamespaceId', 
 
     :param client: Wrapper for client.
     :param id: Namespace ID.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return request_get_namespace(client, namespace_id, **kwds)
@@ -367,7 +367,7 @@ def request_get_linked_address(client: 'Client', namespace_id: 'NamespaceId', **
 
     :param client: Wrapper for client.
     :param id: Namespace ID.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return request_get_namespace(client, namespace_id, **kwds)
@@ -405,7 +405,7 @@ def request_get_network_type(client: 'Client', **kwds):
     Make "/network" request.
 
     :param client: Wrapper for client.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return client.get("/network", **kwds)
@@ -435,7 +435,7 @@ def request_get_transaction(client: 'Client', hash: str, **kwds):
 
     :param client: Wrapper for client.
     :param hash: Transaction hash.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return client.get(f"/transaction/{hash}", **kwds)
@@ -464,7 +464,7 @@ def request_get_transactions(client: 'Client', hashes: typing.Sequence[str], **k
 
     :param client: Wrapper for client.
     :param hashes: Sequence of transaction hashes.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return client.get(f"/transaction/{hash}", **kwds)
@@ -493,7 +493,7 @@ def request_get_transaction_status(client: 'Client', hash: str, **kwds):
 
     :param client: Wrapper for client.
     :param hash: Transaction hash.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     return client.get(f"/transaction/{hash}/status", **kwds)
@@ -520,7 +520,7 @@ def request_get_transaction_statuses(client: 'Client', hashes: typing.Sequence[s
 
     :param client: Wrapper for client.
     :param hashes: Sequence of transaction hashes.
-    :param timeout: (optional) Timeout for request (in seconds).
+    :param timeout: (Optional) timeout for request (in seconds).
     """
 
     json = {'hashes': list(hashes)}

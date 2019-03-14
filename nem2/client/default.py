@@ -251,3 +251,4 @@ class Listener(abc.Listener):
         )
         session.path = url.path or '/'
         self._client = client.WebsocketClient(session, loop=loop)
+        super().__init__()

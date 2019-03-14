@@ -417,6 +417,7 @@ class ListenerMessage:
     message: MessageType
 
 
+@util.observable
 class Listener:
     """
     Abstract base class for the websockets-based listener.
@@ -427,17 +428,21 @@ class Listener:
     _client: 'WebsocketClient'
     _loop: util.OptionalLoopType
     _uid: typing.Optional[str] = None
+    _iter: typing.AsyncIterator[bytes]
+
+    def __init__(self):
+        self._iter = self._client.__aiter__()
 
     def __enter__(self) -> 'Listener':
         raise TypeError("Only use async with.")
 
-    def __exit__(self) -> None:
+    def __exit__(self, exc_type, exc, tb) -> None:
         pass
 
     async def __aenter__(self) -> 'Listener':
         return self
 
-    async def __aexit__(self) -> None:
+    async def __aexit__(self, exc_type, exc, tb) -> None:
         return await self.close()
 
     async def close(self) -> None:
@@ -457,41 +462,42 @@ class Listener:
             self._uid = json.loads(await self._client.recv())['uid']
         return self._uid
 
-    @util.observable
-    async def __aiter__(self) -> typing.AsyncIterator[ListenerMessage]:
+    def __aiter__(self) -> 'Listener':
+        return self
+
+    async def __anext__(self) -> typing.Optional[ListenerMessage]:
         """Iterate over subscribed messages."""
 
-        async for message in self._client:
-            data = json.loads(message)
-            if 'uid' in data:
-                # UID reset.
-                self._uid = data['uid']
-            elif 'transaction' in data:
-                channel_name = typing.cast(str, data['meta'].pop('channelName'))
-                # TODO(ahuszagh) Implement.
-                # Requires implementing a general deserializer for the transaction
-                raise NotImplementedError
-            elif 'block' in data:
-                # New block info.
-                yield ListenerMessage('block', models.BlockInfo.from_dto(data))
-            elif 'status' in data:
-                # New transaction status error.
-                yield ListenerMessage('status', models.TransactionStatusError.from_dto(data))
-            elif 'meta' in data:
-                channel_name = typing.cast(str, data['meta']['channelName'])
-                hash = typing.cast(str, data['meta']['hash'])
-                yield ListenerMessage(channel_name, hash)
-            elif 'parentHash' in data:
-                yield ListenerMessage('cosignature', models.CosignatureSignedTransaction.from_dto(data))
-            else:
-                # Unknown data information, don't pollute the message,
-                # only send the information's keys.
-                raise ValueError(f"Unknown message from Listener subscription, keys are {data.keys()}.")
+        message: bytes = await self._iter.__anext__()
+        data = json.loads(message)
+        if 'transaction' in data:
+            channel_name = typing.cast(str, data['meta'].pop('channelName'))
+            # TODO(ahuszagh) Implement.
+            # Requires implementing a general deserializer for the transaction
+            raise NotImplementedError
+        elif 'block' in data:
+            # New block info.
+            return ListenerMessage('block', models.BlockInfo.from_dto(data))
+        elif 'status' in data:
+            # New transaction status error.
+            return ListenerMessage('status', models.TransactionStatusError.from_dto(data))
+        elif 'meta' in data:
+            channel_name = typing.cast(str, data['meta']['channelName'])
+            hash = typing.cast(str, data['meta']['hash'])
+            return ListenerMessage(channel_name, hash)
+        elif 'parentHash' in data:
+            return ListenerMessage('cosignature', models.CosignatureSignedTransaction.from_dto(data))
+        else:
+            # Unknown data information, don't pollute the message,
+            # only send the information's keys.
+            raise ValueError(f"Unknown message from Listener subscription, keys are {data.keys()}.")
 
+    @util.observable
     async def new_block(self) -> None:
         """Emit message when new blocks are added to chain."""
         await self.subscribe('block')
 
+    @util.observable
     async def confirmed(self, address: 'Address') -> None:
         """Emit message when new transactions are confirmed for a given address."""
         await self.subscribe(f'confirmedAdded/{address.address}')
@@ -499,34 +505,40 @@ class Listener:
     confirmed_added = confirmed
     confirmedAdded = util.undoc(confirmed_added)
 
+    @util.observable
     async def unconfirmed_added(self, address: 'Address') -> None:
         """Emit message when new, unconfirmed transactions are announced for a given address."""
         await self.subscribe(f'confirmedAdded/{address.address}')
 
     unconfirmedAdded = util.undoc(unconfirmed_added)
 
+    @util.observable
     async def unconfirmed_removed(self, address: 'Address') -> None:
         """Emit message when unconfirmed transactions change state for a given address."""
         await self.subscribe(f'unconfirmedRemoved/{address.address}')
 
     unconfirmedRemoved = util.undoc(unconfirmed_removed)
 
+    @util.observable
     async def aggregate_bonded_added(self, address: 'Address') -> None:
         """Emit message when new, unconfirmed, aggregate transactions are announced for a given address."""
         await self.subscribe(f'partialAdded/{address.address}')
 
     aggregateBondedAdded = util.undoc(aggregate_bonded_added)
 
+    @util.observable
     async def aggregate_bonded_removed(self, address: 'Address') -> None:
         """Emit message when unconfirmed, aggregate transactions change state for a given address."""
         await self.subscribe(f'partialRemoved/{address.address}')
 
     aggregateBondedRemoved = util.undoc(aggregate_bonded_removed)
 
+    @util.observable
     async def status(self, address: 'Address') -> None:
         """Emit message each time a transaction contains an error for a given address."""
         await self.subscribe(f'status/{address.address}')
 
+    @util.observable
     async def cosignature_added(self, address: 'Address') -> None:
         """Emit message each time a cosigner signs a message initiated by the given address."""
         await self.subscribe(f'cosignature/{address.address}')

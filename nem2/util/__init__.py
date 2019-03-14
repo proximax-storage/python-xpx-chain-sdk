@@ -29,7 +29,7 @@ from .asynchronous import *
 
 from .documentation import doc, inherit_doc, undoc
 from .factory import defactorize
-from .reactive import observable
+from .observable import observable
 from .reify import reify
 
 from .stdint import *

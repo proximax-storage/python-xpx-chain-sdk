@@ -16,6 +16,7 @@ class TestAsyncLoop(harness.TestCase):
         with aiohttp.default_response(200, **responses.BLOCK_INFO["Ok"]):
             block_info = loop.run_until_complete(http.blockchain.get_block_by_height(1))
             self.assertEqual(block_info.total_fee, 0)
+        loop.close()
 
 
 class TestHttp(harness.TestCase):

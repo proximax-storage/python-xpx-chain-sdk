@@ -40,11 +40,11 @@ class TransactionInfo(util.Dto):
     def is_unconfirmed(self):
         """Is transaction pending to be included."""
 
-        return all((
-            self.height == 0,
-            self.hash is None,
-            self.merkle_component_hash is None
-        ))
+        return (
+            self.height == 0
+            and self.hash is None
+            and self.merkle_component_hash is None
+        )
 
     isUnconfirmed = util.undoc(is_unconfirmed)
 
@@ -56,10 +56,10 @@ class TransactionInfo(util.Dto):
 
     def has_missing_signatures(self) -> bool:
         """Does the transaction have missing signatures."""
-        return all((
-            self.height == 0,
-            self.hash != self.merkle_component_hash,
-        ))
+        return (
+            self.height == 0
+            and self.hash != self.merkle_component_hash
+        )
 
     hasMissingSignatures = util.undoc(has_missing_signatures)
 

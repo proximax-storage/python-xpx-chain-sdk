@@ -59,7 +59,6 @@ EXTRAS_REQUIRE = {
     'sphinx': ['sphinx_rtd_theme>=0.4', 'sphinx_autodoc_typehints'],
     'crypto': ['pycryptodome>=3.4', 'ed25519>=1.4', 'ed25519sha3>=1.4'],
     'reactive': ['rx>=1.6'],
-    'uvloop': ['uvloop>=0.12'],
 }
 
 # Define endpoint for internet tests in a single place.

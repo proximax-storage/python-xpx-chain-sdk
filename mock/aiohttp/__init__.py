@@ -13,11 +13,6 @@ import asyncio
 
 __version__ = "3.5.4"
 
-# TODO(ahuszagh)
-#   Need to add support for cookies.
-#   Need to add support for prep-prepared requests.
-#   Need to the request and redirects to the response object.
-
 
 class ClientError(Exception):
     pass
@@ -192,9 +187,9 @@ class ClientResponse:
         return self
 
     async def __aexit__(self, *args):
-        await self.close()
+        self.close()
 
-    async def close(self):
+    def close(self):
         self._closed = True
 
     def release(self):
@@ -270,13 +265,13 @@ class ClientSession:
     def __enter__(self):
         raise TypeError("Use `async with` instead.")
 
-    def __exit__(self, *args):
+    def __exit__(self, exc_type, exc, tb):
         pass
 
     async def __aenter__(self):
         return self
 
-    async def __aexit__(self, *args):
+    async def __aexit__(self, exc_type, exc, tb):
         await self.close()
 
     @property

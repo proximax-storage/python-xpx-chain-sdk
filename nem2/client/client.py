@@ -74,7 +74,7 @@ class Client:
     def __enter__(self) -> 'Client':
         return self
 
-    def __exit__(self) -> None:
+    def __exit__(self, exc_type, exc, tb) -> None:
         self.close()
 
     def close(self):
@@ -92,8 +92,8 @@ class Client:
         Make DELETE request from relative path.
 
         :param relative_path: Relative path from endpoint prefixed with "/".
-        :param \*args: Optional positional arguments for request.
-        :param \**kwds: Optional keyword arguments for request.
+        :param \\*args: Optional positional arguments for request.
+        :param \\**kwds: Optional keyword arguments for request.
         """
 
         path = self._endpoint + relative_path
@@ -104,8 +104,8 @@ class Client:
         Make GET request from relative path.
 
         :param relative_path: Relative path from endpoint prefixed with "/".
-        :param \*args: Optional positional arguments for request.
-        :param \**kwds: Optional keyword arguments for request.
+        :param \\*args: Optional positional arguments for request.
+        :param \\**kwds: Optional keyword arguments for request.
         """
 
         path = self._endpoint + relative_path
@@ -116,8 +116,8 @@ class Client:
         Make HEAD request from relative path.
 
         :param relative_path: Relative path from endpoint prefixed with "/".
-        :param \*args: Optional positional arguments for request.
-        :param \**kwds: Optional keyword arguments for request.
+        :param \\*args: Optional positional arguments for request.
+        :param \\**kwds: Optional keyword arguments for request.
         """
 
         path = self._endpoint + relative_path
@@ -128,8 +128,8 @@ class Client:
         Make OPTIONS request from relative path.
 
         :param relative_path: Relative path from endpoint prefixed with "/".
-        :param \*args: Optional positional arguments for request.
-        :param \**kwds: Optional keyword arguments for request.
+        :param \\*args: Optional positional arguments for request.
+        :param \\**kwds: Optional keyword arguments for request.
         """
 
         path = self._endpoint + relative_path
@@ -140,8 +140,8 @@ class Client:
         Make PATCH request from relative path.
 
         :param relative_path: Relative path from endpoint prefixed with "/".
-        :param \*args: Optional positional arguments for request.
-        :param \**kwds: Optional keyword arguments for request.
+        :param \\*args: Optional positional arguments for request.
+        :param \\**kwds: Optional keyword arguments for request.
         """
 
         path = self._endpoint + relative_path
@@ -152,8 +152,8 @@ class Client:
         Make POST request from relative path.
 
         :param relative_path: Relative path from endpoint prefixed with "/".
-        :param \*args: Optional positional arguments for request.
-        :param \**kwds: Optional keyword arguments for request.
+        :param \\*args: Optional positional arguments for request.
+        :param \\**kwds: Optional keyword arguments for request.
         """
 
         path = self._endpoint + relative_path
@@ -164,8 +164,8 @@ class Client:
         Make PUT request from relative path.
 
         :param relative_path: Relative path from endpoint prefixed with "/".
-        :param \*args: Optional positional arguments for request.
-        :param \**kwds: Optional keyword arguments for request.
+        :param \\*args: Optional positional arguments for request.
+        :param \\**kwds: Optional keyword arguments for request.
         """
 
         path = self._endpoint + relative_path
@@ -191,7 +191,7 @@ class AsyncClient(Client):
     def __enter__(self) -> 'AsyncClient':
         raise TypeError("Only use async with.")
 
-    def __exit__(self) -> None:
+    def __exit__(self, exc_type, exc, tb) -> None:
         pass
 
     async def __aenter__(self) -> 'AsyncClient':
@@ -230,7 +230,7 @@ class WebsocketClient:
     def __enter__(self) -> 'WebsocketClient':
         raise TypeError("Only use async with.")
 
-    def __exit__(self) -> None:
+    def __exit__(self, exc_type, exc, tb) -> None:
         pass
 
     async def __aenter__(self) -> 'WebsocketClient':

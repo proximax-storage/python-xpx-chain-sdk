@@ -43,6 +43,11 @@ if typing.TYPE_CHECKING:
 
 TransactionInfoType = typing.Union['TransactionInfo', 'AggregateTransactionInfo']
 
+# Callback types to register hooks to determine if
+LoadCatbuffer = typing.Callable[[bytes], typing.Tuple['Transaction', bytes]]
+LoadDto = typing.Callable[[dict], 'Transaction']
+Hooks = typing.Dict[TransactionType, typing.Tuple[LoadCatbuffer, LoadDto]]
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -68,6 +73,7 @@ class Transaction(util.Model):
     signature: typing.Optional[str]
     signer: typing.Optional['PublicAccount']
     transaction_info: typing.Optional[TransactionInfoType]
+    HOOKS: typing.ClassVar[Hooks] = {}
 
     def sign_with(self, account: 'Account') -> 'SignedTransaction':
         """
@@ -221,14 +227,40 @@ class Transaction(util.Model):
     def from_catbuffer(cls, data: bytes) -> typing.Tuple['Transaction', bytes]:
         """
         Deserialize object from catbuffer interchange format.
+        If the cls is a subclass of `Transaction`, use the dedicated loader.
+        If the cls is `Transaction`, determine the transaction type
+        and load that.
 
         :param data: Transaction data in catbuffer interchange format.
-        :param embedded: Is embedded transaction.
         """
-        inst = cls.__new__(cls)
-        total_size, data = inst.load_catbuffer_shared(data)
-        data = inst.load_catbuffer_specific(data)
-        return inst, data
+
+        if cls is not Transaction:
+            # Have a subclass, use a dedicated loader.
+            inst = cls.__new__(cls)
+            total_size, data = inst.load_catbuffer_shared(data)
+            data = inst.load_catbuffer_specific(data)
+            return inst, data
+        else:
+            # Directly calling Transaction.from_catbuffer, detect the proper
+            # loader and call that.
+            type = TransactionType.from_catbuffer(data[102:104])[0]
+            return cls.HOOKS[type][0](data)
+
+    def to_dto(self) -> dict:
+        """Serialize object data to data transfer object."""
+        raise NotImplementedError
+
+    @classmethod
+    def from_dto(cls, data: dict) -> 'Transaction':
+        """
+        Deserialize object from data transfer object.
+        If the cls is a subclass of `Transaction`, use the dedicated loader.
+        If the cls is `Transaction`, determine the transaction type
+        and load that.
+
+        :param data: Transaction data in data transfer object.
+        """
+        raise NotImplementedError
 
     def aggregate_transaction(self) -> bytes:
         """Build aggregate transaction."""

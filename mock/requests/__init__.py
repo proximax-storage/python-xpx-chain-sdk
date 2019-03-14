@@ -15,11 +15,6 @@ from .exceptions import *
 
 __version__ = "2.21"
 
-# TODO(ahuszagh)
-#   Need to add support for cookies.
-#   Need to add support for prep-prepared requests.
-#   Need to the request and redirects to the response object.
-
 
 class CaseInsensitiveDict(dict):
     """Dict which performs case-insensitive lookups"""
@@ -117,7 +112,7 @@ class Response:
     def __enter__(self):
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, exc_type, exc, tb):
         self.close()
 
     def __bool__(self):
@@ -177,7 +172,7 @@ class Session:
     def __enter__(self):
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, exc_type, exc, tb):
         self.close()
 
     def close(self):

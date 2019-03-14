@@ -176,3 +176,15 @@ class SecretProofInnerTransaction(InnerTransaction, SecretProofTransaction):
     """Embedded secret proof transaction."""
 
     __slots__ = ()
+
+
+Transaction.HOOKS[TransactionType.SECRET_PROOF] = (
+    SecretProofTransaction.from_catbuffer,
+    SecretProofTransaction.from_dto,
+)
+
+
+InnerTransaction.HOOKS[TransactionType.SECRET_PROOF] = (
+    SecretProofInnerTransaction.from_catbuffer,
+    SecretProofInnerTransaction.from_dto,
+)

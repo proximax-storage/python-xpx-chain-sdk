@@ -37,6 +37,7 @@ import math
 
 from ..types import BytesType, OptionalBytesType
 
+
 # API
 
 

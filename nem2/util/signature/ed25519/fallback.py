@@ -44,6 +44,13 @@ import warnings
 from nem2.util import bit
 from ..types import HashFuncType
 
+# EXCEPTIONS
+
+
+class SecretsWarning(UserWarning):
+    pass
+
+
 # API
 
 
@@ -158,7 +165,7 @@ def hint(m: bytes, hash512: HashFuncType) -> int:
 
 
 def inv(z: int) -> int:
-    """$= z^{-1} \mod q$, for z != 0"""
+    """$= z^{-1} \\mod q$, for z != 0"""
 
     # Adapted from curve25519_athlon.c in djb's Curve25519.
     z2 = z * z % Q                                  # 2
@@ -302,11 +309,11 @@ def encode_point(p: Point) -> bytes:
 
 def is_on_curve(p: Point) -> bool:
     (x, y, z, t) = p
-    return all((
-        z % Q != 0,
-        x * y % Q == z * t % Q,
-        (y * y - x * x - z * z - D * t * t) % Q == 0,
-    ))
+    return (
+        z % Q != 0
+        and x * y % Q == z * t % Q
+        and (y * y - x * x - z * z - D * t * t) % Q == 0
+    )
 
 
 def decode_uint256(s: bytes) -> int:
@@ -347,7 +354,7 @@ def decode_hash512(h: bytes) -> int:
 def publickey(seed: bytes, hash512: HashFuncType) -> typing.Tuple[bytes, bytes]:
     """Generate public and private key from seed."""
 
-    warnings.warn('Security warning: generating verifying key using insecure ed25519 implementation, secrets may be leaked.')
+    warnings.warn('Security warning: generating verifying key using insecure ed25519 implementation, secrets may be leaked.', SecretsWarning)
 
     assert len(seed) == 32
 
@@ -360,7 +367,7 @@ def publickey(seed: bytes, hash512: HashFuncType) -> typing.Tuple[bytes, bytes]:
 def sign(message: bytes, signing_key: bytes, hash512: HashFuncType) -> bytes:
     """Sign message using public and private key."""
 
-    warnings.warn('Security warning: signing message using insecure ed25519 implementation, secrets may be leaked.')
+    warnings.warn('Security warning: signing message using insecure ed25519 implementation, secrets may be leaked.', SecretsWarning)
 
     if len(signing_key) != 64:
         raise ValueError("Invalid signing key length.")
@@ -384,7 +391,7 @@ def verify(verifying_key: bytes, signature: bytes, message: bytes, hash512: Hash
     :param message: Original message.
     """
 
-    warnings.warn('Security warning: verifying signature using insecure ed25519 implementation, secrets may be leaked.')
+    warnings.warn('Security warning: verifying signature using insecure ed25519 implementation, secrets may be leaked.', SecretsWarning)
 
     if len(verifying_key) != 32:
         raise ValueError("Invalid verifying key length.")
@@ -399,9 +406,9 @@ def verify(verifying_key: bytes, signature: bytes, message: bytes, hash512: Hash
     (x1, y1, z1, t1) = p = scalarmult_b(s)
     (x2, y2, z2, t2) = q = edwards_add(r, scalarmult(a, h))
 
-    return all((
-        is_on_curve(p),
-        is_on_curve(q),
-        (x1 * z2 - x2 * z1) % Q == 0,
-        (y1 * z2 - y2 * z1) % Q == 0,
-    ))
+    return (
+        is_on_curve(p)
+        and is_on_curve(q)
+        and (x1 * z2 - x2 * z1) % Q == 0
+        and (y1 * z2 - y2 * z1) % Q == 0
+    )

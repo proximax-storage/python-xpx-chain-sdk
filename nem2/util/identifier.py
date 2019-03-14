@@ -30,7 +30,7 @@ import typing
 from . import hashlib
 from . import stdint
 
-FQN = re.compile('\A[a-z0-9][a-z0-9-_]*\Z')
+FQN = re.compile(r'\A[a-z0-9][a-z0-9-_]*\Z')
 NAMESPACE_MAX_DEPTH = 3
 
 

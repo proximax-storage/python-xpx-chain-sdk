@@ -10,9 +10,12 @@ NEM2 SDK Python
 # Getting Started
 
 
+
 # Optimization
 
 The NEM2 SDK makes copious use of assertions to ensure functionality is correct during debugging, and during use of the client, it may be preferable to disable these assertions. This may be done by either setting the environment variable `PYTHONOPTIMIZE=TRUE`, or through the command-line flag `-O`.
+
+In addition, installing [uvloop](https://github.com/magicstack/uvloop) may further improve asynchronous code performance.
 
 # Testing
 
