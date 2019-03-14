@@ -30,6 +30,10 @@ import re
 import typing
 
 SNAKE_CASE = re.compile(r'(.*?)_([a-z])')
+Field = dataclasses.Field
+FrozenInstanceError = dataclasses.FrozenInstanceError
+InitVar = dataclasses.InitVar
+MISSING = dataclasses.MISSING
 
 
 def snake_to_camel(name: str) -> str:

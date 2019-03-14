@@ -37,7 +37,7 @@ from .stdint import *
 from .identifier import generate_mosaic_id, generate_namespace_id
 
 from .abc import *
-from .dataclasses import dataclass
+from .dataclasses import Field, FrozenInstanceError, InitVar, MISSING, dataclass
 from .format import InterchangeFormat
 from .mixin import *
 
@@ -81,6 +81,10 @@ __all__ = [
     'generate_namespace_id',
 
     # Models
+    'Field',
+    'FrozenInstanceError',
+    'InitVar',
+    'MISSING',
     'dataclass',
     'EnumMixin',
     'IntMixin',
