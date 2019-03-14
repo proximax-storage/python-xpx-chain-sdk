@@ -10,10 +10,9 @@ class TestNamespaceNames(harness.TestCase):
         sync_data=client.NamespaceHttp,
         async_data=client.AsyncNamespaceHttp
     )
-    async def test_names(self, data, cb):
-        http = data(responses.ENDPOINT)
-        ids = [models.NamespaceId.from_hex("84b3552d375ffa4b")]
-
-        result = await cb(http.get_namespace_names(ids))
-        if len(result):
-            self.assertEqual(result[0].name, "nem")
+    async def test_names(self, data, await_cb, with_cb):
+        async with with_cb(data(responses.ENDPOINT)) as http:
+            ids = [models.NamespaceId.from_hex("84b3552d375ffa4b")]
+            result = await await_cb(http.get_namespace_names(ids))
+            if len(result):
+                self.assertEqual(result[0].name, "nem")

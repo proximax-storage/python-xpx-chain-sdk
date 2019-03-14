@@ -23,6 +23,7 @@
 """
 
 import asyncio
+import contextlib
 import functools
 import unittest
 
@@ -63,10 +64,20 @@ def test_case(sync_data, async_data):
         async def async_cb(x):
             return await x
 
+        @contextlib.asynccontextmanager
+        async def sync_with(x):
+            with x as y:
+                yield y
+
+        @contextlib.asynccontextmanager
+        async def async_with(x):
+            async with x as y:
+                yield y
+
         @functools.wraps(f)
         async def wrapped(self):
-            await f(self, sync_data, sync_cb)
-            await f(self, async_data, async_cb)
+            await f(self, sync_data, sync_cb, sync_with)
+            await f(self, async_data, async_cb, async_with)
 
         return wrapped
 

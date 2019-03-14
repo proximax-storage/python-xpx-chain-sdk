@@ -46,7 +46,6 @@ class Connect:
     def __init__(self, uri, *args, **kwds):
         self._wsuri = parse_uri(uri)
         self._kwds = kwds
-        self._kwds.setdefault("ssl", self._wsuri.secure)
         self._kwds.setdefault("host", self._wsuri.host)
         self._kwds.setdefault("port", self._wsuri.port)
         self._kwds.setdefault("secure", self._wsuri.secure)
@@ -59,10 +58,12 @@ class Connect:
         await self.ws_client.close()
 
     def __await__(self):
+        return self.await_impl().__await__()
+
+    async def await_impl(self):
         return self.ws_client
 
-    def __iter__(self):
-        return self.ws_client
+    __iter__ = __await__
 
 
 connect = Connect

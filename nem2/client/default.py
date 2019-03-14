@@ -25,8 +25,6 @@
     limitations under the License.
 """
 
-import asyncio
-import atexit
 import aiohttp
 import requests
 import websockets
@@ -69,17 +67,21 @@ AsyncHTTPError = aiohttp.ClientResponseError
 
 # SYNCHRONOUS
 
-SYNC_SESSION = requests.Session()
-atexit.register(SYNC_SESSION.close)
-
 
 @util.inherit_doc
 class HttpBase(abc.HttpBase):
     """Abstract base class for synchronous HTTP clients."""
 
     def __init__(self, endpoint: str) -> None:
-        self._client = client.Client(SYNC_SESSION, endpoint)
+        self._endpoint = endpoint
         self._index = 0
+
+    def __enter__(self):
+        self._client_ = client.Client(requests.Session(), self._endpoint)
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.close()
 
     @property
     def root(self):
@@ -147,27 +149,23 @@ class TransactionHttp(HttpBase, abc.TransactionHttp):
 
 # ASYNCHRONOUS
 
-ASYNC_SESSION = aiohttp.ClientSession()
-
-
-@atexit.register
-def close_sessions() -> None:
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(ASYNC_SESSION.close())
-
 
 @util.inherit_doc
 class AsyncHttpBase(abc.AsyncHttpBase):
     """Abstract base class for synchronous HTTP clients."""
 
     def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
+        self._endpoint = endpoint
         self._index = 1
         self._loop = loop
-        if loop is None:
-            self._client = client.AsyncClient(ASYNC_SESSION, endpoint)
-        else:
-            session = aiohttp.ClientSession(loop=loop)
-            self._client = client.AsyncClient(session, endpoint, loop=loop)
+        self._session = aiohttp.ClientSession(loop=loop)
+
+    async def __aenter__(self):
+        self._client_ = client.AsyncClient(self._session, self._endpoint)
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb) -> None:
+        await self.close()
 
     @property
     def root(self):
@@ -241,14 +239,15 @@ class Listener(abc.Listener):
     """Asynchronous websockets-based listener."""
 
     def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
-        self._loop = loop
         url = client.parse_ws_url(endpoint)
-        session = websockets.WebSocketClientProtocol(
-            host=url.host,
-            port=url.port,
-            loop=loop,
-            secure=url.scheme == 'wss',
-        )
-        session.path = url.path or '/'
-        self._client = client.WebsocketClient(session, loop=loop)
-        super().__init__()
+        self._loop = loop
+        self._conn = websockets.connect(url.url, loop=loop)
+
+    async def __aenter__(self) -> 'Listener':
+        self._session = await self._conn.__aenter__()
+        self._client_ = client.WebsocketClient(self._session)
+        self._iter_ = self._client_.__aiter__()
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb) -> None:
+        await self._conn.__aexit__(None, None, None)

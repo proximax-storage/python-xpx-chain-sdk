@@ -10,6 +10,6 @@ class TestBlockchainScore(harness.TestCase):
         sync_data=client.BlockchainHttp,
         async_data=client.AsyncBlockchainHttp
     )
-    async def test_blockchain_score(self, data, cb):
-        http = data(responses.ENDPOINT)
-        self.assertIsInstance(await cb(http.get_blockchain_score()), models.BlockchainScore)
+    async def test_blockchain_score(self, data, await_cb, with_cb):
+        async with with_cb(data(responses.ENDPOINT)) as http:
+            self.assertIsInstance(await await_cb(http.get_blockchain_score()), models.BlockchainScore)

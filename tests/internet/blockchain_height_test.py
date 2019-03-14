@@ -9,6 +9,6 @@ class TestBlockchainHeight(harness.TestCase):
         sync_data=client.BlockchainHttp,
         async_data=client.AsyncBlockchainHttp
     )
-    async def test_blockchain_height(self, data, cb):
-        http = data(responses.ENDPOINT)
-        self.assertGreaterEqual(await cb(http.get_blockchain_height()), 11402)
+    async def test_blockchain_height(self, data, await_cb, with_cb):
+        async with with_cb(data(responses.ENDPOINT)) as http:
+            self.assertGreaterEqual(await await_cb(http.get_blockchain_height()), 11402)

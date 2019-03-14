@@ -10,10 +10,9 @@ class TestMosaicNames(harness.TestCase):
         sync_data=client.MosaicHttp,
         async_data=client.AsyncMosaicHttp
     )
-    async def test_names(self, data, cb):
-        http = data(responses.ENDPOINT)
-        ids = [models.MosaicId.from_hex("d525ad41d95fcf29")]
-
-        result = await cb(http.get_mosaic_names(ids))
-        if len(result):
-            self.assertEqual(result[0].name, "xem")
+    async def test_names(self, data, await_cb, with_cb):
+        async with with_cb(data(responses.ENDPOINT)) as http:
+            ids = [models.MosaicId.from_hex("d525ad41d95fcf29")]
+            result = await await_cb(http.get_mosaic_names(ids))
+            if len(result):
+                self.assertEqual(result[0].name, "xem")

@@ -52,9 +52,27 @@ class HttpBase:
     :param endpoint: Domain name and port for the endpoint.
     """
 
-    _client: 'Client'
+    _endpoint: str
+    _client_: 'Client'
     _index: int
     _network_type: typing.Optional['NetworkType'] = None
+
+    def __enter__(self):
+        raise NotImplementedError
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        raise NotImplementedError
+
+    def close(self):
+        """Close the client session."""
+        self._client.close()
+
+    @property
+    def _client(self) -> 'Client':
+        try:
+            return self._client_
+        except AttributeError:
+            raise RuntimeError('Must be used inside `with` block.')
 
     def __call__(self, cbs, *args, **kwds):
         """Invoke the NIS callback."""
@@ -70,7 +88,7 @@ class HttpBase:
         :param http: HTTP client.
         """
         inst = cls.__new__(cls)
-        inst._client = http._client
+        inst._client_ = http._client_
         inst._index = http._index
         inst._network_type = http._network_type
         return typing.cast(T, inst)
@@ -114,6 +132,29 @@ class AsyncHttpBase(HttpBase):
     """
 
     _loop: util.OptionalLoopType
+
+    def __enter__(self):
+        raise TypeError("Only use async with.")
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.close()
+
+    async def __aenter__(self):
+        raise NotImplementedError
+
+    async def __aexit__(self, exc_type, exc, tb) -> None:
+        raise NotImplementedError
+
+    async def close(self):
+        """Close the client session."""
+        await self._client.close()
+
+    @property
+    def _client(self) -> 'Client':
+        try:
+            return self._client_
+        except AttributeError:
+            raise RuntimeError('Must be used inside `async with` block.')
 
     def __call__(self, cbs, *args, **kwds):
         return self.call(cbs, *args, **kwds)
@@ -425,13 +466,11 @@ class Listener:
     :param endpoint: Domain name and port for the endpoint.
     """
 
-    _client: 'WebsocketClient'
+    _client_: 'WebsocketClient'
+    _iter_: typing.AsyncIterator[bytes]
+    _conn: typing.AsyncContextManager
     _loop: util.OptionalLoopType
     _uid: typing.Optional[str] = None
-    _iter: typing.AsyncIterator[bytes]
-
-    def __init__(self):
-        self._iter = self._client.__aiter__()
 
     def __enter__(self) -> 'Listener':
         raise TypeError("Only use async with.")
@@ -439,15 +478,25 @@ class Listener:
     def __exit__(self, exc_type, exc, tb) -> None:
         pass
 
-    async def __aenter__(self) -> 'Listener':
-        return self
+    async def __aenter__(self):
+        raise NotImplementedError
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
-        return await self.close()
+        raise NotImplementedError
 
-    async def close(self) -> None:
-        """Close the client session."""
-        await self._client.close()
+    @property
+    def _client(self) -> 'WebsocketClient':
+        try:
+            return self._client_
+        except AttributeError:
+            raise RuntimeError('Must be used inside `async with` block.')
+
+    @property
+    def _iter(self) -> typing.AsyncIterator[bytes]:
+        try:
+            return self._iter_
+        except AttributeError:
+            raise RuntimeError('Must be used inside `async with` block.')
 
     @property
     def closed(self) -> bool:

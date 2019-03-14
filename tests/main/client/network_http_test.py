@@ -13,8 +13,8 @@ class TestNetworkHttp(harness.TestCase):
         sync_data=(client.NetworkHttp, requests),
         async_data=(client.AsyncNetworkHttp, aiohttp),
     )
-    async def test_get_network_type(self, data, cb):
-        http = data[0](responses.ENDPOINT)
-        with data[1].default_response(200, **responses.NETWORK_TYPE["MIJIN_TEST"]):
-            self.assertEqual(await cb(http.get_network_type()), models.NetworkType.MIJIN_TEST)
-            self.assertEqual(await cb(http.getNetworkType()), models.NetworkType.MIJIN_TEST)
+    async def test_get_network_type(self, data, await_cb, with_cb):
+        async with with_cb(data[0](responses.ENDPOINT)) as http:
+            with data[1].default_response(200, **responses.NETWORK_TYPE["MIJIN_TEST"]):
+                self.assertEqual(await await_cb(http.get_network_type()), models.NetworkType.MIJIN_TEST)
+                self.assertEqual(await await_cb(http.getNetworkType()), models.NetworkType.MIJIN_TEST)

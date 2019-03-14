@@ -10,6 +10,6 @@ class TestDiagnosticStorage(harness.TestCase):
         sync_data=client.BlockchainHttp,
         async_data=client.AsyncBlockchainHttp
     )
-    async def test_diagnostic_storage(self, data, cb):
-        http = data(responses.ENDPOINT)
-        self.assertIsInstance(await cb(http.get_diagnostic_storage()), models.BlockchainStorageInfo)
+    async def test_diagnostic_storage(self, data, await_cb, with_cb):
+        async with with_cb(data(responses.ENDPOINT)) as http:
+            self.assertIsInstance(await await_cb(http.get_diagnostic_storage()), models.BlockchainStorageInfo)

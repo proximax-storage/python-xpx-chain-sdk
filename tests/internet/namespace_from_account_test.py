@@ -10,10 +10,9 @@ class TestNamespaceFromAccount(harness.TestCase):
         sync_data=client.NamespaceHttp,
         async_data=client.AsyncNamespaceHttp
     )
-    async def test_namespace_from_account(self, data, cb):
-        http = data(responses.ENDPOINT)
-        address = models.Address.create_from_raw_address("SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM")
-
-        infos = await cb(http.get_namespaces_from_account(address))
-        self.assertEqual(len(infos), 1)
-        self.assertEqual(infos[0].meta_id, '5C7C07005CC1FE000176FA2B')
+    async def test_namespace_from_account(self, data, await_cb, with_cb):
+        async with with_cb(data(responses.ENDPOINT)) as http:
+            address = models.Address.create_from_raw_address("SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM")
+            infos = await await_cb(http.get_namespaces_from_account(address))
+            self.assertEqual(len(infos), 1)
+            self.assertEqual(infos[0].meta_id, '5C7C07005CC1FE000176FA2B')

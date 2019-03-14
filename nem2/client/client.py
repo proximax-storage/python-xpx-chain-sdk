@@ -6,11 +6,11 @@
     into requests providing solely a relative path.
 """
 
+import contextlib
 import typing
 import urllib.error
 import urllib3
-
-from nem2 import util
+import warnings
 
 # UTILITY
 
@@ -181,12 +181,9 @@ class AsyncClient(Client):
     :param loop: Event loop.
     """
 
-    _loop: util.OptionalLoopType
-
-    def __init__(self, session, endpoint, loop=None) -> None:
+    def __init__(self, session, endpoint) -> None:
         self._session = session
         self._endpoint = parse_http_url(endpoint).url
-        self._loop = loop
 
     def __enter__(self) -> 'AsyncClient':
         raise TypeError("Only use async with.")
@@ -199,10 +196,6 @@ class AsyncClient(Client):
 
     async def __aexit__(self) -> None:
         await self.close()
-
-    def __del__(self):
-        if self._loop is not None and not self.closed:
-            self._loop.run_until_complete(self.close())
 
     async def close(self):
         """Close the client session."""
@@ -217,39 +210,29 @@ class AsyncClient(Client):
 # WEBSOCKETS
 
 
+@contextlib.contextmanager
+def catch_deprecation_warning():
+    """
+    Catch the `async with` deprecation error in websockets.
+    Remove after 3.4 is dropped.
+    """
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=DeprecationWarning, module='websockets')
+        yield
+
+
 class WebsocketClient:
     """Asynchronous host using websockets."""
 
     _session: typing.Any
-    _loop: util.OptionalLoopType
 
-    def __init__(self, session, loop=None) -> None:
+    def __init__(self, session) -> None:
         self._session = session
-        self._loop = loop
-
-    def __enter__(self) -> 'WebsocketClient':
-        raise TypeError("Only use async with.")
-
-    def __exit__(self, exc_type, exc, tb) -> None:
-        pass
-
-    async def __aenter__(self) -> 'WebsocketClient':
-        return self
-
-    async def __aexit__(self) -> None:
-        return await self.close()
 
     async def __aiter__(self) -> typing.AsyncIterator[typing.AnyStr]:
-        async for message in self._session:
-            yield typing.cast(typing.AnyStr, message)
-
-    def __del__(self) -> None:
-        if self._loop is not None:
-            self._loop.run_until_complete(self.close())
-
-    async def close(self) -> None:
-        """Close the client session."""
-        await self._session.wait_closed()
+        with catch_deprecation_warning():
+            async for message in self._session:
+                yield typing.cast(typing.AnyStr, message)
 
     @property
     def closed(self) -> bool:
@@ -259,18 +242,22 @@ class WebsocketClient:
 
     async def recv(self) -> typing.AnyStr:
         """Receive next message."""
-        result = await self._session.recv()
-        return typing.cast(typing.AnyStr, result)
+        with catch_deprecation_warning():
+            result = await self._session.recv()
+            return typing.cast(typing.AnyStr, result)
 
     async def send(self, data: typing.AnyStr) -> None:
         """Send message."""
-        await self._session.send(data)
+        with catch_deprecation_warning():
+            await self._session.send(data)
 
     async def ping(self, data: typing.Optional[bytes] = None) -> typing.Awaitable[None]:
         """Send websocket a ping."""
-        result = await self._session.ping(data)
-        return typing.cast(typing.Awaitable[None], result)
+        with catch_deprecation_warning():
+            result = await self._session.ping(data)
+            return typing.cast(typing.Awaitable[None], result)
 
     async def pong(self, data: bytes = b'') -> None:
         """Send websocket a pong."""
-        await self._session.pong(data)
+        with catch_deprecation_warning():
+            await self._session.pong(data)

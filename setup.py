@@ -62,7 +62,7 @@ EXTRAS_REQUIRE = {
 }
 
 # Define endpoint for internet tests in a single place.
-ENDPOINT = "http://localhost:3000"
+ENDPOINT = "localhost:3000"
 # Inject a mockdir to inject custom HTTP clients.
 PROJECTDIR = os.path.dirname(os.path.realpath(__file__))
 MOCKDIR = os.path.join(PROJECTDIR, 'mock')
