@@ -99,8 +99,8 @@ __all__ = [
     'NamespaceType',
 
     # Transaction
-    'AddressAliasInnerTransaction'
-    'AddressAliasTransaction'
+    'AddressAliasInnerTransaction',
+    'AddressAliasTransaction',
     'AggregateTransactionCosignature',
     'AggregateTransactionInfo',
     'ChronoUnit',
