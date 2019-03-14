@@ -93,7 +93,6 @@ def fix_annotations(cls, clsdict, global_vars):
 def set_slots(cls, clsdict, slots):
     """Set default __slots__ implementation."""
 
-    # TODO(ahuszagh) Need to update the slots
     if not slots or '__slots__' in clsdict:
         return
     annotations = clsdict['__annotations__']
@@ -120,7 +119,7 @@ def set_copy(cls, clsdict, copy) -> None:
 def set_deepcopy(cls, clsdict, deepcopy):
     """Set default __deepcopy__ implementation."""
 
-    if not deepcopy or '__copy__' in clsdict:
+    if not deepcopy or '__deepcopy__' in clsdict:
         return
 
     def func(self):
