@@ -122,8 +122,8 @@ def set_deepcopy(cls, clsdict, deepcopy):
     if not deepcopy or '__deepcopy__' in clsdict:
         return
 
-    def func(self):
-        data = copy.deepcopy(dataclasses.asdict(self))
+    def func(self, memo=None):
+        data = copy.deepcopy(dataclasses.asdict(self), memo)
         return cls(**data)
 
     func.__name__ = '__deepcopy__'
