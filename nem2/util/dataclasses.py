@@ -124,7 +124,7 @@ def set_deepcopy(cls, clsdict, deepcopy):
 
     def func(self, memo=None):
         data = copy.deepcopy(dataclasses.asdict(self), memo)
-        return cls(**data)
+        return type(self)(**data)
 
     func.__name__ = '__deepcopy__'
     func.__qualname__ = f'{cls.__qualname__}.__deepcopy__'
