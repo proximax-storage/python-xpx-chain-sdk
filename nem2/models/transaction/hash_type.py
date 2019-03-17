@@ -24,20 +24,17 @@
 
 import enum
 import string
-import struct
-import typing
 
 from nem2 import util
 
 
-class HashType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
+class HashType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """Enumerations for support hash types."""
 
     SHA3_256 = 0
     KECCAK_256 = 1
     HASH_160 = 2
     HASH_256 = 3
-    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def description(self) -> str:
         return DESCRIPTION[self]
@@ -56,17 +53,6 @@ class HashType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
             return self.hash_length() == len(input)
         return False
 
-    def to_catbuffer(self) -> bytes:
-        return struct.pack('<B', int(self))
-
-    @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['HashType', bytes]:
-        assert len(data) >= cls.CATBUFFER_SIZE
-        inst = cls(struct.unpack('<B', data[:cls.CATBUFFER_SIZE])[0])
-        return inst, data[cls.CATBUFFER_SIZE:]
-
-
-HashType.CATBUFFER_SIZE = 1
 
 DESCRIPTION = {
     HashType.SHA3_256: "SHA3-256 (default).",

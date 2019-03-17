@@ -22,15 +22,14 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 
 from nem2 import util
 from nem2.util.signature import ed25519
 from .address import Address
 from .public_account import PublicAccount
-
-if typing.TYPE_CHECKING:
-    from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import NetworkType
 
 
 @util.inherit_doc
@@ -40,25 +39,32 @@ class Account:
     Describe account via private key, public key and account address.
 
     :param address: Address for the account.
-    :param public_key: Hex-encoded public key (with or without '0x' prefix).
-    :param private_key: Hex-encoded private key (with or without '0x' prefix).
+    :param public_key: Hex-encoded or raw bytes for public key.
+    :param private_key: Hex-encoded or raw bytes for private key.
     """
 
-    address: 'Address'
+    address: Address
     public_key: str
     private_key: str
 
-    def __init__(self, address: Address, public_key: str, private_key: str) -> None:
+    def __init__(
+        self,
+        address: Address,
+        public_key: typing.AnyStr,
+        private_key: typing.AnyStr,
+    ) -> None:
+        public_key = util.encode_hex(public_key)
+        private_key = util.encode_hex(private_key)
         if len(public_key) != 64:
             raise ValueError("Invalid public key length")
         if len(private_key) != 64:
             raise ValueError("Invalid private key length")
-        object.__setattr__(self, 'address', address)
-        object.__setattr__(self, 'public_key', public_key)
-        object.__setattr__(self, 'private_key', private_key)
+        self._set('address', address)
+        self._set('public_key', public_key)
+        self._set('private_key', private_key)
 
     @property
-    def network_type(self) -> 'NetworkType':
+    def network_type(self) -> NetworkType:
         """Get network type."""
         return self.address.network_type
 
@@ -67,22 +73,30 @@ class Account:
     @property
     def public_account(self) -> PublicAccount:
         """Get public account."""
-        return PublicAccount.create_from_public_key(self.public_key, self.network_type)
+        return PublicAccount.create_from_public_key(
+            self.public_key,
+            self.network_type
+        )
 
     publicAccount = util.undoc(public_account)
 
     @classmethod
-    def create_from_private_key(cls, private_key: str, network_type: 'NetworkType') -> 'Account':
+    def create_from_private_key(
+        cls,
+        private_key: typing.AnyStr,
+        network_type: NetworkType,
+    ) -> Account:
         """
         Generate Account object from private_key and network type.
 
-        :param private_key: Hex-encoded private key (with or without '0x' prefix).
+        :param private_key: Hex-encoded or raw bytes for private key.
         :param network_type: Network type.
         :return: Account object.
         """
 
+        private_key = util.encode_hex(private_key)
         signing_key = ed25519.sha3.SigningKey(util.unhexlify(private_key))
-        public_key = util.hexlify(signing_key.get_verifying_key().to_bytes())
+        public_key = signing_key.get_verifying_key().to_bytes()
         address = Address.create_from_public_key(public_key, network_type)
 
         return cls(address, public_key, private_key)
@@ -90,7 +104,11 @@ class Account:
     createFromPrivateKey = util.undoc(create_from_private_key)
 
     @classmethod
-    def generate_new_account(cls, network_type: 'NetworkType', entropy=None) -> 'Account':
+    def generate_new_account(
+        cls,
+        network_type: NetworkType,
+        entropy=None
+    ) -> Account:
         """
         Generate new NEM account from network type and random bytes.
 
@@ -112,13 +130,15 @@ class Account:
 
     generateNewAccount = util.undoc(generate_new_account)
 
-    def sign(self, transaction: bytes) -> bytes:
+    def sign(self, transaction: typing.AnyStr) -> bytes:
         """
         Sign transaction using private key.
 
-        :param transaction: Transaction data to sign.
+        :param private_key: Hex-encoded or raw bytes for transaction data.
         :return: Signed transaction data.
         """
+
+        transaction = util.decode_hex(transaction, with_prefix=True)
 
         # Skip first 100 bytes.
         # uint32_t size
@@ -131,16 +151,17 @@ class Account:
 
         return size + signature + public_key + signing_bytes
 
-    def sign_data(self, data: bytes) -> str:
+    def sign_data(self, data: typing.AnyStr) -> str:
         """
         Sign raw data using private key.
 
-        :param data: Raw data as bytes.
+        :param private_key: Hex-encoded or raw bytes to sign.
         :return: Hex-encoded signature of data.
         """
 
-        private_key: bytes = util.unhexlify(self.private_key)
-        public_key: bytes = util.unhexlify(self.public_key)
+        data = util.decode_hex(data, with_prefix=True)
+        private_key = util.unhexlify(self.private_key)
+        public_key = util.unhexlify(self.public_key)
         key = ed25519.sha3.SigningKey(private_key + public_key)
 
         return util.hexlify(key.sign(data))

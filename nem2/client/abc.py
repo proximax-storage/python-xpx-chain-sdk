@@ -22,22 +22,20 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import json
 import typing
 
 from nem2 import models
 from nem2 import util
+from .client import Client, WebsocketClient
 from . import nis
-
-if typing.TYPE_CHECKING:
-    from .client import Client, WebsocketClient
-    from nem2.models import *
 
 T = typing.TypeVar('T')
 MessageType = typing.Union[
-    'BlockInfo',
-    'CosignatureSignedTransaction',
-    'TransactionStatusError',
+    models.BlockInfo,
+    models.CosignatureSignedTransaction,
+    models.TransactionStatusError,
     str
 ]
 
@@ -53,9 +51,9 @@ class HttpBase:
     """
 
     _endpoint: str
-    _client_: 'Client'
+    _client: Client
     _index: int
-    _network_type: typing.Optional['NetworkType'] = None
+    _network_type: typing.Optional[models.NetworkType] = None
 
     def __enter__(self):
         raise NotImplementedError
@@ -65,19 +63,19 @@ class HttpBase:
 
     def close(self):
         """Close the client session."""
-        self._client.close()
-
-    @property
-    def _client(self) -> 'Client':
-        try:
-            return self._client_
-        except AttributeError:
-            raise RuntimeError('Must be used inside `with` block.')
+        self.client.close()
 
     def __call__(self, cbs, *args, **kwds):
         """Invoke the NIS callback."""
-        cb: Cb = cbs[self.index]
-        return typing.cast(T, cb(self.client, *args, **kwds))
+        cb = cbs[self.index]
+        # Force self.network_type to be executed on a different logical
+        # block. Otherwise, we lead to infinite recursion when calling
+        # get_network_type().
+        try:
+            network_type = kwds.pop('network_type')
+        except KeyError:
+            network_type = self.network_type
+        return typing.cast(T, cb(self.client, network_type, *args, **kwds))
 
     @classmethod
     def from_http(cls: typing.Type[T], http) -> T:
@@ -88,15 +86,18 @@ class HttpBase:
         :param http: HTTP client.
         """
         inst = cls.__new__(cls)
-        inst._client_ = http._client_
+        inst._client = http._client
         inst._index = http._index
         inst._network_type = http._network_type
         return typing.cast(T, inst)
 
     @property
-    def client(self) -> 'Client':
+    def client(self) -> Client:
         """Get client wrapper for HTTP client."""
-        return self._client
+        try:
+            return self._client
+        except AttributeError:
+            raise RuntimeError('Must be used inside `with` block.')
 
     @property
     def index(self) -> int:
@@ -117,9 +118,14 @@ class HttpBase:
         return self.network_type
 
     @property
-    def root(self) -> 'Http':
+    def root(self) -> Http:
         """Get Http to the same endpoint."""
         raise NotImplementedError
+
+    @property
+    def _none(self):
+        """Generate `None` with same evaluation as network_type."""
+        return None
 
 
 @util.inherit_doc
@@ -147,12 +153,12 @@ class AsyncHttpBase(HttpBase):
 
     async def close(self):
         """Close the client session."""
-        await self._client.close()
+        await self.client.close()
 
     @property
-    def _client(self) -> 'Client':
+    def client(self) -> Client:
         try:
-            return self._client_
+            return self._client
         except AttributeError:
             raise RuntimeError('Must be used inside `async with` block.')
 
@@ -190,37 +196,42 @@ class AsyncHttpBase(HttpBase):
             self._network_type = await network.get_network_type()
         return self._network_type
 
+    @property
+    async def _none(self):
+        """Generate `None` with same evaluation as network_type."""
+        return None
+
 
 class Http(HttpBase):
     """Abstract base class for the main HTTP client."""
 
     @property
-    def account(self) -> 'AccountHttp':
+    def account(self) -> AccountHttp:
         """Get AccountHttp to the same endpoint."""
         raise NotImplementedError
 
     @property
-    def blockchain(self) -> 'BlockchainHttp':
+    def blockchain(self) -> BlockchainHttp:
         """Get BlockchainHttp to the same endpoint."""
         raise NotImplementedError
 
     @property
-    def mosaic(self) -> 'MosaicHttp':
+    def mosaic(self) -> MosaicHttp:
         """Get MosaicHttp to the same endpoint."""
         raise NotImplementedError
 
     @property
-    def namespace(self) -> 'NamespaceHttp':
+    def namespace(self) -> NamespaceHttp:
         """Get NamespaceHttp to the same endpoint."""
         raise NotImplementedError
 
     @property
-    def network(self) -> 'NetworkHttp':
+    def network(self) -> NetworkHttp:
         """Get NetworkHttp to the same endpoint."""
         raise NotImplementedError
 
     @property
-    def transaction(self) -> 'TransactionHttp':
+    def transaction(self) -> TransactionHttp:
         """Get TransactionHttp to the same endpoint."""
         raise NotImplementedError
 
@@ -292,7 +303,11 @@ class BlockchainHttp(HttpBase):
 class MosaicHttp(HttpBase):
     """Abstract base class for the mosaic HTTP client."""
 
-    def get_mosaic_names(self, ids: typing.Sequence['MosaicId'], **kwds):
+    def get_mosaic_names(
+        self,
+        ids: typing.Sequence[models.MosaicId],
+        **kwds
+    ):
         """
         Get mosaic names from IDs.
 
@@ -311,7 +326,11 @@ class MosaicHttp(HttpBase):
 class NamespaceHttp(HttpBase):
     """Abstract base class for the namespace HTTP client."""
 
-    def get_namespace(self, namespace_id: 'NamespaceId', **kwds):
+    def get_namespace(
+        self,
+        namespace_id: models.NamespaceId,
+        **kwds
+    ):
         """
         Get namespace information from ID.
 
@@ -322,7 +341,11 @@ class NamespaceHttp(HttpBase):
 
     getNamespace = util.undoc(get_namespace)
 
-    def get_namespaces_from_account(self, address: 'Address', **kwds):
+    def get_namespaces_from_account(
+        self,
+        address: models.Address,
+        **kwds
+    ):
         """
         Get namespaces owned by account.
 
@@ -333,7 +356,11 @@ class NamespaceHttp(HttpBase):
 
     getNamespacesFromAccount = util.undoc(get_namespaces_from_account)
 
-    def get_namespaces_from_accounts(self, addresses: typing.Sequence['Address'], **kwds):
+    def get_namespaces_from_accounts(
+        self,
+        addresses: typing.Sequence[models.Address],
+        **kwds
+    ):
         """
         Get namespaces owned by accounts.
 
@@ -344,7 +371,11 @@ class NamespaceHttp(HttpBase):
 
     getNamespacesFromAccounts = util.undoc(get_namespaces_from_accounts)
 
-    def get_namespace_names(self, ids: typing.Sequence['NamespaceId'], **kwds):
+    def get_namespace_names(
+        self,
+        ids: typing.Sequence[models.NamespaceId],
+        **kwds
+    ):
         """
         Get namespace names from IDs.
 
@@ -355,7 +386,11 @@ class NamespaceHttp(HttpBase):
 
     getNamespaceNames = util.undoc(get_namespace_names)
 
-    def get_linked_mosaic_id(self, namespace_id: 'NamespaceId', **kwds):
+    def get_linked_mosaic_id(
+        self,
+        namespace_id: models.NamespaceId,
+        **kwds
+    ):
         """
         Get mosaic ID from linked mosaic alias.
 
@@ -366,7 +401,11 @@ class NamespaceHttp(HttpBase):
 
     getLinkedMosaicId = util.undoc(get_linked_mosaic_id)
 
-    def get_linked_address(self, namespace_id: 'NamespaceId', **kwds):
+    def get_linked_address(
+        self,
+        namespace_id: models.NamespaceId,
+        **kwds
+    ):
         """
         Get address from linked address alias.
 
@@ -387,7 +426,7 @@ class NetworkHttp(HttpBase):
 
         :return: Network type.
         """
-        return self(nis.get_network_type, **kwds)
+        return self(nis.get_network_type, network_type=self._none, **kwds)
 
     getNetworkType = util.undoc(get_network_type)
 
@@ -466,13 +505,13 @@ class Listener:
     :param endpoint: Domain name and port for the endpoint.
     """
 
-    _client_: 'WebsocketClient'
+    _client: WebsocketClient
     _iter_: typing.AsyncIterator[bytes]
     _conn: typing.AsyncContextManager
     _loop: util.OptionalLoopType
     _uid: typing.Optional[str] = None
 
-    def __enter__(self) -> 'Listener':
+    def __enter__(self) -> Listener:
         raise TypeError("Only use async with.")
 
     def __exit__(self, exc_type, exc, tb) -> None:
@@ -485,9 +524,9 @@ class Listener:
         raise NotImplementedError
 
     @property
-    def _client(self) -> 'WebsocketClient':
+    def client(self) -> WebsocketClient:
         try:
-            return self._client_
+            return self._client
         except AttributeError:
             raise RuntimeError('Must be used inside `async with` block.')
 
@@ -501,17 +540,17 @@ class Listener:
     @property
     def closed(self) -> bool:
         """Get if client session has been closed."""
-        return self._client.closed
+        return self.client.closed
 
     @property
     async def uid(self) -> str:
         """Get UUID (unique identifier) for WS requests."""
 
         if self._uid is None:
-            self._uid = json.loads(await self._client.recv())['uid']
+            self._uid = json.loads(await self.client.recv())['uid']
         return self._uid
 
-    def __aiter__(self) -> 'Listener':
+    def __aiter__(self) -> Listener:
         return self
 
     async def __anext__(self) -> typing.Optional[ListenerMessage]:
@@ -547,7 +586,7 @@ class Listener:
         await self.subscribe('block')
 
     @util.observable
-    async def confirmed(self, address: 'Address') -> None:
+    async def confirmed(self, address: models.Address) -> None:
         """Emit message when new transactions are confirmed for a given address."""
         await self.subscribe(f'confirmedAdded/{address.address}')
 
@@ -555,40 +594,40 @@ class Listener:
     confirmedAdded = util.undoc(confirmed_added)
 
     @util.observable
-    async def unconfirmed_added(self, address: 'Address') -> None:
+    async def unconfirmed_added(self, address: models.Address) -> None:
         """Emit message when new, unconfirmed transactions are announced for a given address."""
         await self.subscribe(f'confirmedAdded/{address.address}')
 
     unconfirmedAdded = util.undoc(unconfirmed_added)
 
     @util.observable
-    async def unconfirmed_removed(self, address: 'Address') -> None:
+    async def unconfirmed_removed(self, address: models.Address) -> None:
         """Emit message when unconfirmed transactions change state for a given address."""
         await self.subscribe(f'unconfirmedRemoved/{address.address}')
 
     unconfirmedRemoved = util.undoc(unconfirmed_removed)
 
     @util.observable
-    async def aggregate_bonded_added(self, address: 'Address') -> None:
+    async def aggregate_bonded_added(self, address: models.Address) -> None:
         """Emit message when new, unconfirmed, aggregate transactions are announced for a given address."""
         await self.subscribe(f'partialAdded/{address.address}')
 
     aggregateBondedAdded = util.undoc(aggregate_bonded_added)
 
     @util.observable
-    async def aggregate_bonded_removed(self, address: 'Address') -> None:
+    async def aggregate_bonded_removed(self, address: models.Address) -> None:
         """Emit message when unconfirmed, aggregate transactions change state for a given address."""
         await self.subscribe(f'partialRemoved/{address.address}')
 
     aggregateBondedRemoved = util.undoc(aggregate_bonded_removed)
 
     @util.observable
-    async def status(self, address: 'Address') -> None:
+    async def status(self, address: models.Address) -> None:
         """Emit message each time a transaction contains an error for a given address."""
         await self.subscribe(f'status/{address.address}')
 
     @util.observable
-    async def cosignature_added(self, address: 'Address') -> None:
+    async def cosignature_added(self, address: models.Address) -> None:
         """Emit message each time a cosigner signs a message initiated by the given address."""
         await self.subscribe(f'cosignature/{address.address}')
 
@@ -599,7 +638,7 @@ class Listener:
             'uid': await self.uid,
             'subscribe': channel
         })
-        await self._client.send(message)
+        await self.client.send(message)
 
     async def unsubscribe(self, channel: str) -> None:
         """Unsubscribe from websockets channel."""
@@ -608,4 +647,4 @@ class Listener:
             'uid': await self.uid,
             'unsubscribe': channel
         })
-        await self._client.send(message)
+        await self.client.send(message)

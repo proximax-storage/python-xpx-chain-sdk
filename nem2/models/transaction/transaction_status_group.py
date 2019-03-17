@@ -22,13 +22,18 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import enum
 import typing
+
 from nem2 import util
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
-class TransactionStatusGroup(util.Dto, util.EnumMixin, str, enum.Enum):
+class TransactionStatusGroup(util.DTO, util.EnumMixin, str, enum.Enum):
     """Enumerated groups  for a transaction status."""
 
     FAILED = "failed"
@@ -38,11 +43,18 @@ class TransactionStatusGroup(util.Dto, util.EnumMixin, str, enum.Enum):
     def description(self) -> str:
         return DESCRIPTION[self]
 
-    def to_dto(self) -> str:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> str:
         return typing.cast(str, self.value)
 
     @classmethod
-    def from_dto(cls, data: str) -> 'TransactionStatusGroup':
+    def from_dto(
+        cls,
+        data: str,
+        network_type: OptionalNetworkType = None
+    ) -> TransactionStatusGroup:
         return cls(data)
 
 

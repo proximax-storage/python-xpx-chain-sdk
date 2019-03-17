@@ -22,21 +22,32 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionAnnounceResponse(util.Dto):
+class TransactionAnnounceResponse(util.DTO):
     """Response from announcing a transaction."""
 
     message: str
 
-    def to_dto(self) -> dict:
-        return {
-            'message': self.message,
-        }
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
+        return {'message': self.message}
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'TransactionAnnounceResponse':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> TransactionAnnounceResponse:
         return cls(data['message'])

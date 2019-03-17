@@ -25,11 +25,28 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import os
-import struct
 import typing
 
 from nem2 import util
+from ..blockchain.network_type import NetworkType
+
+DTOType = typing.Sequence[int]
+OptionalNetworkType = typing.Optional[NetworkType]
+RawNonceType = typing.Union[int, bytes, str]
+
+
+def nonce_as_bytes(nonce: RawNonceType):
+    """Convert nonce to underlying byte array."""
+    if isinstance(nonce, int):
+        return util.u32_to_catbuffer(nonce)
+    elif isinstance(nonce, str):
+        return util.unhexlify(nonce)
+    elif isinstance(nonce, bytes):
+        return nonce
+    else:
+        raise TypeError(f"Invalid nonce type, got {type(nonce)}.")
 
 
 @util.inherit_doc
@@ -42,23 +59,18 @@ class MosaicNonce(util.IntMixin, util.Model):
     """
 
     nonce: bytes
-    CATBUFFER_SIZE: typing.ClassVar[int] = 4
+    CATBUFFER_SIZE = util.U32_BYTES
 
     def __init__(self, nonce: typing.Union[int, bytes]) -> None:
-        if isinstance(nonce, int):
-            object.__setattr__(self, 'nonce', struct.pack('<I', nonce))
-        elif isinstance(nonce, bytes):
-            if len(nonce) != 4:
-                raise ValueError("Nonce length is incorrect.")
-            object.__setattr__(self, 'nonce', nonce)
-        else:
-            raise TypeError(f"Invalid nonce type, got {type(nonce)}.")
+        self._set('nonce', nonce_as_bytes(nonce))
+        if len(self.nonce) != 4:
+            raise ValueError(f"Nonce length is incorrect.")
 
     def __int__(self) -> int:
-        return typing.cast(int, struct.unpack('<I', self.nonce)[0])
+        return util.u32_from_catbuffer(self.nonce)
 
     @classmethod
-    def create_random(cls, entropy=os.urandom) -> 'MosaicNonce':
+    def create_random(cls, entropy=os.urandom) -> MosaicNonce:
         """
         Create new mosaic nonce from random bytes.
 
@@ -70,7 +82,7 @@ class MosaicNonce(util.IntMixin, util.Model):
     createRandom = util.undoc(create_random)
 
     @classmethod
-    def create_from_hex(cls, data: str) -> 'MosaicNonce':
+    def create_from_hex(cls, data: str) -> MosaicNonce:
         """
         Create mosaic nonce from hex-encoded nonce.
 
@@ -81,7 +93,7 @@ class MosaicNonce(util.IntMixin, util.Model):
     createFromHex = util.undoc(create_from_hex)
 
     @classmethod
-    def create_from_int(cls, nonce: int) -> 'MosaicNonce':
+    def create_from_int(cls, nonce: int) -> MosaicNonce:
         """
         Create mosaic nonce from 32-bit integer.
 
@@ -91,18 +103,31 @@ class MosaicNonce(util.IntMixin, util.Model):
 
     createFromInt = util.undoc(create_from_int)
 
-    def to_dto(self) -> util.U64DTOType:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> DTOType:
         return list(self.nonce)
 
     @classmethod
-    def from_dto(cls, data: util.U64DTOType) -> 'MosaicNonce':
+    def from_dto(
+        cls,
+        data: DTOType,
+        network_type: OptionalNetworkType = None
+    ) -> MosaicNonce:
         return cls(bytes(data))
 
-    def to_catbuffer(self) -> bytes:
-        return self.nonce
+    def to_catbuffer(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> bytes:
+        return util.u32_to_catbuffer(int(self))
 
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicNonce', bytes]:
-        assert len(data) >= cls.CATBUFFER_SIZE
-        inst = cls(data[:cls.CATBUFFER_SIZE])
-        return inst, data[cls.CATBUFFER_SIZE:]
+    def from_catbuffer(
+        cls,
+        data: bytes,
+        network_type=None
+    ) -> MosaicNonce:
+        size = cls.CATBUFFER_SIZE
+        return cls(util.u32_from_catbuffer(data[:size]))

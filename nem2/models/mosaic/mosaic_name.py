@@ -22,14 +22,20 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
 from .mosaic_id import MosaicId
+from ..blockchain.network_type import NetworkType
 from ..namespace.namespace_id import NamespaceId
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicName(util.Dto):
+class MosaicName(util.DTO):
     """
     Mosaic name and identifiers.
 
@@ -38,11 +44,14 @@ class MosaicName(util.Dto):
     :param parent_id: Parent namespace ID.
     """
 
-    mosaic_id: 'MosaicId'
+    mosaic_id: MosaicId
     name: str
-    parent_id: 'NamespaceId'
+    parent_id: NamespaceId
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         return {
             'mosaicId': self.mosaic_id.to_dto(),
             'name': self.name,
@@ -50,8 +59,12 @@ class MosaicName(util.Dto):
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'MosaicName':
-        mosaic_id = MosaicId.from_dto(data['mosaicId'])
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> MosaicName:
+        mosaic_id = MosaicId.from_dto(data['mosaicId'], network_type)
         name = data['name']
-        parent_id = NamespaceId.from_dto(data['parentId'])
+        parent_id = NamespaceId.from_dto(data['parentId'], network_type)
         return cls(mosaic_id, name, parent_id)

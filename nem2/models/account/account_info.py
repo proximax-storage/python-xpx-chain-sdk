@@ -22,16 +22,15 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 
 from nem2 import util
+from .address import Address
 from .public_account import PublicAccount
+from ..mosaic.mosaic import Mosaic
 
-if typing.TYPE_CHECKING:
-    from .address import Address
-    from ..mosaic.mosaic import Mosaic      # noqa: F401
-
-MosaicListType = typing.Sequence['Mosaic']
+MosaicListType = typing.Sequence[Mosaic]
 
 
 @util.inherit_doc
@@ -51,7 +50,7 @@ class AccountInfo:
     """
 
     meta: typing.Any       # TODO(ahuszagh) Fix...
-    address: 'Address'
+    address: Address
     address_height: int
     public_key: str
     public_key_height: int
@@ -60,7 +59,7 @@ class AccountInfo:
     importance_height: int
 
     @property
-    def public_account(self) -> 'PublicAccount':
+    def public_account(self) -> PublicAccount:
         """Get public account."""
         return PublicAccount(self.address, self.public_key)
 

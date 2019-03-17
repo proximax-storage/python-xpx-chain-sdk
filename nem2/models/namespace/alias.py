@@ -22,47 +22,51 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 
 from nem2 import util
 from .alias_type import AliasType
 from ..account.address import Address
+from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic_id import MosaicId
 
-ValueType = typing.Optional[typing.Union['Address', 'MosaicId']]
+OptionalNetworkType = typing.Optional[NetworkType]
+DTOType = typing.Optional[dict]
+ValueType = typing.Optional[typing.Union[Address, MosaicId]]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class Alias(util.Dto):
+class Alias(util.DTO):
     """
     Alias for type definitions.
 
     :param value: Address or mosaic ID for alias.
     """
 
-    type: 'AliasType'
+    type: AliasType
     value: ValueType
 
     def __init__(self, value: ValueType = None) -> None:
-        object.__setattr__(self, "value", value)
+        self._set("value", value)
         if isinstance(value, Address):
-            object.__setattr__(self, "type", AliasType.ADDRESS)
+            self._set("type", AliasType.ADDRESS)
         elif isinstance(value, MosaicId):
-            object.__setattr__(self, "type", AliasType.MOSAIC_ID)
+            self._set("type", AliasType.MOSAIC_ID)
         elif value is None:
-            object.__setattr__(self, "type", AliasType.NONE)
+            self._set("type", AliasType.NONE)
         else:
             raise TypeError("Got invalid value type for Alias.")
 
     @property
-    def address(self) -> 'Address':
+    def address(self) -> Address:
         if self.type != AliasType.ADDRESS:
             raise ValueError("Alias does not store address.")
         return self.value
 
     @property
-    def mosaic_id(self) -> 'MosaicId':
+    def mosaic_id(self) -> MosaicId:
         if self.type != AliasType.MOSAIC_ID:
             raise ValueError("Alias does not store mosaic ID.")
         return self.value
@@ -74,23 +78,33 @@ class Alias(util.Dto):
             return False
         return self.astuple() == other.astuple()
 
-    def to_dto(self) -> typing.Optional[dict]:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> DTOType:
         if self.type == AliasType.NONE:
             return None
-        elif self.type == AliasType.ADDRESS:
-            return {'type': self.type.to_dto(), 'address': self.value.to_dto()}
+
+        type = self.type.to_dto(network_type)
+        value = self.value.to_dto(network_type)
+        if self.type == AliasType.ADDRESS:
+            return {'type': type, 'address': value}
         elif self.type == AliasType.MOSAIC_ID:
-            return {'type': self.type.to_dto(), 'mosaicId': self.value.to_dto()}
+            return {'type': type, 'mosaicId': value}
         raise ValueError("Invalid data for Alias.to_dto.")
 
     @classmethod
-    def from_dto(cls, data: typing.Optional[dict]) -> 'Alias':
+    def from_dto(
+        cls,
+        data: DTOType,
+        network_type: OptionalNetworkType = None,
+    ) -> Alias:
         if data is None:
             return cls()
 
-        type = AliasType.from_dto(data['type'])
+        type = AliasType.from_dto(data['type'], network_type)
         if type == AliasType.ADDRESS:
-            return cls(Address.from_dto(data['address']))
+            return cls(Address.from_dto(data['address'], network_type))
         elif type == AliasType.MOSAIC_ID:
-            return cls(MosaicId.from_dto(data['mosaicId']))
+            return cls(MosaicId.from_dto(data['mosaicId'], network_type))
         raise ValueError("Invalid data for Alias.from_dto.")

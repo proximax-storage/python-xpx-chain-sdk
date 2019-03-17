@@ -22,13 +22,19 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
 from .deadline import Deadline
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionStatusError(util.Dto):
+class TransactionStatusError(util.DTO):
     """
     Model representing errors in transactions from listeners.
 
@@ -39,19 +45,26 @@ class TransactionStatusError(util.Dto):
 
     hash: str
     status: str
-    deadline: 'Deadline'
+    deadline: Deadline
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         return {
             'hash': self.hash,
             'status': self.status,
-            'deadline': self.deadline.to_dto(),
+            'deadline': self.deadline.to_dto(network_type),
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'TransactionStatusError':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> TransactionStatusError:
         return cls(
             hash=data['hash'],
             status=data['status'],
-            deadline=Deadline.from_dto(data['deadline']),
+            deadline=Deadline.from_dto(data['deadline'], network_type),
         )

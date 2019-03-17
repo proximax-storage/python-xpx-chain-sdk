@@ -22,27 +22,24 @@
     limitations under the License.
 """
 
-import struct
+from __future__ import annotations
 import typing
 
 from nem2 import util
+from .deadline import Deadline
 from .inner_transaction import InnerTransaction
+from .message import Message
 from .plain_message import EMPTY_MESSAGE, PlainMessage
 from .transaction import Transaction
+from .transaction_info import TransactionInfo
 from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
 from ..account.address import Address
+from ..account.public_account import PublicAccount
+from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic import Mosaic
 
-if typing.TYPE_CHECKING:
-    # We dynamically resolve the forward references which are used
-    # in an auto-generate __init__ outside of the module.
-    # Silence the lint warnings.
-    from .deadline import Deadline
-    from .message import Message
-    from .transaction_info import TransactionInfo       # noqa
-    from ..account.public_account import PublicAccount
-    from ..blockchain.network_type import NetworkType
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -63,22 +60,22 @@ class TransferTransaction(Transaction):
     :param transaction_info: (Optional) Transaction metadata.
     """
 
-    recipient: 'Address'
-    mosaics: typing.Sequence['Mosaic']
-    message: 'Message'
+    recipient: Address
+    mosaics: typing.Sequence[Mosaic]
+    message: Message
 
     def __init__(self,
-        network_type: 'NetworkType',
-        version: 'TransactionVersion',
-        deadline: 'Deadline',
+        network_type: NetworkType,
+        version: TransactionVersion,
+        deadline: Deadline,
         fee: int,
-        recipient: 'Address',
-        mosaics: typing.Optional[typing.Sequence['Mosaic']] = None,
-        message: 'Message' = EMPTY_MESSAGE,
+        recipient: Address,
+        mosaics: typing.Optional[typing.Sequence[Mosaic]] = None,
+        message: Message = EMPTY_MESSAGE,
         signature: typing.Optional[str] = None,
-        signer: typing.Optional['PublicAccount'] = None,
-        transaction_info: typing.Optional['TransactionInfo'] = None,
-    ):
+        signer: typing.Optional[PublicAccount] = None,
+        transaction_info: typing.Optional[TransactionInfo] = None,
+    ) -> None:
         super().__init__(
             TransactionType.TRANSFER,
             network_type,
@@ -89,19 +86,19 @@ class TransferTransaction(Transaction):
             signer,
             transaction_info,
         )
-        object.__setattr__(self, 'recipient', recipient)
-        object.__setattr__(self, 'mosaics', mosaics or [])
-        object.__setattr__(self, 'message', message)
+        self._set('recipient', recipient)
+        self._set('mosaics', mosaics or [])
+        self._set('message', message)
 
     @classmethod
     def create(
         cls,
-        deadline: 'Deadline',
-        recipient: 'Address',
-        mosaics: typing.Optional[typing.Sequence['Mosaic']],
-        message: 'Message',
-        network_type: 'NetworkType',
-    ) -> 'TransferTransaction':
+        deadline: Deadline,
+        recipient: Address,
+        mosaics: typing.Optional[typing.Sequence[Mosaic]],
+        message: Message,
+        network_type: NetworkType,
+    ) -> TransferTransaction:
         """
         Create new transfer transaction.
 
@@ -121,7 +118,7 @@ class TransferTransaction(Transaction):
             message
         )
 
-    def entity_size(self) -> int:
+    def catbuffer_size_specific(self) -> int:
         # Extra 3 + address_size + message_size + $MOSAIC_SIZE * mosaics_count
         # 2 for message_size, and 1 for mosaics_count.
         recipient_size = Address.CATBUFFER_SIZE
@@ -129,7 +126,10 @@ class TransferTransaction(Transaction):
         mosaics_size = Mosaic.CATBUFFER_SIZE * len(self.mosaics)
         return recipient_size + message_size + mosaics_size + 3
 
-    def to_catbuffer_specific(self) -> bytes:
+    def to_catbuffer_specific(
+        self,
+        network_type: OptionalNetworkType = None,
+    ) -> bytes:
         """Export transfer-specific data to catbuffer."""
 
         # uint8_t[25] recipient
@@ -137,15 +137,19 @@ class TransferTransaction(Transaction):
         # uint8_t mosaics_count
         # uint8_t[message_size] message
         # Mosaic[mosaics_count] mosaics
-        recipient = self.recipient.to_catbuffer()
-        message_size = struct.pack('<H', len(self.message.payload))
-        mosaics_count = struct.pack('<B', len(self.mosaics))
+        recipient = self.recipient.to_catbuffer(network_type)
+        message_size = util.u16_to_catbuffer(len(self.message.payload))
+        mosaics_count = util.u8_to_catbuffer(len(self.mosaics))
         message = self.message.payload
-        mosaics = b''.join(i.to_catbuffer() for i in self.mosaics)
+        mosaics = b''.join(i.to_catbuffer(network_type) for i in self.mosaics)
 
         return recipient + message_size + mosaics_count + message + mosaics
 
-    def load_catbuffer_specific(self, data: bytes) -> bytes:
+    def load_catbuffer_specific(
+        self,
+        data: bytes,
+        network_type: OptionalNetworkType = None,
+    ) -> bytes:
         """Load transfer-specific data data from catbuffer."""
 
         # uint8_t[25] recipient
@@ -153,23 +157,26 @@ class TransferTransaction(Transaction):
         # uint8_t mosaics_count
         # uint8_t[message_size] message
         # Mosaic[mosaics_count] mosaics
-        recipient, data = Address.from_catbuffer(data)
-        message_size = struct.unpack('<H', data[:2])[0]
-        mosaics_count = struct.unpack('<B', data[2:3])[0]
+        recipient, data = Address.from_catbuffer_pair(data, network_type)
+        message_size = util.u16_from_catbuffer(data[:2])
+        mosaics_count = util.u8_from_catbuffer(data[2:3])
         message = PlainMessage(data[3: message_size + 3])
         mosaics = []
         data = data[message_size + 3:]
         for i in range(mosaics_count):
-            mosaic, data = Mosaic.from_catbuffer(data)
+            mosaic, data = Mosaic.from_catbuffer_pair(data, network_type)
             mosaics.append(mosaic)
 
-        object.__setattr__(self, 'recipient', recipient)
-        object.__setattr__(self, 'mosaics', mosaics)
-        object.__setattr__(self, 'message', message)
+        self._set('recipient', recipient)
+        self._set('mosaics', mosaics)
+        self._set('message', message)
 
-        return data
+        return typing.cast(bytes, data)
 
-    def to_aggregate(self, signer: 'PublicAccount') -> 'TransferInnerTransaction':
+    def to_aggregate(
+        self,
+        signer: PublicAccount
+    ) -> TransferInnerTransaction:
         """Convert transaction to inner transaction."""
         inst = TransferInnerTransaction.from_transaction(self, signer)
         return typing.cast(TransferInnerTransaction, inst)
@@ -182,12 +189,11 @@ class TransferInnerTransaction(InnerTransaction, TransferTransaction):
 
 
 Transaction.HOOKS[TransactionType.TRANSFER] = (
-    TransferTransaction.from_catbuffer,
+    TransferTransaction.from_catbuffer_pair,
     TransferTransaction.from_dto,
 )
 
-
 InnerTransaction.HOOKS[TransactionType.TRANSFER] = (
-    TransferInnerTransaction.from_catbuffer,
+    TransferInnerTransaction.from_catbuffer_pair,
     TransferInnerTransaction.from_dto,
 )

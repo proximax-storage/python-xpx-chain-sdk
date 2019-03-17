@@ -22,16 +22,16 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import asyncio
-
 import rx
 from rx.internal import extensionmethod
 
 
-def to_future(self) -> 'asyncio.Future':
+def to_future(self) -> asyncio.Future:
     """Convert observable to an awaitable object."""
 
-    future: 'asyncio.Future' = asyncio.Future()
+    future: asyncio.Future = asyncio.Future()
     values = []
 
     def on_next(v):

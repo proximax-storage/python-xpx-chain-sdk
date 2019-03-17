@@ -22,33 +22,30 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import enum
-import struct
-import typing
 
 from nem2 import util
 
 
 @util.inherit_doc
-class NetworkType(util.Model, util.EnumMixin, enum.IntEnum):
+class NetworkType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """Identifier for the network type."""
 
     MAIN_NET    = 0x68
     TEST_NET    = 0x98
     MIJIN       = 0x60
     MIJIN_TEST  = 0x90
-    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def description(self) -> str:
         return DESCRIPTION[self]
 
     def identifier(self) -> bytes:
         """Get address identifier from type."""
-
         return TO_IDENTIFIER[self]
 
     @classmethod
-    def create_from_identifier(cls, identifier: bytes) -> 'NetworkType':
+    def create_from_identifier(cls, identifier: bytes) -> NetworkType:
         """
         Identify and create the network type from the raw address identifier.
 
@@ -61,7 +58,7 @@ class NetworkType(util.Model, util.EnumMixin, enum.IntEnum):
     createFromIdentifier = util.undoc(create_from_identifier)
 
     @classmethod
-    def create_from_raw_address(cls, address: str) -> 'NetworkType':
+    def create_from_raw_address(cls, address: str) -> NetworkType:
         """
         Identify and create the network type from the raw address.
 
@@ -73,24 +70,6 @@ class NetworkType(util.Model, util.EnumMixin, enum.IntEnum):
 
     createFromRawAddress = util.undoc(create_from_raw_address)
 
-    def to_dto(self) -> int:
-        return int(self)
-
-    @classmethod
-    def from_dto(cls, data: int) -> 'NetworkType':
-        return cls(data)
-
-    def to_catbuffer(self) -> bytes:
-        return struct.pack('<B', int(self))
-
-    @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['NetworkType', bytes]:
-        assert len(data) >= cls.CATBUFFER_SIZE
-        inst = cls(struct.unpack('<B', data[:cls.CATBUFFER_SIZE])[0])
-        return inst, data[cls.CATBUFFER_SIZE:]
-
-
-NetworkType.CATBUFFER_SIZE = 1
 
 DESCRIPTION = {
     NetworkType.MAIN_NET: "Main network",

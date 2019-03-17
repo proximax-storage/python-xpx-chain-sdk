@@ -22,11 +22,15 @@
     limitations under the License.
 """
 
-import struct
+from __future__ import annotations
 import typing
 
 from nem2 import util
 from .mosaic_id import MosaicId
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
+SIZE = MosaicId.CATBUFFER_SIZE + util.U64_BYTES
 
 
 @util.inherit_doc
@@ -39,30 +43,44 @@ class Mosaic(util.Model):
     :param amount: Mosaic quantity in the smallest unit possible.
     """
 
-    id: 'MosaicId'
+    id: MosaicId
     amount: int
-    CATBUFFER_SIZE: typing.ClassVar[int] = 16
+    CATBUFFER_SIZE: typing.ClassVar[int] = SIZE
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         return {
-            'amount': util.uint64_to_dto(self.amount),
-            'id': self.id.to_dto(),
+            'amount': util.u64_to_dto(self.amount),
+            'id': self.id.to_dto(network_type),
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'Mosaic':
-        amount = util.dto_to_uint64(data['amount'])
-        return cls(MosaicId.from_dto(data['id']), amount)
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> Mosaic:
+        mosaic_id = MosaicId.from_dto(data['id'], network_type)
+        amount = util.u64_from_dto(data['amount'])
+        return cls(mosaic_id, amount)
 
-    def to_catbuffer(self) -> bytes:
-        id: bytes = self.id.to_catbuffer()
-        amount: bytes = struct.pack('<Q', self.amount)
-        return id + amount
+    def to_catbuffer(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> bytes:
+        mosaic_id = self.id.to_catbuffer(network_type)
+        amount = util.u64_to_catbuffer(self.amount)
+        return mosaic_id + amount
 
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['Mosaic', bytes]:
-        assert len(data) >= cls.CATBUFFER_SIZE
-        id = MosaicId.from_catbuffer(data)[0]
-        amount = struct.unpack('<Q', data[id.CATBUFFER_SIZE:cls.CATBUFFER_SIZE])[0]
-        inst = cls(id, amount)
-        return inst, data[cls.CATBUFFER_SIZE:]
+    def from_catbuffer(
+        cls,
+        data: bytes,
+        network_type: OptionalNetworkType = None
+    ) -> Mosaic:
+        id_size = MosaicId.CATBUFFER_SIZE
+        mosaic_id = MosaicId.from_catbuffer(data, network_type)
+        amount = util.u64_from_catbuffer(data[id_size:])
+        return cls(mosaic_id, amount)

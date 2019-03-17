@@ -22,12 +22,11 @@
     limitations under the License.
 """
 
-import typing
-from nem2 import util
+from __future__ import annotations
 
-if typing.TYPE_CHECKING:
-    from .transaction_type import TransactionType
-    from ..blockchain.network_type import NetworkType
+from nem2 import util
+from .transaction_type import TransactionType
+from ..blockchain.network_type import NetworkType
 
 
 @util.inherit_doc
@@ -46,20 +45,21 @@ class SignedTransaction:
     payload: bytes
     hash: str
     signer: str
-    type: 'TransactionType'
-    network_type: 'NetworkType'
+    type: TransactionType
+    network_type: NetworkType
 
-    def __init__(self,
+    def __init__(
+        self,
         payload: bytes,
         hash: str,
         signer: str,
-        type: 'TransactionType',
-        network_type: 'NetworkType',
+        type: TransactionType,
+        network_type: NetworkType,
     ):
         if len(hash) != 64:
             raise ValueError('Transaction hash must be 64 characters long.')
-        object.__setattr__(self, 'payload', payload)
-        object.__setattr__(self, 'hash', hash)
-        object.__setattr__(self, 'signer', signer)
-        object.__setattr__(self, 'type', type)
-        object.__setattr__(self, 'network_type', network_type)
+        self._set('payload', payload)
+        self._set('hash', hash)
+        self._set('signer', signer)
+        self._set('type', type)
+        self._set('network_type', network_type)

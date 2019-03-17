@@ -6,6 +6,8 @@
     into requests providing solely a relative path.
 """
 
+from __future__ import annotations
+
 import contextlib
 import typing
 import urllib.error
@@ -23,7 +25,7 @@ DEFAULT_PORT = {
 }
 
 
-def parse_http_url(uri: str, scheme: str = 'http') -> 'urllib3.util.Url':
+def parse_http_url(uri: str, scheme: str = 'http') -> urllib3.util.Url:
     """Add a default scheme if not present."""
 
     url = urllib3.util.parse_url(uri)
@@ -37,7 +39,7 @@ def parse_http_url(uri: str, scheme: str = 'http') -> 'urllib3.util.Url':
     return url
 
 
-def parse_ws_url(uri: str, scheme: str = 'ws') -> 'urllib3.util.Url':
+def parse_ws_url(uri: str, scheme: str = 'ws') -> urllib3.util.Url:
     """Process a websockets URI and return the kwds for the initializer."""
 
     url = urllib3.util.parse_url(uri)
@@ -71,7 +73,7 @@ class Client:
         self._endpoint = parse_http_url(endpoint).url
         self._closed = False
 
-    def __enter__(self) -> 'Client':
+    def __enter__(self) -> Client:
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:
@@ -185,13 +187,13 @@ class AsyncClient(Client):
         self._session = session
         self._endpoint = parse_http_url(endpoint).url
 
-    def __enter__(self) -> 'AsyncClient':
+    def __enter__(self) -> AsyncClient:
         raise TypeError("Only use async with.")
 
     def __exit__(self, exc_type, exc, tb) -> None:
         pass
 
-    async def __aenter__(self) -> 'AsyncClient':
+    async def __aenter__(self) -> AsyncClient:
         return self
 
     async def __aexit__(self) -> None:
@@ -217,7 +219,11 @@ def catch_deprecation_warning():
     Remove after 3.4 is dropped.
     """
     with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=DeprecationWarning, module='websockets')
+        warnings.filterwarnings(
+            "ignore",
+            category=DeprecationWarning,
+            module='websockets'
+        )
         yield
 
 
@@ -251,7 +257,10 @@ class WebsocketClient:
         with catch_deprecation_warning():
             await self._session.send(data)
 
-    async def ping(self, data: typing.Optional[bytes] = None) -> typing.Awaitable[None]:
+    async def ping(
+        self,
+        data: typing.Optional[bytes] = None
+    ) -> typing.Awaitable[None]:
         """Send websocket a ping."""
         with catch_deprecation_warning():
             result = await self._session.ping(data)

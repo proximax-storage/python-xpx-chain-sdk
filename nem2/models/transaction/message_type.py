@@ -22,12 +22,14 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import enum
+
 from nem2 import util
 
 
 @util.inherit_doc
-class MessageType(util.EnumMixin, enum.IntEnum):
+class MessageType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """Message type."""
 
     PLAIN = 0

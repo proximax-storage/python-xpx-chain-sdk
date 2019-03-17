@@ -22,13 +22,27 @@
     limitations under the License.
 """
 
-import struct
+from __future__ import annotations
 import typing
 
 from nem2 import util
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
+DTOType = typing.Sequence[util.U64DTOType]
+VERSION = 1
+DURATION_ID = 2
+PROPERTY_SIZE = 9
+PROPERTIES = {
+    DURATION_ID: 'duration'
+}
 
 
-def to_flags(supply_mutable: bool, transferable: bool, levy_mutable: bool) -> int:
+def to_flags(
+    supply_mutable: bool,
+    transferable: bool,
+    levy_mutable: bool
+) -> int:
     """Convert 3 binary values to sequential bit flags"""
 
     flags: int = 0
@@ -42,10 +56,17 @@ def to_flags(supply_mutable: bool, transferable: bool, levy_mutable: bool) -> in
     return flags
 
 
-DURATION_ID = 2
-PROPERTIES = {
-    DURATION_ID: 'duration'
-}
+def property_to_catbuffer(id: int, value: int) -> bytes:
+    """Convert property with ID to catbuffer."""
+    return util.u8_to_catbuffer(id) + util.u64_to_catbuffer(value)
+
+
+def property_from_catbuffer(catbuffer: bytes) -> typing.Tuple[int, int]:
+    """Convert catbuffer to property with ID."""
+
+    id = util.u8_from_catbuffer(catbuffer[:1])
+    value = util.u64_from_catbuffer(catbuffer[1:])
+    return (id, value)
 
 
 @util.inherit_doc
@@ -83,7 +104,7 @@ class MosaicProperties(util.Model):
     levyMutable = util.undoc(levy_mutable)
 
     @classmethod
-    def create(cls, **kwds) -> 'MosaicProperties':
+    def create(cls, **kwds) -> MosaicProperties:
         """
         Create mosaic properties with default parameters.
 
@@ -101,40 +122,61 @@ class MosaicProperties(util.Model):
         flags = to_flags(supply_mutable, transferable, levy_mutable)
         return MosaicProperties(flags, divisibility, duration)
 
-    def to_dto(self) -> typing.Sequence[util.U64DTOType]:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> DTOType:
         return [
-            util.uint64_to_dto(self.flags),
-            util.uint64_to_dto(self.divisibility),
-            util.uint64_to_dto(self.duration),
+            util.u64_to_dto(self.flags),
+            util.u64_to_dto(self.divisibility),
+            util.u64_to_dto(self.duration),
         ]
 
     @classmethod
-    def from_dto(cls, data: typing.Sequence[util.U64DTOType]) -> 'MosaicProperties':
-        flags = util.dto_to_uint64(data[0])
-        divisibility = util.dto_to_uint64(data[1])
-        duration = util.dto_to_uint64(data[2])
+    def from_dto(
+        cls,
+        data: DTOType,
+        network_type: OptionalNetworkType = None
+    ) -> MosaicProperties:
+        flags = util.u64_from_dto(data[0])
+        divisibility = util.u64_from_dto(data[1])
+        duration = util.u64_from_dto(data[2])
         return cls(flags, divisibility, duration)
 
-    def to_catbuffer(self) -> bytes:
-        data = struct.pack('<BBB', 1, self.flags, self.divisibility)
-        properties = struct.pack('<BQ', DURATION_ID, self.duration)
-        return data + properties
+    def to_catbuffer(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> bytes:
+        version = util.u8_to_catbuffer(VERSION)
+        flags = util.u8_to_catbuffer(self.flags)
+        divisibility = util.u8_to_catbuffer(self.divisibility)
+        duration = property_to_catbuffer(DURATION_ID, self.duration)
+        return version + flags + divisibility + duration
 
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicProperties', bytes]:
+    def from_catbuffer_pair(
+        cls,
+        data: bytes,
+        network_type: OptionalNetworkType = None
+    ) -> typing.Tuple[MosaicProperties, bytes]:
         # Read the array count, property flags and divisibility.
-        assert len(data) >= 3
-        count, flags, divisibility = struct.unpack('<BBB', data[:3])
+        count = util.u8_from_catbuffer(data[:1])
+        flags = util.u8_from_catbuffer(data[1:2])
+        divisibility = util.u8_from_catbuffer(data[2:3])
 
         # Ensure the buffer is long enough for the data, and iteratively
         # read the remaining properties.
-        buffer_length = 3 + 9 * count
-        assert len(data) >= buffer_length
-        properties = struct.iter_unpack('<BQ', data[3:])
+        step = PROPERTY_SIZE
+        property_size = step * count
+        size = 3 + property_size
         kwds = {}
-        for _ in range(count):
-            prop_id, prop_value = next(properties)
-            kwds[PROPERTIES[prop_id]] = prop_value
+        for i in range(0, property_size, step):
+            start = 3 + i
+            stop = start + step
+            id, value = property_from_catbuffer(data[start:stop])
+            kwds[PROPERTIES[id]] = value
 
+        # Instantiate our class and return pair.
         inst = cls(flags, divisibility, **kwds)
-        return inst, data[buffer_length:]
+        remaining = data[size:]
+        return inst, remaining

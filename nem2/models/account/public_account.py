@@ -22,12 +22,16 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
 from nem2.util.signature import ed25519
 from .address import Address
 from ..blockchain.network_type import NetworkType
 
 
+# TODO(ahuszagh) Needs a model.
 @util.inherit_doc
 @util.dataclass(frozen=True)
 class PublicAccount:
@@ -38,14 +42,19 @@ class PublicAccount:
     :param public_key: Hex-encoded public key (with or without '0x' prefix).
     """
 
-    address: 'Address'
+    address: Address
     public_key: str
 
-    def __init__(self, address: 'Address', public_key: str) -> None:
+    def __init__(
+        self,
+        address: Address,
+        public_key: typing.AnyStr,
+    ) -> None:
+        public_key = util.encode_hex(public_key)
         if len(public_key) != 64:
             raise ValueError("Invalid public key length")
-        object.__setattr__(self, 'address', address)
-        object.__setattr__(self, 'public_key', public_key)
+        self._set('address', address)
+        self._set('public_key', public_key)
 
     @property
     def network_type(self) -> 'NetworkType':
@@ -55,15 +64,20 @@ class PublicAccount:
     networkType = util.undoc(network_type)
 
     @classmethod
-    def create_from_public_key(cls, public_key: str, network_type: NetworkType) -> 'PublicAccount':
+    def create_from_public_key(
+        cls,
+        public_key: typing.AnyStr,
+        network_type: NetworkType,
+    ) -> 'PublicAccount':
         """
         Create PublicAccount from the public key and network type.
 
-        :param public_key: Hex-encoded public key (with or without '0x' prefix).
+        :param public_key: Hex-encoded or raw bytes for public key.
         :param network_type: Network type for address.
         :return: PublicAccount object.
         """
 
+        public_key = util.encode_hex(public_key)
         address = Address.create_from_public_key(public_key, network_type)
         return cls(address, public_key)
 
@@ -72,21 +86,25 @@ class PublicAccount:
     # TODO(ahuszagh)
     # verifyTransaction?
 
-    def verify_signature(self, data: bytes, signature: str) -> bool:
+    def verify_signature(
+        self,
+        data: typing.AnyStr,
+        signature: typing.AnyStr
+    ) -> bool:
         """
         Verify a signature.
 
-        :param data: Raw data as bytes.
-        :param signature: The signature to verify (hex-encoded).
+        :param data: Hex-encoded or raw bytes used to generate signature.
+        :param public_key: Hex-encoded or raw bytes for signature.
         :return: Boolean representing if the signature was verified.
         """
 
-        if len(signature) != 128:
+        data = util.decode_hex(data, with_prefix=True)
+        signature = util.decode_hex(signature, with_prefix=True)
+        if len(signature) != 64:
             raise ValueError("Signature length is incorrect.")
 
-        public_key: bytes = util.unhexlify(self.public_key)
-        signature: bytes = util.unhexlify(signature)
-
+        public_key = util.unhexlify(self.public_key)
         key = ed25519.sha3.VerifyingKey(public_key)
         try:
             key.verify(signature, data)

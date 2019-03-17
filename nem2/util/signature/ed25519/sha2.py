@@ -22,6 +22,8 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+
 try:
     from ed25519 import (
         BadSignatureError,

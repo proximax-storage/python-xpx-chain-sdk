@@ -28,7 +28,7 @@ from nem2 import util
 
 # TODO(ahuszagh) This is not yet implemented in Catapult. Subject to change
 @util.inherit_doc
-class MosaicLevyType(util.Dto, util.EnumMixin, enum.IntEnum):
+class MosaicLevyType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """Mosaic levy type."""
 
     ABSOLUTE = 1
@@ -36,13 +36,6 @@ class MosaicLevyType(util.Dto, util.EnumMixin, enum.IntEnum):
 
     def description(self) -> str:
         return DESCRIPTION[self]
-
-    def to_dto(self) -> int:
-        return int(self)
-
-    @classmethod
-    def from_dto(cls, data: int) -> 'MosaicLevyType':
-        return cls(data)
 
 
 DESCRIPTION = {

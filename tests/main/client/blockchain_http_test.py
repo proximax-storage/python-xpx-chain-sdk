@@ -16,6 +16,10 @@ class TestBlockchainHttp(harness.TestCase):
     async def test_get_block_by_height(self, data, await_cb, with_cb):
 
         async with with_cb(data[0](responses.ENDPOINT)) as http:
+            # Set the network type
+            with data[1].default_response(200, **responses.NETWORK_TYPE["MIJIN_TEST"]):
+                await await_cb(http.network_type)
+
             with data[1].default_response(200, **responses.BLOCK_INFO["Ok"]):
                 block_info = await await_cb(http.get_block_by_height(1))
                 self.assertEqual(block_info.hash, "3A2D7D82D9B7F2C12E1CD549BC0C515A9150698EC0ADBF94121AB5D1730CEAA1")

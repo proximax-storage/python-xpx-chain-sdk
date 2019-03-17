@@ -22,30 +22,26 @@
     limitations under the License.
 """
 
-import struct
+from __future__ import annotations
 import typing
 
 from nem2 import util
+from .aggregate_transaction_info import AggregateTransactionInfo
 from .deadline import Deadline
 from .signed_transaction import SignedTransaction
+from .transaction_info import TransactionInfo
 from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
+from ..account.account import Account
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
-if typing.TYPE_CHECKING:
-    # We dynamically resolve the forward references which are used
-    # in an auto-generate __init__ outside of the module.
-    # Silence the lint warnings.
-    from .aggregate_transaction_info import AggregateTransactionInfo    # noqa
-    from .transaction_info import TransactionInfo                       # noqa
-    from ..account.account import Account
-
-TransactionInfoType = typing.Union['TransactionInfo', 'AggregateTransactionInfo']
+OptionalNetworkType = typing.Optional[NetworkType]
+TransactionInfoType = typing.Union[TransactionInfo, AggregateTransactionInfo]
 
 # Callback types to register hooks to determine if
-LoadCatbuffer = typing.Callable[[bytes], typing.Tuple['Transaction', bytes]]
-LoadDto = typing.Callable[[dict], 'Transaction']
+LoadCatbuffer = typing.Callable[[bytes, OptionalNetworkType], typing.Tuple['Transaction', bytes]]
+LoadDto = typing.Callable[[dict, OptionalNetworkType], 'Transaction']
 Hooks = typing.Dict[TransactionType, typing.Tuple[LoadCatbuffer, LoadDto]]
 
 
@@ -65,17 +61,17 @@ class Transaction(util.Model):
     :param transaction_info: Transaction metadata.
     """
 
-    type: 'TransactionType'
-    network_type: 'NetworkType'
-    version: 'TransactionVersion'
-    deadline: typing.Optional['Deadline']
+    type: TransactionType
+    network_type: NetworkType
+    version: TransactionVersion
+    deadline: typing.Optional[Deadline]
     fee: typing.Optional[int]
     signature: typing.Optional[str]
-    signer: typing.Optional['PublicAccount']
+    signer: typing.Optional[PublicAccount]
     transaction_info: typing.Optional[TransactionInfoType]
     HOOKS: typing.ClassVar[Hooks] = {}
 
-    def sign_with(self, account: 'Account') -> 'SignedTransaction':
+    def sign_with(self, account: Account) -> SignedTransaction:
         """
         Serialize and sign transaction.
 
@@ -96,43 +92,42 @@ class Transaction(util.Model):
     signWith = util.undoc(sign_with)
 
     @staticmethod
-    def transaction_hash(transaction: bytes) -> str:
+    def transaction_hash(transaction: typing.AnyStr) -> str:
         """Generate transaction hash from signed transaction payload."""
 
-        signature_half = transaction[4: 36]
-        signer = transaction[68: 100]
+        transaction = util.decode_hex(transaction, with_prefix=True)
+
+        signature_half = transaction[4:36]
+        signer = transaction[68:100]
         rest = transaction[100:]
         data = signature_half + signer + rest
         hash = util.hashlib.sha3_256(data).hexdigest()
         return typing.cast(str, hash)
 
     @staticmethod
-    def shared_entity_size() -> int:
-        """Get the base size of the transaction entity."""
+    def catbuffer_size_shared() -> int:
+        """Get the shared size of the entity."""
         return 120
 
-    sharedEntitySize = util.undoc(shared_entity_size)
+    sharedEntitySize = util.undoc(catbuffer_size_shared)
 
-    def entity_size(self) -> int:
-        """Get the total size of the transaction entity."""
+    def catbuffer_size_specific(self) -> int:
+        """Get the transaction-specific size of the entity."""
         raise NotImplementedError
 
-    entitySize = util.undoc(entity_size)
-
-    def to_catbuffer(self) -> bytes:
-        """
-        Serialize object to catbuffer interchange format.
-
-        :param embedded: Is embedded transaction.
-        """
-
-        total_size = self.entity_size()
-        shared = self.to_catbuffer_shared(total_size)
-        specific = self.to_catbuffer_specific()
-
+    def catbuffer_size(self) -> int:
+        """Get the total size of the entity."""
+        shared = self.catbuffer_size_shared()
+        specific = self.catbuffer_size_specific()
         return shared + specific
 
-    def to_catbuffer_shared(self, size) -> bytes:
+    entitySize = util.undoc(catbuffer_size)
+
+    def to_catbuffer_shared(
+        self,
+        size: int,
+        network_type: OptionalNetworkType = None
+    ) -> bytes:
         """
         Serialize shared transaction data to catbuffer interchange format.
 
@@ -147,8 +142,8 @@ class Transaction(util.Model):
         # uint16_t type
         # uint64_t fee
         # uint64_t deadline
-        buffer = bytearray(self.shared_entity_size())
-        buffer[0:4] = struct.pack('<I', size)
+        buffer = bytearray(self.catbuffer_size_shared())
+        buffer[0:4] = util.u32_to_catbuffer(size)
         if self.signer is not None and self.signature is not None:
             # Transaction is signed.
             buffer[4:68] = util.unhexlify(self.signature)
@@ -160,23 +155,46 @@ class Transaction(util.Model):
         buffer[100:101] = self.version.to_catbuffer()
         buffer[101:102] = self.network_type.to_catbuffer()
         buffer[102:104] = self.type.to_catbuffer()
-        buffer[104:112] = struct.pack('<Q', self.fee)
+        buffer[104:112] = util.u64_to_catbuffer(self.fee)
         buffer[112:120] = self.deadline.to_catbuffer()
 
         return bytes(buffer)
 
     toCatbufferShared = util.undoc(to_catbuffer_shared)
 
-    def to_catbuffer_specific(self) -> bytes:
+    def to_catbuffer_specific(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> bytes:
         """Serialize transaction-specific data to catbuffer interchange format."""
         raise NotImplementedError
 
     toCatbufferSpecific = util.undoc(to_catbuffer_specific)
 
-    def load_catbuffer_shared(self, data: bytes) -> typing.Tuple[int, bytes]:
+    def to_catbuffer(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> bytes:
+        """
+        Serialize object to catbuffer interchange format.
+
+        :param embedded: Is embedded transaction.
+        """
+
+        total_size = self.catbuffer_size()
+        shared = self.to_catbuffer_shared(total_size, network_type)
+        specific = self.to_catbuffer_specific(network_type)
+
+        return shared + specific
+
+    def load_catbuffer_shared(
+        self,
+        data: bytes,
+        network_type: OptionalNetworkType = None,
+    ) -> typing.Tuple[int, bytes]:
         """Load shared transaction data from catbuffer."""
 
-        assert len(data) >= self.shared_entity_size()
+        assert len(data) >= self.catbuffer_size_shared()
 
         # uint32_t size
         # uint8_t[64] signature
@@ -186,45 +204,61 @@ class Transaction(util.Model):
         # uint16_t type
         # uint64_t fee
         # uint64_t deadline
-        total_size = struct.unpack('<I', data[:4])[0]
+        total_size = util.u32_from_catbuffer(data[:4])
         signature = data[4:68]
         public_key = data[68:100]
-        version = TransactionVersion.from_catbuffer(data[100:101])[0]
-        network_type = NetworkType.from_catbuffer(data[101:102])[0]
-        type = TransactionType.from_catbuffer(data[102:104])[0]
-        fee = struct.unpack('<Q', data[104:112])[0]
-        deadline = Deadline.from_catbuffer(data[112:])[0]
+        version = TransactionVersion.from_catbuffer(data[100:101])
+        network_type = NetworkType.from_catbuffer(data[101:102])
+        type = TransactionType.from_catbuffer(data[102:104])
+        fee = util.u64_from_catbuffer(data[104:112])
+        deadline = Deadline.from_catbuffer(data[112:])
 
-        object.__setattr__(self, 'type', type)
-        object.__setattr__(self, 'network_type', network_type)
-        object.__setattr__(self, 'version', version)
-        object.__setattr__(self, 'deadline', deadline)
-        object.__setattr__(self, 'fee', fee)
+        self._set('type', type)
+        self._set('network_type', network_type)
+        self._set('version', version)
+        self._set('deadline', deadline)
+        self._set('fee', fee)
         if signature != bytes(64) and public_key != bytes(32):
             # Transaction is signed.
-            object.__setattr__(self, 'signature', util.hexlify(signature))
+            self._set('signature', util.hexlify(signature))
             signer = PublicAccount.create_from_public_key(util.hexlify(public_key), network_type)
-            object.__setattr__(self, 'signer', signer)
+            self._set('signer', signer)
         else:
             # Transaction is not signed.
             # All zero bytes for public key and hash, impossible, must be
             # dummy data.
-            object.__setattr__(self, 'signature', None)
-            object.__setattr__(self, 'signer', None)
-        object.__setattr__(self, 'transaction_info', None)
+            self._set('signature', None)
+            self._set('signer', None)
+        self._set('transaction_info', None)
 
-        return total_size, data[self.shared_entity_size():]
+        return total_size, data[self.catbuffer_size_shared():]
 
     loadCatbufferShared = util.undoc(load_catbuffer_shared)
 
-    def load_catbuffer_specific(self, data: bytes) -> bytes:
+    def load_catbuffer_specific(
+        self,
+        data: bytes,
+        network_type: OptionalNetworkType = None,
+    ) -> bytes:
         """Load transaction-specific data data from catbuffer."""
         raise NotImplementedError
 
     loadCatbufferSpecific = util.undoc(load_catbuffer_specific)
 
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['Transaction', bytes]:
+    def from_catbuffer(
+        cls,
+        data: typing.AnyStr,
+        network_type: OptionalNetworkType = None,
+    ) -> Transaction:
+        return cls.from_catbuffer_pair(data, network_type)[0]
+
+    @classmethod
+    def from_catbuffer_pair(
+        cls,
+        data: typing.AnyStr,
+        network_type: OptionalNetworkType = None,
+    ) -> typing.Tuple[Transaction, bytes]:
         """
         Deserialize object from catbuffer interchange format.
         If the cls is a subclass of `Transaction`, use the dedicated loader.
@@ -234,24 +268,32 @@ class Transaction(util.Model):
         :param data: Transaction data in catbuffer interchange format.
         """
 
+        data = util.decode_hex(data, with_prefix=True)
         if cls is not Transaction:
             # Have a subclass, use a dedicated loader.
             inst = cls.__new__(cls)
-            total_size, data = inst.load_catbuffer_shared(data)
-            data = inst.load_catbuffer_specific(data)
+            total_size, data = inst.load_catbuffer_shared(data, network_type)
+            data = inst.load_catbuffer_specific(data, network_type)
             return inst, data
         else:
             # Directly calling Transaction.from_catbuffer, detect the proper
             # loader and call that.
             type = TransactionType.from_catbuffer(data[102:104])[0]
-            return cls.HOOKS[type][0](data)
+            return cls.HOOKS[type][0](data, network_type)
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         """Serialize object data to data transfer object."""
         raise NotImplementedError
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'Transaction':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ) -> Transaction:
         """
         Deserialize object from data transfer object.
         If the cls is a subclass of `Transaction`, use the dedicated loader.
@@ -268,7 +310,7 @@ class Transaction(util.Model):
 
     aggregateTransaction = util.undoc(aggregate_transaction)
 
-    def to_aggregate(self, signer: 'PublicAccount'):
+    def to_aggregate(self, signer: PublicAccount):
         """Convert transaction to inner transaction."""
         raise NotImplementedError
 

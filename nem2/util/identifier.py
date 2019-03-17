@@ -22,9 +22,9 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import itertools
 import re
-import struct
 import typing
 
 from . import hashlib
@@ -32,13 +32,9 @@ from . import stdint
 
 FQN = re.compile(r'\A[a-z0-9][a-z0-9-_]*\Z')
 NAMESPACE_MAX_DEPTH = 3
-
-
-def unpack_uint32(data: bytes) -> typing.Generator[int, None, None]:
-    """Unpack array of 32-bit integers from a byte array."""
-
-    for value in struct.iter_unpack('<I', data):
-        yield value[0]
+pack_u64 = stdint.u64_to_catbuffer
+unpack_u32 = stdint.u32_iter_from_catbuffer
+unpack_u64_dto = lambda x: list(itertools.islice(unpack_u32(x), 2))
 
 
 def generate_mosaic_id(nonce: bytes, public_key: bytes) -> int:
@@ -66,9 +62,9 @@ def generate_mosaic_id(nonce: bytes, public_key: bytes) -> int:
     hasher = hashlib.sha3_256()
     hasher.update(nonce)
     hasher.update(public_key)
-    result = list(itertools.islice(unpack_uint32(hasher.digest()), 2))
+    result = unpack_u64_dto(hasher.digest())
 
-    return stdint.dto_to_uint64((result[0], result[1] & 0x7FFFFFFF))
+    return stdint.u64_from_dto((result[0], result[1] & 0x7FFFFFFF))
 
 
 def generate_namespace_id(*names: str) -> typing.Sequence[int]:
@@ -98,10 +94,10 @@ def generate_namespace_id(*names: str) -> typing.Sequence[int]:
     parent_id = 0
     for name in names:
         hasher = hashlib.sha3_256()
-        hasher.update(struct.pack('<Q', parent_id))
+        hasher.update(pack_u64(parent_id))
         hasher.update(name.encode('ascii'))
-        result = list(itertools.islice(unpack_uint32(hasher.digest()), 2))
-        parent_id = stdint.dto_to_uint64((result[0], result[1] | 0x80000000))
+        result = unpack_u64_dto(hasher.digest())
+        parent_id = stdint.u64_from_dto((result[0], result[1] | 0x80000000))
         ids.append(parent_id)
 
     return ids

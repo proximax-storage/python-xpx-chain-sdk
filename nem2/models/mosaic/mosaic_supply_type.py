@@ -23,34 +23,19 @@
 """
 
 import enum
-import struct
-import typing
-
 from nem2 import util
 
 
 @util.inherit_doc
-class MosaicSupplyType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
+class MosaicSupplyType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """Mosaic supply type."""
 
     DECREASE = 0
     INCREASE = 1
-    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def description(self) -> str:
         return DESCRIPTION[self]
 
-    def to_catbuffer(self) -> bytes:
-        return struct.pack('<B', int(self))
-
-    @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicSupplyType', bytes]:
-        assert len(data) >= cls.CATBUFFER_SIZE
-        inst = cls(struct.unpack('<B', data[:cls.CATBUFFER_SIZE])[0])
-        return inst, data[cls.CATBUFFER_SIZE:]
-
-
-MosaicSupplyType.CATBUFFER_SIZE = 1
 
 DESCRIPTION = {
     MosaicSupplyType.DECREASE: "Decrease mosaic supply.",

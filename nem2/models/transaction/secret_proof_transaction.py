@@ -22,24 +22,21 @@
     limitations under the License.
 """
 
-import struct
+from __future__ import annotations
 import typing
 
 from nem2 import util
+from .deadline import Deadline
 from .hash_type import HashType
 from .inner_transaction import InnerTransaction
 from .transaction import Transaction
+from .transaction_info import TransactionInfo
 from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
+from ..account.public_account import PublicAccount
+from ..blockchain.network_type import NetworkType
 
-if typing.TYPE_CHECKING:
-    # We dynamically resolve the forward references which are used
-    # in an auto-generate __init__ outside of the module.
-    # Silence the lint warnings.
-    from .deadline import Deadline
-    from .transaction_info import TransactionInfo       # noqa
-    from ..account.public_account import PublicAccount
-    from ..blockchain.network_type import NetworkType
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -60,21 +57,22 @@ class SecretProofTransaction(Transaction):
     :param transaction_info: (Optional) Transaction metadata.
     """
 
-    hash_type: 'HashType'
+    hash_type: HashType
     secret: str
     proof: str
 
-    def __init__(self,
-        network_type: 'NetworkType',
-        version: 'TransactionVersion',
-        deadline: 'Deadline',
+    def __init__(
+        self,
+        network_type: NetworkType,
+        version: TransactionVersion,
+        deadline: Deadline,
         fee: int,
-        hash_type: 'HashType',
+        hash_type: HashType,
         secret: str,
         proof: str,
         signature: typing.Optional[str] = None,
-        signer: typing.Optional['PublicAccount'] = None,
-        transaction_info: typing.Optional['TransactionInfo'] = None,
+        signer: typing.Optional[PublicAccount] = None,
+        transaction_info: typing.Optional[TransactionInfo] = None,
     ):
         if not hash_type.validate(secret):
             raise ValueError("HashType and secret have incompatible lengths.")
@@ -88,19 +86,19 @@ class SecretProofTransaction(Transaction):
             signer,
             transaction_info,
         )
-        object.__setattr__(self, 'hash_type', hash_type)
-        object.__setattr__(self, 'secret', secret)
-        object.__setattr__(self, 'proof', proof)
+        self._set('hash_type', hash_type)
+        self._set('secret', secret)
+        self._set('proof', proof)
 
     @classmethod
     def create(
         cls,
-        deadline: 'Deadline',
-        hash_type: 'HashType',
+        deadline: Deadline,
+        hash_type: HashType,
         secret: str,
         proof: str,
-        network_type: 'NetworkType',
-    ) -> 'SecretProofTransaction':
+        network_type: NetworkType,
+    ) -> SecretProofTransaction:
         """
         Create new secret proof transaction.
 
@@ -120,17 +118,18 @@ class SecretProofTransaction(Transaction):
             proof
         )
 
-    def entity_size(self) -> int:
+    def catbuffer_size_specific(self) -> int:
         # extra 3 bytes, 1 for hash_type, 2 for proof size.
         # The proof size is always 32, even if HASH_160 is used.
         # The hash is just 0-padded to 32 bytes.
-        shared_size = self.shared_entity_size()
         secret_size = 32
         proof_size = len(self.proof) // 2
+        return secret_size + proof_size + 3
 
-        return shared_size + secret_size + proof_size + 3
-
-    def to_catbuffer_specific(self) -> bytes:
+    def to_catbuffer_specific(
+        self,
+        network_type: OptionalNetworkType = None,
+    ) -> bytes:
         """Export secret proof-specific data to catbuffer."""
 
         # uint8_t hash_type
@@ -138,32 +137,40 @@ class SecretProofTransaction(Transaction):
         # uint16_t proof_size
         # uint8_t[proof_size] proof
         proof_size = len(self.proof) // 2
-        hash_type = self.hash_type.to_catbuffer()
+        hash_type = self.hash_type.to_catbuffer(network_type)
         secret = util.unhexlify(self.secret)
         secret = secret + b'\x00' * (32 - len(secret))
-        proof = struct.pack('<H', proof_size) + util.unhexlify(self.proof)
+        proof = util.u16_to_catbuffer(proof_size) + util.unhexlify(self.proof)
         return hash_type + secret + proof
 
-    def load_catbuffer_specific(self, data: bytes) -> bytes:
+    def load_catbuffer_specific(
+        self,
+        data: bytes,
+        network_type: OptionalNetworkType = None,
+    ) -> bytes:
         """Load secret proof-specific data data from catbuffer."""
 
         # uint8_t hash_type
         # uint8_t[32] secret
         # uint16_t proof_size
         # uint8_t[proof_size] proof
-        hash_type, data = HashType.from_catbuffer(data)
+        hash_type, data = HashType.from_catbuffer_pair(data, network_type)
         hash_length = hash_type.hash_length() // 2
         secret = util.hexlify(data[:hash_length])
-        proof_size = struct.unpack('<H', data[hash_length: hash_length + 2])[0]
-        proof = util.hexlify(data[hash_length + 2: hash_length + proof_size + 2])
+        data = data[hash_length:]
+        proof_size = util.u16_from_catbuffer(data[:2])
+        proof = util.hexlify(data[2: proof_size + 2])
 
-        object.__setattr__(self, 'hash_type', hash_type)
-        object.__setattr__(self, 'secret', secret)
-        object.__setattr__(self, 'proof', proof)
+        self._set('hash_type', hash_type)
+        self._set('secret', secret)
+        self._set('proof', proof)
 
-        return data[hash_length + proof_size + 2:]
+        return typing.cast(bytes, data[proof_size + 2:])
 
-    def to_aggregate(self, signer: 'PublicAccount') -> 'SecretProofInnerTransaction':
+    def to_aggregate(
+        self,
+        signer: PublicAccount
+    ) -> SecretProofInnerTransaction:
         """Convert transaction to inner transaction."""
         inst = SecretProofInnerTransaction.from_transaction(self, signer)
         return typing.cast(SecretProofInnerTransaction, inst)
@@ -176,12 +183,11 @@ class SecretProofInnerTransaction(InnerTransaction, SecretProofTransaction):
 
 
 Transaction.HOOKS[TransactionType.SECRET_PROOF] = (
-    SecretProofTransaction.from_catbuffer,
+    SecretProofTransaction.from_catbuffer_pair,
     SecretProofTransaction.from_dto,
 )
 
-
 InnerTransaction.HOOKS[TransactionType.SECRET_PROOF] = (
-    SecretProofInnerTransaction.from_catbuffer,
+    SecretProofInnerTransaction.from_catbuffer_pair,
     SecretProofInnerTransaction.from_dto,
 )

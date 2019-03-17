@@ -27,7 +27,7 @@ from nem2 import util
 
 
 @util.inherit_doc
-class AliasType(util.Dto, util.EnumMixin, enum.IntEnum):
+class AliasType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """Alias type."""
 
     NONE = 0
@@ -36,13 +36,6 @@ class AliasType(util.Dto, util.EnumMixin, enum.IntEnum):
 
     def description(self) -> str:
         return DESCRIPTION[self]
-
-    def to_dto(self) -> int:
-        return int(self)
-
-    @classmethod
-    def from_dto(cls, data: int) -> 'AliasType':
-        return cls(data)
 
 
 DESCRIPTION = {

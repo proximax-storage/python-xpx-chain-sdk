@@ -22,19 +22,16 @@
     limitations under the License.
 """
 
-import struct
-import typing
+from __future__ import annotations
 
 from nem2 import util
-
-if typing.TYPE_CHECKING:
-    from .mosaic_nonce import MosaicNonce
-    from ..account.public_account import PublicAccount
+from .mosaic_nonce import MosaicNonce
+from ..account.public_account import PublicAccount
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True, id=0)
-class MosaicId(util.IntMixin, util.Model):
+class MosaicId(util.IntMixin, util.U64Mixin):
     """
     Mosaic identifier.
 
@@ -42,36 +39,23 @@ class MosaicId(util.IntMixin, util.Model):
     """
 
     id: int
-    CATBUFFER_SIZE: typing.ClassVar[int] = 8
 
     def __int__(self) -> int:
         return self.id
 
     @classmethod
-    def create_from_nonce(cls, nonce: 'MosaicNonce', owner: 'PublicAccount') -> 'MosaicId':
+    def create_from_nonce(
+        cls,
+        nonce: MosaicNonce,
+        owner: PublicAccount,
+    ) -> MosaicId:
         """
         Create mosaic ID from nonce and owner.
 
         :param nonce: Mosaic nonce.
         :param owner: Account of mosaic owner.
         """
-        key: bytes = util.unhexlify(owner.public_key)
+        key = util.unhexlify(owner.public_key)
         return cls(util.generate_mosaic_id(nonce.nonce, key))
 
     createFromNonce = util.undoc(create_from_nonce)
-
-    def to_dto(self) -> util.U64DTOType:
-        return util.uint64_to_dto(self.id)
-
-    @classmethod
-    def from_dto(cls, data: util.U64DTOType) -> 'MosaicId':
-        return cls(util.dto_to_uint64(data))
-
-    def to_catbuffer(self) -> bytes:
-        return struct.pack('<Q', self.id)
-
-    @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['MosaicId', bytes]:
-        assert len(data) >= cls.CATBUFFER_SIZE
-        inst = cls(struct.unpack('<Q', data[:cls.CATBUFFER_SIZE])[0])
-        return inst, data[cls.CATBUFFER_SIZE:]

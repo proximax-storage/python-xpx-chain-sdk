@@ -22,9 +22,9 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import asyncio
 import collections
-
 import rx
 from rx.internal import extensionmethod
 
@@ -32,10 +32,10 @@ from rx.internal import extensionmethod
 class AsyncIterable:
     """Adapter class to convert an observable to an asynchronous iterator."""
 
-    def __init__(self, observable: 'rx.Observable'):
+    def __init__(self, observable: rx.Observable):
         self.observable = observable
-        self.notifications: 'collections.deque' = collections.deque()
-        self.future: 'asyncio.Future' = asyncio.Future()
+        self.notifications: collections.deque = collections.deque()
+        self.future: asyncio.Future = asyncio.Future()
         self.observable.materialize().subscribe(self.on_next)
 
     def __aiter__(self):

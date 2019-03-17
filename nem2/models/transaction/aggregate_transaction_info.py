@@ -22,12 +22,18 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AggregateTransactionInfo(util.Dto):
+class AggregateTransactionInfo(util.DTO):
     """Aggregate transaction metadata."""
 
     height: int
@@ -36,13 +42,13 @@ class AggregateTransactionInfo(util.Dto):
     aggregate_hash: str
     aggregate_id: str
 
-    def is_unconfirmed(self):
+    def is_unconfirmed(self) -> bool:
         """Is transaction pending to be included."""
 
-        return all((
-            self.height == 0,
-            self.aggregate_hash == self.aggregate_id,
-        ))
+        return (
+            self.height == 0
+            and self.aggregate_hash == self.aggregate_id
+        )
 
     isUnconfirmed = util.undoc(is_unconfirmed)
 
@@ -54,16 +60,19 @@ class AggregateTransactionInfo(util.Dto):
 
     def has_missing_signatures(self) -> bool:
         """Does the transaction have missing signatures."""
-        return all((
-            self.height == 0,
-            self.aggregate_hash != self.aggregate_id,
-        ))
+        return (
+            self.height == 0
+            and self.aggregate_hash != self.aggregate_id
+        )
 
     hasMissingSignatures = util.undoc(has_missing_signatures)
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         return {
-            'height': util.uint64_to_dto(self.height),
+            'height': util.u64_to_dto(self.height),
             'index': self.index,
             'id': self.id,
             'aggregateHash': self.aggregate_hash,
@@ -71,9 +80,13 @@ class AggregateTransactionInfo(util.Dto):
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'AggregateTransactionInfo':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ) -> AggregateTransactionInfo:
         return cls(
-            height=util.dto_to_uint64(data['height']),
+            height=util.u64_from_dto(data['height']),
             index=data['index'],
             id=data['id'],
             aggregate_hash=data['aggregateHash'],

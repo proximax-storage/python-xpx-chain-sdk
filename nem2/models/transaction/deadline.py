@@ -22,12 +22,15 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import datetime
 import enum
-import struct
 import typing
 
 from nem2 import util
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -69,7 +72,7 @@ KEYWORDS = {
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class Deadline(util.Model):
+class Deadline(util.U64Mixin):
     """
     Deadline of a transaction.
 
@@ -82,11 +85,14 @@ class Deadline(util.Model):
     """
 
     deadline: datetime.datetime
-    CATBUFFER_SIZE: typing.ClassVar[int] = 8
     TIMESTAMP_NEMESIS_BLOCK: typing.ClassVar[int] = 1459468800
 
     @classmethod
-    def create(cls, deadline: int = 2, unit: ChronoUnit = ChronoUnit.HOURS):
+    def create(
+        cls,
+        deadline: int = 2,
+        unit: ChronoUnit = ChronoUnit.HOURS
+    ) -> Deadline:
         """
         Create deadline relative to current local time.
 
@@ -114,7 +120,7 @@ class Deadline(util.Model):
     toTimestamp = util.undoc(to_timestamp)
 
     @classmethod
-    def from_timestamp(cls, timestamp: int) -> 'Deadline':
+    def from_timestamp(cls, timestamp: int) -> Deadline:
         """
         Create deadline from UTC timestamp.
 
@@ -126,18 +132,30 @@ class Deadline(util.Model):
 
     fromTimestamp = util.undoc(from_timestamp)
 
-    def to_dto(self) -> util.U64DTOType:
-        return util.uint64_to_dto(self.to_timestamp())
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> util.U64DTOType:
+        return util.u64_to_dto(self.to_timestamp())
 
     @classmethod
-    def from_dto(cls, data: util.U64DTOType) -> 'Deadline':
-        return cls.from_timestamp(util.dto_to_uint64(data))
+    def from_dto(
+        cls,
+        data: util.U64DTOType,
+        network_type: OptionalNetworkType = None,
+    ) -> Deadline:
+        return cls.from_timestamp(util.u64_from_dto(data))
 
-    def to_catbuffer(self) -> bytes:
-        return struct.pack('<Q', self.to_timestamp())
+    def to_catbuffer(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> bytes:
+        return util.u64_to_catbuffer(self.to_timestamp())
 
     @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['Deadline', bytes]:
-        assert len(data) >= cls.CATBUFFER_SIZE
-        inst = cls.from_timestamp(struct.unpack('<Q', data[:cls.CATBUFFER_SIZE])[0])
-        return inst, data[cls.CATBUFFER_SIZE:]
+    def from_catbuffer(
+        cls,
+        data: bytes,
+        network_type: OptionalNetworkType = None,
+    ) -> Deadline:
+        return cls.from_timestamp(util.u64_from_catbuffer(data))

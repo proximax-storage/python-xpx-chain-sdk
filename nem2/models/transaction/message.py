@@ -22,15 +22,15 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
-from nem2 import util
 
-if typing.TYPE_CHECKING:
-    from .message_type import MessageType
+from nem2 import util
+from .message_type import MessageType
 
 
 @util.dataclass(frozen=True)
-class Message(util.Dto):
+class Message(util.DTO):
     """
     Abstract message type.
 
@@ -38,10 +38,10 @@ class Message(util.Dto):
     :param payload: Message data, in bytes.
     """
 
-    type: 'MessageType'
+    type: MessageType
     payload: bytes
 
     @classmethod
-    def create(cls, data: bytes) -> 'Message':
+    def create(cls, data: typing.AnyStr) -> Message:
         """Create a message from raw bytes."""
         raise NotImplementedError

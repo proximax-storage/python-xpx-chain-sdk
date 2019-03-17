@@ -22,15 +22,13 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import enum
-import struct
-import typing
-
 from nem2 import util
 
 
 @util.inherit_doc
-class TransactionType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
+class TransactionType(util.U16Mixin, util.EnumMixin, enum.IntEnum):
     """Transaction type."""
 
     TRANSFER = 0x4154
@@ -45,22 +43,10 @@ class TransactionType(util.Catbuffer, util.EnumMixin, enum.IntEnum):
     LOCK = 0x4148
     SECRET_LOCK = 0x4152
     SECRET_PROOF = 0x4252
-    CATBUFFER_SIZE: typing.ClassVar[int]
 
     def description(self) -> str:
         return DESCRIPTION[self]
 
-    def to_catbuffer(self) -> bytes:
-        return struct.pack('<H', int(self))
-
-    @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['TransactionType', bytes]:
-        assert len(data) >= cls.CATBUFFER_SIZE
-        inst = cls(struct.unpack('<H', data[:cls.CATBUFFER_SIZE])[0])
-        return inst, data[cls.CATBUFFER_SIZE:]
-
-
-TransactionType.CATBUFFER_SIZE = 2
 
 DESCRIPTION = {
     TransactionType.TRANSFER: "Transfer Transaction transaction type.",

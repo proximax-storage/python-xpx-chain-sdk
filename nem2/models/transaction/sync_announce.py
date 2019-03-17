@@ -22,6 +22,8 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+
 from nem2 import util
 
 

@@ -22,16 +22,21 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
 from .mosaic_id import MosaicId
 from .mosaic_levy_type import MosaicLevyType
 from ..account.address import Address
+from ..blockchain.network_type import NetworkType
 
+OptionalNetworkType = typing.Optional[NetworkType]
 
 # TODO(ahuszagh) This is not yet implemented in Catapult. Subject to change
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicLevy(util.Dto):
+class MosaicLevy(util.DTO):
     """
     Information describing a mosaic levy.
 
@@ -41,12 +46,15 @@ class MosaicLevy(util.Dto):
     :param fee: Fee amount for levy.
     """
 
-    type: 'MosaicLevyType'
-    recipient: 'Address'
-    mosaic_id: 'MosaicId'
+    type: MosaicLevyType
+    recipient: Address
+    mosaic_id: MosaicId
     fee: int
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None,
+    ) -> dict:
         return {
             'type': self.type.to_dto(),
             'recipient': self.recipient.to_dto(),
@@ -55,7 +63,11 @@ class MosaicLevy(util.Dto):
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'MosaicLevy':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> MosaicLevy:
         return cls(
             type=MosaicLevyType.from_dto(data['type']),
             recipient=Address.from_dto(data['recipient']),

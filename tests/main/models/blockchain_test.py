@@ -1,4 +1,5 @@
 from nem2 import models
+from nem2 import util
 from tests import harness
 
 
@@ -94,6 +95,26 @@ class TestBlockInfo(harness.TestCase):
             block_transactions_hash=self.block_transactions_hash,
             merkle_tree=self.merkle_tree,
         )
+        self.dto = {
+            'meta': {
+                'hash': self.hash,
+                'generationHash': self.generation_hash,
+                'totalFee': util.u64_to_dto(self.total_fee),
+                'numTransactions': self.num_transactions,
+                'merkleTree': self.merkle_tree,
+            },
+            'block': {
+                'signature': self.signature,
+                'signer': self.public_key,
+                'version': self.version,
+                'type': self.type,
+                'height': util.u64_to_dto(self.height),
+                'timestamp': util.u64_to_dto(self.timestamp),
+                'difficulty': util.u64_to_dto(self.difficulty),
+                'previousBlockHash': self.previous_block_hash,
+                'blockTransactionsHash': self.block_transactions_hash,
+            },
+        }
 
     def test_slots(self):
         with self.assertRaises(TypeError):
@@ -129,83 +150,60 @@ class TestBlockInfo(harness.TestCase):
         self.assertTrue(bi3 == bi3)
 
     def test_to_dto(self):
-        dto = self.block_info.to_dto()
+        dto = self.block_info.to_dto(self.network_type)
         self.assertIn("merkleTree", dto['meta'])
-        self.assertEqual(dto, {
-            'meta': {
-                'hash': self.hash,
-                'generationHash': self.generation_hash,
-                'totalFee': [0, 0],
-                'numTransactions': self.num_transactions,
-                'merkleTree': self.merkle_tree,
-            },
-            'block': {
-                'signature': self.signature,
-                'signer': self.public_key,
-                'version': self.version,
-                'type': self.type,
-                'height': [1, 0],
-                'timestamp': [0, 0],
-                'difficulty': [276447232, 23283],
-                'previousBlockHash': self.previous_block_hash,
-                'blockTransactionsHash': self.block_transactions_hash,
-            },
-        })
+        self.assertEqual(dto, self.dto)
 
         block_info = self.block_info.replace(merkle_tree=None)
-        dto = block_info.to_dto()
+        dto = block_info.to_dto(self.network_type)
         self.assertNotIn("merkleTree", dto['meta'])
 
     def test_from_dto(self):
-        dto = self.block_info.to_dto()
-        self.assertEqual(self.block_info, models.BlockInfo.from_dto(dto))
+        self.assertEqual(self.block_info, models.BlockInfo.from_dto(self.dto, self.network_type))
 
         block_info = self.block_info.replace(merkle_tree=None)
-        dto = block_info.to_dto()
-        self.assertEqual(block_info, models.BlockInfo.from_dto(dto))
+        dto = block_info.to_dto(self.network_type)
+        self.assertEqual(block_info, models.BlockInfo.from_dto(dto, self.network_type))
 
 
 class TestBlockchainScore(harness.TestCase):
 
+    def setUp(self):
+        self.network_type = models.NetworkType.MIJIN_TEST
+        self.score = models.BlockchainScore(554597137692201874146690593473)
+        self.dto = {'scoreLow': [2781082305, 27425266], 'scoreHigh': [5, 7]}
+
     def test_properties(self):
-        value = models.BlockchainScore(554597137692201874146690593473)
-        self.assertEqual(value.score_low, 117790623335183041)
-        self.assertEqual(value.score_high, 30064771077)
+        self.assertEqual(self.score.score_low, 117790623335183041)
+        self.assertEqual(self.score.score_high, 30064771077)
 
     def test_slots(self):
-        value = models.BlockchainScore(554597137692201874146690593473)
         with self.assertRaises(TypeError):
-            value.__dict__
+            self.score.__dict__
 
     def test_to_dto(self):
-        value = models.BlockchainScore(554597137692201874146690593473)
-        dto = {'scoreLow': [2781082305, 27425266], 'scoreHigh': [5, 7]}
-        self.assertEqual(value.to_dto(), dto)
+        self.assertEqual(self.score.to_dto(self.network_type), self.dto)
 
     def test_from_dto(self):
-        dto = {'scoreLow': [2781082305, 27425266], 'scoreHigh': [5, 7]}
-        value = models.BlockchainScore.from_dto(dto)
-        self.assertEqual(value.score, 554597137692201874146690593473)
+        self.assertEqual(self.score, models.BlockchainScore.from_dto(self.dto, self.network_type))
 
 
 class TestBlockchainStorageInfo(harness.TestCase):
 
+    def setUp(self):
+        self.network_type = models.NetworkType.MIJIN_TEST
+        self.info = models.BlockchainStorageInfo(11459, 25, 25)
+        self.dto = {'numBlocks': 11459, 'numTransactions': 25, 'numAccounts': 25}
+
     def test_slots(self):
-        value = models.BlockchainStorageInfo(11459, 25, 25)
         with self.assertRaises(TypeError):
-            value.__dict__
+            self.info.__dict__
 
     def test_to_dto(self):
-        value = models.BlockchainStorageInfo(11459, 25, 25)
-        dto = {'numBlocks': 11459, 'numTransactions': 25, 'numAccounts': 25}
-        self.assertEqual(value.to_dto(), dto)
+        self.assertEqual(self.info.to_dto(self.network_type), self.dto)
 
     def test_from_dto(self):
-        dto = {'numBlocks': 11459, 'numTransactions': 25, 'numAccounts': 25}
-        value = models.BlockchainStorageInfo.from_dto(dto)
-        self.assertEqual(value.num_blocks, 11459)
-        self.assertEqual(value.num_transactions, 25)
-        self.assertEqual(value.num_accounts, 25)
+        self.assertEqual(self.info, models.BlockchainStorageInfo.from_dto(self.dto, self.network_type))
 
 
 class TestNetworkType(harness.TestCase):
@@ -259,15 +257,3 @@ class TestNetworkType(harness.TestCase):
 
         with self.assertRaises(KeyError):
             create("FD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54")
-
-    def test_to_dto(self):
-        self.assertEqual(self.main_net.to_dto(), 0x68)
-        self.assertEqual(self.test_net.to_dto(), 0x98)
-        self.assertEqual(self.mijin.to_dto(), 0x60)
-        self.assertEqual(self.mijin_test.toDto(), 0x90)
-
-    def test_from_dto(self):
-        self.assertEqual(self.main_net, models.NetworkType.from_dto(0x68))
-        self.assertEqual(self.test_net, models.NetworkType.fromDto(0x98))
-        self.assertEqual(self.mijin, models.NetworkType.from_dto(0x60))
-        self.assertEqual(self.mijin_test, models.NetworkType.from_dto(0x90))

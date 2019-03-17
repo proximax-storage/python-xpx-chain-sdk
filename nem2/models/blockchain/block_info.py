@@ -22,19 +22,21 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 
 from nem2 import util
 from .network_type import NetworkType
 from ..account.public_account import PublicAccount
 
+OptionalNetworkType = typing.Optional[NetworkType]
 MerkleTreeType = typing.Sequence[str]
 OptionalMerkleTreeType = typing.Optional[MerkleTreeType]
 
 
 @util.inherit_doc
-@util.dataclass(frozen=True, merkle_tree=None)
-class BlockInfo(util.Dto):
+@util.dataclass(frozen=True)
+class BlockInfo(util.DTO):
     """
     Basic information describing a block.
 
@@ -60,8 +62,8 @@ class BlockInfo(util.Dto):
     total_fee: int
     num_transactions: int
     signature: str
-    signer: 'PublicAccount'
-    network_type: 'NetworkType'
+    signer: PublicAccount
+    network_type: NetworkType
     version: int
     type: int
     height: int
@@ -71,11 +73,53 @@ class BlockInfo(util.Dto):
     block_transactions_hash: str
     merkle_tree: OptionalMerkleTreeType
 
-    def to_dto(self) -> dict:
+    def __init__(
+        self,
+        hash: typing.AnyStr,
+        generation_hash: typing.AnyStr,
+        total_fee: int,
+        num_transactions: int,
+        signature: typing.AnyStr,
+        signer: PublicAccount,
+        network_type: NetworkType,
+        version: int,
+        type: int,
+        height: int,
+        timestamp: int,
+        difficulty: int,
+        previous_block_hash: typing.AnyStr,
+        block_transactions_hash: typing.AnyStr,
+        merkle_tree: OptionalMerkleTreeType = None,
+    ):
+        hash = util.encode_hex(hash)
+        generation_hash = util.encode_hex(generation_hash)
+        signature = util.encode_hex(signature)
+        previous_block_hash = util.encode_hex(previous_block_hash)
+        block_transactions_hash = util.encode_hex(block_transactions_hash)
+        self._set('hash', hash)
+        self._set('generation_hash', generation_hash)
+        self._set('total_fee', total_fee)
+        self._set('num_transactions', num_transactions)
+        self._set('signature', signature)
+        self._set('signer', signer)
+        self._set('network_type', network_type)
+        self._set('version', version)
+        self._set('type', type)
+        self._set('height', height)
+        self._set('timestamp', timestamp)
+        self._set('difficulty', difficulty)
+        self._set('previous_block_hash', previous_block_hash)
+        self._set('block_transactions_hash', block_transactions_hash)
+        self._set('merkle_tree', merkle_tree)
+
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         meta = {
             'hash': self.hash,
             'generationHash': self.generation_hash,
-            'totalFee': util.uint64_to_dto(self.total_fee),
+            'totalFee': util.u64_to_dto(self.total_fee),
             'numTransactions': self.num_transactions,
         }
         block = {
@@ -83,9 +127,9 @@ class BlockInfo(util.Dto):
             'signer': self.signer.public_key,
             'version': self.version,
             'type': self.type,
-            'height': util.uint64_to_dto(self.height),
-            'timestamp': util.uint64_to_dto(self.timestamp),
-            'difficulty': util.uint64_to_dto(self.difficulty),
+            'height': util.u64_to_dto(self.height),
+            'timestamp': util.u64_to_dto(self.timestamp),
+            'difficulty': util.u64_to_dto(self.difficulty),
             'previousBlockHash': self.previous_block_hash,
             'blockTransactionsHash': self.block_transactions_hash,
         }
@@ -99,7 +143,11 @@ class BlockInfo(util.Dto):
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'BlockInfo':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ) -> BlockInfo:
         meta = data['meta']
         block = data['block']
         version = block['version']
@@ -109,16 +157,16 @@ class BlockInfo(util.Dto):
         return cls(
             hash=meta['hash'],
             generation_hash=meta['generationHash'],
-            total_fee=util.dto_to_uint64(meta.get('totalFee', [0, 0])),
+            total_fee=util.u64_from_dto(meta.get('totalFee', [0, 0])),
             num_transactions=meta.get('numTransactions', 0),
             signature=block['signature'],
             signer=PublicAccount.create_from_public_key(block['signer'], network_type),
             network_type=network_type,
             version=version,
             type=block['type'],
-            height=util.dto_to_uint64(block['height']),
-            timestamp=util.dto_to_uint64(block['timestamp']),
-            difficulty=util.dto_to_uint64(block['difficulty']),
+            height=util.u64_from_dto(block['height']),
+            timestamp=util.u64_from_dto(block['timestamp']),
+            difficulty=util.u64_from_dto(block['difficulty']),
             previous_block_hash=block['previousBlockHash'],
             block_transactions_hash=block['blockTransactionsHash'],
             merkle_tree=meta.get('merkleTree')

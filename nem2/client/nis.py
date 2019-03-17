@@ -25,29 +25,29 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 
 from nem2 import util
 from nem2 import models
+from . import client
 
-if typing.TYPE_CHECKING:
-    from .client import Client
-    from nem2.models import *
+OptionalNetworkType = typing.Optional[models.NetworkType]
 
 # BOILERPLATE
 # -----------
 
 
-def synchronous_request(name, doc, raise_for_status=False):
+def synchronous_request(name, doc="", raise_for_status=True):
     """Generate wrappers for a synchronous request."""
 
-    def f(*args, **kwds):
-        response = REQUEST[name](*args, **kwds)
+    def f(client, network_type, *args, **kwds):
+        response = REQUEST[name](client, *args, **kwds)
         if raise_for_status:
             response.raise_for_status()
         status = response.status_code
         json = response.json()
-        return PROCESS[name](status, json)
+        return PROCESS[name](status, json, network_type)
 
     f.__name__ = name
     f.__doc__ = doc
@@ -56,16 +56,16 @@ def synchronous_request(name, doc, raise_for_status=False):
     return f
 
 
-def asynchronous_request(name, doc, raise_for_status=False):
+def asynchronous_request(name, doc="", raise_for_status=True):
     """Generate wrappers for an asynchronous request."""
 
-    async def f(*args, **kwds):
-        async with REQUEST[name](*args, **kwds) as response:
+    async def f(client, network_type, *args, **kwds):
+        async with REQUEST[name](client, *args, **kwds) as response:
             if raise_for_status:
                 response.raise_for_status()
             status = response.status
             json = await response.json()
-            return PROCESS[name](status, json)
+            return PROCESS[name](status, json, await network_type)
 
     f.__name__ = f"async_{name}"
     f.__doc__ = doc
@@ -85,7 +85,11 @@ def request(*args, **kwds):
 # BLOCKCHAIN HTTP
 # ---------------
 
-def request_get_block_by_height(client: 'Client', height: int, **kwds):
+def request_get_block_by_height(
+    client: client.Client,
+    height: int,
+    **kwds
+):
     """
     Make "/block/{height}" request.
 
@@ -97,22 +101,27 @@ def request_get_block_by_height(client: 'Client', height: int, **kwds):
     return client.get(f"/block/{height}", **kwds)
 
 
-def process_get_block_by_height(status: int, json: dict) -> 'BlockInfo':
+def process_get_block_by_height(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.BlockInfo:
     """
     Process the "/block/{height}" HTTP response.
 
     :param status: Status code for HTTP response.
     :param json: JSON data for response message.
+    :param network_type: Network type..
     """
 
     assert status == 200
-    return models.BlockInfo.from_dto(json)
+    return models.BlockInfo.from_dto(json, network_type)
 
 
-get_block_by_height = request("get_block_by_height", "", True)
+get_block_by_height = request("get_block_by_height")
 
 
-def request_get_blockchain_height(client: 'Client', **kwds):
+def request_get_blockchain_height(client: client.Client, **kwds):
     """
     Make "/chain/height" request.
 
@@ -123,7 +132,11 @@ def request_get_blockchain_height(client: 'Client', **kwds):
     return client.get("/chain/height", **kwds)
 
 
-def process_get_blockchain_height(status: int, json: dict) -> int:
+def process_get_blockchain_height(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> int:
     """
     Process the "/chain/height" HTTP response.
 
@@ -132,13 +145,13 @@ def process_get_blockchain_height(status: int, json: dict) -> int:
     """
 
     assert status == 200
-    return util.dto_to_uint64(json['height'])
+    return util.u64_from_dto(json['height'])
 
 
-get_blockchain_height = request("get_blockchain_height", "", True)
+get_blockchain_height = request("get_blockchain_height")
 
 
-def request_get_blockchain_score(client: 'Client', **kwds):
+def request_get_blockchain_score(client: client.Client, **kwds):
     """
     Make "/chain/score" request.
 
@@ -149,7 +162,11 @@ def request_get_blockchain_score(client: 'Client', **kwds):
     return client.get("/chain/score", **kwds)
 
 
-def process_get_blockchain_score(status: int, json: dict) -> 'BlockchainScore':
+def process_get_blockchain_score(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.BlockchainScore:
     """
     Process the "/chain/score" HTTP response.
 
@@ -158,13 +175,13 @@ def process_get_blockchain_score(status: int, json: dict) -> 'BlockchainScore':
     """
 
     assert status == 200
-    return models.BlockchainScore.from_dto(json)
+    return models.BlockchainScore.from_dto(json, network_type)
 
 
-get_blockchain_score = request("get_blockchain_score", "", True)
+get_blockchain_score = request("get_blockchain_score")
 
 
-def request_get_diagnostic_storage(client: 'Client', **kwds):
+def request_get_diagnostic_storage(client: client.Client, **kwds):
     """
     Make "/diagnostic/storage" request.
 
@@ -175,7 +192,11 @@ def request_get_diagnostic_storage(client: 'Client', **kwds):
     return client.get("/diagnostic/storage", **kwds)
 
 
-def process_get_diagnostic_storage(status: int, json: dict) -> 'BlockchainStorageInfo':
+def process_get_diagnostic_storage(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.BlockchainStorageInfo:
     """
     Process the "/diagnostic/storage" HTTP response.
 
@@ -184,16 +205,20 @@ def process_get_diagnostic_storage(status: int, json: dict) -> 'BlockchainStorag
     """
 
     assert status == 200
-    return models.BlockchainStorageInfo.from_dto(json)
+    return models.BlockchainStorageInfo.from_dto(json, network_type)
 
 
-get_diagnostic_storage = request("get_diagnostic_storage", "", True)
+get_diagnostic_storage = request("get_diagnostic_storage")
 
 # MOSAIC HTTP
 # -----------
 
 
-def request_get_mosaic_names(client: 'Client', ids: typing.Sequence['MosaicId'], **kwds):
+def request_get_mosaic_names(
+    client: client.Client,
+    ids: typing.Sequence[models.MosaicId],
+    **kwds
+):
     """
     Make "/mosaic/names" request.
 
@@ -206,7 +231,11 @@ def request_get_mosaic_names(client: 'Client', ids: typing.Sequence['MosaicId'],
     return client.post("/mosaic/names", json=json, **kwds)
 
 
-def process_get_mosaic_names(status: int, json: list) -> typing.Sequence['MosaicName']:
+def process_get_mosaic_names(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.MosaicName]:
     """
     Process the "/mosaic/names" HTTP response.
 
@@ -215,16 +244,20 @@ def process_get_mosaic_names(status: int, json: list) -> typing.Sequence['Mosaic
     """
 
     assert status == 200
-    return [models.MosaicName.from_dto(i) for i in json]
+    return [models.MosaicName.from_dto(i, network_type) for i in json]
 
 
-get_mosaic_names = request("get_mosaic_names", "", True)
+get_mosaic_names = request("get_mosaic_names")
 
 # NAMESPACE HTTP
 # --------------
 
 
-def request_get_namespace(client: 'Client', namespace_id: 'NamespaceId', **kwds):
+def request_get_namespace(
+    client: client.Client,
+    namespace_id: models.NamespaceId,
+    **kwds
+):
     """
     Make "/namespace/{namespace_id}" request.
 
@@ -236,7 +269,11 @@ def request_get_namespace(client: 'Client', namespace_id: 'NamespaceId', **kwds)
     return client.get(f"/namespace/{namespace_id:x}", **kwds)
 
 
-def process_get_namespace(status: int, json: dict) -> 'NamespaceInfo':
+def process_get_namespace(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.NamespaceInfo:
     """
     Process the "/namespace/{namespace_id}" HTTP response.
 
@@ -245,13 +282,17 @@ def process_get_namespace(status: int, json: dict) -> 'NamespaceInfo':
     """
 
     assert status == 200
-    return models.NamespaceInfo.from_dto(json)
+    return models.NamespaceInfo.from_dto(json, network_type)
 
 
-get_namespace = request("get_namespace", "", True)
+get_namespace = request("get_namespace")
 
 
-def request_get_namespace_names(client: 'Client', ids: typing.Sequence['NamespaceId'], **kwds):
+def request_get_namespace_names(
+    client: client.Client,
+    ids: typing.Sequence[models.NamespaceId],
+    **kwds
+):
     """
     Make "/namespace/names" request.
 
@@ -264,7 +305,11 @@ def request_get_namespace_names(client: 'Client', ids: typing.Sequence['Namespac
     return client.post("/namespace/names", json=json, **kwds)
 
 
-def process_get_namespace_names(status: int, json: list) -> typing.Sequence['NamespaceName']:
+def process_get_namespace_names(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.NamespaceName]:
     """
     Process the "/namespace/names" HTTP response.
 
@@ -273,13 +318,17 @@ def process_get_namespace_names(status: int, json: list) -> typing.Sequence['Nam
     """
 
     assert status == 200
-    return [models.NamespaceName.from_dto(i) for i in json]
+    return [models.NamespaceName.from_dto(i, network_type) for i in json]
 
 
-get_namespace_names = request("get_namespace_names", "", True)
+get_namespace_names = request("get_namespace_names")
 
 
-def request_get_namespaces_from_account(client: 'Client', address: 'Address', **kwds):
+def request_get_namespaces_from_account(
+    client: client.Client,
+    address: models.Address,
+    **kwds
+):
     """
     Make "/account/{address}/namespaces" request.
 
@@ -291,7 +340,11 @@ def request_get_namespaces_from_account(client: 'Client', address: 'Address', **
     return client.get(f"/account/{address.address}/namespaces", **kwds)
 
 
-def process_get_namespaces_from_account(status: int, json: list) -> typing.Sequence['NamespaceInfo']:
+def process_get_namespaces_from_account(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.NamespaceInfo]:
     """
     Process the "/account/{address}/namespaces" HTTP response.
 
@@ -300,13 +353,17 @@ def process_get_namespaces_from_account(status: int, json: list) -> typing.Seque
     """
 
     assert status == 200
-    return [models.NamespaceInfo.from_dto(i) for i in json]
+    return [models.NamespaceInfo.from_dto(i, network_type) for i in json]
 
 
-get_namespaces_from_account = request("get_namespaces_from_account", "", True)
+get_namespaces_from_account = request("get_namespaces_from_account")
 
 
-def request_get_namespaces_from_accounts(client: 'Client', addresses: typing.Sequence['Address'], **kwds):
+def request_get_namespaces_from_accounts(
+    client: client.Client,
+    addresses: typing.Sequence[models.Address],
+    **kwds
+):
     """
     Make "/account/namespaces" request.
 
@@ -319,7 +376,11 @@ def request_get_namespaces_from_accounts(client: 'Client', addresses: typing.Seq
     return client.post("/account/namespaces", json=json, **kwds)
 
 
-def process_get_namespaces_from_accounts(status: int, json: list) -> typing.Sequence['NamespaceInfo']:
+def process_get_namespaces_from_accounts(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.NamespaceInfo]:
     """
     Process the "/account/namespaces" HTTP response.
 
@@ -328,13 +389,17 @@ def process_get_namespaces_from_accounts(status: int, json: list) -> typing.Sequ
     """
 
     assert status == 200
-    return [models.NamespaceInfo.from_dto(i) for i in json]
+    return [models.NamespaceInfo.from_dto(i, network_type) for i in json]
 
 
-get_namespaces_from_accounts = request("get_namespaces_from_accounts", "", True)
+get_namespaces_from_accounts = request("get_namespaces_from_accounts")
 
 
-def request_get_linked_mosaic_id(client: 'Client', namespace_id: 'NamespaceId', **kwds):
+def request_get_linked_mosaic_id(
+    client: client.Client,
+    namespace_id: models.NamespaceId,
+    **kwds
+):
     """
     Make "/namespace/{namespace_id}" request.
 
@@ -346,7 +411,11 @@ def request_get_linked_mosaic_id(client: 'Client', namespace_id: 'NamespaceId', 
     return request_get_namespace(client, namespace_id, **kwds)
 
 
-def process_get_linked_mosaic_id(status: int, json: dict) -> 'MosaicId':
+def process_get_linked_mosaic_id(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.MosaicId:
     """
     Process the "/namespace/{namespace_id}" HTTP response.
 
@@ -354,14 +423,18 @@ def process_get_linked_mosaic_id(status: int, json: dict) -> 'MosaicId':
     :param json: JSON data for response message.
     """
 
-    namespace_info = process_get_namespace(status, json)
+    namespace_info = process_get_namespace(status, json, network_type)
     return namespace_info.alias.mosaic_id
 
 
-get_linked_mosaic_id = request("get_linked_mosaic_id", "", True)
+get_linked_mosaic_id = request("get_linked_mosaic_id")
 
 
-def request_get_linked_address(client: 'Client', namespace_id: 'NamespaceId', **kwds):
+def request_get_linked_address(
+    client: client.Client,
+    namespace_id: models.NamespaceId,
+    **kwds
+):
     """
     Make "/namespace/{namespace_id}" request.
 
@@ -373,7 +446,11 @@ def request_get_linked_address(client: 'Client', namespace_id: 'NamespaceId', **
     return request_get_namespace(client, namespace_id, **kwds)
 
 
-def process_get_linked_address(status: int, json: dict) -> 'Address':
+def process_get_linked_address(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.Address:
     """
     Process the "/namespace/{namespace_id}" HTTP response.
 
@@ -381,11 +458,11 @@ def process_get_linked_address(status: int, json: dict) -> 'Address':
     :param json: JSON data for response message.
     """
 
-    namespace_info = process_get_namespace(status, json)
+    namespace_info = process_get_namespace(status, json, network_type)
     return namespace_info.alias.address
 
 
-get_linked_address = request("get_linked_address", "", True)
+get_linked_address = request("get_linked_address")
 
 # NETWORK HTTP
 # ------------
@@ -400,7 +477,7 @@ NETWORK_TYPE = {
 }
 
 
-def request_get_network_type(client: 'Client', **kwds):
+def request_get_network_type(client: client.Client, **kwds):
     """
     Make "/network" request.
 
@@ -411,7 +488,11 @@ def request_get_network_type(client: 'Client', **kwds):
     return client.get("/network", **kwds)
 
 
-def process_get_network_type(status: int, json: dict) -> 'NetworkType':
+def process_get_network_type(
+    status: int,
+    json: dict,
+    network_type: OptionalNetworkType,
+) -> models.NetworkType:
     """
     Process the "/network" HTTP response.
 
@@ -423,13 +504,13 @@ def process_get_network_type(status: int, json: dict) -> 'NetworkType':
     return NETWORK_TYPE[json['name']]
 
 
-get_network_type = request("get_network_type", "", True)
+get_network_type = request("get_network_type")
 
 # TRANSACTION HTTP
 # ----------------
 
 
-def request_get_transaction(client: 'Client', hash: str, **kwds):
+def request_get_transaction(client: client.Client, hash: str, **kwds):
     """
     Make "/transaction/{hash}" request.
 
@@ -442,7 +523,11 @@ def request_get_transaction(client: 'Client', hash: str, **kwds):
 
 
 # TODO(ahuszagh) Annotate
-def process_get_transaction(status: int, json: dict):
+def process_get_transaction(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+):
     """
     Process the "/transaction/{hash}" HTTP response.
 
@@ -455,10 +540,14 @@ def process_get_transaction(status: int, json: dict):
     raise NotImplementedError
 
 
-get_transaction = request("get_transaction", "", True)
+get_transaction = request("get_transaction")
 
 
-def request_get_transactions(client: 'Client', hashes: typing.Sequence[str], **kwds):
+def request_get_transactions(
+    client: client.Client,
+    hashes: typing.Sequence[str],
+    **kwds
+):
     """
     Make "/transaction/{hash}" request.
 
@@ -471,7 +560,11 @@ def request_get_transactions(client: 'Client', hashes: typing.Sequence[str], **k
 
 
 # TODO(ahuszagh) Annotate
-def process_get_transactions(status: int, json: list):
+def process_get_transactions(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+):
     """
     Process the "/transaction/{hash}" HTTP response.
 
@@ -484,10 +577,14 @@ def process_get_transactions(status: int, json: list):
     raise NotImplementedError
 
 
-get_transactions = request("get_transactions", "", True)
+get_transactions = request("get_transactions")
 
 
-def request_get_transaction_status(client: 'Client', hash: str, **kwds):
+def request_get_transaction_status(
+    client: client.Client,
+    hash: str,
+    **kwds
+):
     """
     Make "/transaction/{hash}/status" request.
 
@@ -499,7 +596,11 @@ def request_get_transaction_status(client: 'Client', hash: str, **kwds):
     return client.get(f"/transaction/{hash}/status", **kwds)
 
 
-def process_get_transaction_status(status: int, json: dict) -> 'TransactionStatus':
+def process_get_transaction_status(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.TransactionStatus:
     """
     Process the "/transaction/{hash}/status" HTTP response.
 
@@ -508,13 +609,17 @@ def process_get_transaction_status(status: int, json: dict) -> 'TransactionStatu
     """
 
     assert status == 200
-    return models.TransactionStatus.from_dto(json)
+    return models.TransactionStatus.from_dto(json, network_type)
 
 
-get_transaction_status = request("get_transaction_status", "", True)
+get_transaction_status = request("get_transaction_status")
 
 
-def request_get_transaction_statuses(client: 'Client', hashes: typing.Sequence[str], **kwds):
+def request_get_transaction_statuses(
+    client: client.Client,
+    hashes: typing.Sequence[str],
+    **kwds
+):
     """
     Make "/transaction/statuses" request.
 
@@ -527,7 +632,11 @@ def request_get_transaction_statuses(client: 'Client', hashes: typing.Sequence[s
     return client.post(f"/transaction/statuses", json=json, **kwds)
 
 
-def process_get_transaction_statuses(status: int, json: list) -> typing.Sequence['TransactionStatus']:
+def process_get_transaction_statuses(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.TransactionStatus]:
     """
     Process the "/transaction/statuses" HTTP response.
 
@@ -536,10 +645,10 @@ def process_get_transaction_statuses(status: int, json: list) -> typing.Sequence
     """
 
     assert status == 200
-    return [models.TransactionStatus.from_dto(i) for i in json]
+    return [models.TransactionStatus.from_dto(i, network_type) for i in json]
 
 
-get_transaction_statuses = request("get_transaction_statuses", "", True)
+get_transaction_statuses = request("get_transaction_statuses")
 
 # FORWARDERS
 # ----------

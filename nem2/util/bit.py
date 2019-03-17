@@ -22,6 +22,8 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+
 
 def set(byte: int, index: int) -> int:
     """Set bit at index to 1."""

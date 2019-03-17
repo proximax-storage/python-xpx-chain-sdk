@@ -22,13 +22,19 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
 from .namespace_id import NamespaceId
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class NamespaceName(util.Dto):
+class NamespaceName(util.DTO):
     """
     Namespace name and identifier.
 
@@ -36,11 +42,11 @@ class NamespaceName(util.Dto):
     :param name: Namespace name.
     """
 
-    namespace_id: 'NamespaceId'
+    namespace_id: NamespaceId
     name: str
 
     @classmethod
-    def create_from_name(cls, name: str) -> 'NamespaceName':
+    def create_from_name(cls, name: str) -> NamespaceName:
         """
         Create namespace name and identifier from name.
 
@@ -49,14 +55,21 @@ class NamespaceName(util.Dto):
         namespace_id = NamespaceId(name)
         return cls(namespace_id, name)
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         return {
-            'namespaceId': self.namespace_id.to_dto(),
+            'namespaceId': self.namespace_id.to_dto(network_type),
             'name': self.name
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'NamespaceName':
-        namespace_id = NamespaceId.from_dto(data['namespaceId'])
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> NamespaceName:
+        namespace_id = NamespaceId.from_dto(data['namespaceId'], network_type)
         name = data['name']
         return cls(namespace_id, name)

@@ -28,9 +28,21 @@ from nem2 import util
 IdType = typing.Union[str, int]
 
 
+def id_to_int(id: IdType) -> int:
+    """Convert identifier to int."""
+
+    if isinstance(id, int):
+        return id
+    elif isinstance(id, str):
+        ids = util.generate_namespace_id(id) or [0]
+        return ids[-1]
+    else:
+        raise TypeError(f"Invalid type for ID, got {type(id).__name__}")
+
+
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class NamespaceId(util.IntMixin, util.Dto):
+class NamespaceId(util.IntMixin, util.U64Mixin):
     """
     Identifier for a namespace.
 
@@ -40,21 +52,7 @@ class NamespaceId(util.IntMixin, util.Dto):
     id: int
 
     def __init__(self, id: IdType) -> None:
-        if isinstance(id, int):
-            object.__setattr__(self, 'id', id)
-        elif isinstance(id, str):
-            ids = util.generate_namespace_id(id) or [0]
-            object.__setattr__(self, 'id', ids[-1])
-        else:
-            name = type(id).__name__
-            raise TypeError(f"Expected str or int for NamespaceId, got {name}")
+        self._set('id', id_to_int(id))
 
     def __int__(self) -> int:
         return self.id
-
-    def to_dto(self) -> util.U64DTOType:
-        return util.uint64_to_dto(self.id)
-
-    @classmethod
-    def from_dto(cls, data: util.U64DTOType) -> 'NamespaceId':
-        return cls(util.dto_to_uint64(data))

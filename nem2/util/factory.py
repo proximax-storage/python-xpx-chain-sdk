@@ -25,6 +25,7 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import inspect
 import typing
 
@@ -95,7 +96,13 @@ def defactorize_class(cls, module, qualname, special):
     return cls
 
 
-def defactorize(obj, module=None, qualname=None, namespace=None, special={'__init__'}):
+def defactorize(
+    obj,
+    module=None,
+    qualname=None,
+    namespace=None,
+    special={'__init__'}
+):
     """
     Patch an object to modify the qualified name and module.
 

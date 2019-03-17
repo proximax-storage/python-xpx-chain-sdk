@@ -22,8 +22,8 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import asyncio
-
 import rx
 from rx.internal import extensionclassmethod
 

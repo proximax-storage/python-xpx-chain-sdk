@@ -37,6 +37,7 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import os
 import typing
 import warnings
@@ -351,7 +352,10 @@ def decode_hash512(h: bytes) -> int:
     return decode_uint256(h)
 
 
-def publickey(seed: bytes, hash512: HashFuncType) -> typing.Tuple[bytes, bytes]:
+def publickey(
+    seed: bytes,
+    hash512: HashFuncType
+) -> typing.Tuple[bytes, bytes]:
     """Generate public and private key from seed."""
 
     warnings.warn('Security warning: generating verifying key using insecure ed25519 implementation, secrets may be leaked.', SecretsWarning)
@@ -364,7 +368,11 @@ def publickey(seed: bytes, hash512: HashFuncType) -> typing.Tuple[bytes, bytes]:
     return seed + public_key, public_key
 
 
-def sign(message: bytes, signing_key: bytes, hash512: HashFuncType) -> bytes:
+def sign(
+    message: bytes,
+    signing_key: bytes,
+    hash512: HashFuncType
+) -> bytes:
     """Sign message using public and private key."""
 
     warnings.warn('Security warning: signing message using insecure ed25519 implementation, secrets may be leaked.', SecretsWarning)
@@ -382,7 +390,12 @@ def sign(message: bytes, signing_key: bytes, hash512: HashFuncType) -> bytes:
     return encode_point(p) + encode_uint256(s)
 
 
-def verify(verifying_key: bytes, signature: bytes, message: bytes, hash512: HashFuncType) -> bool:
+def verify(
+    verifying_key: bytes,
+    signature: bytes,
+    message: bytes,
+    hash512: HashFuncType
+) -> bool:
     """
     Verify signature from public key and message.
 

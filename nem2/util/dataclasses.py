@@ -22,6 +22,7 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import contextlib
 import copy
 import dataclasses
@@ -61,27 +62,29 @@ def set_defaults(cls, defaults):
     init.__defaults__ = tuple(defaults.values())
 
 
-def global_annotation(global_vars, type):
+def fix_annotation(type, global_vars, local_vars):
     """Fix annotation for field with type."""
 
     if isinstance(type, str):
-        if type in global_vars:
-            return global_vars[type]
+        try:
+            return eval(type, global_vars, local_vars)
+        except NameError:
+            return type
     elif isinstance(type, typing.ForwardRef):
-        arg = global_annotation(global_vars, type.__forward_arg__)
+        arg = fix_annotation(type.__forward_arg__, global_vars, local_vars)
         is_argument = type.__forward_is_argument__
         if isinstance(arg, str):
             return typing.ForwardRef(arg, is_argument)
         return arg
     elif hasattr(type, '__args__'):
         args = type.__args__
-        args = tuple((global_annotation(global_vars, i) for i in args))
+        args = tuple((fix_annotation(i, global_vars, local_vars) for i in args))
         type.__args__ = args
 
     return type
 
 
-def fix_annotations(cls, clsdict, global_vars):
+def fix_annotations(cls, clsdict, global_vars, local_vars):
     """Fix any forward references to variables defined in the callee scope."""
 
     # Don't care except when enforcing types.
@@ -90,18 +93,26 @@ def fix_annotations(cls, clsdict, global_vars):
 
     annotations = clsdict['__annotations__']
     for field, type in annotations.items():
-        type = global_annotation(global_vars, type)
+        type = fix_annotation(type, global_vars, local_vars)
         annotations[field] = type
 
 
-def set_slots(cls, clsdict, slots):
+def is_classvar(x, global_vars, local_vars):
+    """Determine if x is a ClassVar."""
+
+    if isinstance(x, str):
+        x = eval(x, global_vars, local_vars)
+    return getattr(x, '__origin__', None) is typing.ClassVar
+
+
+def set_slots(cls, clsdict, slots, global_vars, local_vars):
     """Set default __slots__ implementation."""
 
     if not slots or '__slots__' in clsdict:
         return
     annotations = clsdict['__annotations__']
-    is_classvar = lambda x: getattr(x, '__origin__', None) is not typing.ClassVar
-    slots = (k for k, v in annotations.items() if is_classvar(v))
+    is_cv = lambda x: is_classvar(x, global_vars, local_vars)
+    slots = (k for k, v in annotations.items() if not is_cv(v))
     clsdict['__slots__'] = tuple(slots)
 
 
@@ -224,9 +235,16 @@ def set_camelcase_properties(cls, clsdict, camelcase_properties):
             clsdict[camelcase] = property(fget, fset, fdel)
 
 
+def set_miscellaneous(cls, clsdict):
+    """Set miscellaneous data for the class."""
+
+    clsdict['_set'] = object.__setattr__
+
+
 def wrap_dataclass(
     cls,
     global_vars,
+    local_vars,
     slots=True,
     copy=True,
     deepcopy=True,
@@ -242,8 +260,8 @@ def wrap_dataclass(
     name = cls.__name__
     bases = cls.__bases__
     clsdict = cls.__dict__.copy()
-    fix_annotations(cls, clsdict, global_vars)
-    set_slots(cls, clsdict, slots)
+    fix_annotations(cls, clsdict, global_vars, local_vars)
+    set_slots(cls, clsdict, slots, global_vars, local_vars)
     set_copy(cls, clsdict, copy)
     set_deepcopy(cls, clsdict, deepcopy)
     set_asdict(cls, clsdict, asdict)
@@ -251,6 +269,7 @@ def wrap_dataclass(
     set_fields(cls, clsdict, fields)
     set_replace(cls, clsdict, replace)
     set_camelcase_properties(cls, clsdict, camelcase_properties)
+    set_miscellaneous(cls, clsdict)
 
     return mcls.__new__(mcls, name, bases, clsdict)
 
@@ -316,6 +335,7 @@ def dataclass(
 
     frame = inspect.stack()[1].frame
     global_vars = frame.f_globals
+    local_vars = frame.f_locals
     dataclass_kwds = {
         'init': init,
         'repr': repr,
@@ -336,7 +356,7 @@ def dataclass(
     }
 
     def wrap(cls):
-        base = wrap_dataclass(cls, global_vars, **wrap_kwds)
+        base = wrap_dataclass(cls, global_vars, local_vars, **wrap_kwds)
         new_cls = dataclasses.dataclass(**dataclass_kwds)(base)
         set_defaults(new_cls, defaults)
         update_closure(cls, new_cls)

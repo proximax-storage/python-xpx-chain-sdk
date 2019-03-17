@@ -22,6 +22,7 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import hashlib
 
 from .types import OptionalBytesType

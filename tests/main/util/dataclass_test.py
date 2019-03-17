@@ -49,7 +49,7 @@ class TestDataclass(harness.TestCase):
         ll = LinkedList(5)
         self.assertEqual(ll.asdict(), {'value': 5, 'prev': None, 'next': None})
 
-    def test_deepcopy(self):
+    def test_astuple(self):
         ll = LinkedList(5)
         self.assertEqual(ll.astuple(), (5, None, None))
 

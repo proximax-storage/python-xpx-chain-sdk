@@ -2,52 +2,79 @@ from nem2 import util
 from tests import harness
 
 
+def run_test(case, name, items):
+    get = lambda name: getattr(util, name)
+    for value, low, high, cat, dto in items:
+        case.assertEqual(get(f'{name}_low')(value), low)
+        case.assertEqual(get(f'{name}_high')(value), high)
+        case.assertEqual(get(f'{name}_from_catbuffer')(cat), value)
+        case.assertEqual(get(f'{name}_from_dto')(dto), value)
+        case.assertEqual(get(f'{name}_to_catbuffer')(value), cat)
+        case.assertEqual(get(f'{name}_to_dto')(value), dto)
+        case.assertEqual(next(get(f'{name}_iter_from_catbuffer')(cat)), value)
+        case.assertEqual(next(get(f'{name}_iter_from_dto')([dto])), value)
+        case.assertEqual(next(get(f'{name}_iter_to_catbuffer')([value])), cat)
+        case.assertEqual(next(get(f'{name}_iter_to_dto')([value])), dto)
+
+
 class TestUint64(harness.TestCase):
 
-    def test_uint64_low(self):
-        self.assertEqual(util.uint64_low(0x0), 0x0)
-        self.assertEqual(util.uint64_low(0x1), 0x1)
-        self.assertEqual(util.uint64_low(0xFFFFFFFF), 0xFFFFFFFF)
-        self.assertEqual(util.uint64_low(0x1FFFFFFFF), 0xFFFFFFFF)
+    def test_u8(self):
+        run_test(
+            case=self,
+            name='u8',
+            items=[
+                (0x00, 0x0, 0x0, b'\x00', 0x00),
+                (0x01, 0x1, 0x0, b'\x01', 0x01),
+                (0x0F, 0xF, 0x0, b'\x0F', 0x0F),
+                (0x1F, 0xF, 0x1, b'\x1F', 0x1F),
+            ],
+        )
 
-    def test_uint64_high(self):
-        self.assertEqual(util.uint64_high(0x0), 0x0)
-        self.assertEqual(util.uint64_high(0x1), 0x0)
-        self.assertEqual(util.uint64_high(0xFFFFFFFF), 0x0)
-        self.assertEqual(util.uint64_high(0x1FFFFFFFF), 0x1)
+    def test_u16(self):
+        run_test(
+            case=self,
+            name='u16',
+            items=[
+                (0x0000, 0x00, 0x00, b'\x00\x00', 0x0000),
+                (0x0001, 0x01, 0x00, b'\x01\x00', 0x0001),
+                (0x00FF, 0xFF, 0x00, b'\xFF\x00', 0x00FF),
+                (0x01FF, 0xFF, 0x01, b'\xFF\x01', 0x01FF),
+            ],
+        )
 
-    def test_uint64_to_dto(self):
-        self.assertEqual(util.uint64_to_dto(0x0), [0x0, 0x0])
-        self.assertEqual(util.uint64_to_dto(0x1), [0x1, 0x0])
-        self.assertEqual(util.uint64_to_dto(0xFFFFFFFF), [0xFFFFFFFF, 0x0])
-        self.assertEqual(util.uint64_to_dto(0x1FFFFFFFF), [0xFFFFFFFF, 0x1])
+    def test_u32(self):
+        run_test(
+            case=self,
+            name='u32',
+            items=[
+                (0x00000000, 0x0000, 0x0000, b'\x00\x00\x00\x00', 0x00000000),
+                (0x00000001, 0x0001, 0x0000, b'\x01\x00\x00\x00', 0x00000001),
+                (0x0000FFFF, 0xFFFF, 0x0000, b'\xFF\xFF\x00\x00', 0x0000FFFF),
+                (0x0001FFFF, 0xFFFF, 0x0001, b'\xFF\xFF\x01\x00', 0x0001FFFF),
+            ],
+        )
 
-    def test_dto_to_uint64(self):
-        self.assertEqual(util.dto_to_uint64([0x0, 0x0]), 0x0)
-        self.assertEqual(util.dto_to_uint64([0x1, 0x0]), 0x1)
-        self.assertEqual(util.dto_to_uint64([0xFFFFFFFF, 0x0]), 0xFFFFFFFF)
-        self.assertEqual(util.dto_to_uint64([0xFFFFFFFF, 0x1]), 0x1FFFFFFFF)
+    def test_u64(self):
+        run_test(
+            case=self,
+            name='u64',
+            items=[
+                (0x0000000000000000, 0x00000000, 0x00000000, b'\x00\x00\x00\x00\x00\x00\x00\x00', [0x00000000, 0x00000000]),
+                (0x0000000000000001, 0x00000001, 0x00000000, b'\x01\x00\x00\x00\x00\x00\x00\x00', [0x00000001, 0x00000000]),
+                (0x00000000FFFFFFFF, 0xFFFFFFFF, 0x00000000, b'\xFF\xFF\xFF\xFF\x00\x00\x00\x00', [0xFFFFFFFF, 0x00000000]),
+                (0x00000001FFFFFFFF, 0xFFFFFFFF, 0x00000001, b'\xFF\xFF\xFF\xFF\x01\x00\x00\x00', [0xFFFFFFFF, 0x00000001]),
+            ],
+        )
 
-    def test_uint128_low(self):
-        self.assertEqual(util.uint128_low(0x0), 0x0)
-        self.assertEqual(util.uint128_low(0x1), 0x1)
-        self.assertEqual(util.uint128_low(0xFFFFFFFFFFFFFFFF), 0xFFFFFFFFFFFFFFFF)
-        self.assertEqual(util.uint128_low(0x1FFFFFFFFFFFFFFFF), 0xFFFFFFFFFFFFFFFF)
-
-    def test_uint128_high(self):
-        self.assertEqual(util.uint128_high(0x0), 0x0)
-        self.assertEqual(util.uint128_high(0x1), 0x0)
-        self.assertEqual(util.uint128_high(0xFFFFFFFFFFFFFFFF), 0x0)
-        self.assertEqual(util.uint128_high(0x1FFFFFFFFFFFFFFFF), 0x1)
-
-    def test_uint128_to_dto(self):
-        self.assertEqual(util.uint128_to_dto(0x0), [[0x0, 0x0], [0x0, 0x0]])
-        self.assertEqual(util.uint128_to_dto(0x1), [[0x1, 0x0], [0x0, 0x0]])
-        self.assertEqual(util.uint128_to_dto(0xFFFFFFFFFFFFFFFF), [[0xFFFFFFFF, 0xFFFFFFFF], [0x0, 0x0]])
-        self.assertEqual(util.uint128_to_dto(0x1FFFFFFFFFFFFFFFF), [[0xFFFFFFFF, 0xFFFFFFFF], [0x1, 0x0]])
-
-    def test_dto_to_uint128(self):
-        self.assertEqual(util.dto_to_uint128([[0x0, 0x0], [0x0, 0x0]]), 0x0)
-        self.assertEqual(util.dto_to_uint128([[0x1, 0x0], [0x0, 0x0]]), 0x1)
-        self.assertEqual(util.dto_to_uint128([[0xFFFFFFFF, 0xFFFFFFFF], [0x0, 0x0]]), 0xFFFFFFFFFFFFFFFF)
-        self.assertEqual(util.dto_to_uint128([[0xFFFFFFFF, 0xFFFFFFFF], [0x1, 0x0]]), 0x1FFFFFFFFFFFFFFFF)
+    def test_u128(self):
+        run_test(
+            case=self,
+            name='u128',
+            items=[
+                (0x00000000000000000000000000000000, 0x0000000000000000, 0x0000000000000000, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', [[0x00000000, 0x00000000], [0x00000000, 0x00000000]]),
+                (0x00000000000000000000000000000001, 0x0000000000000001, 0x0000000000000000, b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', [[0x00000001, 0x00000000], [0x00000000, 0x00000000]]),
+                (0x0000000000000000FFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000, b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x00\x00\x00\x00\x00\x00\x00\x00', [[0xFFFFFFFF, 0xFFFFFFFF], [0x00000000, 0x00000000]]),
+                (0x0000000000000001FFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x0000000000000001, b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01\x00\x00\x00\x00\x00\x00\x00', [[0xFFFFFFFF, 0xFFFFFFFF], [0x00000001, 0x00000000]]),
+            ],
+        )

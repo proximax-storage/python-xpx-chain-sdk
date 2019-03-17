@@ -77,6 +77,23 @@ def add_model_replace(ctx) -> None:
     common.add_method(ctx, 'replace', [kw_arg], ret_type)
 
 
+def add_model_set(ctx) -> None:
+    """Add model fields method."""
+
+    args = []
+    str_type = ctx.api.builtin_type('builtins.str')
+    name_var = nodes.Var('name', str_type)
+    name_arg = nodes.Argument(variable=name_var, type_annotation=str_type, initializer=None, kind=nodes.ARG_POS)
+    args.append(name_arg)
+
+    any_type = types.AnyType(types.TypeOfAny.special_form)
+    value_var = nodes.Var('value', any_type)
+    value_arg = nodes.Argument(variable=value_var, type_annotation=any_type, initializer=None, kind=nodes.ARG_POS)
+    args.append(value_arg)
+
+    common.add_method(ctx, '_set', args, types.NoneTyp())
+
+
 def add_intmixin_hook(ctx):
     """Add IntMixin information to the class context."""
 
@@ -119,6 +136,7 @@ def add_dataclass_hook(ctx):
     add_model_astuple(ctx)
     add_model_fields(ctx)
     add_model_replace(ctx)
+    add_model_set(ctx)
 
 
 class Nem2Plugin(Plugin):

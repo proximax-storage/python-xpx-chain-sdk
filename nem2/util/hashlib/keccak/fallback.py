@@ -32,34 +32,34 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import binascii
 import math
 
 from ..types import BytesType, OptionalBytesType
 
-
 # API
 
 
-def keccak_224(data: OptionalBytesType = None) -> 'Keccak':
+def keccak_224(data: OptionalBytesType = None) -> Keccak:
     """Returns a 224-bit keccak hash object; optionally initialized with a string."""
 
     return Keccak(c=448, r=1152, n=224, name='keccak_224', data=data)
 
 
-def keccak_256(data: OptionalBytesType = None) -> 'Keccak':
+def keccak_256(data: OptionalBytesType = None) -> Keccak:
     """Returns a 256-bit keccak hash object; optionally initialized with a string."""
 
     return Keccak(c=512, r=1088, n=256, name='keccak_256', data=data)
 
 
-def keccak_384(data: OptionalBytesType = None) -> 'Keccak':
+def keccak_384(data: OptionalBytesType = None) -> Keccak:
     """Returns a 384-bit keccak hash object; optionally initialized with a string."""
 
     return Keccak(c=768, r=832, n=384, name='keccak_384', data=data)
 
 
-def keccak_512(data: OptionalBytesType = None) -> 'Keccak':
+def keccak_512(data: OptionalBytesType = None) -> Keccak:
     """Returns a 512-bit keccak hash object; optionally initialized with a string."""
 
     return Keccak(c=1024, r=576, n=512, name='keccak_512', data=data)
@@ -182,7 +182,7 @@ class Keccak:
 
         return binascii.hexlify(self.digest()).decode('ascii')
 
-    def copy(self) -> 'Keccak':
+    def copy(self) -> Keccak:
         """Return a copy of the hash object."""
 
         # First initialize whatever can be done normally

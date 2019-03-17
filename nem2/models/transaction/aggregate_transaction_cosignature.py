@@ -22,11 +22,14 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
-from nem2 import util
 
-if typing.TYPE_CHECKING:
-    from ..account.public_account import PublicAccount
+from nem2 import util
+from ..account.public_account import PublicAccount
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -40,4 +43,23 @@ class AggregateTransactionCosignature:
     """
 
     signature: str
-    signer: 'PublicAccount'
+    signer: PublicAccount
+
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
+        return {
+            'signature': self.signature,
+            'signer': self.signer.public_key,
+        }
+
+    @classmethod
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> AggregateTransactionCosignature:
+        signature = data['signature']
+        signer = PublicAccount.create_from_public_key(data['signer'], network_type)
+        return cls(signature, signer)

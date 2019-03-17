@@ -13,6 +13,10 @@ class TestAsyncLoop(harness.TestCase):
     def test_loop(self):
         async def inner(loop):
             async with client.AsyncHttp(responses.ENDPOINT, loop=loop) as http:
+                # Set the network type
+                with aiohttp.default_response(200, **responses.NETWORK_TYPE["MIJIN_TEST"]):
+                    await http.network_type
+
                 with aiohttp.default_response(200, **responses.BLOCK_INFO["Ok"]):
                     block_info = await http.blockchain.get_block_by_height(1)
                     self.assertEqual(block_info.total_fee, 0)

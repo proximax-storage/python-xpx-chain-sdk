@@ -22,6 +22,7 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 from Crypto.Hash import keccak
 
 from ..types import OptionalBytesType
@@ -29,25 +30,25 @@ from ..types import OptionalBytesType
 # API
 
 
-def keccak_224(data: OptionalBytesType = None) -> 'keccak':
+def keccak_224(data: OptionalBytesType = None) -> keccak:
     """Returns a 224-bit keccak hash object; optionally initialized with a string."""
 
     return keccak.new(digest_bits=224, data=data)
 
 
-def keccak_256(data: OptionalBytesType = None) -> 'keccak':
+def keccak_256(data: OptionalBytesType = None) -> keccak:
     """Returns a 256-bit keccak hash object; optionally initialized with a string."""
 
     return keccak.new(digest_bits=256, data=data)
 
 
-def keccak_384(data: OptionalBytesType = None) -> 'keccak':
+def keccak_384(data: OptionalBytesType = None) -> keccak:
     """Returns a 384-bit keccak hash object; optionally initialized with a string."""
 
     return keccak.new(digest_bits=384, data=data)
 
 
-def keccak_512(data: OptionalBytesType = None) -> 'keccak':
+def keccak_512(data: OptionalBytesType = None) -> keccak:
     """Returns a 512-bit keccak hash object; optionally initialized with a string."""
 
     return keccak.new(digest_bits=512, data=data)

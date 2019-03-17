@@ -22,13 +22,18 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
+
 from nem2 import util
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True, hash=None, merkle_component_hash=None)
-class TransactionInfo(util.Dto):
+class TransactionInfo(util.DTO):
     """Transaction metadata."""
 
     height: int
@@ -63,9 +68,12 @@ class TransactionInfo(util.Dto):
 
     hasMissingSignatures = util.undoc(has_missing_signatures)
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         data = {
-            'height': util.uint64_to_dto(self.height),
+            'height': util.u64_to_dto(self.height),
             'index': self.index,
             'id': self.id,
         }
@@ -76,9 +84,13 @@ class TransactionInfo(util.Dto):
         return data
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'TransactionInfo':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ) -> TransactionInfo:
         return cls(
-            height=util.dto_to_uint64(data['height']),
+            height=util.u64_from_dto(data['height']),
             index=data['index'],
             id=data['id'],
             hash=data.get('hash'),

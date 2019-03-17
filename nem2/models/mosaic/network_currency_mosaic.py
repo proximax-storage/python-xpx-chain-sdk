@@ -22,6 +22,7 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 
 from nem2 import util
@@ -44,7 +45,7 @@ class NetworkCurrencyMosaic(Mosaic):
     """
 
     __slots__ = ()
-    NAMESPACE_ID: typing.ClassVar['NamespaceId'] = NamespaceId("cat.currency")
+    NAMESPACE_ID: typing.ClassVar[NamespaceId] = NamespaceId("cat.currency")
     DIVISIBILITY: typing.ClassVar[int] = 6
     INITIAL_SUPPLY: typing.ClassVar[int] = 8999999998
     TRANSFERABLE: typing.ClassVar[bool] = True
@@ -56,7 +57,7 @@ class NetworkCurrencyMosaic(Mosaic):
         super().__init__(mosaic_id, amount)
 
     @classmethod
-    def create_relative(cls, amount: int) -> 'NetworkCurrencyMosaic':
+    def create_relative(cls, amount: int) -> NetworkCurrencyMosaic:
         """
         Create `NetworkCurrencyMosaic` using relative (divisibility) units.
 
@@ -73,7 +74,7 @@ class NetworkCurrencyMosaic(Mosaic):
     createRelative = util.undoc(create_relative)
 
     @classmethod
-    def create_absolute(cls, amount: int) -> 'NetworkCurrencyMosaic':
+    def create_absolute(cls, amount: int) -> NetworkCurrencyMosaic:
         """
         Create `NetworkCurrencyMosaic` using absolute (smallest) units.
 

@@ -22,12 +22,18 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class CosignatureSignedTransaction(util.Dto):
+class CosignatureSignedTransaction(util.DTO):
     """
     Cosignature signed transaction.
 
@@ -40,7 +46,10 @@ class CosignatureSignedTransaction(util.Dto):
     signature: str
     signer: str
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         return {
             'parentHash': self.parent_hash,
             'signature': self.signature,
@@ -48,7 +57,11 @@ class CosignatureSignedTransaction(util.Dto):
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'CosignatureSignedTransaction':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> CosignatureSignedTransaction:
         return cls(
             parent_hash=data['parentHash'],
             signature=data['signature'],

@@ -22,14 +22,12 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import binascii
 import typing
 
-HexType = typing.Union[str, bytes, bytearray]
-BytesType = typing.Union[bytes, bytearray]
 
-
-def hexlify(data: BytesType, with_prefix=False) -> str:
+def hexlify(data: bytes, with_prefix=False) -> str:
     """Convert bytes data to hexadecimal string."""
 
     encoded = binascii.hexlify(data).decode('ascii')
@@ -38,7 +36,15 @@ def hexlify(data: BytesType, with_prefix=False) -> str:
     return encoded
 
 
-def unhexlify(data: HexType, with_prefix=False) -> bytes:
+def encode_hex(data: typing.AnyStr, with_prefix=False) -> str:
+    """Encodes raw bytes to hex."""
+
+    if isinstance(data, str):
+        return data
+    return hexlify(data, with_prefix=with_prefix)
+
+
+def unhexlify(data: typing.AnyStr, with_prefix=False) -> bytes:
     """Convert hexadecimal string to raw bytes."""
 
     if with_prefix:
@@ -46,8 +52,16 @@ def unhexlify(data: HexType, with_prefix=False) -> bytes:
     return binascii.unhexlify(data)
 
 
+def decode_hex(data: typing.AnyStr, with_prefix=False) -> bytes:
+    """Decode hex data to raw bytes."""
+
+    if isinstance(data, bytes):
+        return data
+    return unhexlify(data, with_prefix=with_prefix)
+
+
 @typing.no_type_check
-def remove_prefix(data: HexType) -> HexType:
+def remove_prefix(data: typing.AnyStr) -> typing.AnyStr:
     """Remove hexadecimal prefix from string ('0x', '0X')"""
 
     if isinstance(data, str):

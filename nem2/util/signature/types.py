@@ -22,6 +22,7 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 
 BytesType = typing.Union[bytes, bytearray]

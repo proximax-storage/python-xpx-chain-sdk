@@ -22,6 +22,7 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 
 from nem2 import util
@@ -44,7 +45,7 @@ class NetworkHarvestMosaic(Mosaic):
     """
 
     __slots__ = ()
-    NAMESPACE_ID: typing.ClassVar['NamespaceId'] = NamespaceId("cat.harvest")
+    NAMESPACE_ID: typing.ClassVar[NamespaceId] = NamespaceId("cat.harvest")
     DIVISIBILITY: typing.ClassVar[int] = 3
     INITIAL_SUPPLY: typing.ClassVar[int] = 15000000
     TRANSFERABLE: typing.ClassVar[bool] = True
@@ -56,7 +57,7 @@ class NetworkHarvestMosaic(Mosaic):
         super().__init__(mosaic_id, amount)
 
     @classmethod
-    def create_relative(cls, amount: int) -> 'NetworkHarvestMosaic':
+    def create_relative(cls, amount: int) -> NetworkHarvestMosaic:
         """
         Create `NetworkHarvestMosaic` using relative (divisibility) units.
 
@@ -73,7 +74,7 @@ class NetworkHarvestMosaic(Mosaic):
     createRelative = util.undoc(create_relative)
 
     @classmethod
-    def create_absolute(cls, amount: int) -> 'NetworkHarvestMosaic':
+    def create_absolute(cls, amount: int) -> NetworkHarvestMosaic:
         """
         Create `NetworkHarvestMosaic` using absolute (smallest) units.
 

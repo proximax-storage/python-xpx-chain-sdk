@@ -27,7 +27,7 @@ from nem2 import util
 
 
 @util.inherit_doc
-class NamespaceType(util.Dto, util.EnumMixin, enum.IntEnum):
+class NamespaceType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """Namespace type."""
 
     ROOT_NAMESPACE = 0
@@ -35,13 +35,6 @@ class NamespaceType(util.Dto, util.EnumMixin, enum.IntEnum):
 
     def description(self) -> str:
         return DESCRIPTION[self]
-
-    def to_dto(self) -> int:
-        return int(self)
-
-    @classmethod
-    def from_dto(cls, data: int) -> 'NamespaceType':
-        return cls(data)
 
 
 DESCRIPTION = {

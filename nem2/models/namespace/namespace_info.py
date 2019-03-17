@@ -22,6 +22,7 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 
 from nem2 import util
@@ -31,13 +32,15 @@ from .namespace_id import NamespaceId
 from .namespace_type import NamespaceType
 from ..account.address import Address
 from ..account.public_account import PublicAccount
+from ..blockchain.network_type import NetworkType
 
-NamespaceIdListType = typing.Sequence['NamespaceId']
+NamespaceIdListType = typing.Sequence[NamespaceId]
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class NamespaceInfo(util.Dto):
+class NamespaceInfo(util.DTO):
     """
     Information describing a namespace.
 
@@ -57,17 +60,17 @@ class NamespaceInfo(util.Dto):
     active: bool
     index: int
     meta_id: str
-    type: 'NamespaceType'
+    type: NamespaceType
     depth: int
     levels: NamespaceIdListType
-    parent_id: 'NamespaceId'
-    owner: 'PublicAccount'
+    parent_id: NamespaceId
+    owner: PublicAccount
     start_height: int
     end_height: int
-    alias: 'Alias'
+    alias: Alias
 
     @property
-    def id(self) -> 'NamespaceId':
+    def id(self) -> NamespaceId:
         """Get the namespace ID."""
         return self.levels[-1]
 
@@ -92,36 +95,39 @@ class NamespaceInfo(util.Dto):
 
     hasAlias = util.undoc(has_alias)
 
-    def parent_namespace_id(self) -> 'NamespaceId':
+    def parent_namespace_id(self) -> NamespaceId:
         """Get parent namespace ID."""
 
         if self.is_root():
             raise ValueError("Unable to get parent namespace ID of root namespace.")
         return self.parent_id
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         meta = {
             'active': self.active,
             'index': self.index,
             'id': self.meta_id,
         }
         namespace = {
-            'type': self.type.to_dto(),
+            'type': self.type.to_dto(network_type),
             'depth': self.depth,
-            'parentId': self.parent_id.to_dto(),
+            'parentId': self.parent_id.to_dto(network_type),
             'owner': self.owner.public_key,
             'ownerAddress': util.hexlify(self.owner.address.encoded),
-            'startHeight': util.uint64_to_dto(self.start_height),
-            'endHeight': util.uint64_to_dto(self.end_height),
+            'startHeight': util.u64_to_dto(self.start_height),
+            'endHeight': util.u64_to_dto(self.end_height),
         }
 
         # levels => ('level0', 'level1', ...)
         for i in range(self.depth):
             key = f"level{i}"
-            namespace[key] = self.levels[i].to_dto()
+            namespace[key] = self.levels[i].to_dto(network_type)
 
         # Optional alias.
-        alias = self.alias.to_dto()
+        alias = self.alias.to_dto(network_type)
         if alias is not None:
             namespace['alias'] = alias
 
@@ -131,24 +137,28 @@ class NamespaceInfo(util.Dto):
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'NamespaceInfo':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> NamespaceInfo:
         meta = data['meta']
         namespace = data['namespace']
         address = Address.create_from_encoded(util.unhexlify(namespace['ownerAddress']))
         depth = namespace['depth']
-        levels = [NamespaceId.from_dto(namespace[f'level{i}']) for i in range(depth)]
-        alias = Alias.from_dto(namespace.get('alias'))
+        levels = [NamespaceId.from_dto(namespace[f'level{i}'], network_type) for i in range(depth)]
+        alias = Alias.from_dto(namespace.get('alias'), network_type)
 
         return cls(
             active=meta['active'],
             index=meta['index'],
             meta_id=meta['id'],
-            type=NamespaceType.from_dto(namespace['type']),
+            type=NamespaceType.from_dto(namespace['type'], network_type),
             depth=depth,
             levels=levels,
-            parent_id=NamespaceId.from_dto(namespace['parentId']),
+            parent_id=NamespaceId.from_dto(namespace['parentId'], network_type),
             owner=PublicAccount(address, namespace['owner']),
-            start_height=util.dto_to_uint64(namespace['startHeight']),
-            end_height=util.dto_to_uint64(namespace['endHeight']),
+            start_height=util.u64_from_dto(namespace['startHeight']),
+            end_height=util.u64_from_dto(namespace['endHeight']),
             alias=alias,
         )

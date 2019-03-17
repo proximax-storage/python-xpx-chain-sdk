@@ -22,15 +22,14 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import enum
-import struct
-import typing
 
 from nem2 import util
 
 
 @util.inherit_doc
-class TransactionVersion(util.Catbuffer, enum.IntEnum):
+class TransactionVersion(util.U8Mixin, enum.IntEnum):
     """Transaction version."""
 
     TRANSFER = 3
@@ -45,16 +44,3 @@ class TransactionVersion(util.Catbuffer, enum.IntEnum):
     SECRET_PROOF = 1
     ADDRESS_ALIAS = 1
     MOSAIC_ALIAS = 1
-    CATBUFFER_SIZE: typing.ClassVar[int]
-
-    def to_catbuffer(self) -> bytes:
-        return struct.pack('<B', int(self))
-
-    @classmethod
-    def from_catbuffer(cls, data: bytes) -> typing.Tuple['TransactionVersion', bytes]:
-        assert len(data) >= cls.CATBUFFER_SIZE
-        inst = cls(struct.unpack('<B', data[:cls.CATBUFFER_SIZE])[0])
-        return inst, data[cls.CATBUFFER_SIZE:]
-
-
-TransactionVersion.CATBUFFER_SIZE = 1

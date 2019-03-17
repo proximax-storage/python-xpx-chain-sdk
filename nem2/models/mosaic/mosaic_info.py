@@ -22,18 +22,19 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 
 from nem2 import util
 from .mosaic_id import MosaicId
+from .mosaic_levy import MosaicLevy
+from .mosaic_nonce import MosaicNonce
+from .mosaic_properties import MosaicProperties
 from ..account.public_account import PublicAccount
+from ..blockchain.network_type import NetworkType
 
-if typing.TYPE_CHECKING:
-    from .mosaic_levy import MosaicLevy
-    from .mosaic_nonce import MosaicNonce
-    from .mosaic_properties import MosaicProperties
-
-OptionalMosaicLevyType = typing.Optional['MosaicLevy']
+OptionalMosaicLevyType = typing.Optional[MosaicLevy]
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 # TODO(ahuszagh) Needs to/from dto.
@@ -43,7 +44,7 @@ OptionalMosaicLevyType = typing.Optional['MosaicLevy']
 #       namespace ID is missing in info, not in DTO.
 @util.inherit_doc
 @util.dataclass(frozen=True, levy=None)
-class MosaicInfo(util.Dto):
+class MosaicInfo(util.DTO):
     """
     Information describing a mosaic.
 
@@ -62,12 +63,12 @@ class MosaicInfo(util.Dto):
     active: bool
     index: int
     meta_id: str
-    mosaic_id: 'MosaicId'
-    nonce: 'MosaicNonce'
+    mosaic_id: MosaicId
+    nonce: MosaicNonce
     supply: int
     height: int
-    owner: 'PublicAccount'
-    properties: 'MosaicProperties'
+    owner: PublicAccount
+    properties: MosaicProperties
     levy: OptionalMosaicLevyType
 
     @property
@@ -98,7 +99,10 @@ class MosaicInfo(util.Dto):
 
     isLevyMutable = util.undoc(is_levy_mutable)
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         # TODO(ahuszagh) This differs, since it seems the old
         # way was a mosaic name.
         #
@@ -124,7 +128,11 @@ class MosaicInfo(util.Dto):
         raise NotImplementedError
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'MosaicLevy':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> MosaicLevy:
         # Namespace ID is clearly the parent ID.
         # Nonce is clearly found somewhere???
         # TODO(ahuszagh) We obviously cannot get the nonce...

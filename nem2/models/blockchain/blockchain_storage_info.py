@@ -22,12 +22,18 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
+from .network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class BlockchainStorageInfo(util.Dto):
+class BlockchainStorageInfo(util.DTO):
     """
     Blockchain information describing stored data.
 
@@ -40,7 +46,10 @@ class BlockchainStorageInfo(util.Dto):
     num_transactions: int
     num_accounts: int
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         return {
             "numBlocks": self.num_blocks,
             "numTransactions": self.num_transactions,
@@ -48,7 +57,11 @@ class BlockchainStorageInfo(util.Dto):
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'BlockchainStorageInfo':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None
+    ) -> BlockchainStorageInfo:
         num_blocks = data['numBlocks']
         num_transactions = data['numTransactions']
         num_accounts = data['numAccounts']

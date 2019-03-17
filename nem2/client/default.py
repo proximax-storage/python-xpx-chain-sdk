@@ -25,6 +25,7 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import aiohttp
 import requests
 import websockets
@@ -77,7 +78,7 @@ class HttpBase(abc.HttpBase):
         self._index = 0
 
     def __enter__(self):
-        self._client_ = client.Client(requests.Session(), self._endpoint)
+        self._client = client.Client(requests.Session(), self._endpoint)
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:
@@ -93,27 +94,27 @@ class Http(HttpBase, abc.Http):
     """Main client for the synchronous NIS API."""
 
     @property
-    def account(self) -> 'AccountHttp':
+    def account(self) -> AccountHttp:
         return AccountHttp.from_http(self)
 
     @property
-    def blockchain(self) -> 'BlockchainHttp':
+    def blockchain(self) -> BlockchainHttp:
         return BlockchainHttp.from_http(self)
 
     @property
-    def mosaic(self) -> 'MosaicHttp':
+    def mosaic(self) -> MosaicHttp:
         return MosaicHttp.from_http(self)
 
     @property
-    def namespace(self) -> 'NamespaceHttp':
+    def namespace(self) -> NamespaceHttp:
         return NamespaceHttp.from_http(self)
 
     @property
-    def network(self) -> 'NetworkHttp':
+    def network(self) -> NetworkHttp:
         return NetworkHttp.from_http(self)
 
     @property
-    def transaction(self) -> 'TransactionHttp':
+    def transaction(self) -> TransactionHttp:
         return TransactionHttp.from_http(self)
 
 
@@ -161,7 +162,7 @@ class AsyncHttpBase(abc.AsyncHttpBase):
         self._session = aiohttp.ClientSession(loop=loop)
 
     async def __aenter__(self):
-        self._client_ = client.AsyncClient(self._session, self._endpoint)
+        self._client = client.AsyncClient(self._session, self._endpoint)
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
@@ -177,27 +178,27 @@ class AsyncHttp(AsyncHttpBase, abc.Http):
     """Main client for the synchronous NIS API."""
 
     @property
-    def account(self) -> 'AsyncAccountHttp':
+    def account(self) -> AsyncAccountHttp:
         return AsyncAccountHttp.from_http(self)
 
     @property
-    def blockchain(self) -> 'AsyncBlockchainHttp':
+    def blockchain(self) -> AsyncBlockchainHttp:
         return AsyncBlockchainHttp.from_http(self)
 
     @property
-    def mosaic(self) -> 'AsyncMosaicHttp':
+    def mosaic(self) -> AsyncMosaicHttp:
         return AsyncMosaicHttp.from_http(self)
 
     @property
-    def namespace(self) -> 'AsyncNamespaceHttp':
+    def namespace(self) -> AsyncNamespaceHttp:
         return AsyncNamespaceHttp.from_http(self)
 
     @property
-    def network(self) -> 'AsyncNetworkHttp':
+    def network(self) -> AsyncNetworkHttp:
         return AsyncNetworkHttp.from_http(self)
 
     @property
-    def transaction(self) -> 'AsyncTransactionHttp':
+    def transaction(self) -> AsyncTransactionHttp:
         return AsyncTransactionHttp.from_http(self)
 
 
@@ -243,10 +244,10 @@ class Listener(abc.Listener):
         self._loop = loop
         self._conn = websockets.connect(url.url, loop=loop)
 
-    async def __aenter__(self) -> 'Listener':
+    async def __aenter__(self) -> Listener:
         self._session = await self._conn.__aenter__()
-        self._client_ = client.WebsocketClient(self._session)
-        self._iter_ = self._client_.__aiter__()
+        self._client = client.WebsocketClient(self._session)
+        self._iter_ = self._client.__aiter__()
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:

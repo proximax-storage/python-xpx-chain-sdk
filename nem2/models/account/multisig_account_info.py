@@ -22,13 +22,12 @@
     limitations under the License.
 """
 
+from __future__ import annotations
 import typing
 from nem2 import util
+from .public_account import PublicAccount
 
-if typing.TYPE_CHECKING:
-    from .public_account import PublicAccount
-
-PublicAccountListType = typing.Sequence['PublicAccount']
+PublicAccountListType = typing.Sequence[PublicAccount]
 
 
 @util.inherit_doc
@@ -47,7 +46,7 @@ class MultisigAccountInfo:
     :param multisig_accounts: List of multisig accounts this account cosigns.
     """
 
-    account: 'PublicAccount'
+    account: PublicAccount
     min_approval: int
     min_removal: int
     cosignatories: PublicAccountListType
@@ -60,7 +59,7 @@ class MultisigAccountInfo:
 
     isMultisig = util.undoc(is_multisig)
 
-    def has_cosigner(self, account: 'PublicAccount') -> bool:
+    def has_cosigner(self, account: PublicAccount) -> bool:
         """
         Check if another account is cosignatory of multisig account.
 
@@ -71,7 +70,7 @@ class MultisigAccountInfo:
 
     hasCosigner = util.undoc(has_cosigner)
 
-    def is_cosigner_of_multisig_account(self, account: 'PublicAccount') -> bool:
+    def is_cosigner_of_multisig_account(self, account: PublicAccount) -> bool:
         """
         Check if multisig account is cosignatory of another account.
 

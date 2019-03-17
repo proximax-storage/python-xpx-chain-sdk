@@ -22,7 +22,7 @@
     limitations under the License.
 """
 
-import struct
+from __future__ import annotations
 import typing
 
 from nem2 import util
@@ -31,6 +31,8 @@ from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -47,10 +49,14 @@ class InnerTransaction(Transaction):
     HOOKS: typing.ClassVar[Hooks] = {}
 
     @staticmethod
-    def shared_entity_size() -> int:
+    def catbuffer_size_shared() -> int:
         return 40
 
-    def to_catbuffer_shared(self, size) -> bytes:
+    def to_catbuffer_shared(
+        self,
+        size: int,
+        network_type: OptionalNetworkType = None,
+    ) -> bytes:
         """
         Serialize shared transaction data to catbuffer interchange format.
 
@@ -62,8 +68,8 @@ class InnerTransaction(Transaction):
         # uint8_t version
         # uint8_t network_type
         # uint16_t type
-        buffer = bytearray(self.shared_entity_size())
-        buffer[0:4] = struct.pack('<I', size)
+        buffer = bytearray(self.catbuffer_size_shared())
+        buffer[0:4] = util.u32_to_catbuffer(size)
         buffer[4:36] = util.unhexlify(self.signer.public_key)
         buffer[36:37] = self.version.to_catbuffer()
         buffer[37:38] = self.network_type.to_catbuffer()
@@ -71,40 +77,48 @@ class InnerTransaction(Transaction):
 
         return bytes(buffer)
 
-    def load_catbuffer_shared(self, data: bytes) -> typing.Tuple[int, bytes]:
+    def load_catbuffer_shared(
+        self,
+        data: typing.AnyStr,
+        network_type: OptionalNetworkType = None,
+    ) -> typing.Tuple[int, bytes]:
         """Load shared transaction data from catbuffer."""
 
-        assert len(data) >= self.shared_entity_size()
+        data = util.decode_hex(data, with_prefix=True)
+        assert len(data) >= self.catbuffer_size_shared()
 
         # uint32_t size
         # uint8_t[32] signer
         # uint8_t version
         # uint8_t network_type
         # uint16_t type
-        total_size = struct.unpack('<I', data[:4])[0]
+        total_size = util.u32_from_catbuffer(data[:4])
         public_key = data[4:36]
-        version = TransactionVersion.from_catbuffer(data[36:37])[0]
-        network_type = NetworkType.from_catbuffer(data[37:38])[0]
-        type = TransactionType.from_catbuffer(data[38:40])[0]
+        version = TransactionVersion.from_catbuffer(data[36:37])
+        network_type = NetworkType.from_catbuffer(data[37:38])
+        type = TransactionType.from_catbuffer(data[38:40])
 
-        object.__setattr__(self, 'type', type)
-        object.__setattr__(self, 'network_type', network_type)
-        object.__setattr__(self, 'version', version)
-        object.__setattr__(self, 'deadline', None)
-        object.__setattr__(self, 'fee', None)
-        object.__setattr__(self, 'signature', None)
+        self._set('type', type)
+        self._set('network_type', network_type)
+        self._set('version', version)
+        self._set('deadline', None)
+        self._set('fee', None)
+        self._set('signature', None)
         if public_key != bytes(32):
-            signer = PublicAccount.create_from_public_key(util.hexlify(public_key), network_type)
-            object.__setattr__(self, 'signer', signer)
+            signer = PublicAccount.create_from_public_key(public_key, network_type)
+            self._set('signer', signer)
         else:
-            object.__setattr__(self, 'signer', None)
-        object.__setattr__(self, 'signer', signer)
-        object.__setattr__(self, 'transaction_info', signer)
+            self._set('signer', None)
+        self._set('transaction_info', None)
 
-        return total_size, data[self.shared_entity_size():]
+        return total_size, data[self.catbuffer_size_shared():]
 
     @classmethod
-    def from_transaction(cls, transaction: 'Transaction', signer: 'PublicAccount') -> 'InnerTransaction':
+    def from_transaction(
+        cls,
+        transaction: Transaction,
+        signer: PublicAccount
+    ) -> InnerTransaction:
         """
         Generate aggregate transaction from regular transaction.
 

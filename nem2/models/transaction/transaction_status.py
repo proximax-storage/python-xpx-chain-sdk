@@ -22,14 +22,20 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
 from .deadline import Deadline
 from .transaction_status_group import TransactionStatusGroup
+from ..blockchain.network_type import NetworkType
+
+OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionStatus(util.Dto):
+class TransactionStatus(util.DTO):
     """
     Basic information describing announced transaction.
 
@@ -40,27 +46,34 @@ class TransactionStatus(util.Dto):
     :param height: Block height at which it was confirmed or rejected.
     """
 
-    group: 'TransactionStatusGroup'
+    group: TransactionStatusGroup
     status: str
     hash: str
-    deadline: 'Deadline'
+    deadline: Deadline
     height: int
 
-    def to_dto(self) -> dict:
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
         return {
-            'group': self.group.to_dto(),
+            'group': self.group.to_dto(network_type),
             'status': self.status,
             'hash': self.hash,
-            'deadline': self.deadline.to_dto(),
-            'height': util.uint64_to_dto(self.height),
+            'deadline': self.deadline.to_dto(network_type),
+            'height': util.u64_to_dto(self.height),
         }
 
     @classmethod
-    def from_dto(cls, data: dict) -> 'TransactionStatus':
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ) -> TransactionStatus:
         return cls(
-            group=TransactionStatusGroup.from_dto(data['group']),
+            group=TransactionStatusGroup.from_dto(data['group'], network_type),
             status=data['status'],
             hash=data['hash'],
-            deadline=Deadline.from_dto(data['deadline']),
-            height=util.dto_to_uint64(data['height']),
+            deadline=Deadline.from_dto(data['deadline'], network_type),
+            height=util.u64_from_dto(data['height']),
         )
