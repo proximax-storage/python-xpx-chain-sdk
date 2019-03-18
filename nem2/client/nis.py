@@ -727,6 +727,83 @@ def process_get_transaction_statuses(
 
 get_transaction_statuses = request("get_transaction_statuses")
 
+
+def request_announce(
+    client: client.Client,
+    transaction: models.SignedTransaction,
+    **kwds
+):
+    """
+    Make "/transaction/sync" request.
+
+    :param client: Wrapper for client.
+    :param transaction: Signed transaction data.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    json = {'payload': transaction.payload}
+    return client.put(f"/transaction", json=json, **kwds)
+
+
+def process_announce(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.TransactionAnnounceResponse:
+    """
+    Process the "/transaction/sync" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return models.TransactionAnnounceResponse.from_dto(json)
+
+
+announce = request("announce")
+
+
+def request_announce_sync(
+    client: client.Client,
+    transaction: models.SignedTransaction,
+    **kwds
+):
+    """
+    Make "/transaction/sync" request.
+
+    :param client: Wrapper for client.
+    :param transaction: Signed transaction data.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    sync = models.SyncAnnounce.create(transaction)
+    json = sync.to_dto()
+    return client.post(f"/transaction/sync", json=json, **kwds)
+
+
+def process_announce_sync(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> typing.Union[models.Transaction, models.TransactionStatus]:
+    """
+    Process the "/transaction/sync" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    if 'status' in json:
+        json.setdefault('group', 'failed')
+        json.setdefault('height', [0, 0])
+        return models.TransactionStatus.from_dto(json)
+    return models.Transaction.from_dto(json)
+
+
+announce_sync = request("announce_sync")
+
 # FORWARDERS
 # ----------
 
@@ -760,6 +837,8 @@ REQUEST = {
     'get_transactions': request_get_transactions,
     'get_transaction_status': request_get_transaction_status,
     'get_transaction_statuses': request_get_transaction_statuses,
+    'announce': request_announce,
+    'announce_sync': request_announce_sync,
 }
 
 PROCESS = {
@@ -792,4 +871,6 @@ PROCESS = {
     'get_transactions': process_get_transactions,
     'get_transaction_status': process_get_transaction_status,
     'get_transaction_statuses': process_get_transaction_statuses,
+    'announce': process_announce,
+    'announce_sync': process_announce_sync,
 }

@@ -511,10 +511,36 @@ class TransactionHTTP(HTTPSharedBase):
     getTransactionStatuses = util.undoc(get_transaction_statuses)
 
     # TODO(ahuszagh)
-    # announce
     # announceAggregateBonded
     # announceAggregateBondedCosignature
-    # announceSync
+
+    def announce(
+        self,
+        transaction: models.SignedTransaction,
+        **kwds
+    ):
+        """
+        Announce transaction to network.
+
+        :param transaction: Signed transaction data.
+        :return: Transaction announce response.
+        """
+        return self(nis.announce, transaction, **kwds)
+
+    def announce_sync(
+        self,
+        transaction: models.SignedTransaction,
+        **kwds
+    ):
+        """
+        Announce and get synchronization message for transaction.
+
+        :param transaction: Signed transaction data.
+        :return: Transaction status or object.
+        """
+        return self(nis.announce_sync, transaction, **kwds)
+
+    announceSync = util.undoc(announce_sync)
 
 
 # WEBSOCKET

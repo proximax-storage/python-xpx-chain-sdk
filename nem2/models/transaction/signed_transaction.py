@@ -23,6 +23,7 @@
 """
 
 from __future__ import annotations
+import typing
 
 from nem2 import util
 from .transaction_type import TransactionType
@@ -44,7 +45,7 @@ class SignedTransaction:
     :param network_type: Signer network type.
     """
 
-    payload: bytes
+    payload: str
     hash: str
     signer: str
     type: TransactionType
@@ -52,14 +53,19 @@ class SignedTransaction:
 
     def __init__(
         self,
-        payload: bytes,
+        payload: typing.AnyStr,
         hash: str,
         signer: str,
         type: TransactionType,
         network_type: NetworkType,
     ):
+        payload = util.encode_hex(payload)
+        hash = util.encode_hex(hash)
+        signer = util.encode_hex(signer)
         if len(hash) != 64:
             raise ValueError('Transaction hash must be 64 characters long.')
+        if len(signer) != 64:
+            raise ValueError('Signer public key must be 64 characters long.')
         self._set('payload', payload)
         self._set('hash', hash)
         self._set('signer', signer)

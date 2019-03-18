@@ -329,7 +329,7 @@ class TestSecretProofTransaction(harness.TestCase):
 
     def test_sign_with(self):
         signed_transaction = self.transaction.sign_with(self.signer)
-        self.assertEqual(util.hexlify(signed_transaction.payload), self.payload)
+        self.assertEqual(signed_transaction.payload, self.payload)
         self.assertEqual(signed_transaction.hash, self.hash)
         self.assertEqual(signed_transaction.signer, self.signer.public_key)
         self.assertEqual(signed_transaction.type, models.TransactionType.SECRET_PROOF)
@@ -364,6 +364,10 @@ class TestSignedTransaction(harness.TestCase):
         self.assertEqual(self.transaction.signer, self.signer)
         self.assertEqual(self.transaction.type, self.type)
         self.assertEqual(self.transaction.network_type, self.network_type)
+
+
+class TestSyncAnnounce(harness.TestCase):
+    pass        # TODO(ahuszagh) Implement
 
 
 class TestTransaction(harness.TestCase):

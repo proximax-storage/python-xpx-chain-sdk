@@ -32,6 +32,7 @@
 # Account
 from .account.account import *
 from .account.account_info import *
+from .account.account_metadata import *
 from .account.address import *
 from .account.multisig_account_graph_info import *
 from .account.multisig_account_info import *
@@ -88,6 +89,7 @@ from .transaction.multisig_cosignatory_modification_type import *
 from .transaction.plain_message import *
 from .transaction.secret_proof_transaction import *
 from .transaction.signed_transaction import *
+from .transaction.sync_announce import *
 from .transaction.transaction import *
 from .transaction.transaction_announce_response import *
 from .transaction.transaction_info import *
@@ -103,6 +105,7 @@ __all__ = (
     # Account
     account.__all__         # type: ignore
     + account_info.__all__
+    + account_metadata.__all__
     + address.__all__
     + multisig_account_graph_info.__all__
     + multisig_account_info.__all__
@@ -155,6 +158,7 @@ __all__ = (
     + plain_message.__all__
     + secret_proof_transaction.__all__
     + signed_transaction.__all__
+    + sync_announce.__all__
     + transaction.__all__   # type: ignore
     + transaction_announce_response.__all__
     + transaction_info.__all__

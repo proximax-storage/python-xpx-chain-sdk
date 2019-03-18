@@ -23,15 +23,20 @@
 """
 
 from __future__ import annotations
+import typing
 
 from nem2 import util
+from .signed_transaction import SignedTransaction
+from ..account.address import Address
+from ..blockchain.network_type import NetworkType
 
 __all__ = ['SyncAnnounce']
 
+OptionalNetworkType = typing.Optional[NetworkType]
 
-# TODO(ahuszagh) str or bytes??
+
 @util.dataclass(frozen=True)
-class SyncAnnounce:
+class SyncAnnounce(util.DTO):
     """
     Signed transaction to announce and sync.
 
@@ -40,10 +45,59 @@ class SyncAnnounce:
     :param address: Transaction address.
     """
 
-    payload: bytes
-    hash: bytes
-    address: bytes
+    payload: str
+    hash: str
+    address: str
 
-    # TODO(ahuszagh) Implement
-    # from_dto
-    # to_dto
+    def __init__(
+        self,
+        payload: typing.AnyStr,
+        hash: typing.AnyStr,
+        address: str,
+    ):
+        payload = util.encode_hex(payload)
+        hash = util.encode_hex(hash)
+        if len(hash) != 64:
+            raise ValueError('Transaction hash must be 64 characters long.')
+        self._set('payload', payload)
+        self._set('hash', hash)
+        self._set('address', address)
+
+    @classmethod
+    def create(cls, transaction: SignedTransaction):
+        """
+        Create sync announce object from signed transaction data.
+
+        :param transaction: Signed transaction data.
+        """
+        public_key = transaction.signer
+        network_type = transaction.network_type
+        address = Address.create_from_public_key(public_key, network_type)
+
+        return SyncAnnounce(
+            payload=transaction.payload,
+            hash=transaction.hash,
+            address=address.address,
+        )
+
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None
+    ) -> dict:
+        return {
+            'payload': self.payload,
+            'hash': self.hash,
+            'address': self.address,
+        }
+
+    @classmethod
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ) -> SyncAnnounce:
+        return cls(
+            payload=data['payload'],
+            hash=data['hash'],
+            address=data['address'],
+        )
