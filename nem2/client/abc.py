@@ -28,7 +28,7 @@ import typing
 
 from nem2 import models
 from nem2 import util
-from .client import Client, WebsocketClient
+from . import client
 from . import nis
 
 T = typing.TypeVar('T')
@@ -43,27 +43,55 @@ MessageType = typing.Union[
 # ----
 
 
-class HttpBase:
-    """
-    Abstract base class for HTTP clients.
-
-    :param endpoint: Domain name and port for the endpoint.
-    """
+class HTTPSharedBase:
+    """Shared, abstract base class for sync and async HTTP clients."""
 
     _endpoint: str
-    _client: Client
+    _client: client.ClientSharedBase
     _index: int
     _network_type: typing.Optional[models.NetworkType] = None
 
-    def __enter__(self):
-        raise NotImplementedError
+    @property
+    def index(self) -> int:
+        """Get index for NIS callbacks."""
+        return self._index
 
-    def __exit__(self, exc_type, exc, tb) -> None:
-        raise NotImplementedError
+    @property
+    def raw(self) -> client.ClientSharedBase:
+        """Get client wrapper for HTTP client."""
+        raise util.AbstractMethodError
+
+    @property
+    def root(self) -> HTTP:
+        """Get HTTP to the same endpoint."""
+        raise util.AbstractMethodError
+
+    @property
+    def network_type(self):
+        """Get network type for client."""
+        raise util.AbstractMethodError
+
+    @property
+    def networkType(self):
+        return self.network_type
+
+    @classmethod
+    def from_http(cls: typing.Type[T], http) -> T:
+        """
+        Initialize HTTPBase directly from existing HTTP client.
+        For internal use, do not use directly.
+
+        :param http: HTTP client.
+        """
+        inst = cls.__new__(cls)
+        inst._client = http._client
+        inst._index = http._index
+        inst._network_type = http._network_type
+        return typing.cast(T, inst)
 
     def close(self):
         """Close the client session."""
-        self.client.close()
+        raise util.AbstractMethodError
 
     def __call__(self, cbs, *args, **kwds):
         """Invoke the NIS callback."""
@@ -75,61 +103,48 @@ class HttpBase:
             network_type = kwds.pop('network_type')
         except KeyError:
             network_type = self.network_type
-        return typing.cast(T, cb(self.client, network_type, *args, **kwds))
-
-    @classmethod
-    def from_http(cls: typing.Type[T], http) -> T:
-        """
-        Initialize HttpBase directly from existing HTTP client.
-        For internal use, do not use directly.
-
-        :param http: HTTP client.
-        """
-        inst = cls.__new__(cls)
-        inst._client = http._client
-        inst._index = http._index
-        inst._network_type = http._network_type
-        return typing.cast(T, inst)
+        return typing.cast(T, cb(self.raw, network_type, *args, **kwds))
 
     @property
-    def client(self) -> Client:
-        """Get client wrapper for HTTP client."""
+    def _none(self):
+        """Generate `None` with same evaluation as `network_type`."""
+        raise util.AbstractMethodError
+
+
+@util.inherit_doc
+class HTTPBase(HTTPSharedBase):
+    """Abstract base class for HTTP clients."""
+
+    def __enter__(self) -> HTTPBase:
+        raise util.AbstractMethodError
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        raise util.AbstractMethodError
+
+    def close(self) -> None:
+        self.raw.close()
+
+    @property
+    def raw(self) -> client.Client:
         try:
-            return self._client
+            return typing.cast(client.Client, self._client)
         except AttributeError:
             raise RuntimeError('Must be used inside `with` block.')
 
     @property
-    def index(self) -> int:
-        """Get index for NIS callbacks."""
-        return self._index
-
-    @property
-    def network_type(self):
-        """Get network type for client."""
-
+    def network_type(self) -> models.NetworkType:
         if self._network_type is None:
             network = self.root.network
             self._network_type = network.get_network_type()
         return self._network_type
 
     @property
-    def networkType(self):
-        return self.network_type
-
-    @property
-    def root(self) -> Http:
-        """Get Http to the same endpoint."""
-        raise NotImplementedError
-
-    @property
-    def _none(self):
-        """Generate `None` with same evaluation as network_type."""
+    def _none(self) -> None:
         return None
 
 
 @util.inherit_doc
-class AsyncHttpBase(HttpBase):
+class AsyncHTTPBase(HTTPSharedBase):
     """
     Abstract base class for asynchronous HTTP clients.
 
@@ -139,26 +154,25 @@ class AsyncHttpBase(HttpBase):
 
     _loop: util.OptionalLoopType
 
-    def __enter__(self):
+    def __enter__(self) -> AsyncHTTPBase:
         raise TypeError("Only use async with.")
 
     def __exit__(self, exc_type, exc, tb) -> None:
         self.close()
 
-    async def __aenter__(self):
-        raise NotImplementedError
+    async def __aenter__(self) -> AsyncHTTPBase:
+        raise util.AbstractMethodError
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
-        raise NotImplementedError
+        raise util.AbstractMethodError
 
-    async def close(self):
-        """Close the client session."""
-        await self.client.close()
+    async def close(self) -> None:
+        await self.raw.close()
 
     @property
-    def client(self) -> Client:
+    def raw(self) -> client.AsyncClient:
         try:
-            return self._client
+            return typing.cast(client.AsyncClient, self._client)
         except AttributeError:
             raise RuntimeError('Must be used inside `async with` block.')
 
@@ -167,76 +181,66 @@ class AsyncHttpBase(HttpBase):
 
     @util.observable
     async def call(self, cbs, *args, **kwds):
-        """Invoke callback and wrap it in an observable."""
         return await super().__call__(cbs, *args, **kwds)
 
     @classmethod
     def from_http(cls: typing.Type[T], http) -> T:
-        """
-        Initialize AsyncHttpBase directly from existing HTTP client.
-        For internal use, do not use directly.
-
-        :param http: HTTP client.
-        """
-        inst = super(AsyncHttpBase, cls).from_http(http)
+        inst = super(AsyncHTTPBase, cls).from_http(http)
         setattr(inst, '_loop', getattr(http, '_loop'))
         return inst
 
     @property
-    def loop(self):
+    def loop(self) -> util.OptionalLoopType:
         """Get event loop."""
         return self._loop
 
     @property
-    async def network_type(self):
-        """Get network type for client."""
-
+    async def network_type(self) -> models.NetworkType:
         if self._network_type is None:
             network = self.root.network
             self._network_type = await network.get_network_type()
         return self._network_type
 
     @property
-    async def _none(self):
-        """Generate `None` with same evaluation as network_type."""
+    async def _none(self) -> None:
         return None
 
 
-class Http(HttpBase):
+class HTTP(HTTPSharedBase):
     """Abstract base class for the main HTTP client."""
 
     @property
-    def account(self) -> AccountHttp:
-        """Get AccountHttp to the same endpoint."""
-        raise NotImplementedError
+    def account(self) -> AccountHTTP:
+        """Get AccountHTTP to the same endpoint."""
+        raise util.AbstractMethodError
 
     @property
-    def blockchain(self) -> BlockchainHttp:
-        """Get BlockchainHttp to the same endpoint."""
-        raise NotImplementedError
+    def blockchain(self) -> BlockchainHTTP:
+        """Get BlockchainHTTP to the same endpoint."""
+        raise util.AbstractMethodError
 
     @property
-    def mosaic(self) -> MosaicHttp:
-        """Get MosaicHttp to the same endpoint."""
-        raise NotImplementedError
+    def mosaic(self) -> MosaicHTTP:
+        """Get MosaicHTTP to the same endpoint."""
+        raise util.AbstractMethodError
 
     @property
-    def namespace(self) -> NamespaceHttp:
-        """Get NamespaceHttp to the same endpoint."""
-        raise NotImplementedError
+    def namespace(self) -> NamespaceHTTP:
+        """Get NamespaceHTTP to the same endpoint."""
+        raise util.AbstractMethodError
 
     @property
-    def network(self) -> NetworkHttp:
-        """Get NetworkHttp to the same endpoint."""
-        raise NotImplementedError
+    def network(self) -> NetworkHTTP:
+        """Get NetworkHTTP to the same endpoint."""
+        raise util.AbstractMethodError
 
     @property
-    def transaction(self) -> TransactionHttp:
-        """Get TransactionHttp to the same endpoint."""
-        raise NotImplementedError
+    def transaction(self) -> TransactionHTTP:
+        """Get TransactionHTTP to the same endpoint."""
+        raise util.AbstractMethodError
 
 
-class AccountHttp(HttpBase):
+class AccountHTTP(HTTPSharedBase):
     """Abstract base class for the account HTTP client."""
 
     # TODO(ahuszagh)
@@ -251,7 +255,7 @@ class AccountHttp(HttpBase):
     # aggregateBondedTransactions
 
 
-class BlockchainHttp(HttpBase):
+class BlockchainHTTP(HTTPSharedBase):
     """Abstract base class for the blockchain HTTP client."""
 
     def get_block_by_height(self, height: int, **kwds):
@@ -300,7 +304,7 @@ class BlockchainHttp(HttpBase):
     getDiagnosticStorage = util.undoc(get_diagnostic_storage)
 
 
-class MosaicHttp(HttpBase):
+class MosaicHTTP(HTTPSharedBase):
     """Abstract base class for the mosaic HTTP client."""
 
     def get_mosaic_names(
@@ -323,7 +327,7 @@ class MosaicHttp(HttpBase):
     # getMosaics
 
 
-class NamespaceHttp(HttpBase):
+class NamespaceHTTP(HTTPSharedBase):
     """Abstract base class for the namespace HTTP client."""
 
     def get_namespace(
@@ -417,7 +421,7 @@ class NamespaceHttp(HttpBase):
     getLinkedAddress = util.undoc(get_linked_address)
 
 
-class NetworkHttp(HttpBase):
+class NetworkHTTP(HTTPSharedBase):
     """Abstract base class for the network HTTP client."""
 
     def get_network_type(self, **kwds):
@@ -431,7 +435,7 @@ class NetworkHttp(HttpBase):
     getNetworkType = util.undoc(get_network_type)
 
 
-class TransactionHttp(HttpBase):
+class TransactionHTTP(HTTPSharedBase):
     """Abstract base class for the transaction HTTP client."""
 
     def get_transaction(self, hash: str, **kwds):
@@ -505,7 +509,7 @@ class Listener:
     :param endpoint: Domain name and port for the endpoint.
     """
 
-    _client: WebsocketClient
+    _client: client.WebsocketClient
     _iter_: typing.AsyncIterator[bytes]
     _conn: typing.AsyncContextManager
     _loop: util.OptionalLoopType
@@ -518,13 +522,13 @@ class Listener:
         pass
 
     async def __aenter__(self):
-        raise NotImplementedError
+        raise util.AbstractMethodError
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
-        raise NotImplementedError
+        raise util.AbstractMethodError
 
     @property
-    def client(self) -> WebsocketClient:
+    def raw(self) -> client.WebsocketClient:
         try:
             return self._client
         except AttributeError:
@@ -540,14 +544,14 @@ class Listener:
     @property
     def closed(self) -> bool:
         """Get if client session has been closed."""
-        return self.client.closed
+        return self.raw.closed
 
     @property
     async def uid(self) -> str:
         """Get UUID (unique identifier) for WS requests."""
 
         if self._uid is None:
-            self._uid = json.loads(await self.client.recv())['uid']
+            self._uid = json.loads(await self.raw.recv())['uid']
         return self._uid
 
     def __aiter__(self) -> Listener:
@@ -565,20 +569,24 @@ class Listener:
             raise NotImplementedError
         elif 'block' in data:
             # New block info.
-            return ListenerMessage('block', models.BlockInfo.from_dto(data))
+            block = models.BlockInfo.from_dto(data)
+            return ListenerMessage('block', block)
         elif 'status' in data:
             # New transaction status error.
-            return ListenerMessage('status', models.TransactionStatusError.from_dto(data))
+            error = models.TransactionStatusError.from_dto(data)
+            return ListenerMessage('status', error)
         elif 'meta' in data:
             channel_name = typing.cast(str, data['meta']['channelName'])
             hash = typing.cast(str, data['meta']['hash'])
             return ListenerMessage(channel_name, hash)
         elif 'parentHash' in data:
-            return ListenerMessage('cosignature', models.CosignatureSignedTransaction.from_dto(data))
+            cosignature = models.CosignatureSignedTransaction.from_dto(data)
+            return ListenerMessage('cosignature', cosignature)
         else:
             # Unknown data information, don't pollute the message,
             # only send the information's keys.
-            raise ValueError(f"Unknown message from Listener subscription, keys are {data.keys()}.")
+            msg = f"Unknown message from Listener subscription, keys are {data.keys()}."
+            raise ValueError(msg)
 
     @util.observable
     async def new_block(self) -> None:
@@ -595,40 +603,40 @@ class Listener:
 
     @util.observable
     async def unconfirmed_added(self, address: models.Address) -> None:
-        """Emit message when new, unconfirmed transactions are announced for a given address."""
+        """Emit message for unconfirmed transactions are announced."""
         await self.subscribe(f'confirmedAdded/{address.address}')
 
     unconfirmedAdded = util.undoc(unconfirmed_added)
 
     @util.observable
     async def unconfirmed_removed(self, address: models.Address) -> None:
-        """Emit message when unconfirmed transactions change state for a given address."""
+        """Emit message when unconfirmed transactions change state."""
         await self.subscribe(f'unconfirmedRemoved/{address.address}')
 
     unconfirmedRemoved = util.undoc(unconfirmed_removed)
 
     @util.observable
     async def aggregate_bonded_added(self, address: models.Address) -> None:
-        """Emit message when new, unconfirmed, aggregate transactions are announced for a given address."""
+        """Emit message when new, unconfirmed, aggregate transactions are announced."""
         await self.subscribe(f'partialAdded/{address.address}')
 
     aggregateBondedAdded = util.undoc(aggregate_bonded_added)
 
     @util.observable
     async def aggregate_bonded_removed(self, address: models.Address) -> None:
-        """Emit message when unconfirmed, aggregate transactions change state for a given address."""
+        """Emit message when unconfirmed, aggregate transactions change state."""
         await self.subscribe(f'partialRemoved/{address.address}')
 
     aggregateBondedRemoved = util.undoc(aggregate_bonded_removed)
 
     @util.observable
     async def status(self, address: models.Address) -> None:
-        """Emit message each time a transaction contains an error for a given address."""
+        """Emit message each time a transaction contains an error."""
         await self.subscribe(f'status/{address.address}')
 
     @util.observable
     async def cosignature_added(self, address: models.Address) -> None:
-        """Emit message each time a cosigner signs a message initiated by the given address."""
+        """Emit message each time a cosigner signs a message"""
         await self.subscribe(f'cosignature/{address.address}')
 
     async def subscribe(self, channel: str) -> None:
@@ -638,7 +646,7 @@ class Listener:
             'uid': await self.uid,
             'subscribe': channel
         })
-        await self.client.send(message)
+        await self.raw.send(message)
 
     async def unsubscribe(self, channel: str) -> None:
         """Unsubscribe from websockets channel."""
@@ -647,4 +655,4 @@ class Listener:
             'uid': await self.uid,
             'unsubscribe': channel
         })
-        await self.client.send(message)
+        await self.raw.send(message)

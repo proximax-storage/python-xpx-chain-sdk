@@ -27,6 +27,16 @@ from mypy import nodes
 from mypy import types
 from mypy.plugins import common
 
+GLOB_IMPORT = 'nem2.util.glob_import'
+MODULE_IMPORT = 'nem2.util.module_import'
+DATACLASS = 'nem2.util.dataclasses.dataclass'
+INT_MIXIN = 'nem2.util.mixin.IntMixin'
+MULTISIG_ACCOUNT_GRAPH_INFO = (
+    'nem2.models.account.'
+    'multisig_account_graph_info.'
+    'MultisigAccountGraphInfo'
+)
+
 
 def is_model_field(sym: nodes.SymbolTableNode) -> bool:
     """Determine if a node is a model field."""
@@ -40,8 +50,12 @@ def add_model_init(ctx, var_types, var_fields) -> None:
     args = []
     for (var_type, var_field) in zip(var_types, var_fields):
         var = nodes.Var(var_field, var_type)
-        arg = nodes.Argument(variable=var, type_annotation=var_type, initializer=None, kind=nodes.ARG_POS)
-        args.append(arg)
+        args.append(nodes.Argument(
+            variable=var,
+            type_annotation=var_type,
+            initializer=None,
+            kind=nodes.ARG_POS
+        ))
 
     common.add_method(ctx, '__init__', args, types.NoneTyp())
 
@@ -72,7 +86,12 @@ def add_model_replace(ctx) -> None:
 
     any_type = types.AnyType(types.TypeOfAny.special_form)
     var = nodes.Var('change', any_type)
-    kw_arg = nodes.Argument(variable=var, type_annotation=any_type, initializer=None, kind=types.ARG_STAR2)
+    kw_arg = nodes.Argument(
+        variable=var,
+        type_annotation=any_type,
+        initializer=None,
+        kind=types.ARG_STAR2
+    )
     ret_type = types.Instance(ctx.cls.info, [])
     common.add_method(ctx, 'replace', [kw_arg], ret_type)
 
@@ -83,12 +102,22 @@ def add_model_set(ctx) -> None:
     args = []
     str_type = ctx.api.builtin_type('builtins.str')
     name_var = nodes.Var('name', str_type)
-    name_arg = nodes.Argument(variable=name_var, type_annotation=str_type, initializer=None, kind=nodes.ARG_POS)
+    name_arg = nodes.Argument(
+        variable=name_var,
+        type_annotation=str_type,
+        initializer=None,
+        kind=nodes.ARG_POS
+    )
     args.append(name_arg)
 
     any_type = types.AnyType(types.TypeOfAny.special_form)
     value_var = nodes.Var('value', any_type)
-    value_arg = nodes.Argument(variable=value_var, type_annotation=any_type, initializer=None, kind=nodes.ARG_POS)
+    value_arg = nodes.Argument(
+        variable=value_var,
+        type_annotation=any_type,
+        initializer=None,
+        kind=nodes.ARG_POS
+    )
     args.append(value_arg)
 
     common.add_method(ctx, '_set', args, types.NoneTyp())
@@ -99,7 +128,12 @@ def add_intmixin_hook(ctx):
 
     int_type = ctx.api.builtin_type('builtins.int')
     var = nodes.Var('value', int_type)
-    arg = nodes.Argument(variable=var, type_annotation=int_type, initializer=None, kind=nodes.ARG_POS)
+    arg = nodes.Argument(
+        variable=var,
+        type_annotation=int_type,
+        initializer=None,
+        kind=nodes.ARG_POS
+    )
     args = [arg]
 
     common.add_method(ctx, '__init__', args, types.NoneTyp())
@@ -143,14 +177,14 @@ class Nem2Plugin(Plugin):
     """Plugin to support basic, automatically generated NEM models."""
 
     def get_class_decorator_hook(self, fullname: str):
-        if fullname == 'nem2.util.dataclasses.dataclass':
+        if fullname == DATACLASS:
             return add_dataclass_hook
         return None
 
     def get_customize_class_mro_hook(self, fullname: str):
-        if fullname == 'nem2.util.mixin.IntMixin':
+        if fullname == INT_MIXIN:
             return add_intmixin_hook
-        elif fullname == 'nem2.models.account.multisig_account_graph_info.MultisigAccountGraphInfo':
+        elif fullname == MULTISIG_ACCOUNT_GRAPH_INFO:
             return add_dict_hook
         return None
 

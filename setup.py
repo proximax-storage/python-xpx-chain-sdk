@@ -1,9 +1,7 @@
 import os
+import setuptools
 import subprocess
 import sys
-
-from distutils.cmd import Command
-from setuptools import find_packages, setup
 
 
 def shell_command(command, short_description, **env):
@@ -15,7 +13,7 @@ def shell_command(command, short_description, **env):
         environ.update(env)
         kwds['env'] = environ
 
-    class ShellCommand(Command):
+    class ShellCommand(setuptools.Command):
         """Run custom script when invoked."""
 
         description = short_description
@@ -33,6 +31,22 @@ def shell_command(command, short_description, **env):
     return ShellCommand
 
 
+def unittest_command(suite):
+    """Get new command for unittest suite."""
+
+    return [
+        sys.executable,
+        "-m",
+        "unittest",
+        "discover",
+        "-v",
+        "-s",
+        suite,
+        "-p",
+        "*_test.py"
+    ]
+
+
 LICENSE = "Apache-2.0"
 MAINTAINER = ['Alex Huszagh']
 MAINTAINER_EMAIL = ['ahuszagh@gmail.com']
@@ -43,7 +57,7 @@ VERSION = "0.0.1"
 DESCRIPTION = "Python SDK for NEM2."
 LONG_DESCRIPTION = "TODO(ahuszagh) Implement..."
 
-PACKAGES = find_packages()
+PACKAGES = setuptools.find_packages()
 
 REQUIRES = [
     'aiohttp>=3.5',
@@ -80,19 +94,24 @@ COMMANDS = {
         command=[sys.executable, "-m", "flake8"],
         short_description="Run flake8 on project.",
     ),
+    'lint_tests': shell_command(
+        command=[sys.executable, "-m", "flake8", "tests"],
+        short_description="Run flake8 on unit tests.",
+    ),
     'test': shell_command(
-        command=[sys.executable, "-m", "unittest", "discover", "-v", "-s", "tests.main", "-p", "*_test.py"],
+        command=unittest_command("tests.main"),
         short_description="Run main unittest suite.",
         PYTHONPATH=MOCKDIR
     ),
     'test_internet': shell_command(
-        command=[sys.executable, "-m", "unittest", "discover", "-v", "-s", "tests.internet", "-p", "*_test.py"],
+        command=unittest_command("tests.internet"),
         short_description="Run internet-dependent unittest suite.",
         NIS2_ENDPOINT=ENDPOINT
     ),
 }
 
-setup(install_requires=REQUIRES,
+setuptools.setup(
+    install_requires=REQUIRES,
     extras_require=EXTRAS_REQUIRE,
     python_requires=">=3.7",
     tests_require=TESTS_REQUIRE,

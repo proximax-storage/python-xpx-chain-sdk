@@ -36,6 +36,8 @@ from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['AggregateTransaction']
+
 Cosignatures = typing.Sequence[AggregateTransactionCosignature]
 InnerTransactions = typing.Sequence[InnerTransaction]
 OptionalNetworkType = typing.Optional[NetworkType]
@@ -47,7 +49,8 @@ class AggregateTransaction(Transaction):
     inner_transactions: InnerTransactions
     cosignatures: Cosignatures
 
-    def __init__(self,
+    def __init__(
+        self,
         network_type: NetworkType,
         type: TransactionType,
         version: TransactionVersion,

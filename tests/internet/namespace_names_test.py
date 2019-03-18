@@ -7,8 +7,8 @@ from tests import responses
 class TestNamespaceNames(harness.TestCase):
 
     @harness.test_case(
-        sync_data=client.NamespaceHttp,
-        async_data=client.AsyncNamespaceHttp
+        sync_data=client.NamespaceHTTP,
+        async_data=client.AsyncNamespaceHTTP
     )
     async def test_names(self, data, await_cb, with_cb):
         async with with_cb(data(responses.ENDPOINT)) as http:

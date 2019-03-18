@@ -7,8 +7,8 @@ from tests import responses
 class TestNetwork(harness.TestCase):
 
     @harness.test_case(
-        sync_data=client.NetworkHttp,
-        async_data=client.AsyncNetworkHttp
+        sync_data=client.NetworkHTTP,
+        async_data=client.AsyncNetworkHTTP
     )
     async def test_network(self, data, await_cb, with_cb):
         async with with_cb(data(responses.ENDPOINT)) as http:

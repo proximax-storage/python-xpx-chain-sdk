@@ -29,6 +29,8 @@ from nem2 import util
 from .deadline import Deadline
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['TransactionStatusError']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 

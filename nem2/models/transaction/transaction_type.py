@@ -26,6 +26,8 @@ from __future__ import annotations
 import enum
 from nem2 import util
 
+__all__ = ['TransactionType']
+
 
 @util.inherit_doc
 class TransactionType(util.U16Mixin, util.EnumMixin, enum.IntEnum):

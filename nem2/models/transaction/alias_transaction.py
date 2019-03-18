@@ -33,6 +33,8 @@ from ..mosaic.mosaic_id import MosaicId
 from ..namespace.alias_action_type import AliasActionType
 from ..namespace.namespace_id import NamespaceId
 
+__all__ = ['AliasTransaction']
+
 
 class AliasTransaction(Transaction):
     """Abstract class for alias transactions."""

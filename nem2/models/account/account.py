@@ -31,6 +31,8 @@ from .address import Address
 from .public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['Account']
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -94,8 +96,8 @@ class Account:
         :return: Account object.
         """
 
-        private_key = util.encode_hex(private_key)
-        signing_key = ed25519.sha3.SigningKey(util.unhexlify(private_key))
+        private_key = util.decode_hex(private_key)
+        signing_key = ed25519.sha3.SigningKey(private_key)
         public_key = signing_key.get_verifying_key().to_bytes()
         address = Address.create_from_public_key(public_key, network_type)
 
@@ -122,8 +124,8 @@ class Account:
         else:
             signing_key, verifying_key = ed25519.sha3.create_keypair()
 
-        public_key = util.hexlify(verifying_key.to_bytes())
-        private_key = util.hexlify(signing_key.to_seed())
+        public_key = verifying_key.to_bytes()
+        private_key = signing_key.to_seed()
         address = Address.create_from_public_key(public_key, network_type)
 
         return cls(address, public_key, private_key)
@@ -145,18 +147,18 @@ class Account:
         # uint8_t[64] signature
         # uint8_t[32] signer
         signing_bytes = transaction[100:]
-        signature = util.unhexlify(self.sign_data(signing_bytes))
+        signature = self.sign_data(signing_bytes)
         public_key = util.unhexlify(self.public_key)
         size = transaction[:4]
 
         return size + signature + public_key + signing_bytes
 
-    def sign_data(self, data: typing.AnyStr) -> str:
+    def sign_data(self, data: typing.AnyStr) -> bytes:
         """
         Sign raw data using private key.
 
         :param private_key: Hex-encoded or raw bytes to sign.
-        :return: Hex-encoded signature of data.
+        :return: Raw data signature.
         """
 
         data = util.decode_hex(data, with_prefix=True)
@@ -164,6 +166,36 @@ class Account:
         public_key = util.unhexlify(self.public_key)
         key = ed25519.sha3.SigningKey(private_key + public_key)
 
-        return util.hexlify(key.sign(data))
+        return typing.cast(bytes, key.sign(data))
 
     signData = util.undoc(sign_data)
+
+    def verify_signature(
+        self,
+        data: typing.AnyStr,
+        signature: typing.AnyStr
+    ) -> bool:
+        """
+        Verify a signature.
+
+        :param data: Hex-encoded or raw bytes used to generate signature.
+        :param public_key: Hex-encoded or raw bytes for signature.
+        :return: Boolean representing if the signature was verified.
+        """
+        return self.public_account.verify_signature(data, signature)
+
+    verifySignature = util.undoc(verify_signature)
+
+    def verify_transaction(
+        self,
+        transaction: typing.AnyStr
+    ) -> bool:
+        """
+        Verify signed transaction data.
+
+        :param transaction: Hex-encoded or raw bytes for transaction data.
+        :return: Boolean representing if the transaction signature was verified.
+        """
+        return self.public_account.verify_transaction(transaction)
+
+    verifyTransaction = util.undoc(verify_transaction)

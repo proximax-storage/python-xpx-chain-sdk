@@ -42,25 +42,25 @@ from ..types import BytesType, OptionalBytesType
 
 
 def keccak_224(data: OptionalBytesType = None) -> Keccak:
-    """Returns a 224-bit keccak hash object; optionally initialized with a string."""
+    """Returns a 224-bit keccak hash object"""
 
     return Keccak(c=448, r=1152, n=224, name='keccak_224', data=data)
 
 
 def keccak_256(data: OptionalBytesType = None) -> Keccak:
-    """Returns a 256-bit keccak hash object; optionally initialized with a string."""
+    """Returns a 256-bit keccak hash object"""
 
     return Keccak(c=512, r=1088, n=256, name='keccak_256', data=data)
 
 
 def keccak_384(data: OptionalBytesType = None) -> Keccak:
-    """Returns a 384-bit keccak hash object; optionally initialized with a string."""
+    """Returns a 384-bit keccak hash object"""
 
     return Keccak(c=768, r=832, n=384, name='keccak_384', data=data)
 
 
 def keccak_512(data: OptionalBytesType = None) -> Keccak:
-    """Returns a 512-bit keccak hash object; optionally initialized with a string."""
+    """Returns a 512-bit keccak hash object"""
 
     return Keccak(c=1024, r=576, n=512, name='keccak_512', data=data)
 
@@ -136,13 +136,16 @@ class Keccak:
                 p = self.buffered_data
                 self.buffered_data = b""
             else:
-                # Slice it up into the first r*a bits, for some constant a>=1, and the remaining total-r*a bits.
+                # Slice it up into the first r*a bits, for some constant
+                # a>=1, and the remaining total-r*a bits.
                 p = self.buffered_data[:-extra_bits // 4]
                 self.buffered_data = self.buffered_data[-extra_bits // 4:]
 
             # Absorbing phase
             for i in range((len(p) * 8 // 2) // self.r):
-                to_convert = p[i * (2 * self.r // 8):(i + 1) * (2 * self.r // 8)] + b'00' * (self.c // 8)
+                start_i = i * (2 * self.r // 8)
+                stop_i = (i + 1) * (2 * self.r // 8)
+                to_convert = p[start_i:stop_i] + b'00' * (self.c // 8)
                 p_i = _convert_str_to_table(to_convert, self.w, self.b)
 
                 # First apply the XOR to the state + block
@@ -227,11 +230,11 @@ _ROUND_CONSTANTS = [
 ]
 
 _ROTATION_OFFSETS = [
-    [0,  36,   3,  41,  18],
-    [1,  44,  10,  45,   2],
-    [62,  6,  43,  15,  61],
-    [28, 55,  25,  21,  56],
-    [27, 20,  39,   8,  14]
+    [0,  36,   3,  41,  18],    # noqa: E241
+    [1,  44,  10,  45,   2],    # noqa: E241
+    [62,  6,  43,  15,  61],    # noqa: E241
+    [28, 55,  25,  21,  56],    # noqa: E241
+    [27, 20,  39,   8,  14],    # noqa: E241
 ]
 
 
@@ -249,7 +252,7 @@ def _round(a, rc_fixed, w):
     """
     Perform one round of computation as defined in the Keccak-f permutation.
 
-    :param a: 5x5 matrix containing the state, where each entry is a string of hexchars that is 'w' bits long.
+    :param a: 5x5 matrix containing the state.
     :param rc_fixed: Value of round-constant to use.
     :param w: Word size.
     """
@@ -296,7 +299,7 @@ def _keccakf(a, n_r, w):
     """
     Perform Keccak-f function on the state a.
 
-    :param a: 5x5 matrix containing the state, where each entry is a string of hexchars that is 'w' bits long.
+    :param a: 5x5 matrix containing the state.
     :param n_r: Number of rounds.
     :param w: Word size.
     """
@@ -349,7 +352,7 @@ def _pad10star1(hex_string: bytes, n):
         # Pad with one '0' to reach correct length (don't know test vectors coding)
         hex_string += b'0'
     if bit_length > (len(hex_string) // 2 * 8):
-        raise KeccakError("the string is too short to contain the number of bits announced")
+        raise KeccakError("string is too short to contain announced bits")
 
     bytes_filled = bit_length // 8
     bits_filled = bit_length % 8
@@ -408,7 +411,10 @@ def _convert_str_to_table(string, w, b):
     # Each character in the string represents 4 bits.
     # The string should have exactly 'b' bits.
     if len(string) * 4 != b:
-        raise KeccakError("string can't be divided in 25 blocks of w bits i.e. string must have exactly b bits")
+        raise KeccakError(
+            "string can't be divided in 25 blocks of w "
+            "bits i.e. string must have exactly b bits"
+        )
 
     # Convert
     output = [

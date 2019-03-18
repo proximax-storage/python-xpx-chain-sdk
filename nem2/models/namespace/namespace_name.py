@@ -29,6 +29,8 @@ from nem2 import util
 from .namespace_id import NamespaceId
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['NamespaceName']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 

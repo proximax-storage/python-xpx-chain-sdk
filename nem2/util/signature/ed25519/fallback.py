@@ -47,6 +47,11 @@ from ..types import HashFuncType
 
 # EXCEPTIONS
 
+SECRET_LEAK_MSG = (
+    'Security warning: {} using insecure ed25519'
+    ' implementation, secrets may be leaked.'
+)
+
 
 class SecretsWarning(UserWarning):
     pass
@@ -262,13 +267,13 @@ def scalarmult(p: Point, e: int) -> Point:
 def make_bpow() -> typing.List[Point]:
     """BPOW[i] == scalarmult(B, 2**i)"""
 
-    l = []
+    bpow = []
     p: Point = B
     for i in range(253):
-        l.append(p)
+        bpow.append(p)
         p = edwards_double(p)
 
-    return l
+    return bpow
 
 
 BPOW = make_bpow()
@@ -358,7 +363,8 @@ def publickey(
 ) -> typing.Tuple[bytes, bytes]:
     """Generate public and private key from seed."""
 
-    warnings.warn('Security warning: generating verifying key using insecure ed25519 implementation, secrets may be leaked.', SecretsWarning)
+    warning_msg = SECRET_LEAK_MSG.format('generating verifying key')
+    warnings.warn(warning_msg, SecretsWarning)
 
     assert len(seed) == 32
 
@@ -375,7 +381,8 @@ def sign(
 ) -> bytes:
     """Sign message using public and private key."""
 
-    warnings.warn('Security warning: signing message using insecure ed25519 implementation, secrets may be leaked.', SecretsWarning)
+    warning_msg = SECRET_LEAK_MSG.format('signing message')
+    warnings.warn(warning_msg, SecretsWarning)
 
     if len(signing_key) != 64:
         raise ValueError("Invalid signing key length.")
@@ -404,7 +411,8 @@ def verify(
     :param message: Original message.
     """
 
-    warnings.warn('Security warning: verifying signature using insecure ed25519 implementation, secrets may be leaked.', SecretsWarning)
+    warning_msg = SECRET_LEAK_MSG.format('verifying signature')
+    warnings.warn(warning_msg, SecretsWarning)
 
     if len(verifying_key) != 32:
         raise ValueError("Invalid verifying key length.")

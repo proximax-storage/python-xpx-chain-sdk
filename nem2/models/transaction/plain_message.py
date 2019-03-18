@@ -30,6 +30,8 @@ from .message import Message
 from .message_type import MessageType
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['PlainMessage']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 

@@ -30,6 +30,8 @@ from .mosaic_id import MosaicId
 from ..blockchain.network_type import NetworkType
 from ..namespace.namespace_id import NamespaceId
 
+__all__ = ['MosaicName']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 

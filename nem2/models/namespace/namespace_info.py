@@ -34,6 +34,8 @@ from ..account.address import Address
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['NamespaceInfo']
+
 NamespaceIdListType = typing.Sequence[NamespaceId]
 OptionalNetworkType = typing.Optional[NetworkType]
 
@@ -115,7 +117,7 @@ class NamespaceInfo(util.DTO):
             'type': self.type.to_dto(network_type),
             'depth': self.depth,
             'parentId': self.parent_id.to_dto(network_type),
-            'owner': self.owner.public_key,
+            'owner': self.owner.to_dto(network_type),
             'ownerAddress': util.hexlify(self.owner.address.encoded),
             'startHeight': util.u64_to_dto(self.start_height),
             'endHeight': util.u64_to_dto(self.end_height),
@@ -145,9 +147,12 @@ class NamespaceInfo(util.DTO):
         meta = data['meta']
         namespace = data['namespace']
         address = Address.create_from_encoded(util.unhexlify(namespace['ownerAddress']))
+        network_type = address.network_type
         depth = namespace['depth']
-        levels = [NamespaceId.from_dto(namespace[f'level{i}'], network_type) for i in range(depth)]
         alias = Alias.from_dto(namespace.get('alias'), network_type)
+        levels = []
+        for i in range(depth):
+            levels.append(NamespaceId.from_dto(namespace[f'level{i}'], network_type))
 
         return cls(
             active=meta['active'],
@@ -157,7 +162,7 @@ class NamespaceInfo(util.DTO):
             depth=depth,
             levels=levels,
             parent_id=NamespaceId.from_dto(namespace['parentId'], network_type),
-            owner=PublicAccount(address, namespace['owner']),
+            owner=PublicAccount.from_dto(namespace['owner'], network_type),
             start_height=util.u64_from_dto(namespace['startHeight']),
             end_height=util.u64_from_dto(namespace['endHeight']),
             alias=alias,

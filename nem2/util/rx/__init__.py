@@ -1,6 +1,6 @@
 """
-    reactive
-    ========
+    rx
+    ==
 
     Optional reactive extensions when RxPy is installed.
 

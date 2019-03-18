@@ -31,6 +31,8 @@ from ..account.address import Address
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic_id import MosaicId
 
+__all__ = ['Alias']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 DTOType = typing.Optional[dict]
 ValueType = typing.Optional[typing.Union[Address, MosaicId]]

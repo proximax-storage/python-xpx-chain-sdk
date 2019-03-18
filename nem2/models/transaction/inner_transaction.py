@@ -32,6 +32,8 @@ from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['InnerTransaction']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 
@@ -63,6 +65,8 @@ class InnerTransaction(Transaction):
         :param size: Entity size.
         """
 
+        network_type = self.network_type
+
         # uint32_t size
         # uint8_t[32] signer
         # uint8_t version
@@ -70,10 +74,10 @@ class InnerTransaction(Transaction):
         # uint16_t type
         buffer = bytearray(self.catbuffer_size_shared())
         buffer[0:4] = util.u32_to_catbuffer(size)
-        buffer[4:36] = util.unhexlify(self.signer.public_key)
-        buffer[36:37] = self.version.to_catbuffer()
-        buffer[37:38] = self.network_type.to_catbuffer()
-        buffer[38:40] = self.type.to_catbuffer()
+        buffer[4:36] = self.signer.to_catbuffer(network_type)
+        buffer[36:37] = self.version.to_catbuffer(network_type)
+        buffer[37:38] = self.network_type.to_catbuffer(network_type)
+        buffer[38:40] = self.type.to_catbuffer(network_type)
 
         return bytes(buffer)
 
@@ -86,6 +90,7 @@ class InnerTransaction(Transaction):
 
         data = util.decode_hex(data, with_prefix=True)
         assert len(data) >= self.catbuffer_size_shared()
+        network_type = NetworkType.from_catbuffer(data[37:38])
 
         # uint32_t size
         # uint8_t[32] signer
@@ -94,8 +99,8 @@ class InnerTransaction(Transaction):
         # uint16_t type
         total_size = util.u32_from_catbuffer(data[:4])
         public_key = data[4:36]
+        signer = PublicAccount.from_catbuffer(public_key, network_type)
         version = TransactionVersion.from_catbuffer(data[36:37])
-        network_type = NetworkType.from_catbuffer(data[37:38])
         type = TransactionType.from_catbuffer(data[38:40])
 
         self._set('type', type)
@@ -105,7 +110,6 @@ class InnerTransaction(Transaction):
         self._set('fee', None)
         self._set('signature', None)
         if public_key != bytes(32):
-            signer = PublicAccount.create_from_public_key(public_key, network_type)
             self._set('signer', signer)
         else:
             self._set('signer', None)

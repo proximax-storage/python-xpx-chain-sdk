@@ -25,6 +25,8 @@
 from .alias import Alias
 from ..mosaic.mosaic_id import MosaicId
 
+__all__ = ['MosaicAlias']
+
 
 class MosaicAlias(Alias):
     """

@@ -23,13 +23,12 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
-OptionalNetworkType = typing.Optional[NetworkType]
+__all__ = ['AggregateTransactionCosignature']
 
 
 @util.inherit_doc
@@ -47,19 +46,19 @@ class AggregateTransactionCosignature:
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: NetworkType,
     ) -> dict:
         return {
             'signature': self.signature,
-            'signer': self.signer.public_key,
+            'signer': self.signer.to_dto(network_type),
         }
 
     @classmethod
     def from_dto(
         cls,
         data: dict,
-        network_type: OptionalNetworkType = None
+        network_type: NetworkType,
     ) -> AggregateTransactionCosignature:
         signature = data['signature']
-        signer = PublicAccount.create_from_public_key(data['signer'], network_type)
+        signer = PublicAccount.from_dto(data['signer'], network_type)
         return cls(signature, signer)

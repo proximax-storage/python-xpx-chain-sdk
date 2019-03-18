@@ -1,0 +1,21 @@
+[flake8]
+ignore =
+    # E501 Line too long.
+    # We don't care about long lines for unittests, for our data
+    # and large models, we need long lines.
+    E501,
+    # E731 do not assign a lambda expression.
+    # Lambda expressions aid readability when used in moderation.
+    E731,
+    # E741 ambiguous variable name.
+    # For quick tests, l is great for naming lists. Using multicharacter,
+    # unambiguous variable names would be pointless.
+    E741,
+    # F403 from module import *' used; unable to detect undefined names.
+    # F405 Name may be undefined, or defined from star imports.
+    # We use glob imports for test harnesses and helpers.
+    F403,
+    F405,
+    # W503 Line break occurred before a binary operator.
+    # PEP8 actually recommends using line breaks before binary operators.
+    W503

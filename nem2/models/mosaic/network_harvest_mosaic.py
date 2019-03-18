@@ -30,6 +30,8 @@ from .mosaic import Mosaic
 from .mosaic_id import MosaicId
 from ..namespace.namespace_id import NamespaceId
 
+__all__ = ['NetworkHarvestMosaic']
+
 
 class NetworkHarvestMosaic(Mosaic):
     """

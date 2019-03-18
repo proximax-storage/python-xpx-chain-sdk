@@ -26,6 +26,13 @@ from __future__ import annotations
 import binascii
 import typing
 
+__all__ = [
+    'decode_hex',
+    'encode_hex',
+    'hexlify',
+    'unhexlify',
+]
+
 
 def hexlify(data: bytes, with_prefix=False) -> str:
     """Convert bytes data to hexadecimal string."""

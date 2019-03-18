@@ -22,6 +22,8 @@
     limitations under the License.
 """
 
+__all__ = ['AccountMetadata']
+
 
 # TODO(ahuszagh) Do I need this?
 class AccountMetadata:

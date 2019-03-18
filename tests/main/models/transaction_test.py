@@ -336,8 +336,7 @@ class TestSecretProofTransaction(harness.TestCase):
         self.assertEqual(signed_transaction.network_type, self.signer.network_type)
 
     def test_to_aggregate(self):
-
-        inner = self.transaction.to_aggregate(self.signer)
+        inner = self.transaction.to_aggregate(self.signer.public_account)
         catbuffer = inner.to_catbuffer()
         self.assertEqual(self.embedded, util.hexlify(catbuffer))
 

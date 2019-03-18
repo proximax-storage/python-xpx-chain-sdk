@@ -47,7 +47,7 @@ class EnumMixin:
 
     def description(self) -> str:
         """Describe enumerated values in detail."""
-        raise NotImplementedError
+        raise abc.AbstractMethodError
 
 
 class IntMixin:
@@ -56,7 +56,7 @@ class IntMixin:
     __slots__ = ()
 
     def __int__(self) -> int:
-        raise NotImplementedError
+        raise abc.AbstractMethodError
 
     def __index__(self) -> int:
         return self.__int__()

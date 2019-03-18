@@ -12,7 +12,7 @@ class TestAsyncLoop(harness.TestCase):
 
     def test_loop(self):
         async def inner(loop):
-            async with client.AsyncHttp(responses.ENDPOINT, loop=loop) as http:
+            async with client.AsyncHTTP(responses.ENDPOINT, loop=loop) as http:
                 # Set the network type
                 with aiohttp.default_response(200, **responses.NETWORK_TYPE["MIJIN_TEST"]):
                     await http.network_type
@@ -26,11 +26,11 @@ class TestAsyncLoop(harness.TestCase):
         loop.close()
 
 
-class TestHttp(harness.TestCase):
+class TestHTTP(harness.TestCase):
 
     @harness.test_case(
-        sync_data=(client.NetworkHttp, requests, client.HTTPError),
-        async_data=(client.AsyncNetworkHttp, aiohttp, client.AsyncHTTPError)
+        sync_data=(client.NetworkHTTP, requests, client.HTTPError),
+        async_data=(client.AsyncNetworkHTTP, aiohttp, client.AsyncHTTPError)
     )
     async def test_exceptions(self, data, await_cb, with_cb):
         async with with_cb(data[0](responses.ENDPOINT)) as http:
@@ -42,17 +42,17 @@ class TestHttp(harness.TestCase):
                     await await_cb(http.get_network_type())
 
     @harness.test_case(
-        sync_data=client.Http,
-        async_data=client.AsyncHttp
+        sync_data=client.HTTP,
+        async_data=client.AsyncHTTP
     )
     async def test_from_http(self, data, await_cb, with_cb):
         async with with_cb(data(responses.ENDPOINT)) as http:
             copy = data.from_http(http)
-            self.assertTrue(http.client is copy.client)
+            self.assertTrue(http.raw is copy.raw)
 
     @harness.test_case(
-        sync_data=(client.Http, requests),
-        async_data=(client.AsyncHttp, aiohttp)
+        sync_data=(client.HTTP, requests),
+        async_data=(client.AsyncHTTP, aiohttp)
     )
     async def test_network_type(self, data, await_cb, with_cb):
         async with with_cb(data[0](responses.ENDPOINT)) as http:

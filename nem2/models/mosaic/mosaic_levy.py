@@ -31,6 +31,8 @@ from .mosaic_levy_type import MosaicLevyType
 from ..account.address import Address
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['MosaicLevy']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 # TODO(ahuszagh) This is not yet implemented in Catapult. Subject to change

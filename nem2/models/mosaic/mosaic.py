@@ -29,6 +29,8 @@ from nem2 import util
 from .mosaic_id import MosaicId
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['Mosaic']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 SIZE = MosaicId.CATBUFFER_SIZE + util.U64_BYTES
 

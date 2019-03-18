@@ -9,7 +9,8 @@ class WebSocketClientProtocol(WebSocketCommonProtocol):
     is_client = True
     side = "client"
 
-    def __init__(self,
+    def __init__(
+        self,
         origin=None,
         extensions=None,
         subprotocols=None,
@@ -36,7 +37,14 @@ class WebSocketClientProtocol(WebSocketCommonProtocol):
     def process_subprotocol(headers, available_subprotocols):
         raise InvalidHandshake
 
-    async def handshake(self, wsuri, origin, available_extensions, available_subprotocols, extra_headers):
+    async def handshake(
+        self,
+        wsuri,
+        origin,
+        available_extensions,
+        available_subprotocols,
+        extra_headers
+    ):
         pass
 
 

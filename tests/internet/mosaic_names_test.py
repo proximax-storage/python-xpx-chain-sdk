@@ -7,8 +7,8 @@ from tests import responses
 class TestMosaicNames(harness.TestCase):
 
     @harness.test_case(
-        sync_data=client.MosaicHttp,
-        async_data=client.AsyncMosaicHttp
+        sync_data=client.MosaicHTTP,
+        async_data=client.AsyncMosaicHTTP
     )
     async def test_names(self, data, await_cb, with_cb):
         async with with_cb(data(responses.ENDPOINT)) as http:

@@ -1,5 +1,5 @@
 from tests import harness
 
 
-class TestMosaicHttp(harness.TestCase):
+class TestMosaicHTTP(harness.TestCase):
     pass

@@ -26,37 +26,46 @@ from __future__ import annotations
 import functools
 import inspect
 
-from .reify import reify
+__all__ = [
+    'doc',
+    'inherit_doc',
+    'undoc',
+]
 
 
 def isproperty(f):
     """Check to see if a callable is a property."""
-
     return isinstance(f, property)
-
-
-def isreify(f):
-    """Check to see if a callable is a reified property."""
-
-    return isinstance(f, reify)
 
 
 def isfunction(f):
     """Check to see if a callable is a function."""
-
     return inspect.isfunction(f)
 
 
 def isclassmethod(f):
     """Check to see if a callable is a classmethod."""
-
     return isinstance(f, classmethod)
 
 
 def isstaticmethod(f):
     """Check to see if a callable is a staticmethod."""
-
     return isinstance(f, staticmethod)
+
+
+def is_public(f):
+    """Check if function is public."""
+    return not f.__name__.startswith('_')
+
+
+def has_doc(f):
+    """Check if function has doc string."""
+    return f.__doc__ is not None
+
+
+def needs_doc(f):
+    """Check if function is public and has no doc string."""
+    return is_public(f) and not has_doc(f)
 
 
 def doc_function(f, doc):
@@ -82,16 +91,6 @@ def wrap_property(f, callback):
         kwds['fdel'] = wrap_function(f.fdel, callback)
 
     return property(**kwds)
-
-
-def wrap_reify(f, callback):
-    """Wrap and modify doc string on a reified property."""
-
-    kwds = {'doc': f.__doc__}
-    if isfunction(f.fget):
-        kwds['fget'] = wrap_function(f.fget, callback)
-
-    return reify(**kwds)
 
 
 def wrap_function(f, callback):
@@ -124,9 +123,6 @@ def wrapper(doc):
         if isproperty(f):
             # Properties
             return wrap_property(f, callback)
-        elif isreify(f):
-            # Reified properties
-            return wrap_reify(f, callback)
         elif isfunction(f):
             # Functions, methods
             return wrap_function(f, callback)
@@ -165,7 +161,7 @@ def inherit_doc(cls):
     # is private to begin with.
     bases = [i for i in cls.__bases__ if i is not object]
     members = inspect.getmembers(cls, inspect.isroutine)
-    members = ((k, v) for k, v in members if not k.startswith('_') and v.__doc__ is None)
+    members = ((k, v) for k, v in members if needs_doc(v))
     for key, func in members:
         for base in bases:
             doc = getattr(getattr(base, key, None), '__doc__', None)

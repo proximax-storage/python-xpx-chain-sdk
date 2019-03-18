@@ -8,11 +8,11 @@ from tests import harness
 from tests import responses
 
 
-class TestNamespaceHttp(harness.TestCase):
+class TestNamespaceHTTP(harness.TestCase):
 
     @harness.test_case(
-        sync_data=(client.NamespaceHttp, requests),
-        async_data=(client.AsyncNamespaceHttp, aiohttp)
+        sync_data=(client.NamespaceHTTP, requests),
+        async_data=(client.AsyncNamespaceHTTP, aiohttp)
     )
     async def test_get_namespace(self, data, await_cb, with_cb):
         async with with_cb(data[0](responses.ENDPOINT)) as http:
@@ -38,8 +38,8 @@ class TestNamespaceHttp(harness.TestCase):
                 self.assertEqual(info, await await_cb(http.getNamespace(namespace_id)))
 
     @harness.test_case(
-        sync_data=(client.NamespaceHttp, requests),
-        async_data=(client.AsyncNamespaceHttp, aiohttp)
+        sync_data=(client.NamespaceHTTP, requests),
+        async_data=(client.AsyncNamespaceHTTP, aiohttp)
     )
     async def test_get_namespace_names(self, data, await_cb, with_cb):
         async with with_cb(data[0](responses.ENDPOINT)) as http:
@@ -56,8 +56,8 @@ class TestNamespaceHttp(harness.TestCase):
                 self.assertEqual(names, await await_cb(http.getNamespaceNames(ids)))
 
     @harness.test_case(
-        sync_data=(client.NamespaceHttp, requests),
-        async_data=(client.AsyncNamespaceHttp, aiohttp)
+        sync_data=(client.NamespaceHTTP, requests),
+        async_data=(client.AsyncNamespaceHTTP, aiohttp)
     )
     async def test_get_namespaces_from_account(self, data, await_cb, with_cb):
         async with with_cb(data[0](responses.ENDPOINT)) as http:
@@ -72,8 +72,8 @@ class TestNamespaceHttp(harness.TestCase):
                 self.assertEqual(infos[0].meta_id, '5C7C07005CC1FE000176FA2B')
 
     @harness.test_case(
-        sync_data=(client.NamespaceHttp, requests),
-        async_data=(client.AsyncNamespaceHttp, aiohttp)
+        sync_data=(client.NamespaceHTTP, requests),
+        async_data=(client.AsyncNamespaceHTTP, aiohttp)
     )
     async def test_get_namespaces_from_accounts(self, data, await_cb, with_cb):
         async with with_cb(data[0](responses.ENDPOINT)) as http:
@@ -88,8 +88,8 @@ class TestNamespaceHttp(harness.TestCase):
                 self.assertEqual(infos[0].meta_id, '5C7C07005CC1FE000176FA2B')
 
     @harness.test_case(
-        sync_data=(client.NamespaceHttp, requests),
-        async_data=(client.AsyncNamespaceHttp, aiohttp)
+        sync_data=(client.NamespaceHTTP, requests),
+        async_data=(client.AsyncNamespaceHTTP, aiohttp)
     )
     async def test_get_linked_mosaic_id(self, data, await_cb, with_cb):
         async with with_cb(data[0](responses.ENDPOINT)) as http:
@@ -103,8 +103,8 @@ class TestNamespaceHttp(harness.TestCase):
                     await await_cb(http.get_linked_mosaic_id(namespace_id))
 
     @harness.test_case(
-        sync_data=(client.NamespaceHttp, requests),
-        async_data=(client.AsyncNamespaceHttp, aiohttp)
+        sync_data=(client.NamespaceHTTP, requests),
+        async_data=(client.AsyncNamespaceHTTP, aiohttp)
     )
     async def test_get_linked_address(self, data, await_cb, with_cb):
         async with with_cb(data[0](responses.ENDPOINT)) as http:

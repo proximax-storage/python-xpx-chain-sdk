@@ -37,22 +37,6 @@ class MyClass:
         """Property doc string (never appears)."""
         return 1
 
-    # REIFIED PROPERTIES
-
-    @util.doc("""Reified property doc string.""")
-    @util.reify
-    def docrei1(self):
-        return 1
-
-    docrei2 = util.doc("""Reified property doc string.""")(docrei1)
-    undocrei1 = util.undoc(docrei1)
-
-    @util.undoc
-    @util.reify
-    def undocrei2(self):
-        """Reified property doc string (never appears)."""
-        return 1
-
     # METHOD
 
     @util.doc("""Method doc string.""")
@@ -124,18 +108,6 @@ class TestDocumentation(harness.TestCase):
         self.assertEqual(inst.docprop2, 1)
         self.assertEqual(inst.undocprop1, 1)
         self.assertEqual(inst.undocprop2, 1)
-
-    def test_reify(self):
-        self.assertTrue(MyClass.docrei1.__doc__ is not None)
-        self.assertEqual(MyClass.docrei1.__doc__, MyClass.docrei2.__doc__)
-        self.assertTrue(MyClass.undocrei1.__doc__ is None)
-        self.assertTrue(MyClass.undocrei2.__doc__ is None)
-
-        inst = MyClass()
-        self.assertEqual(inst.docrei1, 1)
-        self.assertEqual(inst.docrei2, 1)
-        self.assertEqual(inst.undocrei1, 1)
-        self.assertEqual(inst.undocrei2, 1)
 
     def test_method(self):
         inst = MyClass()

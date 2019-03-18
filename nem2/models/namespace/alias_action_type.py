@@ -25,6 +25,8 @@
 import enum
 from nem2 import util
 
+__all__ = ['AliasActionType']
+
 
 @util.inherit_doc
 class AliasActionType(util.U8Mixin, util.EnumMixin, enum.IntEnum):

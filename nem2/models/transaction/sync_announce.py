@@ -26,6 +26,8 @@ from __future__ import annotations
 
 from nem2 import util
 
+__all__ = ['SyncAnnounce']
+
 
 # TODO(ahuszagh) str or bytes??
 @util.dataclass(frozen=True)

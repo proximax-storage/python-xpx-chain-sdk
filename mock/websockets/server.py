@@ -10,7 +10,8 @@ class WebSocketServerProtocol(WebSocketCommonProtocol):
     is_client = False
     side = "server"
 
-    def __init__(self,
+    def __init__(
+        self,
         origin=None,
         extensions=None,
         subprotocols=None,

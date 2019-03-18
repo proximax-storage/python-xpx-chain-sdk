@@ -27,6 +27,8 @@ import enum
 
 from nem2 import util
 
+__all__ = ['TransactionVersion']
+
 
 @util.inherit_doc
 class TransactionVersion(util.U8Mixin, enum.IntEnum):

@@ -27,6 +27,8 @@ import string
 
 from nem2 import util
 
+__all__ = ['HashType']
+
 
 class HashType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """Enumerations for support hash types."""

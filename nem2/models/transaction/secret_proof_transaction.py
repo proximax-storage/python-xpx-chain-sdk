@@ -36,6 +36,11 @@ from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
+__all__ = [
+    'SecretProofTransaction',
+    'SecretProofInnerTransaction',
+]
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 

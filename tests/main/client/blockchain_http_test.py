@@ -7,11 +7,11 @@ from tests import harness
 from tests import responses
 
 
-class TestBlockchainHttp(harness.TestCase):
+class TestBlockchainHTTP(harness.TestCase):
 
     @harness.test_case(
-        sync_data=(client.BlockchainHttp, requests),
-        async_data=(client.AsyncBlockchainHttp, aiohttp)
+        sync_data=(client.BlockchainHTTP, requests),
+        async_data=(client.AsyncBlockchainHTTP, aiohttp)
     )
     async def test_get_block_by_height(self, data, await_cb, with_cb):
 

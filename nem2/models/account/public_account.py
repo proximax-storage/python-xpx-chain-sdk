@@ -30,11 +30,12 @@ from nem2.util.signature import ed25519
 from .address import Address
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['PublicAccount']
 
-# TODO(ahuszagh) Needs a model.
+
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class PublicAccount:
+class PublicAccount(util.Model):
     """
     Describe public account information via public key and account address.
 
@@ -44,6 +45,7 @@ class PublicAccount:
 
     address: Address
     public_key: str
+    CATBUFFER_SIZE: typing.ClassVar[int] = 32 * util.U8_BYTES
 
     def __init__(
         self,
@@ -57,7 +59,7 @@ class PublicAccount:
         self._set('public_key', public_key)
 
     @property
-    def network_type(self) -> 'NetworkType':
+    def network_type(self) -> NetworkType:
         """Get network type."""
         return self.address.network_type
 
@@ -68,7 +70,7 @@ class PublicAccount:
         cls,
         public_key: typing.AnyStr,
         network_type: NetworkType,
-    ) -> 'PublicAccount':
+    ) -> PublicAccount:
         """
         Create PublicAccount from the public key and network type.
 
@@ -82,9 +84,6 @@ class PublicAccount:
         return cls(address, public_key)
 
     createFromPublicKey = util.undoc(create_from_public_key)
-
-    # TODO(ahuszagh)
-    # verifyTransaction?
 
     def verify_signature(
         self,
@@ -113,3 +112,54 @@ class PublicAccount:
             return False
 
     verifySignature = util.undoc(verify_signature)
+
+    def verify_transaction(
+        self,
+        transaction: typing.AnyStr
+    ) -> bool:
+        """
+        Verify signed transaction data.
+
+        :param transaction: Hex-encoded or raw bytes for transaction data.
+        :return: Boolean representing if the transaction signature was verified.
+        """
+
+        transaction = util.decode_hex(transaction, with_prefix=True)
+
+        # Skip first 100 bytes.
+        # uint32_t size
+        # uint8_t[64] signature
+        # uint8_t[32] signer
+        data = transaction[100:]
+        signature = transaction[4:68]
+        return self.verify_signature(data, signature)
+
+    verifyTransaction = util.undoc(verify_transaction)
+
+    def to_dto(
+        self,
+        network_type: NetworkType,
+    ) -> str:
+        return self.public_key
+
+    @classmethod
+    def from_dto(
+        cls,
+        data: str,
+        network_type: NetworkType,
+    ) -> PublicAccount:
+        return PublicAccount.create_from_public_key(data, network_type)
+
+    def to_catbuffer(
+        self,
+        network_type: NetworkType,
+    ) -> bytes:
+        return util.unhexlify(self.public_key)
+
+    @classmethod
+    def from_catbuffer(
+        cls,
+        data: bytes,
+        network_type: NetworkType,
+    ) -> PublicAccount:
+        return PublicAccount.create_from_public_key(data, network_type)

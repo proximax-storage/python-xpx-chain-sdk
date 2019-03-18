@@ -25,6 +25,8 @@
 import enum
 from nem2 import util
 
+__all__ = ['MosaicLevyType']
+
 
 # TODO(ahuszagh) This is not yet implemented in Catapult. Subject to change
 @util.inherit_doc
@@ -39,6 +41,14 @@ class MosaicLevyType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
 
 
 DESCRIPTION = {
-    MosaicLevyType.ABSOLUTE: "The levy is an absolute fee. The field 'fee' states how many sub-units of the specified mosaic will be transferred to the recipient.",
-    MosaicLevyType.CALCULATED: "The levy is calculated from the transferred amount. The field 'fee' states how many percentiles of the transferred quantity will transferred to the recipient.",
+    MosaicLevyType.ABSOLUTE: (
+        "The levy is an absolute fee. The field 'fee' states "
+        "how many sub-units of the specified mosaic will be "
+        "transferred to the recipient."
+    ),
+    MosaicLevyType.CALCULATED: (
+        "The levy is calculated from the transferred amount. "
+        "The field 'fee' states how many percentiles of the "
+        "transferred quantity will transferred to the recipient."
+    ),
 }

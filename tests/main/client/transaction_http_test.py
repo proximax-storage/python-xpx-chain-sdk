@@ -1,5 +1,5 @@
 from tests import harness
 
 
-class TestTransactionHttp(harness.TestCase):
+class TestTransactionHTTP(harness.TestCase):
     pass

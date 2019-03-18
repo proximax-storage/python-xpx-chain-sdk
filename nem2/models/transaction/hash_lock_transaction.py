@@ -24,6 +24,8 @@
 
 from .lock_funds_transaction import LockFundsTransaction
 
+__all__ = ['HashLockTransaction']
+
 
 class HashLockTransaction(LockFundsTransaction):
     # TODO(ahuszagh) Implement

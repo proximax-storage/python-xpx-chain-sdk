@@ -28,10 +28,14 @@ import typing
 from nem2 import util
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['Address']
+
+T = typing.TypeVar('T')
+U = typing.Sequence[T]
 OptionalNetworkType = typing.Optional[NetworkType]
 
 
-def chunks(collection, n):
+def chunks(collection: U, n: int) -> typing.Generator[U, None, None]:
     """Generate n-sized chunks from collection."""
 
     for i in range(0, len(collection), n):

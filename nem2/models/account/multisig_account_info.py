@@ -27,6 +27,8 @@ import typing
 from nem2 import util
 from .public_account import PublicAccount
 
+__all__ = ['MultisigAccountInfo']
+
 PublicAccountListType = typing.Sequence[PublicAccount]
 
 

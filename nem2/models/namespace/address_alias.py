@@ -25,6 +25,8 @@
 from .alias import Alias
 from ..account.address import Address
 
+__all__ = ['AddressAlias']
+
 
 class AddressAlias(Alias):
     """

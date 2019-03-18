@@ -24,6 +24,8 @@
 
 from .alias import Alias
 
+__all__ = ['EmptyAlias']
+
 
 class EmptyAlias(Alias):
     """Empty alias without data."""

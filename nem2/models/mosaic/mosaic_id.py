@@ -28,6 +28,8 @@ from nem2 import util
 from .mosaic_nonce import MosaicNonce
 from ..account.public_account import PublicAccount
 
+__all__ = ['MosaicId']
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True, id=0)

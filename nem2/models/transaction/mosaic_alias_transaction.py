@@ -39,6 +39,8 @@ from ..mosaic.mosaic_id import MosaicId
 from ..namespace.alias_action_type import AliasActionType
 from ..namespace.namespace_id import NamespaceId
 
+__all__ = ['MosaicAliasTransaction']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 
@@ -64,7 +66,8 @@ class MosaicAliasTransaction(AliasTransaction):
     namespace_id: NamespaceId
     mosaic_id: MosaicId
 
-    def __init__(self,
+    def __init__(
+        self,
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,

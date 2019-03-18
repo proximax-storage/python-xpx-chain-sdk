@@ -33,6 +33,8 @@ from .mosaic_properties import MosaicProperties
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['MosaicInfo']
+
 OptionalMosaicLevyType = typing.Optional[MosaicLevy]
 OptionalNetworkType = typing.Optional[NetworkType]
 
@@ -82,19 +84,19 @@ class MosaicInfo(util.DTO):
         return self.properties.duration
 
     def is_supply_mutable(self) -> bool:
-        """Mosaic allows a supply change later on. Defaults to false."""
+        """Mosaic allows a supply change later on. Default false."""
         return self.properties.supply_mutable
 
     isSupplyMutable = util.undoc(is_supply_mutable)
 
     def is_transferable(self) -> bool:
-        """Allow transfer of funds from accounts other than the creator. Defaults to true."""
+        """Allow transfer of funds from non-creator accounts. Default true."""
         return self.properties.transferable
 
     isTransferable = util.undoc(is_transferable)
 
     def is_levy_mutable(self) -> bool:
-        """Get if levy is mutable. Defaults to false."""
+        """Get if levy is mutable. Default false."""
         return self.properties.levy_mutable
 
     isLevyMutable = util.undoc(is_levy_mutable)
@@ -120,7 +122,7 @@ class MosaicInfo(util.DTO):
         #         'mosaicId': self.mosaic_id.to_dto(),
         #         'supply': util.uint64_to_dto(self.supply),
         #         'height': util.uint64_to_dto(self.height),
-        #         'owner': self.owner.public_key,
+        #         'owner': self.owner.to_dto(network_type),
         #         'properties': self.properties.to_dto(),
         #         'levy': levy,
         #     },
@@ -155,7 +157,7 @@ class MosaicInfo(util.DTO):
         #     mosaic_id=mosaic_id,
         #     supply=util.dto_to_uint64(mosaic['supply']),
         #     height=util.dto_to_uint64(mosaic['height']),
-        #     owner=PublicAccount.create_from_public_key(mosaic['owner'], network_type),
+        #     owner=PublicAccount.from_dto(mosaic['owner'], network_type),
         #     properties=MosaicProperties.from_dto(mosaic['properties']),
         #     levy=levy,
         # )

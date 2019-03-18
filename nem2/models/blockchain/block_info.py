@@ -29,6 +29,8 @@ from nem2 import util
 from .network_type import NetworkType
 from ..account.public_account import PublicAccount
 
+__all__ = ['BlockInfo']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 MerkleTreeType = typing.Sequence[str]
 OptionalMerkleTreeType = typing.Optional[MerkleTreeType]
@@ -124,7 +126,7 @@ class BlockInfo(util.DTO):
         }
         block = {
             'signature': self.signature,
-            'signer': self.signer.public_key,
+            'signer': self.signer.to_dto(network_type),
             'version': self.version,
             'type': self.type,
             'height': util.u64_to_dto(self.height),
@@ -160,7 +162,7 @@ class BlockInfo(util.DTO):
             total_fee=util.u64_from_dto(meta.get('totalFee', [0, 0])),
             num_transactions=meta.get('numTransactions', 0),
             signature=block['signature'],
-            signer=PublicAccount.create_from_public_key(block['signer'], network_type),
+            signer=PublicAccount.from_dto(block['signer'], network_type),
             network_type=network_type,
             version=version,
             type=block['type'],

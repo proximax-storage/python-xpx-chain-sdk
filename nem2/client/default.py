@@ -36,22 +36,22 @@ from . import client
 
 __all__ = [
     # Synchronous
-    'Http',
-    'AccountHttp',
-    'BlockchainHttp',
-    'MosaicHttp',
-    'NamespaceHttp',
-    'NetworkHttp',
-    'TransactionHttp',
+    'HTTP',
+    'AccountHTTP',
+    'BlockchainHTTP',
+    'MosaicHTTP',
+    'NamespaceHTTP',
+    'NetworkHTTP',
+    'TransactionHTTP',
 
     # Asynchronous
-    'AsyncHttp',
-    'AsyncAccountHttp',
-    'AsyncBlockchainHttp',
-    'AsyncMosaicHttp',
-    'AsyncNamespaceHttp',
-    'AsyncNetworkHttp',
-    'AsyncTransactionHttp',
+    'AsyncHTTP',
+    'AsyncAccountHTTP',
+    'AsyncBlockchainHTTP',
+    'AsyncMosaicHTTP',
+    'AsyncNamespaceHTTP',
+    'AsyncNetworkHTTP',
+    'AsyncTransactionHTTP',
 
     # Websockets
     'Listener',
@@ -70,14 +70,14 @@ AsyncHTTPError = aiohttp.ClientResponseError
 
 
 @util.inherit_doc
-class HttpBase(abc.HttpBase):
+class HTTPBase(abc.HTTPBase):
     """Abstract base class for synchronous HTTP clients."""
 
     def __init__(self, endpoint: str) -> None:
         self._endpoint = endpoint
         self._index = 0
 
-    def __enter__(self):
+    def __enter__(self) -> HTTPBase:
         self._client = client.Client(requests.Session(), self._endpoint)
         return self
 
@@ -85,66 +85,66 @@ class HttpBase(abc.HttpBase):
         self.close()
 
     @property
-    def root(self):
-        return Http.from_http(self)
+    def root(self) -> HTTP:
+        return HTTP.from_http(self)
 
 
 @util.inherit_doc
-class Http(HttpBase, abc.Http):
+class HTTP(HTTPBase, abc.HTTP):
     """Main client for the synchronous NIS API."""
 
     @property
-    def account(self) -> AccountHttp:
-        return AccountHttp.from_http(self)
+    def account(self) -> AccountHTTP:
+        return AccountHTTP.from_http(self)
 
     @property
-    def blockchain(self) -> BlockchainHttp:
-        return BlockchainHttp.from_http(self)
+    def blockchain(self) -> BlockchainHTTP:
+        return BlockchainHTTP.from_http(self)
 
     @property
-    def mosaic(self) -> MosaicHttp:
-        return MosaicHttp.from_http(self)
+    def mosaic(self) -> MosaicHTTP:
+        return MosaicHTTP.from_http(self)
 
     @property
-    def namespace(self) -> NamespaceHttp:
-        return NamespaceHttp.from_http(self)
+    def namespace(self) -> NamespaceHTTP:
+        return NamespaceHTTP.from_http(self)
 
     @property
-    def network(self) -> NetworkHttp:
-        return NetworkHttp.from_http(self)
+    def network(self) -> NetworkHTTP:
+        return NetworkHTTP.from_http(self)
 
     @property
-    def transaction(self) -> TransactionHttp:
-        return TransactionHttp.from_http(self)
+    def transaction(self) -> TransactionHTTP:
+        return TransactionHTTP.from_http(self)
 
 
 @util.inherit_doc
-class AccountHttp(HttpBase, abc.AccountHttp):
+class AccountHTTP(HTTPBase, abc.AccountHTTP):
     """Account client for the synchronous NIS API."""
 
 
 @util.inherit_doc
-class BlockchainHttp(HttpBase, abc.BlockchainHttp):
+class BlockchainHTTP(HTTPBase, abc.BlockchainHTTP):
     """Blockchain client for the synchronous NIS API."""
 
 
 @util.inherit_doc
-class MosaicHttp(HttpBase, abc.MosaicHttp):
+class MosaicHTTP(HTTPBase, abc.MosaicHTTP):
     """Mosaic client for the synchronous NIS API."""
 
 
 @util.inherit_doc
-class NamespaceHttp(HttpBase, abc.NamespaceHttp):
+class NamespaceHTTP(HTTPBase, abc.NamespaceHTTP):
     """Namespace client for the synchronous NIS API."""
 
 
 @util.inherit_doc
-class NetworkHttp(HttpBase, abc.NetworkHttp):
+class NetworkHTTP(HTTPBase, abc.NetworkHTTP):
     """Network client for the synchronous NIS API."""
 
 
 @util.inherit_doc
-class TransactionHttp(HttpBase, abc.TransactionHttp):
+class TransactionHTTP(HTTPBase, abc.TransactionHTTP):
     """Transaction client for the synchronous NIS API."""
 
 
@@ -152,16 +152,20 @@ class TransactionHttp(HttpBase, abc.TransactionHttp):
 
 
 @util.inherit_doc
-class AsyncHttpBase(abc.AsyncHttpBase):
+class AsyncHTTPBase(abc.AsyncHTTPBase):
     """Abstract base class for synchronous HTTP clients."""
 
-    def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
+    def __init__(
+        self,
+        endpoint: str,
+        loop: util.OptionalLoopType = None
+    ) -> None:
         self._endpoint = endpoint
         self._index = 1
         self._loop = loop
         self._session = aiohttp.ClientSession(loop=loop)
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> AsyncHTTPBase:
         self._client = client.AsyncClient(self._session, self._endpoint)
         return self
 
@@ -169,66 +173,66 @@ class AsyncHttpBase(abc.AsyncHttpBase):
         await self.close()
 
     @property
-    def root(self):
-        return AsyncHttp.from_http(self)
+    def root(self) -> AsyncHTTP:
+        return AsyncHTTP.from_http(self)
 
 
 @util.inherit_doc
-class AsyncHttp(AsyncHttpBase, abc.Http):
+class AsyncHTTP(AsyncHTTPBase, abc.HTTP):
     """Main client for the synchronous NIS API."""
 
     @property
-    def account(self) -> AsyncAccountHttp:
-        return AsyncAccountHttp.from_http(self)
+    def account(self) -> AsyncAccountHTTP:
+        return AsyncAccountHTTP.from_http(self)
 
     @property
-    def blockchain(self) -> AsyncBlockchainHttp:
-        return AsyncBlockchainHttp.from_http(self)
+    def blockchain(self) -> AsyncBlockchainHTTP:
+        return AsyncBlockchainHTTP.from_http(self)
 
     @property
-    def mosaic(self) -> AsyncMosaicHttp:
-        return AsyncMosaicHttp.from_http(self)
+    def mosaic(self) -> AsyncMosaicHTTP:
+        return AsyncMosaicHTTP.from_http(self)
 
     @property
-    def namespace(self) -> AsyncNamespaceHttp:
-        return AsyncNamespaceHttp.from_http(self)
+    def namespace(self) -> AsyncNamespaceHTTP:
+        return AsyncNamespaceHTTP.from_http(self)
 
     @property
-    def network(self) -> AsyncNetworkHttp:
-        return AsyncNetworkHttp.from_http(self)
+    def network(self) -> AsyncNetworkHTTP:
+        return AsyncNetworkHTTP.from_http(self)
 
     @property
-    def transaction(self) -> AsyncTransactionHttp:
-        return AsyncTransactionHttp.from_http(self)
+    def transaction(self) -> AsyncTransactionHTTP:
+        return AsyncTransactionHTTP.from_http(self)
 
 
 @util.inherit_doc
-class AsyncAccountHttp(AsyncHttpBase, abc.AccountHttp):
+class AsyncAccountHTTP(AsyncHTTPBase, abc.AccountHTTP):
     """Account client for the asynchronous NIS API."""
 
 
 @util.inherit_doc
-class AsyncBlockchainHttp(AsyncHttpBase, abc.BlockchainHttp):
+class AsyncBlockchainHTTP(AsyncHTTPBase, abc.BlockchainHTTP):
     """Blockchain client for the asynchronous NIS API."""
 
 
 @util.inherit_doc
-class AsyncMosaicHttp(AsyncHttpBase, abc.MosaicHttp):
+class AsyncMosaicHTTP(AsyncHTTPBase, abc.MosaicHTTP):
     """Mosaic client for the asynchronous NIS API."""
 
 
 @util.inherit_doc
-class AsyncNamespaceHttp(AsyncHttpBase, abc.NamespaceHttp):
+class AsyncNamespaceHTTP(AsyncHTTPBase, abc.NamespaceHTTP):
     """Namespace client for the asynchronous NIS API."""
 
 
 @util.inherit_doc
-class AsyncNetworkHttp(AsyncHttpBase, abc.NetworkHttp):
+class AsyncNetworkHTTP(AsyncHTTPBase, abc.NetworkHTTP):
     """Network client for the asynchronous NIS API."""
 
 
 @util.inherit_doc
-class AsyncTransactionHttp(AsyncHttpBase, abc.TransactionHttp):
+class AsyncTransactionHTTP(AsyncHTTPBase, abc.TransactionHTTP):
     """Transaction client for the asynchronous NIS API."""
 
 
@@ -239,7 +243,11 @@ class AsyncTransactionHttp(AsyncHttpBase, abc.TransactionHttp):
 class Listener(abc.Listener):
     """Asynchronous websockets-based listener."""
 
-    def __init__(self, endpoint: str, loop: util.OptionalLoopType = None) -> None:
+    def __init__(
+        self,
+        endpoint: str,
+        loop: util.OptionalLoopType = None
+    ) -> None:
         url = client.parse_ws_url(endpoint)
         self._loop = loop
         self._conn = websockets.connect(url.url, loop=loop)

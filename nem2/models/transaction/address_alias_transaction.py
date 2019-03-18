@@ -39,6 +39,11 @@ from ..blockchain.network_type import NetworkType
 from ..namespace.alias_action_type import AliasActionType
 from ..namespace.namespace_id import NamespaceId
 
+__all__ = [
+    'AddressAliasTransaction',
+    'AddressAliasInnerTransaction',
+]
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 
@@ -64,7 +69,8 @@ class AddressAliasTransaction(AliasTransaction):
     namespace_id: NamespaceId
     address: Address
 
-    def __init__(self,
+    def __init__(
+        self,
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,

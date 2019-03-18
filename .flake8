@@ -1,0 +1,45 @@
+[flake8]
+# We have some long lines, but 90 is enough to view side-by-side
+# on most modern PCs. Generally, keep <= 80, unless necessary.
+max-line-length = 90
+
+per-file-ignores =
+    # F403 from module import *' used; unable to detect undefined names.
+    # F405 Name may be undefined, or defined from star imports.
+    # We use __all__ and glob imports to make our __init__ files
+    # actually readable and DRY. This way, we don't have to repeat
+    # definitions in __all__, nor do we have to clutter our code
+    # with long import chains. Prohibit `from mod import *` outside
+    # of __init__.
+    **/__init__.py: F403, F405
+
+ignore =
+    # E731 do not assign a lambda expression.
+    # Lambda expressions aid readability when used in moderation.
+    E731,
+    # E741 ambiguous variable name.
+    # We use a lot of cryptographic fallbacks, and restricting the
+    # use of single-letter variables would impede readability.
+    E741,
+    # W503 Line break occurred before a binary operator.
+    # PEP8 actually recommends using line breaks before binary operators.
+    W503
+
+exclude =
+    # Ignore unittests, which have their own configuration.
+    tests,
+    # Python setuptools
+    build,
+    dist,
+    .eggs,
+    *.egg-info,
+    # Sphinx
+    doc/conf.py,
+    # Git
+    .git,
+    # Mypy
+    .mypy_cache,
+    # Python bytecode
+    __pycache__,
+    # Tox integration
+    .tox

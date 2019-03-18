@@ -22,20 +22,21 @@
     limitations under the License.
 """
 
-from collections import abc
+from __future__ import annotations
 import typing
 
 from nem2 import util
+from .multisig_account_info import MultisigAccountInfo
 
-if typing.TYPE_CHECKING:
-    from .multisig_account_info import MultisigAccountInfo
+__all__ = ['MultisigAccountGraphInfo']
 
-GraphType = typing.MutableMapping[int, 'MultisigAccountInfo']
+OptionalValue = typing.Optional[MultisigAccountInfo]
+GraphType = typing.Dict[int, MultisigAccountInfo]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True, slots=False)
-class MultisigAccountGraphInfo(abc.MutableMapping):
+class MultisigAccountGraphInfo:
     """
     Graph info for multi-sig accounts.
 
@@ -46,19 +47,52 @@ class MultisigAccountGraphInfo(abc.MutableMapping):
     multisig_accounts: GraphType
 
     def __init__(self, *args, **kwds) -> None:
-        super().__init__(dict(*args, **kwds))
+        self.multisig_accounts = dict(*args, **kwds)
 
-    def __getitem__(self, key: int) -> 'MultisigAccountInfo':
+    def __contains__(self, key: int) -> bool:
+        return key in self.multisig_accounts
+
+    def __getitem__(self, key: int) -> MultisigAccountInfo:
         return self.multisig_accounts[key]
 
-    def __setitem__(self, key: int, account: 'MultisigAccountInfo') -> None:
+    def __setitem__(self, key: int, account: MultisigAccountInfo) -> None:
         self.multisig_accounts[key] = account
 
     def __delitem__(self, key: int) -> None:
         del self.multisig_accounts[key]
 
-    def __iter__(self) -> typing.Iterator:
+    def __iter__(self) -> typing.Iterator[int]:
         return iter(self.multisig_accounts)
 
     def __len__(self) -> int:
         return len(self.multisig_accounts)
+
+    def clear(self) -> None:
+        self.multisig_accounts.clear()
+
+    def copy(self) -> MultisigAccountGraphInfo:
+        return MultisigAccountGraphInfo(self.multisig_accounts)
+
+    def get(self, key: int, default: OptionalValue = None) -> OptionalValue:
+        return self.multisig_accounts.get(key, default)
+
+    def items(self) -> typing.ItemsView[int, MultisigAccountInfo]:
+        return self.multisig_accounts.items()
+
+    def keys(self) -> typing.KeysView[int]:
+        return self.multisig_accounts.keys()
+
+    def values(self) -> typing.ValuesView[MultisigAccountInfo]:
+        return self.multisig_accounts.values()
+
+    def pop(self, key: int, *args: MultisigAccountInfo):
+        return self.multisig_accounts.pop(key, *args)
+
+    def popitem(self) -> typing.Tuple[int, MultisigAccountInfo]:
+        return self.multisig_accounts.popitem()
+
+    def setdefault(self, key: int, default: OptionalValue = None) -> OptionalValue:
+        return self.multisig_accounts.setdefault(key, default)
+
+    def update(self, *args, **kwds):
+        return self.multisig_accounts.update(*args, **kwds)

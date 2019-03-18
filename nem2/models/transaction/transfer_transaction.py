@@ -39,6 +39,11 @@ from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic import Mosaic
 
+__all__ = [
+    'TransferTransaction',
+    'TransferInnerTransaction',
+]
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 
@@ -64,7 +69,8 @@ class TransferTransaction(Transaction):
     mosaics: typing.Sequence[Mosaic]
     message: Message
 
-    def __init__(self,
+    def __init__(
+        self,
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,

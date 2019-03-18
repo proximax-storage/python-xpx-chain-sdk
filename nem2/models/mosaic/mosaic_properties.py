@@ -28,6 +28,8 @@ import typing
 from nem2 import util
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['MosaicProperties']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 DTOType = typing.Sequence[util.U64DTOType]
 VERSION = 1
@@ -76,7 +78,7 @@ class MosaicProperties(util.Model):
     Properties of an asset.
 
     :param flags: Flags for the properties of the mosaic.
-    :param divisibility: Determines the decimal place mosaic can be divided into (from 0-6).
+    :param divisibility: Decimal places mosaic can be divided into [0-6].
     :param duration: Number of blocks the mosaic will be available.
     """
 
@@ -86,19 +88,19 @@ class MosaicProperties(util.Model):
 
     @property
     def supply_mutable(self) -> bool:
-        """Mosaic allows a supply change later on. Defaults to false."""
+        """Mosaic allows a supply change later on. Default false."""
         return (self.flags & 1) == 1
 
     supplyMutable = util.undoc(supply_mutable)
 
     @property
     def transferable(self) -> bool:
-        """Allow transfer of funds from accounts other than the creator. Defaults to true."""
+        """Allow transfer of funds from non-creator accounts. Default true."""
         return (self.flags & 2) == 2
 
     @property
     def levy_mutable(self) -> bool:
-        """Get if levy is mutable. Defaults to false."""
+        """Get if levy is mutable. Default false."""
         return (self.flags & 4) == 4
 
     levyMutable = util.undoc(levy_mutable)

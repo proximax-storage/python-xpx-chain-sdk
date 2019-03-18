@@ -46,9 +46,11 @@ from __future__ import annotations
 import functools
 import inspect
 
+__all__ = ['observable']
+
 try:
     # Have RxPy installed.
-    from . import reactive
+    from . import rx
 
     def observable_class(cls):
         """Decorate class so it supports a `to_observable` method."""
@@ -61,9 +63,9 @@ try:
 
         # determine the proper mixin
         if has_aiter:
-            mixin = reactive.AsyncGeneratorMixin
+            mixin = rx.AsyncGeneratorMixin
         else:
-            mixin = reactive.CoroutineMixin
+            mixin = rx.CoroutineMixin
 
         class ToObservable(cls, mixin):
             pass
@@ -80,9 +82,9 @@ try:
 
         # Need to get the proper adapter.
         if inspect.isasyncgenfunction(f):
-            adapter = reactive.AsyncGenerator
+            adapter = rx.AsyncGenerator
         else:
-            adapter = reactive.Coroutine
+            adapter = rx.Coroutine
 
         # Wrap methods and free-functions separately. If the first
         # argument is self, we want to get an event loop, if bound,

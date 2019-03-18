@@ -7,11 +7,11 @@ from tests import harness
 from tests import responses
 
 
-class TestNetworkHttp(harness.TestCase):
+class TestNetworkHTTP(harness.TestCase):
 
     @harness.test_case(
-        sync_data=(client.NetworkHttp, requests),
-        async_data=(client.AsyncNetworkHttp, aiohttp),
+        sync_data=(client.NetworkHTTP, requests),
+        async_data=(client.AsyncNetworkHTTP, aiohttp),
     )
     async def test_get_network_type(self, data, await_cb, with_cb):
         async with with_cb(data[0](responses.ENDPOINT)) as http:

@@ -30,6 +30,11 @@ import typing
 from . import hashlib
 from . import stdint
 
+__all__ = [
+    'generate_mosaic_id',
+    'generate_namespace_id',
+]
+
 FQN = re.compile(r'\A[a-z0-9][a-z0-9-_]*\Z')
 NAMESPACE_MAX_DEPTH = 3
 pack_u64 = stdint.u64_to_catbuffer

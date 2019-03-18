@@ -27,15 +27,17 @@ import enum
 
 from nem2 import util
 
+__all__ = ['NetworkType']
+
 
 @util.inherit_doc
 class NetworkType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """Identifier for the network type."""
 
-    MAIN_NET    = 0x68
-    TEST_NET    = 0x98
-    MIJIN       = 0x60
-    MIJIN_TEST  = 0x90
+    MAIN_NET   = 0x68       # noqa: E221
+    TEST_NET   = 0x98       # noqa: E221
+    MIJIN      = 0x60       # noqa: E221
+    MIJIN_TEST = 0x90       # noqa: E221
 
     def description(self) -> str:
         return DESCRIPTION[self]

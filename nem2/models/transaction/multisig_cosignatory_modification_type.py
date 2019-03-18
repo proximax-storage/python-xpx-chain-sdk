@@ -25,6 +25,8 @@
 import enum
 from nem2 import util
 
+__all__ = ['MultisigCosignatoryModificationType']
+
 
 @util.inherit_doc
 class MultisigCosignatoryModificationType(util.U8Mixin, util.EnumMixin, enum.IntEnum):

@@ -31,6 +31,8 @@ from .multisig_cosignatory_modification_type import MultisigCosignatoryModificat
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['MultisigCosignatoryModification']
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -50,7 +52,7 @@ class MultisigCosignatoryModification(util.DTO):
         network_type: NetworkType
     ) -> dict:
         return {
-            'cosignatoryPublicKey': self.cosignatory_public_account.public_key,
+            'cosignatoryPublicKey': self.cosignatory_public_account.to_dto(network_type),
             'type': self.type.to_dto(network_type),
         }
 
@@ -60,6 +62,7 @@ class MultisigCosignatoryModification(util.DTO):
         data: dict,
         network_type: NetworkType,
     ) -> MultisigCosignatoryModification:
+        public_key = data['cosignatoryPublicKey']
         type = MultisigCosignatoryModificationType.from_dto(data['type'], network_type)
-        public_account = PublicAccount.create_from_public_key(data['cosignatoryPublicKey'], network_type)
+        public_account = PublicAccount.from_dto(public_key, network_type)
         return cls(type, public_account)

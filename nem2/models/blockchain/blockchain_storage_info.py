@@ -28,6 +28,8 @@ import typing
 from nem2 import util
 from .network_type import NetworkType
 
+__all__ = ['BlockchainStorageInfo']
+
 OptionalNetworkType = typing.Optional[NetworkType]
 
 

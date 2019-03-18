@@ -25,6 +25,8 @@
 import typing
 from nem2 import util
 
+__all__ = ['NamespaceId']
+
 IdType = typing.Union[str, int]
 
 

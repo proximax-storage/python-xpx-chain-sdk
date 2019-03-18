@@ -28,6 +28,8 @@ from nem2 import util
 from .transaction_type import TransactionType
 from ..blockchain.network_type import NetworkType
 
+__all__ = ['SignedTransaction']
+
 
 @util.inherit_doc
 @util.dataclass

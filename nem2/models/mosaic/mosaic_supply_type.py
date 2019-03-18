@@ -25,6 +25,8 @@
 import enum
 from nem2 import util
 
+__all__ = ['MosaicSupplyType']
+
 
 @util.inherit_doc
 class MosaicSupplyType(util.U8Mixin, util.EnumMixin, enum.IntEnum):

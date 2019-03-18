@@ -55,7 +55,10 @@ class AsyncGenerator:
     def to_observable(self):
         """Export awaitable object to Observable."""
         if self._observable is None:
-            self._observable = rx.Observable.from_async_iterable(self._value, loop=self._loop)
+            self._observable = rx.Observable.from_async_iterable(
+                self._value,
+                loop=self._loop
+            )
         return self._observable
 
     @property
@@ -89,7 +92,10 @@ class AsyncGeneratorMixin(typing.AsyncIterable):
     def to_observable(self):
         """Export async iterable object to Observable."""
         loop = getattr(self, 'loop', None)
-        return rx.Observable.from_async_iterable(self.__aiter__(), loop=loop)
+        return rx.Observable.from_async_iterable(
+            self.__aiter__(),
+            loop=loop
+        )
 
     def toObservable(self):
         return self.to_observable()

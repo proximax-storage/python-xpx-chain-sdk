@@ -28,6 +28,8 @@ import typing
 from nem2 import util
 from .message_type import MessageType
 
+__all__ = ['Message']
+
 
 @util.dataclass(frozen=True)
 class Message(util.DTO):
@@ -44,4 +46,4 @@ class Message(util.DTO):
     @classmethod
     def create(cls, data: typing.AnyStr) -> Message:
         """Create a message from raw bytes."""
-        raise NotImplementedError
+        raise util.AbstractMethodError

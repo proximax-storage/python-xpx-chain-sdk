@@ -11,7 +11,8 @@ MESSAGE = None
 class WebSocketCommonProtocol:
     """Shared protocol for client and server."""
 
-    def __init__(self,
+    def __init__(
+        self,
         host=None,
         port=None,
         secure=None,

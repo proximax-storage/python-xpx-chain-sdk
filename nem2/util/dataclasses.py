@@ -30,6 +30,14 @@ import inspect
 import re
 import typing
 
+__all__ = [
+    'Field',
+    'FrozenInstanceError',
+    'InitVar',
+    'MISSING',
+    'dataclass',
+]
+
 SNAKE_CASE = re.compile(r'(.*?)_([a-z])')
 Field = dataclasses.Field
 FrozenInstanceError = dataclasses.FrozenInstanceError

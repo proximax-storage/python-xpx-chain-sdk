@@ -7,12 +7,13 @@
 """
 
 from __future__ import annotations
-
 import contextlib
 import typing
 import urllib.error
 import urllib3
 import warnings
+
+from nem2 import util
 
 # UTILITY
 
@@ -56,38 +57,24 @@ def parse_ws_url(uri: str, scheme: str = 'ws') -> urllib3.util.Url:
 # HTTP
 
 
-class Client:
-    """
-    Client wrapper for an abstract HTTP session.
-
-    :param session: Requests or aiohttp-like HTTP client session.
-    :param endpoint: Domain name and port for the endpoint.
-    """
+class ClientSharedBase:
+    """Shared, abstract base class for sync and async HTTP clients."""
 
     _session: typing.Any
     _endpoint: str
-    _closed: bool
 
     def __init__(self, session, endpoint) -> None:
         self._session = session
         self._endpoint = parse_http_url(endpoint).url
-        self._closed = False
-
-    def __enter__(self) -> Client:
-        return self
-
-    def __exit__(self, exc_type, exc, tb) -> None:
-        self.close()
 
     def close(self):
         """Close the client session."""
-        self._closed = True
-        self._session.close()
+        raise util.AbstractMethodError
 
     @property
     def closed(self) -> bool:
         """Get if client session has been closed."""
-        return self._closed
+        raise util.AbstractMethodError
 
     def delete(self, relative_path, *args, **kwds):
         """
@@ -174,7 +161,38 @@ class Client:
         return self._session.put(path, *args, **kwds)
 
 
-class AsyncClient(Client):
+@util.inherit_doc
+class Client(ClientSharedBase):
+    """
+    Client wrapper for an abstract HTTP session.
+
+    :param session: Requests or aiohttp-like HTTP client session.
+    :param endpoint: Domain name and port for the endpoint.
+    """
+
+    _closed: bool
+
+    def __init__(self, session, endpoint) -> None:
+        super().__init__(session, endpoint)
+        self._closed = False
+
+    def __enter__(self) -> Client:
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.close()
+
+    def close(self) -> None:
+        self._closed = True
+        self._session.close()
+
+    @property
+    def closed(self) -> bool:
+        return self._closed
+
+
+@util.inherit_doc
+class AsyncClient(ClientSharedBase):
     """
     Asynchronous client with a managed loop.
 
@@ -184,8 +202,7 @@ class AsyncClient(Client):
     """
 
     def __init__(self, session, endpoint) -> None:
-        self._session = session
-        self._endpoint = parse_http_url(endpoint).url
+        super().__init__(session, endpoint)
 
     def __enter__(self) -> AsyncClient:
         raise TypeError("Only use async with.")
@@ -199,13 +216,11 @@ class AsyncClient(Client):
     async def __aexit__(self) -> None:
         await self.close()
 
-    async def close(self):
-        """Close the client session."""
+    async def close(self) -> None:
         await self._session.close()
 
     @property
     def closed(self) -> bool:
-        """Get if client session has been closed."""
         return typing.cast(bool, self._session.closed)
 
 
