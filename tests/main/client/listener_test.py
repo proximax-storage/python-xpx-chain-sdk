@@ -3,6 +3,7 @@ import websockets
 from nem2 import client
 from nem2 import models
 from tests import harness
+from tests import responses
 
 
 UID = [
@@ -22,7 +23,7 @@ class TestListener(harness.TestCase):
 
     async def test_block(self):
         with websockets.default_response(UID):
-            async with client.Listener('localhost:3000/ws') as listener:
+            async with client.Listener('{responses.ENDPOINT}/ws') as listener:
                 self.assertEqual(await listener.uid, "A7Z3K5CZ3WMPMCI2IKHRCPWDHGJAYR76")
                 await listener.new_block()
                 with websockets.default_response(BLOCKS):

@@ -268,6 +268,7 @@ def wrap_dataclass(
     name = cls.__name__
     bases = cls.__bases__
     clsdict = cls.__dict__.copy()
+    clsdict.setdefault('__annotations__', {})
     fix_annotations(cls, clsdict, global_vars, local_vars)
     set_slots(cls, clsdict, slots, global_vars, local_vars)
     set_copy(cls, clsdict, copy)

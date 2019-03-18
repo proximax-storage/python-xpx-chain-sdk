@@ -22,9 +22,11 @@
     limitations under the License.
 """
 
+from nem2 import util
+
 __all__ = ['AccountMetadata']
 
 
-# TODO(ahuszagh) Do I need this?
+@util.dataclass(frozen=True)
 class AccountMetadata:
-    pass
+    """Metadata describing an account."""

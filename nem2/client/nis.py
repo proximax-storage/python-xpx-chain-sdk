@@ -82,8 +82,85 @@ def request(*args, **kwds):
     return s, a
 
 
+# ACCOUNT HTTP
+# ------------
+
+
+def request_get_account_info(
+    client: client.Client,
+    address: models.Address,
+    **kwds
+):
+    """
+    Make "/account/{address}" request.
+
+    :param client: Wrapper for client.
+    :param address: Account address.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/account/{address.address}", **kwds)
+
+
+def process_get_account_info(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.AccountInfo:
+    """
+    Process the "/account/{address}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return models.AccountInfo.from_dto(json, network_type)
+
+
+get_account_info = request("get_account_info")
+
+
+def request_get_accounts_info(
+    client: client.Client,
+    addresses: typing.Sequence[models.Address],
+    **kwds
+):
+    """
+    Make "/account" request.
+
+    :param client: Wrapper for client.
+    :param addresses: Sequence of account addresses.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    json = {"addresses": [i.address for i in addresses]}
+    return client.post(f"/account", json=json, **kwds)
+
+
+def process_get_accounts_info(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.AccountInfo]:
+    """
+    Process the "/account" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return [models.AccountInfo.from_dto(i, network_type) for i in json]
+
+
+get_accounts_info = request("get_accounts_info")
+
 # BLOCKCHAIN HTTP
 # ---------------
+
 
 def request_get_block_by_height(
     client: client.Client,
@@ -368,7 +445,7 @@ def request_get_namespaces_from_accounts(
     Make "/account/namespaces" request.
 
     :param client: Wrapper for client.
-    :param address: Account address.
+    :param addresses: Sequence of account addresses.
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
@@ -654,6 +731,10 @@ get_transaction_statuses = request("get_transaction_statuses")
 # ----------
 
 REQUEST = {
+    # ACCOUNT
+    'get_account_info': request_get_account_info,
+    'get_accounts_info': request_get_accounts_info,
+
     # BLOCKCHAIN
     'get_block_by_height': request_get_block_by_height,
     'get_blockchain_height': request_get_blockchain_height,
@@ -682,6 +763,10 @@ REQUEST = {
 }
 
 PROCESS = {
+    # ACCOUNT
+    'get_account_info': process_get_account_info,
+    'get_accounts_info': process_get_accounts_info,
+
     # BLOCKCHAIN
     'get_block_by_height': process_get_block_by_height,
     'get_blockchain_height': process_get_blockchain_height,

@@ -118,7 +118,62 @@ class TestAccount(harness.TestCase):
 
 
 class TestAccountInfo(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement...
+
+    def setUp(self):
+        self.network_type = models.NetworkType.MIJIN_TEST
+        self.address = models.Address('SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM')
+        self.address_height = 1
+        self.public_key = '7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808'
+        self.public_key_height = 1
+        self.mosaics = []
+        self.importance = 0
+        self.importance_height = 0
+        self.info = models.AccountInfo(
+            meta=None,
+            address=self.address,
+            address_height=self.address_height,
+            public_key=self.public_key,
+            public_key_height=self.public_key_height,
+            mosaics=self.mosaics,
+            importance=self.importance,
+            importance_height=self.importance_height,
+        )
+        self.dto = {
+            'meta': {},
+            'account': {
+                'address': util.hexlify(self.address.encoded),
+                'addressHeight': util.u64_to_dto(self.address_height),
+                'publicKey': self.public_key,
+                'publicKeyHeight': util.u64_to_dto(self.public_key_height),
+                'mosaics': self.mosaics,
+                'importance': util.u64_to_dto(self.importance),
+                'importanceHeight': util.u64_to_dto(self.importance_height),
+            },
+        }
+
+    def test_init(self):
+        self.assertEqual(self.info.address, self.address)
+        self.assertEqual(self.info.address_height, self.address_height)
+        self.assertEqual(self.info.public_key, self.public_key)
+        self.assertEqual(self.info.public_key_height, self.public_key_height)
+        self.assertEqual(self.info.mosaics, self.mosaics)
+        self.assertEqual(self.info.importance, self.importance)
+        self.assertEqual(self.info.importance_height, self.importance_height)
+
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.info.__dict__
+
+    def test_properties(self):
+        self.assertEqual(self.info.public_account, models.PublicAccount(self.address, self.public_key))
+
+    def test_to_dto(self):
+        self.assertEqual(self.info.to_dto(self.network_type), self.dto)
+        self.assertEqual(self.info.toDTO(self.network_type), self.dto)
+
+    def test_from_dto(self):
+        self.assertEqual(self.info, models.AccountInfo.from_dto(self.dto, self.network_type))
+        self.assertEqual(self.info, models.AccountInfo.fromDTO(self.dto, self.network_type))
 
 
 class TestAddress(harness.TestCase):

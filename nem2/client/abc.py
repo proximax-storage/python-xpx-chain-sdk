@@ -243,9 +243,37 @@ class HTTP(HTTPSharedBase):
 class AccountHTTP(HTTPSharedBase):
     """Abstract base class for the account HTTP client."""
 
+    def get_account_info(
+        self,
+        address: models.Address,
+        **kwds
+    ):
+        """
+        Get info for account.
+
+        :param address: Account address.
+        :return: Account info object.
+        """
+        return self(nis.get_account_info, address, **kwds)
+
+    getAccountInfo = util.undoc(get_account_info)
+
+    def get_accounts_info(
+        self,
+        addresses: typing.Sequence[models.Address],
+        **kwds
+    ):
+        """
+        Get info for accounts.
+
+        :param addresses: Sequence of account addresses.
+        :return: List of account info objects.
+        """
+        return self(nis.get_accounts_info, addresses, **kwds)
+
+    getAccountsInfo = util.undoc(get_accounts_info)
+
     # TODO(ahuszagh)
-    # getAccountInfo
-    # getAccountsInfo
     # getMultisigAccountInfo
     # getMultisigAccountGraphInfo
     # transactions
