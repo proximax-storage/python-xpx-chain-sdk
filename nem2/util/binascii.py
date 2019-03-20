@@ -62,7 +62,7 @@ def unhexlify(data: typing.AnyStr, with_prefix=False) -> bytes:
 def decode_hex(data: typing.AnyStr, with_prefix=False) -> bytes:
     """Decode hex data to raw bytes."""
 
-    if isinstance(data, bytes):
+    if isinstance(data, (bytes, bytearray)):
         return data
     return unhexlify(data, with_prefix=with_prefix)
 

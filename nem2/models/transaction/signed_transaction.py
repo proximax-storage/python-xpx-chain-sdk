@@ -33,8 +33,8 @@ __all__ = ['SignedTransaction']
 
 
 @util.inherit_doc
-@util.dataclass
-class SignedTransaction:
+@util.dataclass(frozen=True)
+class SignedTransaction(util.Object):
     """
     Signed transaction data and signature/hash.
 
@@ -58,7 +58,7 @@ class SignedTransaction:
         signer: str,
         type: TransactionType,
         network_type: NetworkType,
-    ):
+    ) -> None:
         payload = util.encode_hex(payload)
         hash = util.encode_hex(hash)
         signer = util.encode_hex(signer)

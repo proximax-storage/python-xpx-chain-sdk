@@ -63,15 +63,31 @@ def add_model_init(ctx, var_types, var_fields) -> None:
 def add_model_asdict(ctx) -> None:
     """Add model asdict method."""
 
+    bool_type = ctx.api.builtin_type('builtins.bool')
     dict_type = ctx.api.builtin_type('builtins.dict')
-    common.add_method(ctx, 'asdict', [], dict_type)
+    var = nodes.Var('recurse', bool_type)
+    recurse = nodes.Argument(
+        variable=var,
+        type_annotation=bool_type,
+        initializer=nodes.NameExpr('True'),
+        kind=nodes.ARG_NAMED_OPT
+    )
+    common.add_method(ctx, 'asdict', [recurse], dict_type)
 
 
 def add_model_astuple(ctx) -> None:
     """Add model astuple method."""
 
+    bool_type = ctx.api.builtin_type('builtins.bool')
     tuple_type = ctx.api.builtin_type('builtins.tuple')
-    common.add_method(ctx, 'astuple', [], tuple_type)
+    var = nodes.Var('recurse', bool_type)
+    recurse = nodes.Argument(
+        variable=var,
+        type_annotation=bool_type,
+        initializer=nodes.NameExpr('True'),
+        kind=nodes.ARG_NAMED_OPT
+    )
+    common.add_method(ctx, 'astuple', [recurse], tuple_type)
 
 
 def add_model_fields(ctx) -> None:
@@ -90,7 +106,7 @@ def add_model_replace(ctx) -> None:
         variable=var,
         type_annotation=any_type,
         initializer=None,
-        kind=types.ARG_STAR2
+        kind=nodes.ARG_STAR2
     )
     ret_type = types.Instance(ctx.cls.info, [])
     common.add_method(ctx, 'replace', [kw_arg], ret_type)
@@ -121,22 +137,6 @@ def add_model_set(ctx) -> None:
     args.append(value_arg)
 
     common.add_method(ctx, '_set', args, types.NoneTyp())
-
-
-def add_intmixin_hook(ctx):
-    """Add IntMixin information to the class context."""
-
-    int_type = ctx.api.builtin_type('builtins.int')
-    var = nodes.Var('value', int_type)
-    arg = nodes.Argument(
-        variable=var,
-        type_annotation=int_type,
-        initializer=None,
-        kind=nodes.ARG_POS
-    )
-    args = [arg]
-
-    common.add_method(ctx, '__init__', args, types.NoneTyp())
 
 
 def add_dict_hook(ctx):
@@ -182,9 +182,7 @@ class Nem2Plugin(Plugin):
         return None
 
     def get_customize_class_mro_hook(self, fullname: str):
-        if fullname == INT_MIXIN:
-            return add_intmixin_hook
-        elif fullname == MULTISIG_ACCOUNT_GRAPH_INFO:
+        if fullname == MULTISIG_ACCOUNT_GRAPH_INFO:
             return add_dict_hook
         return None
 

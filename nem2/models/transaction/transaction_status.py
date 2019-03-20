@@ -23,16 +23,13 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
 from .deadline import Deadline
 from .transaction_status_group import TransactionStatusGroup
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['TransactionStatus']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -56,7 +53,7 @@ class TransactionStatus(util.DTO):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             'group': self.group.to_dto(network_type),
@@ -71,7 +68,7 @@ class TransactionStatus(util.DTO):
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
-    ) -> TransactionStatus:
+    ):
         return cls(
             group=TransactionStatusGroup.from_dto(data['group'], network_type),
             status=data['status'],

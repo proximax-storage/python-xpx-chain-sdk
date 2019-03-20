@@ -27,12 +27,13 @@ import typing
 
 from nem2 import util
 from .message_type import MessageType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['Message']
 
 
 @util.dataclass(frozen=True)
-class Message(util.DTO):
+class Message(util.Model):
     """
     Abstract message type.
 
@@ -44,6 +45,38 @@ class Message(util.DTO):
     payload: bytes
 
     @classmethod
-    def create(cls, data: typing.AnyStr) -> Message:
+    def create(cls, data: typing.AnyStr):
         """Create a message from raw bytes."""
         raise util.AbstractMethodError
+
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None,
+    ) -> dict:
+        return {
+            'type': self.type.to_dto(network_type),
+            'payload': util.hexlify(self.payload),
+        }
+
+    @classmethod
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ):
+        payload = util.unhexlify(data['payload'])
+        return cls.create(payload)
+
+    def to_catbuffer(
+        self,
+        network_type: OptionalNetworkType = None,
+    ) -> bytes:
+        return self.payload
+
+    @classmethod
+    def from_catbuffer_pair(
+        cls,
+        data: bytes,
+        network_type: OptionalNetworkType = None,
+    ):
+        return cls.create(data), data[len(data):]

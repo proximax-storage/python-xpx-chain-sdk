@@ -14,7 +14,7 @@ class TestBlockInfo(harness.TestCase):
         self.public_key = "7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808"
         self.network_type = models.NetworkType.MIJIN_TEST
         self.signer = models.PublicAccount.create_from_public_key(self.public_key, self.network_type)
-        self.version = 36867
+        self.version = 3
         self.type = 32835
         self.height = 1
         self.timestamp = 0
@@ -106,7 +106,7 @@ class TestBlockInfo(harness.TestCase):
             'block': {
                 'signature': self.signature,
                 'signer': self.public_key,
-                'version': self.version,
+                'version': 36867,
                 'type': self.type,
                 'height': util.u64_to_dto(self.height),
                 'timestamp': util.u64_to_dto(self.timestamp),

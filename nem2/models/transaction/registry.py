@@ -1,8 +1,10 @@
 """
-    types
-    =====
+    registry
+    ========
 
-    Shared types for cryptographic hash functions.
+    Class decorators to simplify defining and registering transactions.
+    These allow us to register classes via `TYPE_MAP` with a class
+    decorator, simplifying the generation of new transactions.
 
     License
     -------
@@ -22,8 +24,16 @@
     limitations under the License.
 """
 
-from __future__ import annotations
-import typing
+from .transaction_type import TransactionType
 
-BytesType = typing.Union[bytes, bytearray]
-OptionalBytesType = typing.Optional[BytesType]
+
+def register_transaction(name: str):
+    """Register transaction by type."""
+
+    type = getattr(TransactionType, name)
+
+    def decorator(cls):
+        cls.TYPE_MAP[type] = cls
+        return cls
+
+    return decorator

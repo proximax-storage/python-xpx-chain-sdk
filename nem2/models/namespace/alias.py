@@ -28,12 +28,11 @@ import typing
 from nem2 import util
 from .alias_type import AliasType
 from ..account.address import Address
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 from ..mosaic.mosaic_id import MosaicId
 
 __all__ = ['Alias']
 
-OptionalNetworkType = typing.Optional[NetworkType]
 DTOType = typing.Optional[dict]
 ValueType = typing.Optional[typing.Union[Address, MosaicId]]
 
@@ -73,16 +72,14 @@ class Alias(util.DTO):
             raise ValueError("Alias does not store mosaic ID.")
         return self.value
 
-    mosaicId = util.undoc(mosaic_id)
-
     def __eq__(self, other) -> bool:
         if not isinstance(other, Alias):
             return False
-        return self.astuple() == other.astuple()
+        return self.astuple(recurse=False) == other.astuple(recurse=False)
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> DTOType:
         if self.type == AliasType.NONE:
             return None
@@ -100,7 +97,7 @@ class Alias(util.DTO):
         cls,
         data: DTOType,
         network_type: OptionalNetworkType = None,
-    ) -> Alias:
+    ):
         if data is None:
             return cls()
 

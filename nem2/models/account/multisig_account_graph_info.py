@@ -36,7 +36,7 @@ GraphType = typing.Dict[int, MultisigAccountInfo]
 
 @util.inherit_doc
 @util.dataclass(frozen=True, slots=False)
-class MultisigAccountGraphInfo:
+class MultisigAccountGraphInfo(util.Object):
     """
     Graph info for multi-sig accounts.
 
@@ -46,8 +46,8 @@ class MultisigAccountGraphInfo:
 
     multisig_accounts: GraphType
 
-    def __init__(self, *args, **kwds) -> None:
-        self.multisig_accounts = dict(*args, **kwds)
+    def __init__(self, *args) -> None:
+        self.multisig_accounts = dict(*args)
 
     def __contains__(self, key: int) -> bool:
         return key in self.multisig_accounts

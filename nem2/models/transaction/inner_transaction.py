@@ -23,114 +23,155 @@
 """
 
 from __future__ import annotations
+import bidict
 import typing
 
 from nem2 import util
-from .transaction import Hooks, Transaction
-from .transaction_type import TransactionType
-from .transaction_version import TransactionVersion
+from .base import TransactionBase, TypeMap
+from .format import CatbufferFormat, DTOFormat
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
 __all__ = ['InnerTransaction']
 
-OptionalNetworkType = typing.Optional[NetworkType]
+# We need 3 different transaction base types for `from_transaction`.
+T1 = typing.TypeVar('T1', bound='TransactionBase')
+T2 = typing.TypeVar('T2', bound='TransactionBase')
+T3 = typing.TypeVar('T3', bound='TransactionBase')
 
 
 @util.inherit_doc
-class InnerTransaction(Transaction):
-    """
-    Transaction with an embedded signer for aggregate transactions.
-
-    Produces embedded transactions.
-    """
+class InnerTransaction(TransactionBase):
+    """Abstract, embedded transaction base class."""
 
     __slots__ = ()
-    # Override the base-implementation, so any classmethods
-    # inheriting from (InnerTransaction, cls) use the derived hooks.
-    HOOKS: typing.ClassVar[Hooks] = {}
+    # Overridable classvars.
+    TYPE_MAP: typing.ClassVar[TypeMap] = bidict.bidict()
+    CATBUFFER: typing.ClassVar[CatbufferFormat] = CatbufferFormat(
+        # Layout
+        #   uint32_t size
+        #   uint8_t[32] signer
+        #   uint8_t version
+        #   uint8_t network_type
+        #   uint16_t type
+        slices={
+            'size': slice(0, 4),
+            'signer': slice(4, 36),
+            'version': slice(36, 37),
+            'network_type': slice(37, 38),
+            'type': slice(38, 40),
+        },
+        size_shared=40,
+    )
+    DTO: typing.ClassVar[DTOFormat] = DTOFormat(
+        names={
+            'signer': 'signer',
+            'version': 'version',
+            'network_type': 'version',
+            'type': 'type',
+            'transaction_info': 'meta',
+        },
+    )
 
-    @staticmethod
-    def catbuffer_size_shared() -> int:
-        return 40
-
-    def to_catbuffer_shared(
-        self,
-        size: int,
-        network_type: OptionalNetworkType = None,
-    ) -> bytes:
-        """
-        Serialize shared transaction data to catbuffer interchange format.
-
-        :param size: Entity size.
-        """
-
-        network_type = self.network_type
-
-        # uint32_t size
-        # uint8_t[32] signer
-        # uint8_t version
-        # uint8_t network_type
-        # uint16_t type
-        buffer = bytearray(self.catbuffer_size_shared())
-        buffer[0:4] = util.u32_to_catbuffer(size)
-        buffer[4:36] = self.signer.to_catbuffer(network_type)
-        buffer[36:37] = self.version.to_catbuffer(network_type)
-        buffer[37:38] = self.network_type.to_catbuffer(network_type)
-        buffer[38:40] = self.type.to_catbuffer(network_type)
-
-        return bytes(buffer)
-
-    def load_catbuffer_shared(
-        self,
-        data: typing.AnyStr,
-        network_type: OptionalNetworkType = None,
-    ) -> typing.Tuple[int, bytes]:
-        """Load shared transaction data from catbuffer."""
-
-        data = util.decode_hex(data, with_prefix=True)
-        assert len(data) >= self.catbuffer_size_shared()
-        network_type = NetworkType.from_catbuffer(data[37:38])
-
-        # uint32_t size
-        # uint8_t[32] signer
-        # uint8_t version
-        # uint8_t network_type
-        # uint16_t type
-        total_size = util.u32_from_catbuffer(data[:4])
-        public_key = data[4:36]
-        signer = PublicAccount.from_catbuffer(public_key, network_type)
-        version = TransactionVersion.from_catbuffer(data[36:37])
-        type = TransactionType.from_catbuffer(data[38:40])
-
-        self._set('type', type)
-        self._set('network_type', network_type)
-        self._set('version', version)
-        self._set('deadline', None)
-        self._set('fee', None)
-        self._set('signature', None)
-        if public_key != bytes(32):
-            self._set('signer', signer)
-        else:
-            self._set('signer', None)
-        self._set('transaction_info', None)
-
-        return total_size, data[self.catbuffer_size_shared():]
+    # AGGREGATE
 
     @classmethod
     def from_transaction(
-        cls,
-        transaction: Transaction,
-        signer: PublicAccount
-    ) -> InnerTransaction:
+        cls: typing.Type[T1],
+        transaction: T2,
+        signer: PublicAccount,
+    ) -> T3:
         """
-        Generate aggregate transaction from regular transaction.
+        Generate embedded transaction from non-embedded transaction.
 
-        :param transaction: Non-aggregate transaction.
+        :param transaction: Non-embedded transaction.
         :param signer: Account of transaction signer.
         """
 
-        data = transaction.asdict()
+        data = transaction.asdict(recurse=False)
         data['signer'] = signer
-        data.pop('type')
-        return cls(**data)
+        aggregate_cls: typing.Type[T3] = cls.TYPE_MAP[data['type']]
+        return aggregate_cls(**data)
+
+    # CATBUFFER
+
+    def to_catbuffer_shared(
+        self,
+        network_type: NetworkType,
+    ) -> bytes:
+        # Shared data and callbacks.
+        data = bytearray(self.catbuffer_size_shared())
+        cb = lambda k, v: self.CATBUFFER.save(k, data, v, network_type)
+        cb_get = lambda k: cb(k, getattr(self, k))
+
+        # Save shared data.
+        cb('size', self.catbuffer_size())
+        cb_get('signer')
+        cb_get('version')
+        cb_get('network_type')
+        cb_get('type')
+
+        return bytes(data)
+
+    def load_catbuffer_shared(
+        self,
+        data: bytes,
+        network_type: NetworkType,
+    ) -> bytes:
+        # Shared data and callbacks.
+        cb = lambda k: self.CATBUFFER.load(k, data, network_type)
+        cb_set = lambda k: self._set(k, cb(k))
+
+        # Load shared data.
+        self._set('signature', None)
+        cb_set('signer')
+        cb_set('version')
+        self._set('network_type', network_type)
+        cb_set('type')
+        self._set('fee', None)
+        self._set('deadline', None)
+        self._set('transaction_info', None)
+
+        return data[self.catbuffer_size_shared():]
+
+    # DTO
+
+    def to_dto_shared(
+        self,
+        network_type: NetworkType,
+    ) -> dict:
+        # Shared data and callbacks.
+        data: dict = {}
+        cb = lambda k, v: self.DTO.save(k, data, v, network_type)
+        cb_get = lambda k: cb(k, getattr(self, k))
+
+        # Save shared data.
+        cb_get('signer')
+        cb_get('version')
+        cb_get('network_type')
+        cb_get('type')
+        cb_get('transaction_info')
+
+        return data
+
+    def load_dto_shared(
+        self,
+        data: dict,
+        network_type: NetworkType,
+    ) -> None:
+        # Shared data and callbacks.
+        cb = lambda k: self.DTO.load(k, data, network_type)
+        cb_set = lambda k: self._set(k, cb(k))
+
+        # Load shared data.
+        self._set('signature', None)
+        cb_set('signer')
+        cb_set('version')
+        self._set('network_type', network_type)
+        cb_set('type')
+        self._set('fee', None)
+        self._set('deadline', None)
+        cb_set('transaction_info')
+
+
+InnerTransactionList = typing.Sequence[InnerTransaction]

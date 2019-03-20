@@ -23,15 +23,12 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
 from .deadline import Deadline
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['TransactionStatusError']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -51,7 +48,7 @@ class TransactionStatusError(util.DTO):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             'hash': self.hash,
@@ -63,8 +60,8 @@ class TransactionStatusError(util.DTO):
     def from_dto(
         cls,
         data: dict,
-        network_type: OptionalNetworkType = None
-    ) -> TransactionStatusError:
+        network_type: OptionalNetworkType = None,
+    ):
         return cls(
             hash=data['hash'],
             status=data['status'],

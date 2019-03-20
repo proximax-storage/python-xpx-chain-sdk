@@ -28,11 +28,8 @@ import typing
 from nem2 import util
 from .message import Message
 from .message_type import MessageType
-from ..blockchain.network_type import NetworkType
 
 __all__ = ['PlainMessage']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -45,41 +42,13 @@ class PlainMessage(Message):
 
     __slots__ = ()
 
-    def __init__(self, payload: typing.AnyStr):
+    def __init__(self, payload: typing.AnyStr) -> None:
         payload = util.decode_hex(payload, with_prefix=True)
         super().__init__(MessageType.PLAIN, payload)
 
     @classmethod
-    def create(cls, payload: typing.AnyStr) -> PlainMessage:
+    def create(cls, payload: typing.AnyStr):
         return cls(payload)
-
-    def to_dto(
-        self,
-        network_type: OptionalNetworkType = None
-    ) -> str:
-        return util.hexlify(self.payload)
-
-    @classmethod
-    def from_dto(
-        cls,
-        data: str,
-        network_type: OptionalNetworkType = None
-    ) -> PlainMessage:
-        return cls.create(util.unhexlify(data))
-
-    def to_catbuffer(
-        self,
-        network_type: OptionalNetworkType = None
-    ) -> bytes:
-        return self.payload
-
-    @classmethod
-    def from_catbuffer(
-        cls,
-        data: bytes,
-        network_type: OptionalNetworkType = None
-    ) -> PlainMessage:
-        return cls.create(data)
 
 
 EMPTY_MESSAGE = PlainMessage(b'')

@@ -23,7 +23,7 @@ class TestListener(harness.TestCase):
 
     async def test_block(self):
         with websockets.default_response(UID):
-            async with client.Listener('{responses.ENDPOINT}/ws') as listener:
+            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
                 self.assertEqual(await listener.uid, "A7Z3K5CZ3WMPMCI2IKHRCPWDHGJAYR76")
                 await listener.new_block()
                 with websockets.default_response(BLOCKS):

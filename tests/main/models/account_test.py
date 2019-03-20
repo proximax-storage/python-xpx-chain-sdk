@@ -31,11 +31,6 @@ class TestAccount(harness.TestCase):
         self.assertEqual(self.account.network_type, self.network_type)
         self.assertEqual(self.account.public_account, self.public_account)
 
-        self.assertEqual(self.account.publicKey, self.public_key)
-        self.assertEqual(self.account.privateKey, self.private_key)
-        self.assertEqual(self.account.networkType, self.network_type)
-        self.assertEqual(self.account.publicAccount, self.public_account)
-
     def test_create_from_private_key(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -88,7 +83,6 @@ class TestAccount(harness.TestCase):
             message = b'Hello World!'
             signature = '40af0cb5a7a7533f07a4ba6f1cb2df64f2347feb1b2eaabb9374d28603d146497ea83d3d6ee15758d39c298b48f58e578cc42f36a373e15eef7412e0bd19a801'
             self.assertTrue(self.account.verify_signature(message, signature))
-            self.assertTrue(self.account.verifySignature(message, signature))
 
     def test_verify_transaction(self):
         with warnings.catch_warnings():
@@ -96,7 +90,6 @@ class TestAccount(harness.TestCase):
 
             payload = 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
             self.assertTrue(self.account.verify_transaction(payload))
-            self.assertTrue(self.account.verifyTransaction(payload))
 
     def test_repr(self):
         self.assertEqual(repr(self.account), "Account(address=Address(address='SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG', network_type=<NetworkType.MIJIN_TEST: 144>), public_key='1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955', private_key='97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca')")
@@ -169,11 +162,9 @@ class TestAccountInfo(harness.TestCase):
 
     def test_to_dto(self):
         self.assertEqual(self.info.to_dto(self.network_type), self.dto)
-        self.assertEqual(self.info.toDTO(self.network_type), self.dto)
 
     def test_from_dto(self):
         self.assertEqual(self.info, models.AccountInfo.from_dto(self.dto, self.network_type))
-        self.assertEqual(self.info, models.AccountInfo.fromDTO(self.dto, self.network_type))
 
 
 class TestAddress(harness.TestCase):
@@ -184,10 +175,7 @@ class TestAddress(harness.TestCase):
         self.encoded = b"\x90\xfa9\xecG\xe0V\x00\xaf\xa7C\x08\xa7\xea`}\x14^7\x1b_O\x14G\xbc"
         self.address = models.Address(self.pretty)
         self.network_type = models.NetworkType.MIJIN_TEST
-        self.dto = {
-            'address': self.plain,
-            'networkType': int(self.network_type),
-        }
+        self.dto = util.hexlify(self.address.encoded)
 
     def test_init(self):
         self.assertEqual(self.address.address, self.plain)
@@ -201,19 +189,15 @@ class TestAddress(harness.TestCase):
         self.assertEqual(self.address.address, self.plain)
         self.assertEqual(self.address.network_type, self.network_type)
         self.assertEqual(self.address.encoded, self.encoded)
-        self.assertEqual(self.address.networkType, self.network_type)
 
     def test_create_from_raw_address(self):
         value = models.Address.create_from_raw_address(self.pretty)
         self.assertEqual(value, self.address)
-        self.assertEqual(value, models.Address.createFromRawAddress(self.pretty))
 
     def test_create_from_encoded(self):
         value = models.Address.create_from_encoded(self.encoded)
         self.assertEqual(value.address, self.plain)
         self.assertEqual(value.network_type, models.NetworkType.MIJIN_TEST)
-
-        self.assertEqual(value, models.Address.createFromEncoded(value.encoded))
 
     def test_create_from_public_key(self):
         public_key = '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246'
@@ -230,8 +214,6 @@ class TestAddress(harness.TestCase):
         value = models.Address.create_from_public_key(public_key, models.NetworkType.MIJIN_TEST)
         self.assertEqual(value.address, 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54')
 
-        self.assertEqual(value, models.Address.createFromPublicKey(public_key, value.network_type))
-
     def test_plain(self):
         value = models.Address.create_from_raw_address(self.pretty)
         self.assertEqual(value.plain(), self.plain)
@@ -246,8 +228,6 @@ class TestAddress(harness.TestCase):
 
         value = models.Address.create_from_raw_address("SD5DT3-CH4BLA-BL5HIM-EKP2TA-PUKF4N-Y3L5HR-IR55")
         self.assertFalse(value.is_valid())
-
-        self.assertFalse(value.isValid())
 
     def test_repr(self):
         value = models.Address.create_from_raw_address(self.pretty)
@@ -271,27 +251,19 @@ class TestAddress(harness.TestCase):
 
     def test_to_dto(self):
         self.assertEqual(self.address.to_dto(self.network_type), self.dto)
-        self.assertEqual(self.address.toDTO(self.network_type), self.dto)
 
     def test_from_dto(self):
         self.assertEqual(self.address, models.Address.from_dto(self.dto, self.network_type))
-        self.assertEqual(self.address, models.Address.fromDTO(self.dto, self.network_type))
 
     def test_to_catbuffer(self):
         self.assertEqual(self.address.to_catbuffer(self.network_type), self.encoded)
-        self.assertEqual(self.address.toCatbuffer(self.network_type), self.encoded)
 
     def test_from_catbuffer(self):
         value, rem = models.Address.from_catbuffer_pair(self.encoded, self.network_type)
         self.assertEqual(value, self.address)
         self.assertEqual(rem, b'')
 
-        value, rem = models.Address.fromCatbufferPair(self.encoded, self.network_type)
-        self.assertEqual(value, self.address)
-        self.assertEqual(rem, b'')
-
         self.assertEqual(self.address, models.Address.from_catbuffer(self.encoded, self.network_type))
-        self.assertEqual(self.address, models.Address.fromCatbuffer(self.encoded, self.network_type))
 
 
 class TestMultisigAccountGraphInfo(harness.TestCase):
@@ -325,12 +297,8 @@ class TestPublicAccount(harness.TestCase):
         self.assertEqual(self.public_account.public_key, self.public_key)
         self.assertEqual(self.public_account.network_type, self.network_type)
 
-        self.assertEqual(self.public_account.publicKey, self.public_key)
-        self.assertEqual(self.public_account.networkType, self.network_type)
-
     def test_create_from_public_key(self):
         self.assertEqual(self.public_account, models.PublicAccount.create_from_public_key(self.public_key, self.network_type))
-        self.assertEqual(self.public_account, models.PublicAccount.createFromPublicKey(self.public_key, self.network_type))
 
     def test_verify_signature(self):
         with warnings.catch_warnings():
@@ -339,7 +307,6 @@ class TestPublicAccount(harness.TestCase):
             message = b'Hello World!'
             signature = '40af0cb5a7a7533f07a4ba6f1cb2df64f2347feb1b2eaabb9374d28603d146497ea83d3d6ee15758d39c298b48f58e578cc42f36a373e15eef7412e0bd19a801'
             self.assertTrue(self.public_account.verify_signature(message, signature))
-            self.assertTrue(self.public_account.verifySignature(message, signature))
 
     def test_verify_transaction(self):
         with warnings.catch_warnings():
@@ -347,7 +314,6 @@ class TestPublicAccount(harness.TestCase):
 
             payload = 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
             self.assertTrue(self.public_account.verify_transaction(payload))
-            self.assertTrue(self.public_account.verifyTransaction(payload))
 
     def test_repr(self):
         self.assertEqual(repr(self.public_account), "PublicAccount(address=Address(address='SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG', network_type=<NetworkType.MIJIN_TEST: 144>), public_key='1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955')")

@@ -27,11 +27,10 @@ import typing
 
 from nem2 import util
 from .mosaic_id import MosaicId
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['Mosaic']
 
-OptionalNetworkType = typing.Optional[NetworkType]
 SIZE = MosaicId.CATBUFFER_SIZE + util.U64_BYTES
 
 
@@ -51,7 +50,7 @@ class Mosaic(util.Model):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             'amount': util.u64_to_dto(self.amount),
@@ -62,15 +61,15 @@ class Mosaic(util.Model):
     def from_dto(
         cls,
         data: dict,
-        network_type: OptionalNetworkType = None
-    ) -> Mosaic:
+        network_type: OptionalNetworkType = None,
+    ):
         mosaic_id = MosaicId.from_dto(data['id'], network_type)
         amount = util.u64_from_dto(data['amount'])
         return cls(mosaic_id, amount)
 
     def to_catbuffer(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> bytes:
         mosaic_id = self.id.to_catbuffer(network_type)
         amount = util.u64_to_catbuffer(self.amount)
@@ -80,9 +79,12 @@ class Mosaic(util.Model):
     def from_catbuffer(
         cls,
         data: bytes,
-        network_type: OptionalNetworkType = None
-    ) -> Mosaic:
+        network_type: OptionalNetworkType = None,
+    ):
         id_size = MosaicId.CATBUFFER_SIZE
         mosaic_id = MosaicId.from_catbuffer(data, network_type)
         amount = util.u64_from_catbuffer(data[id_size:])
         return cls(mosaic_id, amount)
+
+
+MosaicList = typing.Sequence[Mosaic]

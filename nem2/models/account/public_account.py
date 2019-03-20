@@ -28,7 +28,7 @@ import typing
 from nem2 import util
 from nem2.util.signature import ed25519
 from .address import Address
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import NetworkType, OptionalNetworkType
 
 __all__ = ['PublicAccount']
 
@@ -63,14 +63,12 @@ class PublicAccount(util.Model):
         """Get network type."""
         return self.address.network_type
 
-    networkType = util.undoc(network_type)
-
     @classmethod
     def create_from_public_key(
         cls,
         public_key: typing.AnyStr,
         network_type: NetworkType,
-    ) -> PublicAccount:
+    ):
         """
         Create PublicAccount from the public key and network type.
 
@@ -81,9 +79,8 @@ class PublicAccount(util.Model):
 
         public_key = util.encode_hex(public_key)
         address = Address.create_from_public_key(public_key, network_type)
-        return cls(address, public_key)
 
-    createFromPublicKey = util.undoc(create_from_public_key)
+        return cls(address, public_key)
 
     def verify_signature(
         self,
@@ -111,8 +108,6 @@ class PublicAccount(util.Model):
         except ed25519.sha3.BadSignatureError:
             return False
 
-    verifySignature = util.undoc(verify_signature)
-
     def verify_transaction(
         self,
         transaction: typing.AnyStr
@@ -134,11 +129,9 @@ class PublicAccount(util.Model):
         signature = transaction[4:68]
         return self.verify_signature(data, signature)
 
-    verifyTransaction = util.undoc(verify_transaction)
-
     def to_dto(
         self,
-        network_type: NetworkType,
+        network_type: OptionalNetworkType = None,
     ) -> str:
         return self.public_key
 
@@ -146,20 +139,28 @@ class PublicAccount(util.Model):
     def from_dto(
         cls,
         data: str,
-        network_type: NetworkType,
-    ) -> PublicAccount:
-        return PublicAccount.create_from_public_key(data, network_type)
+        network_type: OptionalNetworkType = None,
+    ):
+        assert network_type is not None
+        return cls.create_from_public_key(data, network_type)
 
     def to_catbuffer(
         self,
-        network_type: NetworkType,
+        network_type: OptionalNetworkType = None,
     ) -> bytes:
+        # uint8_t[32] public_key
         return util.unhexlify(self.public_key)
 
     @classmethod
     def from_catbuffer(
         cls,
         data: bytes,
-        network_type: NetworkType,
-    ) -> PublicAccount:
-        return PublicAccount.create_from_public_key(data, network_type)
+        network_type: OptionalNetworkType = None,
+    ):
+        assert network_type is not None
+        # uint8_t[32] public_key
+        public_key = data[:32]
+        return cls.create_from_public_key(public_key, network_type)
+
+
+PublicAccountList = typing.Sequence[PublicAccount]

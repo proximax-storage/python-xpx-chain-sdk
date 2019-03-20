@@ -58,3 +58,22 @@ class NamespaceId(util.IntMixin, util.U64Mixin):
 
     def __int__(self) -> int:
         return self.id
+
+    @property
+    def encoded(self) -> str:
+        """Get the namespace ID as a hex-encoded string."""
+        decoded = util.u64_to_catbuffer(self.id)
+        return util.hexlify(decoded)
+
+    @classmethod
+    def create_from_encoded(cls, encoded: typing.AnyStr):
+        """
+        Create namespace ID from hex-encoded string.
+
+        :param encoded: ID bytes or hex-encoded bytes.
+        """
+        decoded = util.decode_hex(encoded, with_prefix=True)
+        return cls(util.u64_from_catbuffer(decoded))
+
+
+NamespaceIdList = typing.Sequence[NamespaceId]

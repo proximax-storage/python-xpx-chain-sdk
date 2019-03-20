@@ -23,14 +23,11 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
-from .network_type import NetworkType
+from .network_type import OptionalNetworkType
 
 __all__ = ['BlockchainStorageInfo']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -50,7 +47,7 @@ class BlockchainStorageInfo(util.DTO):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             "numBlocks": self.num_blocks,
@@ -62,8 +59,8 @@ class BlockchainStorageInfo(util.DTO):
     def from_dto(
         cls,
         data: dict,
-        network_type: OptionalNetworkType = None
-    ) -> BlockchainStorageInfo:
+        network_type: OptionalNetworkType = None,
+    ):
         num_blocks = data['numBlocks']
         num_transactions = data['numTransactions']
         num_accounts = data['numAccounts']

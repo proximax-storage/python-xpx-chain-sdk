@@ -96,6 +96,3 @@ class AsyncGeneratorMixin(typing.AsyncIterable):
             self.__aiter__(),
             loop=loop
         )
-
-    def toObservable(self):
-        return self.to_observable()

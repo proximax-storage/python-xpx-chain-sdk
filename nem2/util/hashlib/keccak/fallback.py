@@ -35,31 +35,30 @@
 from __future__ import annotations
 import binascii
 import math
-
-from ..types import BytesType, OptionalBytesType
+import typing
 
 # API
 
 
-def keccak_224(data: OptionalBytesType = None) -> Keccak:
+def keccak_224(data: typing.Optional[bytes] = None) -> Keccak:
     """Returns a 224-bit keccak hash object"""
 
     return Keccak(c=448, r=1152, n=224, name='keccak_224', data=data)
 
 
-def keccak_256(data: OptionalBytesType = None) -> Keccak:
+def keccak_256(data: typing.Optional[bytes] = None) -> Keccak:
     """Returns a 256-bit keccak hash object"""
 
     return Keccak(c=512, r=1088, n=256, name='keccak_256', data=data)
 
 
-def keccak_384(data: OptionalBytesType = None) -> Keccak:
+def keccak_384(data: typing.Optional[bytes] = None) -> Keccak:
     """Returns a 384-bit keccak hash object"""
 
     return Keccak(c=768, r=832, n=384, name='keccak_384', data=data)
 
 
-def keccak_512(data: OptionalBytesType = None) -> Keccak:
+def keccak_512(data: typing.Optional[bytes] = None) -> Keccak:
     """Returns a 512-bit keccak hash object"""
 
     return Keccak(c=1024, r=576, n=512, name='keccak_512', data=data)
@@ -80,7 +79,14 @@ class KeccakError(Exception):
 class Keccak:
     """Hashlib-compatible object for the v52 of the Keccak hash function."""
 
-    def __init__(self, r: int, c: int, n: int, name: str, data: OptionalBytesType = None):
+    def __init__(
+        self,
+        r: int,
+        c: int,
+        n: int,
+        name: str,
+        data: typing.Optional[bytes] = None
+    ) -> None:
         # Initialize the constants used throughout Keccak bitrate
         self.r = r
         # capacity
@@ -115,12 +121,12 @@ class Keccak:
 
         # Store the calculated digest.
         # We'll only apply padding and recalculate the hash if it's modified.
-        self.last_digest: OptionalBytesType = None
+        self.last_digest: typing.Optional[bytes] = None
 
         if data:
             self.update(data)
 
-    def update(self, data: BytesType) -> None:
+    def update(self, data: bytes) -> None:
         """Update this hash object's state with the provided bytes-like object."""
 
         # Convert the data into a workable format, and add it to the buffer

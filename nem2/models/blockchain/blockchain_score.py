@@ -23,14 +23,11 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
-from .network_type import NetworkType
+from .network_type import OptionalNetworkType
 
 __all__ = ['BlockchainScore']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -49,18 +46,14 @@ class BlockchainScore(util.DTO):
         """Get the low 64-bits of the blockchain score."""
         return util.u128_low(self.score)
 
-    scoreLow = util.undoc(score_low)
-
     @property
     def score_high(self) -> int:
         """Get the high 64-bits of the blockchain score."""
         return util.u128_high(self.score)
 
-    scoreHigh = util.undoc(score_high)
-
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             'scoreLow': util.u64_to_dto(self.score_low),
@@ -72,7 +65,7 @@ class BlockchainScore(util.DTO):
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
-    ) -> BlockchainScore:
+    ):
         score_low = data['scoreLow']
         score_high = data['scoreHigh']
         return cls(util.u128_from_dto([score_low, score_high]))

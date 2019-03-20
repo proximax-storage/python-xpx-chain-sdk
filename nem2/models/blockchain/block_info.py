@@ -26,12 +26,11 @@ from __future__ import annotations
 import typing
 
 from nem2 import util
-from .network_type import NetworkType
+from .network_type import NetworkType, OptionalNetworkType
 from ..account.public_account import PublicAccount
 
 __all__ = ['BlockInfo']
 
-OptionalNetworkType = typing.Optional[NetworkType]
 MerkleTreeType = typing.Sequence[str]
 OptionalMerkleTreeType = typing.Optional[MerkleTreeType]
 
@@ -92,7 +91,7 @@ class BlockInfo(util.DTO):
         previous_block_hash: typing.AnyStr,
         block_transactions_hash: typing.AnyStr,
         merkle_tree: OptionalMerkleTreeType = None,
-    ):
+    ) -> None:
         hash = util.encode_hex(hash)
         generation_hash = util.encode_hex(generation_hash)
         signature = util.encode_hex(signature)
@@ -116,7 +115,7 @@ class BlockInfo(util.DTO):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         meta = {
             'hash': self.hash,
@@ -127,7 +126,7 @@ class BlockInfo(util.DTO):
         block = {
             'signature': self.signature,
             'signer': self.signer.to_dto(network_type),
-            'version': self.version,
+            'version': self.version | (int(network_type) << 8),
             'type': self.type,
             'height': util.u64_to_dto(self.height),
             'timestamp': util.u64_to_dto(self.timestamp),
@@ -149,7 +148,7 @@ class BlockInfo(util.DTO):
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
-    ) -> BlockInfo:
+    ):
         meta = data['meta']
         block = data['block']
         version = block['version']
@@ -164,7 +163,7 @@ class BlockInfo(util.DTO):
             signature=block['signature'],
             signer=PublicAccount.from_dto(block['signer'], network_type),
             network_type=network_type,
-            version=version,
+            version=version & 0xFF,
             type=block['type'],
             height=util.u64_from_dto(block['height']),
             timestamp=util.u64_from_dto(block['timestamp']),

@@ -23,16 +23,13 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
 from .mosaic_id import MosaicId
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 from ..namespace.namespace_id import NamespaceId
 
 __all__ = ['MosaicName']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -52,7 +49,7 @@ class MosaicName(util.DTO):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             'mosaicId': self.mosaic_id.to_dto(),
@@ -64,8 +61,8 @@ class MosaicName(util.DTO):
     def from_dto(
         cls,
         data: dict,
-        network_type: OptionalNetworkType = None
-    ) -> MosaicName:
+        network_type: OptionalNetworkType = None,
+    ):
         mosaic_id = MosaicId.from_dto(data['mosaicId'], network_type)
         name = data['name']
         parent_id = NamespaceId.from_dto(data['parentId'], network_type)

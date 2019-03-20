@@ -23,20 +23,16 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
 from .mosaic_id import MosaicId
-from .mosaic_levy import MosaicLevy
+from .mosaic_levy import OptionalMosaicLevyType
 from .mosaic_nonce import MosaicNonce
 from .mosaic_properties import MosaicProperties
 from ..account.public_account import PublicAccount
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['MosaicInfo']
-
-OptionalMosaicLevyType = typing.Optional[MosaicLevy]
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 # TODO(ahuszagh) Needs to/from dto.
@@ -87,23 +83,17 @@ class MosaicInfo(util.DTO):
         """Mosaic allows a supply change later on. Default false."""
         return self.properties.supply_mutable
 
-    isSupplyMutable = util.undoc(is_supply_mutable)
-
     def is_transferable(self) -> bool:
         """Allow transfer of funds from non-creator accounts. Default true."""
         return self.properties.transferable
-
-    isTransferable = util.undoc(is_transferable)
 
     def is_levy_mutable(self) -> bool:
         """Get if levy is mutable. Default false."""
         return self.properties.levy_mutable
 
-    isLevyMutable = util.undoc(is_levy_mutable)
-
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         # TODO(ahuszagh) This differs, since it seems the old
         # way was a mosaic name.
@@ -133,8 +123,8 @@ class MosaicInfo(util.DTO):
     def from_dto(
         cls,
         data: dict,
-        network_type: OptionalNetworkType = None
-    ) -> MosaicLevy:
+        network_type: OptionalNetworkType = None,
+    ):
         # Namespace ID is clearly the parent ID.
         # Nonce is clearly found somewhere???
         # TODO(ahuszagh) We obviously cannot get the nonce...

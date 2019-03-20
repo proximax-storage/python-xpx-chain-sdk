@@ -30,12 +30,11 @@ import os
 import typing
 
 from nem2 import util
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['MosaicNonce']
 
 DTOType = typing.Sequence[int]
-OptionalNetworkType = typing.Optional[NetworkType]
 RawNonceType = typing.Union[int, bytes, str]
 
 
@@ -72,7 +71,7 @@ class MosaicNonce(util.IntMixin, util.Model):
         return util.u32_from_catbuffer(self.nonce)
 
     @classmethod
-    def create_random(cls, entropy=os.urandom) -> MosaicNonce:
+    def create_random(cls, entropy=os.urandom):
         """
         Create new mosaic nonce from random bytes.
 
@@ -81,33 +80,27 @@ class MosaicNonce(util.IntMixin, util.Model):
         nonce: bytes = entropy(4)
         return cls(nonce)
 
-    createRandom = util.undoc(create_random)
-
     @classmethod
-    def create_from_hex(cls, data: str) -> MosaicNonce:
+    def create_from_hex(cls, data: str):
         """
         Create mosaic nonce from hex-encoded nonce.
 
         :param data: Hex-encoded nonce data.
         """
-        return MosaicNonce(util.unhexlify(data))
-
-    createFromHex = util.undoc(create_from_hex)
+        return cls(util.unhexlify(data))
 
     @classmethod
-    def create_from_int(cls, nonce: int) -> MosaicNonce:
+    def create_from_int(cls, nonce: int):
         """
         Create mosaic nonce from 32-bit integer.
 
         :param nonce: Nonce as 32-bit unsigned integer.
         """
-        return MosaicNonce(nonce)
-
-    createFromInt = util.undoc(create_from_int)
+        return cls(nonce)
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> DTOType:
         return list(self.nonce)
 
@@ -115,13 +108,13 @@ class MosaicNonce(util.IntMixin, util.Model):
     def from_dto(
         cls,
         data: DTOType,
-        network_type: OptionalNetworkType = None
-    ) -> MosaicNonce:
+        network_type: OptionalNetworkType = None,
+    ):
         return cls(bytes(data))
 
     def to_catbuffer(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> bytes:
         return util.u32_to_catbuffer(int(self))
 
@@ -129,7 +122,7 @@ class MosaicNonce(util.IntMixin, util.Model):
     def from_catbuffer(
         cls,
         data: bytes,
-        network_type=None
-    ) -> MosaicNonce:
+        network_type: OptionalNetworkType = None,
+    ):
         size = cls.CATBUFFER_SIZE
         return cls(util.u32_from_catbuffer(data[:size]))

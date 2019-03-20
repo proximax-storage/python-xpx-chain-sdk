@@ -17,4 +17,3 @@ class TestNetworkHTTP(harness.TestCase):
         async with with_cb(data[0](responses.ENDPOINT)) as http:
             with data[1].default_response(200, **responses.NETWORK_TYPE["MIJIN_TEST"]):
                 self.assertEqual(await await_cb(http.get_network_type()), models.NetworkType.MIJIN_TEST)
-                self.assertEqual(await await_cb(http.getNetworkType()), models.NetworkType.MIJIN_TEST)

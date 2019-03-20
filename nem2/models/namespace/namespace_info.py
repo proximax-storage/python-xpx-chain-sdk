@@ -23,21 +23,17 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
 from .alias import Alias
 from .alias_type import AliasType
-from .namespace_id import NamespaceId
+from .namespace_id import NamespaceId, NamespaceIdList
 from .namespace_type import NamespaceType
 from ..account.address import Address
 from ..account.public_account import PublicAccount
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['NamespaceInfo']
-
-NamespaceIdListType = typing.Sequence[NamespaceId]
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -64,7 +60,7 @@ class NamespaceInfo(util.DTO):
     meta_id: str
     type: NamespaceType
     depth: int
-    levels: NamespaceIdListType
+    levels: NamespaceIdList
     parent_id: NamespaceId
     owner: PublicAccount
     start_height: int
@@ -81,21 +77,15 @@ class NamespaceInfo(util.DTO):
 
         return self.type == NamespaceType.ROOT_NAMESPACE
 
-    isRoot = util.undoc(is_root)
-
     def is_subnamespace(self) -> bool:
         """Get if namespace is subnamespace."""
 
         return self.type == NamespaceType.SUB_NAMESPACE
 
-    isSubnamespace = util.undoc(is_subnamespace)
-
     def has_alias(self) -> bool:
         """Get if namespace has alias."""
 
         return self.alias.type != AliasType.NONE
-
-    hasAlias = util.undoc(has_alias)
 
     def parent_namespace_id(self) -> NamespaceId:
         """Get parent namespace ID."""
@@ -106,7 +96,7 @@ class NamespaceInfo(util.DTO):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         meta = {
             'active': self.active,
@@ -118,7 +108,7 @@ class NamespaceInfo(util.DTO):
             'depth': self.depth,
             'parentId': self.parent_id.to_dto(network_type),
             'owner': self.owner.to_dto(network_type),
-            'ownerAddress': util.hexlify(self.owner.address.encoded),
+            'ownerAddress': self.owner.address.to_dto(network_type),
             'startHeight': util.u64_to_dto(self.start_height),
             'endHeight': util.u64_to_dto(self.end_height),
         }
@@ -142,11 +132,11 @@ class NamespaceInfo(util.DTO):
     def from_dto(
         cls,
         data: dict,
-        network_type: OptionalNetworkType = None
-    ) -> NamespaceInfo:
+        network_type: OptionalNetworkType = None,
+    ):
         meta = data['meta']
         namespace = data['namespace']
-        address = Address.create_from_encoded(util.unhexlify(namespace['ownerAddress']))
+        address = Address.from_dto(namespace['ownerAddress'], network_type)
         network_type = address.network_type
         depth = namespace['depth']
         alias = Alias.from_dto(namespace.get('alias'), network_type)

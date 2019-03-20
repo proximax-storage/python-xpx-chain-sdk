@@ -26,13 +26,12 @@ from __future__ import annotations
 import typing
 
 from nem2 import util
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import NetworkType, OptionalNetworkType
 
 __all__ = ['Address']
 
 T = typing.TypeVar('T')
 U = typing.Sequence[T]
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 def chunks(collection: U, n: int) -> typing.Generator[U, None, None]:
@@ -100,12 +99,19 @@ class Address(util.Model):
     network_type: NetworkType
     CATBUFFER_SIZE: typing.ClassVar[int] = 25 * util.U8_BYTES
 
-    def __init__(self, address: str) -> None:
+    def __init__(
+        self,
+        address: str,
+        network_type: OptionalNetworkType = None,
+    ) -> None:
         plain = address.strip().upper().replace('-', '')
+        nt = NetworkType.create_from_raw_address(plain)
         if len(plain) != 40:
             raise ValueError(f"{address} is not a valid raw address")
+        if network_type is not None and network_type != nt:
+            raise ValueError('Network type does not match address.')
         self._set('address', plain)
-        self._set('network_type', NetworkType.create_from_raw_address(plain))
+        self._set('network_type', nt)
 
     @property
     def encoded(self) -> bytes:
@@ -113,40 +119,36 @@ class Address(util.Model):
         return util.b32decode(self.address)
 
     @classmethod
-    def create_from_raw_address(cls, address: str) -> Address:
+    def create_from_raw_address(cls, address: str):
         """
         Create Address from human-readable, raw address.
 
         :param address: Base32-encoded, human-readable address.
         :return: Address object.
         """
-
-        return Address(address)
-
-    createFromRawAddress = util.undoc(create_from_raw_address)
+        return cls(address)
 
     @classmethod
-    def create_from_encoded(cls, address: bytes) -> Address:
+    def create_from_encoded(cls, address: typing.AnyStr):
         """
         Create Address from encoded address.
 
-        :param address: Base32-decoded address bytes.
+        :param address: Base32-decoded address bytes or hex-encoded bytes.
         :return: Address object.
         """
 
+        address = util.decode_hex(address, with_prefix=True)
         if len(address) != 25:
             raise ValueError(f"{address} is not a valid encoded address")
         raw_address = util.b32encode(address)
-        return Address.create_from_raw_address(raw_address)
-
-    createFromEncoded = util.undoc(create_from_encoded)
+        return cls.create_from_raw_address(raw_address)
 
     @classmethod
     def create_from_public_key(
         cls,
         public_key: typing.AnyStr,
         network_type: NetworkType
-    ) -> Address:
+    ):
         """
         Create Address from the public key and network type.
 
@@ -160,47 +162,37 @@ class Address(util.Model):
             raise ValueError(f"{public_key} is not a valid public key")
         address: bytes = public_key_to_address(key, network_type)
 
-        return Address.create_from_encoded(address)
-
-    createFromPublicKey = util.undoc(create_from_public_key)
+        return cls.create_from_encoded(address)
 
     def plain(self) -> str:
         """Get plain representation of address as base32-decoded string."""
-
         return self.address
 
     def pretty(self) -> str:
         """Get pretty representation of address as base32-decoded string."""
-
         return u'-'.join(chunks(self.address, 6))
 
     def is_valid(self) -> bool:
         """Check if address is valid."""
-
         return is_valid_address(self.encoded)
-
-    isValid = util.undoc(is_valid)
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
-    ) -> dict:
-        return {
-            'address': self.address,
-            'networkType': self.network_type.to_dto(network_type),
-        }
+        network_type: OptionalNetworkType = None,
+    ) -> str:
+        return util.hexlify(self.encoded)
 
     @classmethod
     def from_dto(
         cls,
-        data: dict,
-        network_type: OptionalNetworkType = None
-    ) -> Address:
-        return cls.create_from_raw_address(data['address'])
+        data: str,
+        network_type: OptionalNetworkType = None,
+    ):
+        return cls.create_from_encoded(data)
 
     def to_catbuffer(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> bytes:
         return self.encoded
 
@@ -208,6 +200,6 @@ class Address(util.Model):
     def from_catbuffer(
         cls,
         data: bytes,
-        network_type: OptionalNetworkType = None
-    ) -> Address:
+        network_type: OptionalNetworkType = None,
+    ):
         return cls.create_from_encoded(data)

@@ -27,11 +27,9 @@ import enum
 import typing
 
 from nem2 import util
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['TransactionStatusGroup']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -47,7 +45,7 @@ class TransactionStatusGroup(util.DTO, util.EnumMixin, str, enum.Enum):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> str:
         return typing.cast(str, self.value)
 
@@ -55,8 +53,8 @@ class TransactionStatusGroup(util.DTO, util.EnumMixin, str, enum.Enum):
     def from_dto(
         cls,
         data: str,
-        network_type: OptionalNetworkType = None
-    ) -> TransactionStatusGroup:
+        network_type: OptionalNetworkType = None,
+    ):
         return cls(data)
 
 

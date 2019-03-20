@@ -26,42 +26,67 @@
 from __future__ import annotations
 import typing
 
+from nem2 import util
 from .aggregate_transaction_cosignature import AggregateTransactionCosignature
 from .deadline import Deadline
-from .inner_transaction import InnerTransaction
+from .inner_transaction import InnerTransaction, InnerTransactionList
+from .registry import register_transaction
+from .signed_transaction import SignedTransaction
 from .transaction import Transaction
 from .transaction_info import TransactionInfo
 from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
+from ..account.account import Account
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 
 __all__ = ['AggregateTransaction']
 
-Cosignatures = typing.Sequence[AggregateTransactionCosignature]
-InnerTransactions = typing.Sequence[InnerTransaction]
-OptionalNetworkType = typing.Optional[NetworkType]
+Cosignature = AggregateTransactionCosignature
+Cosignatures = typing.Sequence[Cosignature]
 
 
+@util.inherit_doc
+@util.dataclass(frozen=True)
+@register_transaction('AGGREGATE_BONDED')
+@register_transaction('AGGREGATE_COMPLETE')
 class AggregateTransaction(Transaction):
-    """Transaction containing multiple inner transactions."""
+    """
+    Transaction containing multiple inner transactions.
 
-    inner_transactions: InnerTransactions
+    :param network_type: Network type.
+    :param version: Transaction version.
+    :param deadline: Deadline to include transaction.
+    :param fee: Fee for the transaction. Higher fees increase transaction priority.
+    :param inner_transactions: Inner transactions to be included.
+    :param cosignatures: Transaction cosigner signatures.
+    :param type: Transaction type.
+    :param signature: Transaction signature.
+    :param signer: (Optional) Account of transaction creator.
+    :param transaction_info: (Optional) Transaction metadata.
+    """
+
+    inner_transactions: InnerTransactionList
     cosignatures: Cosignatures
 
     def __init__(
         self,
         network_type: NetworkType,
-        type: TransactionType,
         version: TransactionVersion,
         deadline: Deadline,
         fee: int,
-        inner_transactions: typing.Optional[InnerTransactions] = None,
-        cosignatures: Cosignatures = None,
+        inner_transactions: typing.Optional[InnerTransactionList] = None,
+        cosignatures: typing.Optional[Cosignatures] = None,
+        type: TransactionType = TransactionType.AGGREGATE_COMPLETE,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
-    ):
+    ) -> None:
+        if (
+            type != TransactionType.AGGREGATE_COMPLETE
+            and type != TransactionType.AGGREGATE_BONDED
+        ):
+            raise ValueError('Invalid transaction type.')
         super().__init__(
             type,
             network_type,
@@ -75,39 +100,181 @@ class AggregateTransaction(Transaction):
         self._set('inner_transactions', inner_transactions or [])
         self._set('cosignatures', cosignatures or [])
 
-    # TODO(ahuszagh)
-    # create_complete
-    # create_bonded
-    # sign_transaction_with_cosignatories
-    # signed_by_account
+    @classmethod
+    def create_complete(
+        cls,
+        deadline: Deadline,
+        inner_transactions: typing.Optional[InnerTransactionList],
+        cosignatures: typing.Optional[Cosignatures],
+        network_type: NetworkType,
+    ):
+        """
+        Create aggregate complete transaction object.
+
+        :param deadline: Deadline to include transaction.
+        :param inner_transactions: Inner transactions to be included.
+        :param cosignatures: Transaction cosigner signatures.
+        :param network_type: Network type.
+        """
+        return cls(
+            network_type,
+            TransactionVersion.AGGREGATE_COMPLETE,
+            deadline,
+            0,
+            inner_transactions,
+            cosignatures,
+            TransactionType.AGGREGATE_COMPLETE,
+        )
+
+    @classmethod
+    def create_bonded(
+        cls,
+        deadline: Deadline,
+        inner_transactions: typing.Optional[InnerTransactionList],
+        cosignatures: Cosignatures,
+        network_type: NetworkType,
+    ):
+        """
+        Create aggregate bonded transaction object.
+
+        :param deadline: Deadline to include transaction.
+        :param inner_transactions: Inner transactions to be included.
+        :param cosignatures: Transaction cosigner signatures.
+        :param network_type: Network type.
+        """
+        return cls(
+            network_type,
+            TransactionVersion.AGGREGATE_BONDED,
+            deadline,
+            0,
+            inner_transactions,
+            cosignatures,
+            TransactionType.AGGREGATE_BONDED,
+        )
+
+    # SIGNING
+
+    def sign_with(self, account: Account) -> SignedTransaction:
+        raise TypeError('Use `sign_transaction_with_cosignatories` instead.')
+
+    def sign_transaction_with_cosignatories(
+        self,
+        initiator_account: Account,
+        cosignatures: Cosignatures,
+    ) -> SignedTransaction:
+        """
+        Sign transaction with cosignatories.
+
+        :param initiator_account: Initiator account.
+        :param cosignatories: Sequence of accounts cosigning transaction.
+        """
+        # TODO(ahuszagh) Need to sign.
+        # TODO(ahuszagh) Implement...
+        # transaction = self.to_catbuffer()
+        raise NotImplementedError
+
+    def signed_by_account(self, public_account: PublicAccount) -> bool:
+        """
+        Check if account has signed transaction.
+
+        :param public_account: Signer public account.
+        """
+        return (
+            public_account == self.signer
+            or any(i.signer == public_account for i in self.cosignatures)
+        )
+
+    # AGGREGATE
+
+    def to_aggregate(self, signer: PublicAccount):
+        raise TypeError('Aggregate transaction cannot be embedded.')
+
+    # CATBUFFER
+
+    def inner_transactions_size(self) -> int:
+        """Get payload size, the size in bytes of all sub-transactions."""
+        return sum(i.catbuffer_size() for i in self.inner_transactions)
+
+    def cosignatures_size(self) -> int:
+        """Get the size in bytes of all cosignatures."""
+        return sum(i.CATBUFFER_SIZE for i in self.cosignatures)
 
     def catbuffer_size_specific(self) -> int:
-        raise NotImplementedError
+        # 4 extra bytes for the payload size.
+        # The payload size is the size from all inner transactions.
+        extra_size = util.U32_BYTES
+        payload_size = self.inner_transactions_size()
+        cosignatures_size = self.cosignatures_size()
+        return extra_size + payload_size + cosignatures_size
+
+    def to_inner_transactions_bytes(
+        self,
+        network_type: NetworkType,
+    ) -> bytes:
+        """Get the serialized byte array of all sub-transactions."""
+        return util.Model.sequence_to_catbuffer(self.inner_transactions, network_type)
+
+    def to_cosignatures_bytes(
+        self,
+        network_type: NetworkType,
+    ) -> bytes:
+        """Get the serialized byte array of all cosignatures."""
+        return util.Model.sequence_to_catbuffer(self.cosignatures, network_type)
 
     def to_catbuffer_specific(
         self,
-        network_type: OptionalNetworkType = None,
+        network_type: NetworkType,
     ) -> bytes:
         """Export transfer-specific data to catbuffer."""
-        # TODO(ahuszagh) Implement...
-        raise NotImplementedError
+        # uint32_t payload_size
+        # uint8_t[payload_size] transactions
+        # uint8_t[size - payload_size] cosignatures
+        payload_size = util.u32_to_catbuffer(self.inner_transactions_size())
+        transactions = self.to_inner_transactions_bytes(network_type)
+        cosignatures = self.to_cosignatures_bytes(network_type)
+        return payload_size + transactions + cosignatures
+
+    def load_inner_transactions_bytes(
+        self,
+        data: bytes,
+        size: int,
+        network_type: NetworkType,
+    ) -> bytes:
+        """Load inner transactions data from catbuffer."""
+        transactions = []
+        subdata = data[:size]
+        while subdata:
+            # This will hard-error if the transaction is invalid,
+            # or cut-off, since every deserializer checks the input
+            # is valid.
+            value, subdata = InnerTransaction.from_catbuffer_pair(subdata, network_type)
+            transactions.append(value)
+        return data[size:]
+
+    def load_cosignatures_bytes(
+        self,
+        data: bytes,
+        network_type: NetworkType,
+    ) -> bytes:
+        """Load cosignatures data from catbuffer."""
+        count = len(data) // Cosignature.CATBUFFER_SIZE
+        value, data = Cosignature.sequence_from_catbuffer_pair(data, count, network_type)
+        self._set('cosignatures', value)
+        return data
 
     def load_catbuffer_specific(
         self,
         data: bytes,
-        network_type: OptionalNetworkType = None,
+        network_type: NetworkType,
     ) -> bytes:
         """Load transfer-specific data data from catbuffer."""
+
+        # uint32_t payload_size
+        # uint8_t[payload_size] transactions
+        # uint8_t[size - payload_size] cosignatures
         # TODO(ahuszagh) Implement...
+        # payload_size = util.u32_from_catbuffer(data[:4])
+
         raise NotImplementedError
 
-
-Transaction.HOOKS[TransactionType.AGGREGATE_COMPLETE] = (
-    AggregateTransaction.from_catbuffer_pair,
-    AggregateTransaction.from_dto,
-)
-
-Transaction.HOOKS[TransactionType.AGGREGATE_BONDED] = (
-    AggregateTransaction.from_catbuffer_pair,
-    AggregateTransaction.from_dto,
-)
+    # DTO

@@ -24,9 +24,10 @@
 
 from __future__ import annotations
 
-from nem2 import util
+from .address_alias_transaction import AddressAliasTransaction
 from .deadline import Deadline
-from .transaction import Transaction
+from .mosaic_alias_transaction import MosaicAliasTransaction
+from .transaction import TransactionBase
 from ..account.address import Address
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic_id import MosaicId
@@ -36,14 +37,13 @@ from ..namespace.namespace_id import NamespaceId
 __all__ = ['AliasTransaction']
 
 
-class AliasTransaction(Transaction):
+class AliasTransaction(TransactionBase):
     """Abstract class for alias transactions."""
 
     __slots__ = ()
 
-    @classmethod
+    @staticmethod
     def create_for_address(
-        cls,
         deadline: Deadline,
         action_type: AliasActionType,
         namespace_id: NamespaceId,
@@ -60,8 +60,7 @@ class AliasTransaction(Transaction):
         :param network_type: Network type.
         """
 
-        from . import address_alias_transaction as mod
-        return mod.AddressAliasTransaction.create(
+        return AddressAliasTransaction.create(
             deadline,
             action_type,
             namespace_id,
@@ -69,11 +68,8 @@ class AliasTransaction(Transaction):
             network_type,
         )
 
-    createForAddress = util.undoc(create_for_address)
-
-    @classmethod
+    @staticmethod
     def create_for_mosaic(
-        cls,
         deadline: Deadline,
         action_type: AliasActionType,
         namespace_id: NamespaceId,
@@ -90,13 +86,10 @@ class AliasTransaction(Transaction):
         :param network_type: Network type.
         """
 
-        from . import mosaic_alias_transaction as mod
-        return mod.MosaicAliasTransaction.create(
+        return MosaicAliasTransaction.create(
             deadline,
             action_type,
             namespace_id,
             mosaic_id,
             network_type,
         )
-
-    createForMosaic = util.undoc(create_for_mosaic)

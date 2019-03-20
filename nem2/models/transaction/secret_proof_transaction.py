@@ -29,6 +29,7 @@ from nem2 import util
 from .deadline import Deadline
 from .hash_type import HashType
 from .inner_transaction import InnerTransaction
+from .registry import register_transaction
 from .transaction import Transaction
 from .transaction_info import TransactionInfo
 from .transaction_type import TransactionType
@@ -41,11 +42,10 @@ __all__ = [
     'SecretProofInnerTransaction',
 ]
 
-OptionalNetworkType = typing.Optional[NetworkType]
-
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
+@register_transaction('SECRET_PROOF')
 class SecretProofTransaction(Transaction):
     """
     Secret-proof transaction.
@@ -57,7 +57,8 @@ class SecretProofTransaction(Transaction):
     :param hash_type: Hash algorithm secret was generated with.
     :param secret: Hex-encoded seed-proof hash.
     :param proof: Hex-encoded seed proof.
-    :param signature: (Optional) Transaction signature (missing if aggregate transaction).
+    :param type: Transaction type.
+    :param signature: (Optional) Transaction signature (missing if inner transaction).
     :param signer: (Optional) Account of transaction creator.
     :param transaction_info: (Optional) Transaction metadata.
     """
@@ -75,14 +76,17 @@ class SecretProofTransaction(Transaction):
         hash_type: HashType,
         secret: str,
         proof: str,
+        type: TransactionType = TransactionType.SECRET_PROOF,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
-    ):
+    ) -> None:
+        if type != TransactionType.SECRET_PROOF:
+            raise ValueError('Invalid transaction type.')
         if not hash_type.validate(secret):
             raise ValueError("HashType and secret have incompatible lengths.")
         super().__init__(
-            TransactionType.SECRET_PROOF,
+            type,
             network_type,
             version,
             deadline,
@@ -103,7 +107,7 @@ class SecretProofTransaction(Transaction):
         secret: str,
         proof: str,
         network_type: NetworkType,
-    ) -> SecretProofTransaction:
+    ):
         """
         Create new secret proof transaction.
 
@@ -113,7 +117,7 @@ class SecretProofTransaction(Transaction):
         :param proof: Hex-encoded seed proof.
         :param network_type: Network type.
         """
-        return SecretProofTransaction(
+        return cls(
             network_type,
             TransactionVersion.SECRET_PROOF,
             deadline,
@@ -123,17 +127,20 @@ class SecretProofTransaction(Transaction):
             proof
         )
 
+    # CATBUFFER
+
     def catbuffer_size_specific(self) -> int:
         # extra 3 bytes, 1 for hash_type, 2 for proof size.
         # The proof size is always 32, even if HASH_160 is used.
         # The hash is just 0-padded to 32 bytes.
+        extra_size = util.U8_BYTES + util.U16_BYTES
         secret_size = 32
         proof_size = len(self.proof) // 2
-        return secret_size + proof_size + 3
+        return extra_size + secret_size + proof_size
 
     def to_catbuffer_specific(
         self,
-        network_type: OptionalNetworkType = None,
+        network_type: NetworkType,
     ) -> bytes:
         """Export secret proof-specific data to catbuffer."""
 
@@ -151,7 +158,7 @@ class SecretProofTransaction(Transaction):
     def load_catbuffer_specific(
         self,
         data: bytes,
-        network_type: OptionalNetworkType = None,
+        network_type: NetworkType,
     ) -> bytes:
         """Load secret proof-specific data data from catbuffer."""
 
@@ -170,29 +177,33 @@ class SecretProofTransaction(Transaction):
         self._set('secret', secret)
         self._set('proof', proof)
 
-        return typing.cast(bytes, data[proof_size + 2:])
+        return data[proof_size + 2:]
 
-    def to_aggregate(
+    # DTO
+
+    def to_dto_specific(
         self,
-        signer: PublicAccount
-    ) -> SecretProofInnerTransaction:
-        """Convert transaction to inner transaction."""
-        inst = SecretProofInnerTransaction.from_transaction(self, signer)
-        return typing.cast(SecretProofInnerTransaction, inst)
+        network_type: NetworkType,
+    ) -> dict:
+        return {
+            'hashAlgorithm': self.hash_type.to_dto(network_type),
+            'secret': self.secret,
+            'proof': self.proof,
+        }
+
+    def load_dto_specific(
+        self,
+        data: dict,
+        network_type: NetworkType,
+    ) -> None:
+        hash_type = HashType.from_dto(data['hashAlgorithm'], network_type)
+        self._set('hash_type', hash_type)
+        self._set('secret', data['secret'])
+        self._set('proof', data['proof'])
 
 
+@register_transaction('SECRET_PROOF')
 class SecretProofInnerTransaction(InnerTransaction, SecretProofTransaction):
     """Embedded secret proof transaction."""
 
     __slots__ = ()
-
-
-Transaction.HOOKS[TransactionType.SECRET_PROOF] = (
-    SecretProofTransaction.from_catbuffer_pair,
-    SecretProofTransaction.from_dto,
-)
-
-InnerTransaction.HOOKS[TransactionType.SECRET_PROOF] = (
-    SecretProofInnerTransaction.from_catbuffer_pair,
-    SecretProofInnerTransaction.from_dto,
-)

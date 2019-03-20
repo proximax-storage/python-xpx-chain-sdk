@@ -33,11 +33,8 @@ __all__ = [
     'b64decode',
 ]
 
-BasenType = typing.Union[str, bytes, bytearray]
-BytesType = typing.Union[bytes, bytearray]
 
-
-def b32encode(data: BytesType, with_suffix=True) -> str:
+def b32encode(data: bytes, with_suffix=True) -> str:
     """Encode bytes data to a base32-encoded string."""
 
     encoded = base64.b32encode(data).decode('ascii')
@@ -46,7 +43,7 @@ def b32encode(data: BytesType, with_suffix=True) -> str:
     return encoded
 
 
-def b32decode(data: BasenType, with_suffix=True) -> bytes:
+def b32decode(data: typing.AnyStr, with_suffix=True) -> bytes:
     """Decode bytes data from a base32-encoded string."""
 
     if not with_suffix:
@@ -54,7 +51,7 @@ def b32decode(data: BasenType, with_suffix=True) -> bytes:
     return base64.b32decode(data)
 
 
-def b64encode(data: BytesType, altchars=None, with_suffix=True) -> str:
+def b64encode(data: bytes, altchars=None, with_suffix=True) -> str:
     """Encode bytes data to a base64-encoded string."""
 
     encoded = base64.b64encode(data, altchars=altchars).decode('ascii')
@@ -63,7 +60,7 @@ def b64encode(data: BytesType, altchars=None, with_suffix=True) -> str:
     return encoded
 
 
-def b64decode(data: BasenType, altchars=None, with_suffix=True) -> bytes:
+def b64decode(data: typing.AnyStr, altchars=None, with_suffix=True) -> bytes:
     """Decode bytes data from a base64-encoded string."""
 
     if not with_suffix:
@@ -72,7 +69,7 @@ def b64decode(data: BasenType, altchars=None, with_suffix=True) -> bytes:
 
 
 @typing.no_type_check
-def add_suffix(data: BasenType, width: int) -> BasenType:
+def add_suffix(data: typing.AnyStr, width: int) -> typing.AnyStr:
     """Add basen suffix to string ('=')."""
 
     if isinstance(data, str):

@@ -104,7 +104,6 @@ class TestMosaicId(harness.TestCase):
         owner = models.PublicAccount.create_from_public_key(public_key, self.network_type)
         value = models.MosaicId.create_from_nonce(nonce, owner)
         self.assertEqual(value.id, 0x2FF7D64F483BC0A6)
-        self.assertEqual(value, models.MosaicId.createFromNonce(nonce, owner))
 
     def test_repr(self):
         self.assertEqual(repr(self.mosaic_id), "MosaicId(id=5)")
@@ -164,19 +163,15 @@ class TestMosaicLevyType(harness.TestCase):
 
     def test_to_dto(self):
         self.assertEqual(self.absolute.to_dto(self.network_type), self.dto)
-        self.assertEqual(self.absolute.toDTO(self.network_type), self.dto)
 
     def test_from_dto(self):
         self.assertEqual(self.absolute, models.MosaicLevyType.from_dto(self.dto, self.network_type))
-        self.assertEqual(self.absolute, models.MosaicLevyType.fromDTO(self.dto, self.network_type))
 
     def test_to_catbuffer(self):
         self.assertEqual(self.absolute.to_catbuffer(self.network_type), self.catbuffer)
-        self.assertEqual(self.absolute.toCatbuffer(self.network_type), self.catbuffer)
 
     def test_from_catbuffer(self):
         self.assertEqual(self.absolute, models.MosaicLevyType.from_catbuffer(self.catbuffer, self.network_type))
-        self.assertEqual(self.absolute, models.MosaicLevyType.fromCatbuffer(self.catbuffer, self.network_type))
 
 
 class TestMosaicNonce(harness.TestCase):
@@ -217,12 +212,10 @@ class TestMosaicNonce(harness.TestCase):
 
         self.assertEqual(models.MosaicNonce.create_random(fake_entropy).nonce, b'4444')
         models.MosaicNonce.create_random()
-        models.MosaicNonce.createRandom()
 
     def test_create_from_hex(self):
         data = '00000000'
         self.assertEqual(self.nonce, models.MosaicNonce.create_from_hex(data))
-        self.assertEqual(self.nonce, models.MosaicNonce.createFromHex(data))
 
     def test_create_from_int(self):
         self.assertEqual(models.MosaicNonce.create_from_int(5).nonce, b'\x05\x00\x00\x00')
@@ -284,9 +277,6 @@ class TestMosaicProperties(harness.TestCase):
         self.assertEqual(self.properties.levy_mutable, False)
         self.assertEqual(self.properties.divisibility, 1)
         self.assertEqual(self.properties.duration, 100)
-
-        self.assertEqual(self.properties.supplyMutable, True)
-        self.assertEqual(self.properties.levyMutable, False)
 
     def test_create(self):
         properties = models.MosaicProperties.create()
@@ -380,12 +370,10 @@ class TestNetworkCurrencyMosaic(harness.TestCase):
     def test_create_relative(self):
         value = models.NetworkCurrencyMosaic.create_relative(1)
         self.assertEqual(value.amount, 1000000)
-        self.assertEqual(value, models.NetworkCurrencyMosaic.createRelative(1))
 
     def test_create_absolute(self):
         value = models.NetworkCurrencyMosaic.create_absolute(1)
         self.assertEqual(value.amount, 1)
-        self.assertEqual(value, models.NetworkCurrencyMosaic.createAbsolute(1))
 
 
 class TestNetworkHarvestMosaic(harness.TestCase):
@@ -413,9 +401,7 @@ class TestNetworkHarvestMosaic(harness.TestCase):
     def test_create_relative(self):
         value = models.NetworkHarvestMosaic.create_relative(1)
         self.assertEqual(value.amount, 1000)
-        self.assertEqual(value, models.NetworkHarvestMosaic.createRelative(1))
 
     def test_create_absolute(self):
         value = models.NetworkHarvestMosaic.create_absolute(1)
         self.assertEqual(value.amount, 1)
-        self.assertEqual(value, models.NetworkHarvestMosaic.createAbsolute(1))

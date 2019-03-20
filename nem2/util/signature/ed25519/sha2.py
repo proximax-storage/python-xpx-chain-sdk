@@ -34,9 +34,8 @@ try:
 except ImportError:
     from nem2.util import hashlib
     from . import fallback
-    from ..types import BytesType
 
-    def hash512(data: BytesType):
+    def hash512(data: bytes):
         return hashlib.sha512(data).digest()
 
     (

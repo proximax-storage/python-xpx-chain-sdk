@@ -36,7 +36,7 @@ __all__ = ['Account']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class Account:
+class Account(util.Object):
     """
     Describe account via private key, public key and account address.
 
@@ -70,24 +70,17 @@ class Account:
         """Get network type."""
         return self.address.network_type
 
-    networkType = util.undoc(network_type)
-
     @property
     def public_account(self) -> PublicAccount:
         """Get public account."""
-        return PublicAccount.create_from_public_key(
-            self.public_key,
-            self.network_type
-        )
-
-    publicAccount = util.undoc(public_account)
+        return PublicAccount(self.address, self.public_key)
 
     @classmethod
     def create_from_private_key(
         cls,
         private_key: typing.AnyStr,
         network_type: NetworkType,
-    ) -> Account:
+    ):
         """
         Generate Account object from private_key and network type.
 
@@ -103,14 +96,12 @@ class Account:
 
         return cls(address, public_key, private_key)
 
-    createFromPrivateKey = util.undoc(create_from_private_key)
-
     @classmethod
     def generate_new_account(
         cls,
         network_type: NetworkType,
         entropy=None
-    ) -> Account:
+    ):
         """
         Generate new NEM account from network type and random bytes.
 
@@ -129,8 +120,6 @@ class Account:
         address = Address.create_from_public_key(public_key, network_type)
 
         return cls(address, public_key, private_key)
-
-    generateNewAccount = util.undoc(generate_new_account)
 
     def sign(self, transaction: typing.AnyStr) -> bytes:
         """
@@ -168,8 +157,6 @@ class Account:
 
         return typing.cast(bytes, key.sign(data))
 
-    signData = util.undoc(sign_data)
-
     def verify_signature(
         self,
         data: typing.AnyStr,
@@ -184,8 +171,6 @@ class Account:
         """
         return self.public_account.verify_signature(data, signature)
 
-    verifySignature = util.undoc(verify_signature)
-
     def verify_transaction(
         self,
         transaction: typing.AnyStr
@@ -197,5 +182,3 @@ class Account:
         :return: Boolean representing if the transaction signature was verified.
         """
         return self.public_account.verify_transaction(transaction)
-
-    verifyTransaction = util.undoc(verify_transaction)

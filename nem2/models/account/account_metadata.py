@@ -22,11 +22,17 @@
     limitations under the License.
 """
 
+from __future__ import annotations
+import typing
+
 from nem2 import util
 
 __all__ = ['AccountMetadata']
 
 
 @util.dataclass(frozen=True)
-class AccountMetadata:
+class AccountMetadata(util.Object):
     """Metadata describing an account."""
+
+
+OptionalAccountMetadata = typing.Optional[AccountMetadata]

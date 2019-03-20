@@ -29,11 +29,10 @@ from nem2 import util
 from .mosaic_id import MosaicId
 from .mosaic_levy_type import MosaicLevyType
 from ..account.address import Address
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['MosaicLevy']
 
-OptionalNetworkType = typing.Optional[NetworkType]
 
 # TODO(ahuszagh) This is not yet implemented in Catapult. Subject to change
 @util.inherit_doc
@@ -68,11 +67,14 @@ class MosaicLevy(util.DTO):
     def from_dto(
         cls,
         data: dict,
-        network_type: OptionalNetworkType = None
-    ) -> MosaicLevy:
+        network_type: OptionalNetworkType = None,
+    ):
         return cls(
             type=MosaicLevyType.from_dto(data['type']),
             recipient=Address.from_dto(data['recipient']),
             mosaic_id=MosaicId.from_dto(data['mosaicId']),
             fee=data['fee'],
         )
+
+
+OptionalMosaicLevyType = typing.Optional[MosaicLevy]

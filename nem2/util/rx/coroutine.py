@@ -88,6 +88,3 @@ class CoroutineMixin(typing.Awaitable):
             self.__aiter__(),
             loop=loop
         )
-
-    def toObservable(self):
-        return self.to_observable()

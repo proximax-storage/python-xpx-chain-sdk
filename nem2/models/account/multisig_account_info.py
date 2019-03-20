@@ -23,18 +23,16 @@
 """
 
 from __future__ import annotations
-import typing
+
 from nem2 import util
-from .public_account import PublicAccount
+from .public_account import PublicAccount, PublicAccountList
 
 __all__ = ['MultisigAccountInfo']
-
-PublicAccountListType = typing.Sequence[PublicAccount]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MultisigAccountInfo:
+class MultisigAccountInfo(util.Object):
     """
     Information describing a multisig account.
 
@@ -51,15 +49,13 @@ class MultisigAccountInfo:
     account: PublicAccount
     min_approval: int
     min_removal: int
-    cosignatories: PublicAccountListType
-    multisig_accounts: PublicAccountListType
+    cosignatories: PublicAccountList
+    multisig_accounts: PublicAccountList
 
     def is_multisig(self) -> bool:
         """Get if account is a multisig account."""
 
         return self.min_removal != 0 and self.min_approval != 0
-
-    isMultisig = util.undoc(is_multisig)
 
     def has_cosigner(self, account: PublicAccount) -> bool:
         """
@@ -70,8 +66,6 @@ class MultisigAccountInfo:
 
         return account in self.cosignatories
 
-    hasCosigner = util.undoc(has_cosigner)
-
     def is_cosigner_of_multisig_account(self, account: PublicAccount) -> bool:
         """
         Check if multisig account is cosignatory of another account.
@@ -80,5 +74,3 @@ class MultisigAccountInfo:
         """
 
         return account in self.multisig_accounts
-
-    isCosignerOfMultisigAccount = util.undoc(is_cosigner_of_multisig_account)

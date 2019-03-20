@@ -34,7 +34,6 @@ class TestNamespaceHTTP(harness.TestCase):
                 self.assertEqual(info.start_height, 1)
                 self.assertEqual(info.end_height, 18446744073709551615)
                 self.assertEqual(info.alias, models.EmptyAlias())
-                self.assertEqual(info, await await_cb(http.getNamespace(namespace_id)))
 
     @harness.test_case(
         sync_data=(client.NamespaceHTTP, requests),
@@ -52,7 +51,6 @@ class TestNamespaceHTTP(harness.TestCase):
                 self.assertEqual(len(names), 1)
                 self.assertEqual(names[0].namespace_id.id, 0x84b3552d375ffa4b)
                 self.assertEqual(names[0].name, "nem")
-                self.assertEqual(names, await await_cb(http.getNamespaceNames(ids)))
 
     @harness.test_case(
         sync_data=(client.NamespaceHTTP, requests),

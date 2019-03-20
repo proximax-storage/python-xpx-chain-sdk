@@ -26,9 +26,9 @@ from __future__ import annotations
 import typing
 
 from nem2 import util
-from .alias_transaction import AliasTransaction
 from .deadline import Deadline
 from .inner_transaction import InnerTransaction
+from .registry import register_transaction
 from .transaction import Transaction
 from .transaction_info import TransactionInfo
 from .transaction_type import TransactionType
@@ -41,12 +41,11 @@ from ..namespace.namespace_id import NamespaceId
 
 __all__ = ['MosaicAliasTransaction']
 
-OptionalNetworkType = typing.Optional[NetworkType]
-
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicAliasTransaction(AliasTransaction):
+@register_transaction('MOSAIC_ALIAS')
+class MosaicAliasTransaction(Transaction):
     """
     Mosaic alias transaction.
 
@@ -57,6 +56,7 @@ class MosaicAliasTransaction(AliasTransaction):
     :param action_type: Alias action type.
     :param namespace_id: Resulting namespace ID that will be an alias.
     :param mosaic_id: Mosaic to be aliased.
+    :param type: Transaction type.
     :param signature: (Optional) Transaction signature (missing if aggregate transaction).
     :param signer: (Optional) Account of transaction creator.
     :param transaction_info: (Optional) Transaction metadata.
@@ -75,12 +75,15 @@ class MosaicAliasTransaction(AliasTransaction):
         action_type: AliasActionType,
         namespace_id: NamespaceId,
         mosaic_id: MosaicId,
+        type: TransactionType = TransactionType.MOSAIC_ALIAS,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
     ) -> None:
+        if type != TransactionType.MOSAIC_ALIAS:
+            raise ValueError('Invalid transaction type.')
         super().__init__(
-            TransactionType.MOSAIC_ALIAS,
+            type,
             network_type,
             version,
             deadline,
@@ -101,7 +104,7 @@ class MosaicAliasTransaction(AliasTransaction):
         namespace_id: NamespaceId,
         mosaic_id: MosaicId,
         network_type: NetworkType,
-    ) -> MosaicAliasTransaction:
+    ):
         """
         Create new mosaic alias transaction.
 
@@ -111,7 +114,7 @@ class MosaicAliasTransaction(AliasTransaction):
         :param mosaic_id: Mosaic to be aliased.
         :param network_type: Network type.
         """
-        return MosaicAliasTransaction(
+        return cls(
             network_type,
             TransactionVersion.MOSAIC_ALIAS,
             deadline,
@@ -129,60 +132,42 @@ class MosaicAliasTransaction(AliasTransaction):
 
     def to_catbuffer_specific(
         self,
-        network_type: OptionalNetworkType = None,
+        network_type: NetworkType,
     ) -> bytes:
         """Export mosaic alias-specific data to catbuffer."""
 
         # uint8_t action_type
         # NamespaceId namespace_id
         # MosaicId mosaic_id
-        action_type = self.action_type.to_catbuffer()
-        namespace_id = self.namespace_id.to_catbuffer()
-        mosaic_id = self.mosaic_id.to_catbuffer()
+        action_type = self.action_type.to_catbuffer(network_type)
+        namespace_id = self.namespace_id.to_catbuffer(network_type)
+        mosaic_id = self.mosaic_id.to_catbuffer(network_type)
 
         return action_type + namespace_id + mosaic_id
 
     def load_catbuffer_specific(
         self,
         data: bytes,
-        network_type: OptionalNetworkType = None,
+        network_type: NetworkType,
     ) -> bytes:
         """Load mosaic alias-specific data data from catbuffer."""
 
         # uint8_t action_type
         # NamespaceId namespace_id
         # MosaicId mosaic_id
-        action_type, data = AliasActionType.from_catbuffer(data)
-        namespace_id, data = NamespaceId.from_catbuffer(data)
-        mosaic_id, data = MosaicId.from_catbuffer(data)
+        action_type, data = AliasActionType.from_catbuffer_pair(data, network_type)
+        namespace_id, data = NamespaceId.from_catbuffer_pair(data, network_type)
+        mosaic_id, data = MosaicId.from_catbuffer_pair(data, network_type)
 
         self._set('action_type', action_type)
         self._set('namespace_id', namespace_id)
         self._set('mosaic_id', mosaic_id)
 
-        return typing.cast(bytes, data)
-
-    def to_aggregate(
-        self,
-        signer: PublicAccount,
-    ) -> MosaicAliasInnerTransaction:
-        """Convert transaction to inner transaction."""
-        inst = MosaicAliasInnerTransaction.from_transaction(self, signer)
-        return typing.cast(MosaicAliasInnerTransaction, inst)
+        return data
 
 
+@register_transaction('MOSAIC_ALIAS')
 class MosaicAliasInnerTransaction(InnerTransaction, MosaicAliasTransaction):
     """Embedded address alias transaction."""
 
     __slots__ = ()
-
-
-Transaction.HOOKS[TransactionType.MOSAIC_ALIAS] = (
-    MosaicAliasTransaction.from_catbuffer_pair,
-    MosaicAliasTransaction.from_dto,
-)
-
-InnerTransaction.HOOKS[TransactionType.MOSAIC_ALIAS] = (
-    MosaicAliasInnerTransaction.from_catbuffer_pair,
-    MosaicAliasInnerTransaction.from_dto,
-)

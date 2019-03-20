@@ -28,11 +28,9 @@ import typing
 from nem2 import util
 from .signed_transaction import SignedTransaction
 from ..account.address import Address
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['SyncAnnounce']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.dataclass(frozen=True)
@@ -54,7 +52,7 @@ class SyncAnnounce(util.DTO):
         payload: typing.AnyStr,
         hash: typing.AnyStr,
         address: str,
-    ):
+    ) -> None:
         payload = util.encode_hex(payload)
         hash = util.encode_hex(hash)
         if len(hash) != 64:
@@ -74,7 +72,7 @@ class SyncAnnounce(util.DTO):
         network_type = transaction.network_type
         address = Address.create_from_public_key(public_key, network_type)
 
-        return SyncAnnounce(
+        return cls(
             payload=transaction.payload,
             hash=transaction.hash,
             address=address.address,
@@ -82,7 +80,7 @@ class SyncAnnounce(util.DTO):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             'payload': self.payload,
@@ -95,7 +93,7 @@ class SyncAnnounce(util.DTO):
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
-    ) -> SyncAnnounce:
+    ):
         return cls(
             payload=data['payload'],
             hash=data['hash'],

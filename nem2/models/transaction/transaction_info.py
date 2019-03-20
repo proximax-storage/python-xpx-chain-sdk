@@ -26,11 +26,9 @@ from __future__ import annotations
 import typing
 
 from nem2 import util
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['TransactionInfo']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -53,13 +51,9 @@ class TransactionInfo(util.DTO):
             and self.merkle_component_hash is None
         )
 
-    isUnconfirmed = util.undoc(is_unconfirmed)
-
     def is_confirmed(self) -> bool:
         """Is transaction already included."""
         return self.height > 0
-
-    isConfirmed = util.undoc(is_confirmed)
 
     def has_missing_signatures(self) -> bool:
         """Does the transaction have missing signatures."""
@@ -68,11 +62,9 @@ class TransactionInfo(util.DTO):
             and self.hash != self.merkle_component_hash
         )
 
-    hasMissingSignatures = util.undoc(has_missing_signatures)
-
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         data = {
             'height': util.u64_to_dto(self.height),
@@ -90,7 +82,7 @@ class TransactionInfo(util.DTO):
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
-    ) -> TransactionInfo:
+    ):
         return cls(
             height=util.u64_from_dto(data['height']),
             index=data['index'],

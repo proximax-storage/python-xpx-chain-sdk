@@ -39,6 +39,13 @@ __all__ = [
     'U128Mixin',
 ]
 
+IntMixinType = typing.TypeVar('IntMixinType', bound='IntMixin')
+U8MixinType = typing.TypeVar('U8MixinType', bound='U8Mixin')
+U16MixinType = typing.TypeVar('U16MixinType', bound='U16Mixin')
+U32MixinType = typing.TypeVar('U32MixinType', bound='U32Mixin')
+U64MixinType = typing.TypeVar('U64MixinType', bound='U64Mixin')
+U128MixinType = typing.TypeVar('U128MixinType', bound='U128Mixin')
+
 
 class EnumMixin:
     """Mixin defining shared methods for enumerations."""
@@ -61,17 +68,20 @@ class IntMixin:
     def __index__(self) -> int:
         return self.__int__()
 
-    def __format__(self, format_spec: str):
+    def __format__(self, format_spec: str) -> str:
         return int(self).__format__(format_spec)
 
     @classmethod
-    def from_hex(cls, data: str):
+    def from_hex(
+        cls: typing.Type[IntMixinType],
+        data: str
+    ) -> IntMixinType:
         """
         Create instance of class from hex string.
 
         :param data: Hex-encoded ID data (with or without '0x' prefix).
         """
-        return cls(int(data, 16))
+        return cls(int(data, 16))   # type: ignore
 
 
 @documentation.inherit_doc
@@ -81,21 +91,35 @@ class U8Mixin(abc.Model):
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U8_BYTES
 
-    def to_dto(self, network_type=None) -> stdint.U8DTOType:
+    def to_dto(
+        self: U8MixinType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> stdint.U8DTOType:
         asint: int = int(self)      # type: ignore
         return stdint.u8_to_dto(asint)
 
     @classmethod
-    def from_dto(cls, data: stdint.U8DTOType, network_type=None):
+    def from_dto(
+        cls: typing.Type[U8MixinType],
+        data: stdint.U8DTOType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U8MixinType:
         asint = stdint.u8_from_dto(data)
         return cls(asint)           # type: ignore
 
-    def to_catbuffer(self, network_type=None) -> bytes:
+    def to_catbuffer(
+        self: U8MixinType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> bytes:
         asint: int = int(self)      # type: ignore
         return stdint.u8_to_catbuffer(asint)
 
     @classmethod
-    def from_catbuffer(cls, data: bytes, network_type=None):
+    def from_catbuffer(
+        cls: typing.Type[U8MixinType],
+        data: bytes,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U8MixinType:
         size = cls.CATBUFFER_SIZE
         asint = stdint.u8_from_catbuffer(data[:size])
         return cls(asint)           # type: ignore
@@ -108,21 +132,35 @@ class U16Mixin(abc.Model):
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U16_BYTES
 
-    def to_dto(self, network_type=None) -> stdint.U16DTOType:
+    def to_dto(
+        self: U16MixinType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> stdint.U16DTOType:
         asint: int = int(self)      # type: ignore
         return stdint.u16_to_dto(asint)
 
     @classmethod
-    def from_dto(cls, data: stdint.U16DTOType, network_type=None):
+    def from_dto(
+        cls: typing.Type[U16MixinType],
+        data: stdint.U16DTOType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U16MixinType:
         asint = stdint.u16_from_dto(data)
         return cls(asint)           # type: ignore
 
-    def to_catbuffer(self, network_type=None) -> bytes:
+    def to_catbuffer(
+        self: U16MixinType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> bytes:
         asint: int = int(self)      # type: ignore
         return stdint.u16_to_catbuffer(asint)
 
     @classmethod
-    def from_catbuffer(cls, data: bytes, network_type=None):
+    def from_catbuffer(
+        cls: typing.Type[U16MixinType],
+        data: bytes,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U16MixinType:
         size = cls.CATBUFFER_SIZE
         asint = stdint.u16_from_catbuffer(data[:size])
         return cls(asint)           # type: ignore
@@ -135,21 +173,35 @@ class U32Mixin(abc.Model):
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U32_BYTES
 
-    def to_dto(self, network_type=None) -> stdint.U32DTOType:
+    def to_dto(
+        self,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> stdint.U32DTOType:
         asint: int = int(self)      # type: ignore
         return stdint.u32_to_dto(asint)
 
     @classmethod
-    def from_dto(cls, data: stdint.U32DTOType, network_type=None):
+    def from_dto(
+        cls: typing.Type[U32MixinType],
+        data: stdint.U32DTOType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U32MixinType:
         asint = stdint.u32_from_dto(data)
         return cls(asint)           # type: ignore
 
-    def to_catbuffer(self, network_type=None) -> bytes:
+    def to_catbuffer(
+        self: U32MixinType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> bytes:
         asint: int = int(self)      # type: ignore
         return stdint.u32_to_catbuffer(asint)
 
     @classmethod
-    def from_catbuffer(cls, data: bytes, network_type=None):
+    def from_catbuffer(
+        cls: typing.Type[U32MixinType],
+        data: bytes,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U32MixinType:
         size = cls.CATBUFFER_SIZE
         asint = stdint.u32_from_catbuffer(data[:size])
         return cls(asint)           # type: ignore
@@ -162,21 +214,35 @@ class U64Mixin(abc.Model):
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U64_BYTES
 
-    def to_dto(self, network_type=None) -> stdint.U64DTOType:
+    def to_dto(
+        self: U64Mixin,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> stdint.U64DTOType:
         asint: int = int(self)      # type: ignore
         return stdint.u64_to_dto(asint)
 
     @classmethod
-    def from_dto(cls, data: stdint.U64DTOType, network_type=None):
+    def from_dto(
+        cls: typing.Type[U64MixinType],
+        data: stdint.U64DTOType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U64MixinType:
         asint = stdint.u64_from_dto(data)
         return cls(asint)           # type: ignore
 
-    def to_catbuffer(self, network_type=None) -> bytes:
+    def to_catbuffer(
+        self: U64Mixin,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> bytes:
         asint: int = int(self)      # type: ignore
         return stdint.u64_to_catbuffer(asint)
 
     @classmethod
-    def from_catbuffer(cls, data: bytes, network_type=None):
+    def from_catbuffer(
+        cls: typing.Type[U64MixinType],
+        data: bytes,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U64MixinType:
         size = cls.CATBUFFER_SIZE
         asint = stdint.u64_from_catbuffer(data[:size])
         return cls(asint)           # type: ignore
@@ -189,21 +255,35 @@ class U128Mixin(abc.Model):
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U128_BYTES
 
-    def to_dto(self, network_type=None) -> stdint.U128DTOType:
+    def to_dto(
+        self: U128MixinType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> stdint.U128DTOType:
         asint: int = int(self)      # type: ignore
         return stdint.u128_to_dto(asint)
 
     @classmethod
-    def from_dto(cls, data: stdint.U128DTOType, network_type=None):
+    def from_dto(
+        cls: typing.Type[U128MixinType],
+        data: stdint.U128DTOType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U128MixinType:
         asint = stdint.u128_from_dto(data)
         return cls(asint)           # type: ignore
 
-    def to_catbuffer(self, network_type=None) -> bytes:
+    def to_catbuffer(
+        self: U128MixinType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> bytes:
         asint: int = int(self)      # type: ignore
         return stdint.u128_to_catbuffer(asint)
 
     @classmethod
-    def from_catbuffer(cls, data: bytes, network_type=None):
+    def from_catbuffer(
+        cls: typing.Type[U128MixinType],
+        data: bytes,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U128MixinType:
         size = cls.CATBUFFER_SIZE
         asint = stdint.u128_from_catbuffer(data[:size])
         return cls(asint)           # type: ignore

@@ -26,11 +26,10 @@ from __future__ import annotations
 import typing
 
 from nem2 import util
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['MosaicProperties']
 
-OptionalNetworkType = typing.Optional[NetworkType]
 DTOType = typing.Sequence[util.U64DTOType]
 VERSION = 1
 DURATION_ID = 2
@@ -91,8 +90,6 @@ class MosaicProperties(util.Model):
         """Mosaic allows a supply change later on. Default false."""
         return (self.flags & 1) == 1
 
-    supplyMutable = util.undoc(supply_mutable)
-
     @property
     def transferable(self) -> bool:
         """Allow transfer of funds from non-creator accounts. Default true."""
@@ -103,10 +100,8 @@ class MosaicProperties(util.Model):
         """Get if levy is mutable. Default false."""
         return (self.flags & 4) == 4
 
-    levyMutable = util.undoc(levy_mutable)
-
     @classmethod
-    def create(cls, **kwds) -> MosaicProperties:
+    def create(cls, **kwds):
         """
         Create mosaic properties with default parameters.
 
@@ -122,11 +117,11 @@ class MosaicProperties(util.Model):
         divisibility = kwds.get('divisibility', 0)
         duration = kwds.get('duration', 0)
         flags = to_flags(supply_mutable, transferable, levy_mutable)
-        return MosaicProperties(flags, divisibility, duration)
+        return cls(flags, divisibility, duration)
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> DTOType:
         return [
             util.u64_to_dto(self.flags),
@@ -138,8 +133,8 @@ class MosaicProperties(util.Model):
     def from_dto(
         cls,
         data: DTOType,
-        network_type: OptionalNetworkType = None
-    ) -> MosaicProperties:
+        network_type: OptionalNetworkType = None,
+    ):
         flags = util.u64_from_dto(data[0])
         divisibility = util.u64_from_dto(data[1])
         duration = util.u64_from_dto(data[2])
@@ -147,7 +142,7 @@ class MosaicProperties(util.Model):
 
     def to_catbuffer(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> bytes:
         version = util.u8_to_catbuffer(VERSION)
         flags = util.u8_to_catbuffer(self.flags)
@@ -159,8 +154,8 @@ class MosaicProperties(util.Model):
     def from_catbuffer_pair(
         cls,
         data: bytes,
-        network_type: OptionalNetworkType = None
-    ) -> typing.Tuple[MosaicProperties, bytes]:
+        network_type: OptionalNetworkType = None,
+    ):
         # Read the array count, property flags and divisibility.
         count = util.u8_from_catbuffer(data[:1])
         flags = util.u8_from_catbuffer(data[1:2])

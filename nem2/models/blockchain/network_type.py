@@ -24,6 +24,7 @@
 
 from __future__ import annotations
 import enum
+import typing
 
 from nem2 import util
 
@@ -47,7 +48,7 @@ class NetworkType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
         return TO_IDENTIFIER[self]
 
     @classmethod
-    def create_from_identifier(cls, identifier: bytes) -> NetworkType:
+    def create_from_identifier(cls, identifier: bytes):
         """
         Identify and create the network type from the raw address identifier.
 
@@ -57,10 +58,8 @@ class NetworkType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
         assert len(identifier) == 1
         return FROM_IDENTIFIER[identifier]
 
-    createFromIdentifier = util.undoc(create_from_identifier)
-
     @classmethod
-    def create_from_raw_address(cls, address: str) -> NetworkType:
+    def create_from_raw_address(cls, address: str):
         """
         Identify and create the network type from the raw address.
 
@@ -68,9 +67,7 @@ class NetworkType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
         """
 
         assert len(address) == 40
-        return NetworkType.create_from_identifier(address[0].encode('ascii'))
-
-    createFromRawAddress = util.undoc(create_from_raw_address)
+        return cls.create_from_identifier(address[0].encode('ascii'))
 
 
 DESCRIPTION = {
@@ -93,3 +90,5 @@ FROM_IDENTIFIER = {
     b"M": NetworkType.MIJIN,
     b"S": NetworkType.MIJIN_TEST,
 }
+
+OptionalNetworkType = typing.Optional[NetworkType]

@@ -23,14 +23,11 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['CosignatureSignedTransaction']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -50,7 +47,7 @@ class CosignatureSignedTransaction(util.DTO):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             'parentHash': self.parent_hash,
@@ -62,8 +59,8 @@ class CosignatureSignedTransaction(util.DTO):
     def from_dto(
         cls,
         data: dict,
-        network_type: OptionalNetworkType = None
-    ) -> CosignatureSignedTransaction:
+        network_type: OptionalNetworkType = None,
+    ):
         return cls(
             parent_hash=data['parentHash'],
             signature=data['signature'],

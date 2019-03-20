@@ -50,7 +50,7 @@ class MosaicId(util.IntMixin, util.U64Mixin):
         cls,
         nonce: MosaicNonce,
         owner: PublicAccount,
-    ) -> MosaicId:
+    ):
         """
         Create mosaic ID from nonce and owner.
 
@@ -59,5 +59,3 @@ class MosaicId(util.IntMixin, util.U64Mixin):
         """
         key = util.unhexlify(owner.public_key)
         return cls(util.generate_mosaic_id(nonce.nonce, key))
-
-    createFromNonce = util.undoc(create_from_nonce)

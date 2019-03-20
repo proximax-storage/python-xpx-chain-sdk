@@ -43,10 +43,10 @@ import typing
 import warnings
 
 from nem2.util import bit
-from ..types import HashFuncType
 
 # EXCEPTIONS
 
+HashFuncType = typing.Callable[[bytes], bytes]
 SECRET_LEAK_MSG = (
     'Security warning: {} using insecure ed25519'
     ' implementation, secrets may be leaked.'

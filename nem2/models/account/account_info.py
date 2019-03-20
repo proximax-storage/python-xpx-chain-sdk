@@ -23,19 +23,15 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
-from .account_metadata import AccountMetadata
+from .account_metadata import OptionalAccountMetadata
 from .address import Address
 from .public_account import PublicAccount
-from ..blockchain.network_type import NetworkType
-from ..mosaic.mosaic import Mosaic
+from ..blockchain.network_type import OptionalNetworkType
+from ..mosaic.mosaic import Mosaic, MosaicList
 
 __all__ = ['AccountInfo']
-
-MosaicListType = typing.Sequence[Mosaic]
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -54,12 +50,12 @@ class AccountInfo(util.DTO):
     :param importance_height: Importance height of the account.
     """
 
-    meta: typing.Optional[AccountMetadata]
+    meta: OptionalAccountMetadata
     address: Address
     address_height: int
     public_key: str
     public_key_height: int
-    mosaics: MosaicListType
+    mosaics: MosaicList
     importance: int
     importance_height: int
 
@@ -68,8 +64,6 @@ class AccountInfo(util.DTO):
         """Get public account."""
         return PublicAccount(self.address, self.public_key)
 
-    publicAccount = util.undoc(public_account)
-
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -77,7 +71,7 @@ class AccountInfo(util.DTO):
         return {
             'meta': {},
             'account': {
-                'address': util.hexlify(self.address.encoded),
+                'address': self.address.to_dto(network_type),
                 'addressHeight': util.u64_to_dto(self.address_height),
                 'publicKey': self.public_key,
                 'publicKeyHeight': util.u64_to_dto(self.public_key_height),
@@ -92,13 +86,13 @@ class AccountInfo(util.DTO):
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
-    ) -> AccountInfo:
+    ):
         assert data['meta'] == {}
         account = data['account']
         mosaics = account.get('mosaics', [])
         return cls(
             meta=None,
-            address=Address.create_from_encoded(util.unhexlify(account['address'])),
+            address=Address.from_dto(account['address'], network_type),
             address_height=util.u64_from_dto(account.get('addressHeight', [0, 0])),
             public_key=account['publicKey'],
             public_key_height=util.u64_from_dto(account.get('publicKeyHeight', [0, 0])),

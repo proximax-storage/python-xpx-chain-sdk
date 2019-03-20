@@ -29,7 +29,7 @@ from __future__ import annotations
 from nem2 import util
 from .multisig_cosignatory_modification_type import MultisigCosignatoryModificationType
 from ..account.public_account import PublicAccount
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['MultisigCosignatoryModification']
 
@@ -49,7 +49,7 @@ class MultisigCosignatoryModification(util.DTO):
 
     def to_dto(
         self,
-        network_type: NetworkType
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             'cosignatoryPublicKey': self.cosignatory_public_account.to_dto(network_type),
@@ -60,8 +60,8 @@ class MultisigCosignatoryModification(util.DTO):
     def from_dto(
         cls,
         data: dict,
-        network_type: NetworkType,
-    ) -> MultisigCosignatoryModification:
+        network_type: OptionalNetworkType = None,
+    ):
         public_key = data['cosignatoryPublicKey']
         type = MultisigCosignatoryModificationType.from_dto(data['type'], network_type)
         public_account = PublicAccount.from_dto(public_key, network_type)

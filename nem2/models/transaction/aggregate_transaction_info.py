@@ -23,14 +23,11 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['AggregateTransactionInfo']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -52,13 +49,9 @@ class AggregateTransactionInfo(util.DTO):
             and self.aggregate_hash == self.aggregate_id
         )
 
-    isUnconfirmed = util.undoc(is_unconfirmed)
-
     def is_confirmed(self) -> bool:
         """Is transaction already included."""
         return self.height > 0
-
-    isConfirmed = util.undoc(is_confirmed)
 
     def has_missing_signatures(self) -> bool:
         """Does the transaction have missing signatures."""
@@ -67,11 +60,9 @@ class AggregateTransactionInfo(util.DTO):
             and self.aggregate_hash != self.aggregate_id
         )
 
-    hasMissingSignatures = util.undoc(has_missing_signatures)
-
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             'height': util.u64_to_dto(self.height),
@@ -86,7 +77,7 @@ class AggregateTransactionInfo(util.DTO):
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
-    ) -> AggregateTransactionInfo:
+    ):
         return cls(
             height=util.u64_from_dto(data['height']),
             index=data['index'],

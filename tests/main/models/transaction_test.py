@@ -11,25 +11,86 @@ def psuedo_entropy(size: int) -> bytes:
 
 
 class TestAddressAliasTransaction(harness.TestCase):
-    pass        # TODO(ahuszagh) Implement
 
+    def setUp(self):
+        self.deadline = models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57))
+        self.action_type = models.AliasActionType.LINK
+        self.namespace_id = models.NamespaceId(0x88B64C3BE2F47144)
+        self.address = models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54')
+        self.network_type = models.NetworkType.MIJIN_TEST
+        self.transaction = models.AddressAliasTransaction.create(
+            deadline=self.deadline,
+            action_type=self.action_type,
+            namespace_id=self.namespace_id,
+            address=self.address,
+            network_type=self.network_type,
+        )
+        private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
+        self.signer = models.Account.create_from_private_key(private_key, self.network_type)
+        self.catbuffer = '9a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'
+        self.payload = '9a000000102e9c68fe9cbaa5d1d27ad35f9e386b42c265749be0e27182b8a9ebf18a0357332ef4ee350b648ea00437790c70471959b9334aea2e2e89356d52613fd385021b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'
+        self.hash = 'a45d14bae72e64ce94e3cb88927cce8d4048cf08a11ed13936af58efb614c0d4'
+        self.embedded = '4a0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e42004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'
 
-class TestAddressAliasInnerTransaction(harness.TestCase):
-    pass        # TODO(ahuszagh) Implement
+    def test_init(self):
+        self.assertEqual(self.transaction.deadline, self.deadline)
+        self.assertEqual(self.transaction.action_type, self.action_type)
+        self.assertEqual(self.transaction.namespace_id, self.namespace_id)
+        self.assertEqual(self.transaction.address, self.address)
+        self.assertEqual(self.transaction.network_type, self.network_type)
+
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.transaction.__dict__
+
+    def test_catbuffer(self):
+        catbuffer = self.transaction.to_catbuffer()
+        self.assertEqual(self.catbuffer, util.hexlify(catbuffer))
+        self.assertEqual(self.transaction, models.Transaction.from_catbuffer(catbuffer))
+
+    def test_dto(self):
+        # TODO(ahuszagh) Confirm...
+        dto = self.transaction.to_dto()
+        # TODO(ahuszagh)
+        #   Is this right?
+        #   Restore when I get a message on slack.
+        #   https://nem2.slack.com/archives/CEZKUE4KB/p1553097806138700?thread_ts=1553095634.133900&cid=CEZKUE4KB
+        # self.assertEqual(self.dto, dto)
+        # self.assertEqual(self.transaction, models.Transaction.from_dto(dto))
+
+    def test_sign_with(self):
+        signed_transaction = self.transaction.sign_with(self.signer)
+        self.assertEqual(signed_transaction.payload, self.payload)
+        self.assertEqual(signed_transaction.hash, self.hash)
+        self.assertEqual(signed_transaction.signer, self.signer.public_key)
+        self.assertEqual(signed_transaction.type, models.TransactionType.ADDRESS_ALIAS)
+        self.assertEqual(signed_transaction.network_type, self.signer.network_type)
+
+    def test_to_aggregate(self):
+        inner = self.transaction.to_aggregate(self.signer.public_account)
+        catbuffer = inner.to_catbuffer()
+        self.assertEqual(self.embedded, util.hexlify(catbuffer))
+
+        with self.assertRaises(TypeError):
+            inner.__dict__
 
 
 class TestAggregateTransactionCosignature(harness.TestCase):
 
     def setUp(self):
         self.network_type = models.NetworkType.MIJIN_TEST
-        self.signature = '5780C8DF9D46BA2BCF029DCC5D3BF55FE1CB5BE7ABCF30387C4637DDEDFC2152703CA0AD95F21BB9B942F3CC52FCFC2064C7B84CF60D1A9E69195F1943156C07'
-        self.public_key = 'A5F82EC8EBB341427B6785C8111906CD0DF18838FB11B51CE0E18B5E79DFF630'
+        self.signature = '5780c8df9d46ba2bcf029dcc5d3bf55fe1cb5be7abcf30387c4637ddedfc2152703ca0ad95f21bb9b942f3cc52fcfc2064c7b84cf60d1a9e69195f1943156c07'
+        self.public_key = 'a5f82ec8ebb341427b6785c8111906cd0df18838fb11b51ce0e18b5e79dff630'
         self.signer = models.PublicAccount.create_from_public_key(self.public_key, self.network_type)
         self.cosignature = models.AggregateTransactionCosignature(self.signature, self.signer)
         self.dto = {
             'signature': self.signature,
             'signer': self.public_key,
         }
+        self.catbuffer = (
+            util.unhexlify(self.public_key)
+            + util.unhexlify(self.signature)
+        )
 
     def test_slots(self):
         with self.assertRaises(TypeError):
@@ -40,6 +101,12 @@ class TestAggregateTransactionCosignature(harness.TestCase):
 
     def test_from_dto(self):
         self.assertEqual(self.cosignature, models.AggregateTransactionCosignature.from_dto(self.dto, self.network_type))
+
+    def test_to_catbuffer(self):
+        self.assertEqual(self.cosignature.to_catbuffer(self.network_type), self.catbuffer)
+
+    def test_from_catbuffer(self):
+        self.assertEqual(self.cosignature, models.AggregateTransactionCosignature.from_catbuffer(self.catbuffer, self.network_type))
 
 
 class TestAggregateTransactionInfo(harness.TestCase):
@@ -188,6 +255,21 @@ class TestInnnerTransaction(harness.TestCase):
     def test_catbuffer_size_shared(self):
         self.assertEqual(models.InnerTransaction.catbuffer_size_shared(), 40)
 
+    def test_from_catbuffer(self):
+        network_type = models.NetworkType.MIJIN_TEST
+        private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
+        signer = models.Account.create_from_private_key(private_key, network_type)
+        transactions = [
+            (models.TransactionType.ADDRESS_ALIAS, '4a0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e42004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'),
+            (models.TransactionType.MOSAIC_ALIAS, '390000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e43004471f4e23b4cb688a6c03b484fd6f72f'),
+            (models.TransactionType.SECRET_PROOF, '6b0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501905242009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'),
+            (models.TransactionType.TRANSFER, '600000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd589550390544190fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc0c000148656c6c6f20776f726c64210500000000000000e803000000000000'),
+        ]
+
+        for type, payload in transactions:
+            transaction = models.InnerTransaction.from_catbuffer(payload)
+            self.assertEqual(transaction.type, type)
+
 
 class TestMessage(harness.TestCase):
 
@@ -196,8 +278,9 @@ class TestMessage(harness.TestCase):
             models.Message.create(b'Hello world!')
 
     def test_dto(self):
+        dto = {'payload': util.hexlify(b'Hello world!'), 'type': 0}
         with self.assertRaises(NotImplementedError):
-            models.Message.from_dto(b'Hello world!', models.NetworkType.MIJIN_TEST)
+            models.Message.from_dto(dto, models.NetworkType.MIJIN_TEST)
 
 
 class TestMessageType(harness.TestCase):
@@ -225,11 +308,58 @@ class TestMessageType(harness.TestCase):
 
 
 class TestMosaicAliasTransaction(harness.TestCase):
-    pass        # TODO(ahuszagh) Implement
 
+    def setUp(self):
+        self.deadline = models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57))
+        self.action_type = models.AliasActionType.LINK
+        self.namespace_id = models.NamespaceId(0x88B64C3BE2F47144)
+        self.mosaic_id = models.MosaicId(0x2FF7D64F483BC0A6)
+        self.network_type = models.NetworkType.MIJIN_TEST
+        self.transaction = models.MosaicAliasTransaction.create(
+            deadline=self.deadline,
+            action_type=self.action_type,
+            namespace_id=self.namespace_id,
+            mosaic_id=self.mosaic_id,
+            network_type=self.network_type,
+        )
+        private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
+        self.signer = models.Account.create_from_private_key(private_key, self.network_type)
+        self.catbuffer = '8900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e430000000000000000f1b4815c00000000004471f4e23b4cb688a6c03b484fd6f72f'
+        self.payload = '890000004643c4a57eccb783217473cf11bd6642e754d8362a552266fc6e332f523550b3e4431f468c942a1c43748b12f16112b63c282fa48a674a3cb66df33ec8ad100f1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e430000000000000000f1b4815c00000000004471f4e23b4cb688a6c03b484fd6f72f'
+        self.hash = 'fc62407dec7110eb74eb9f210676411f7a3fb3829ac6e002567883e34c4f2a3b'
+        self.embedded = '390000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e43004471f4e23b4cb688a6c03b484fd6f72f'
 
-class TestMosaicAliasInnerTransaction(harness.TestCase):
-    pass        # TODO(ahuszagh) Implement
+    def test_init(self):
+        self.assertEqual(self.transaction.deadline, self.deadline)
+        self.assertEqual(self.transaction.action_type, self.action_type)
+        self.assertEqual(self.transaction.namespace_id, self.namespace_id)
+        self.assertEqual(self.transaction.mosaic_id, self.mosaic_id)
+        self.assertEqual(self.transaction.network_type, self.network_type)
+
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.transaction.__dict__
+
+    def test_catbuffer(self):
+        catbuffer = self.transaction.to_catbuffer()
+        self.assertEqual(self.catbuffer, util.hexlify(catbuffer))
+        self.assertEqual(self.transaction, models.Transaction.from_catbuffer(catbuffer))
+
+    def test_sign_with(self):
+        signed_transaction = self.transaction.sign_with(self.signer)
+        self.assertEqual(signed_transaction.payload, self.payload)
+        self.assertEqual(signed_transaction.hash, self.hash)
+        self.assertEqual(signed_transaction.signer, self.signer.public_key)
+        self.assertEqual(signed_transaction.type, models.TransactionType.MOSAIC_ALIAS)
+        self.assertEqual(signed_transaction.network_type, self.signer.network_type)
+
+    def test_to_aggregate(self):
+        inner = self.transaction.to_aggregate(self.signer.public_account)
+        catbuffer = inner.to_catbuffer()
+        self.assertEqual(self.embedded, util.hexlify(catbuffer))
+
+        with self.assertRaises(TypeError):
+            inner.__dict__
 
 
 class TestMultisigCosignatoryModificationType(harness.TestCase):
@@ -263,7 +393,10 @@ class TestPlainMessage(harness.TestCase):
     def setUp(self):
         self.network_type = models.NetworkType.MIJIN_TEST
         self.message = models.PlainMessage(b'Hello world!')
-        self.dto = '48656c6c6f20776f726c6421'
+        self.dto = {
+            'type': 0,
+            'payload': '48656c6c6f20776f726c6421',
+        }
         self.catbuffer = b'Hello world!'
 
     def test_init(self):
@@ -306,11 +439,19 @@ class TestSecretProofTransaction(harness.TestCase):
             proof=self.proof,
             network_type=self.network_type,
         )
+        self.dto = {
+            'transaction': {
+                'version': 36865,
+                'type': 16978,
+                'fee': [0, 0],
+                'deadline': [1552004337, 0],
+                'hashAlgorithm': int(self.hash_type),
+                'secret': self.secret,
+                'proof': self.proof,
+            },
+        }
         private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
-        network_type = models.NetworkType.MIJIN_TEST
-        self.signer = models.Account.create_from_private_key(private_key, network_type)
-        # TODO(ahuszagh)
-        # Is embedded correct?
+        self.signer = models.Account.create_from_private_key(private_key, self.network_type)
         self.catbuffer = 'bb000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
         self.payload = 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
         self.hash = 'd8949c87755cfd2c003fec4e1bd4aadb00b3f4838fc5ce7ffeded9385805fcdd'
@@ -323,9 +464,18 @@ class TestSecretProofTransaction(harness.TestCase):
         self.assertEqual(self.transaction.proof, self.proof)
         self.assertEqual(self.transaction.network_type, self.network_type)
 
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.transaction.__dict__
+
     def test_catbuffer(self):
         catbuffer = self.transaction.to_catbuffer()
         self.assertEqual(self.catbuffer, util.hexlify(catbuffer))
+        self.assertEqual(self.transaction, models.Transaction.from_catbuffer(catbuffer))
+
+    def test_dto(self):
+        self.assertEqual(self.dto, self.transaction.to_dto())
+        self.assertEqual(self.transaction, models.Transaction.from_dto(self.dto))
 
     def test_sign_with(self):
         signed_transaction = self.transaction.sign_with(self.signer)
@@ -342,10 +492,6 @@ class TestSecretProofTransaction(harness.TestCase):
 
         with self.assertRaises(TypeError):
             inner.__dict__
-
-
-class TestSecretProofInnerTransaction(harness.TestCase):
-    pass        # TODO(ahuszagh) Implement
 
 
 class TestSignedTransaction(harness.TestCase):
@@ -365,9 +511,34 @@ class TestSignedTransaction(harness.TestCase):
         self.assertEqual(self.transaction.type, self.type)
         self.assertEqual(self.transaction.network_type, self.network_type)
 
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.transaction.__dict__
+
 
 class TestSyncAnnounce(harness.TestCase):
-    pass        # TODO(ahuszagh) Implement
+
+    def setUp(self):
+        self.payload = 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
+        self.hash = 'd8949c87755cfd2c003fec4e1bd4aadb00b3f4838fc5ce7ffeded9385805fcdd'
+        self.address = 'SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG'
+        self.network_type = models.NetworkType.MIJIN_TEST
+        self.sync = models.SyncAnnounce(self.payload, self.hash, self.address)
+
+    def test_init(self):
+        self.assertEqual(self.sync.payload, self.payload)
+        self.assertEqual(self.sync.hash, self.hash)
+        self.assertEqual(self.sync.address, self.address)
+
+    def test_create(self):
+        signer = '1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955'
+        type = models.TransactionType.SECRET_PROOF
+        transaction = models.SignedTransaction(self.payload, self.hash, signer, type, self.network_type)
+        self.assertEqual(self.sync, models.SyncAnnounce.create(transaction))
+
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.sync.__dict__
 
 
 class TestTransaction(harness.TestCase):
@@ -379,6 +550,29 @@ class TestTransaction(harness.TestCase):
 
     def test_catbuffer_size_shared(self):
         self.assertEqual(models.Transaction.catbuffer_size_shared(), 120)
+
+    def test_from_catbuffer(self):
+        network_type = models.NetworkType.MIJIN_TEST
+        private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
+        signer = models.Account.create_from_private_key(private_key, network_type)
+        transactions = [
+            (models.TransactionType.ADDRESS_ALIAS, '9a000000102e9c68fe9cbaa5d1d27ad35f9e386b42c265749be0e27182b8a9ebf18a0357332ef4ee350b648ea00437790c70471959b9334aea2e2e89356d52613fd385021b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'),
+            (models.TransactionType.MOSAIC_ALIAS, '890000004643c4a57eccb783217473cf11bd6642e754d8362a552266fc6e332f523550b3e4431f468c942a1c43748b12f16112b63c282fa48a674a3cb66df33ec8ad100f1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e430000000000000000f1b4815c00000000004471f4e23b4cb688a6c03b484fd6f72f'),
+            (models.TransactionType.SECRET_PROOF, 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'),
+            (models.TransactionType.TRANSFER, 'b0000000edbf8094c382ddb1c2341ea861ad979eee4b576b1050bfb5b306cf07d6b378e7c58761a7e5980c09f65b15b5b8caea5d631f9e533c04d33b71961e5ad7b27e0f1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955039054410000000000000000f1b4815c0000000090fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc0c000148656c6c6f20776f726c64210500000000000000e803000000000000'),
+        ]
+
+        for type, payload in transactions:
+            transaction = models.Transaction.from_catbuffer(payload)
+            self.assertEqual(transaction.type, type)
+
+
+    # TODO(ahuszagh) Need to test the hooks.
+    # Implement...
+    #   is_unconfirmed
+    #   is_confirmed
+    #   has_missing_signatures
+    #   is_unannounced
 
 
 class TestTransactionAnnounceResponse(harness.TestCase):
@@ -453,6 +647,10 @@ class TestTransactionStatus(harness.TestCase):
             "height": [1, 0]
         }
 
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.transaction_status.__dict__
+
     def test_to_dto(self):
         self.assertEqual(self.transaction_status.to_dto(self.network_type), self.dto)
 
@@ -473,6 +671,10 @@ class TestTransactionStatusError(harness.TestCase):
             "status": "Success",
             "deadline": [1, 0],
         }
+
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.error.__dict__
 
     def test_to_dto(self):
         self.assertEqual(self.error.to_dto(self.network_type), self.dto)
@@ -547,8 +749,114 @@ class TestTransactionVersion(harness.TestCase):
 
 
 class TestTransferTransaction(harness.TestCase):
-    pass        # TODO(ahuszagh) Implement
 
+    def setUp(self):
+        self.deadline = models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57))
+        self.address = models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54')
+        self.namespace_id = models.NamespaceId(0x84b3552d375ffa4b)
+        self.mosaics = [models.Mosaic(models.MosaicId(5), 1000)]
+        self.message = models.PlainMessage(b'Hello world!')
+        self.network_type = models.NetworkType.MIJIN_TEST
+        self.transaction = models.TransferTransaction.create(
+            deadline=self.deadline,
+            recipient=self.address,
+            mosaics=self.mosaics,
+            message=self.message,
+            network_type=self.network_type,
+        )
+        self.transaction_info = models.TransactionInfo(
+            height=1,
+            index=0,
+            id="5C7C06FF5CC1FE000176FA12",
+            hash="B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
+            merkle_component_hash="B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
+        )
+        self.transaction_with_info = self.transaction.replace(
+            transaction_info=self.transaction_info
+        )
+        self.transaction_namespace = self.transaction.replace(
+            recipient=self.namespace_id
+        )
+        self.dto = {
+            'transaction': {
+                'version': 36867,
+                'type': 16724,
+                'fee': [0, 0],
+                'deadline': [1552004337, 0],
+                'recipient': '90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
+                'mosaics': [{'amount': [1000, 0], 'id': [5, 0]}],
+                'message': {'type': 0, 'payload': '48656c6c6f20776f726c6421'}
+            },
+        }
+        self.dto_with_info = dict(
+            meta={
+                "height": [1, 0],
+                "hash": "B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
+                "merkleComponentHash": "B2635223DB45CFBB4E21CDFC359FE7F222A6E5F6000C99CA9E729DB02E6661F5",
+                "index": 0,
+                "id": "5C7C06FF5CC1FE000176FA12"
+            },
+            **self.dto
+        )
+        self.dto_namespace = {
+            'transaction': {
+                'version': 36867,
+                'type': 16724,
+                'fee': [0, 0],
+                'deadline': [1552004337, 0],
+                'recipient': '914bfa5f372d55b38400000000000000000000000000000000',
+                'mosaics': [{'amount': [1000, 0], 'id': [5, 0]}],
+                'message': {'type': 0, 'payload': '48656c6c6f20776f726c6421'}
+            },
+        }
+        private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
+        self.signer = models.Account.create_from_private_key(private_key, self.network_type)
+        self.catbuffer = 'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000039054410000000000000000f1b4815c0000000090fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc0c000148656c6c6f20776f726c64210500000000000000e803000000000000'
+        self.payload = 'b0000000edbf8094c382ddb1c2341ea861ad979eee4b576b1050bfb5b306cf07d6b378e7c58761a7e5980c09f65b15b5b8caea5d631f9e533c04d33b71961e5ad7b27e0f1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955039054410000000000000000f1b4815c0000000090fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc0c000148656c6c6f20776f726c64210500000000000000e803000000000000'
+        self.hash = '8e5128947c53cd6a7fe537b3d038a9a804b8d1e7827704538c1c95bf0d01703e'
+        self.embedded = '600000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd589550390544190fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc0c000148656c6c6f20776f726c64210500000000000000e803000000000000'
+        self.catbuffer_namespace = 'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000039054410000000000000000f1b4815c00000000914bfa5f372d55b384000000000000000000000000000000000c000148656c6c6f20776f726c64210500000000000000e803000000000000'
 
-class TestTransferInnerTransaction(harness.TestCase):
-    pass        # TODO(ahuszagh) Implement
+    def test_init(self):
+        self.assertEqual(self.transaction.deadline, self.deadline)
+        self.assertEqual(self.transaction.recipient, self.address)
+        self.assertEqual(self.transaction.mosaics, self.mosaics)
+        self.assertEqual(self.transaction.message, self.message)
+        self.assertEqual(self.transaction.network_type, self.network_type)
+
+    def test_slots(self):
+        with self.assertRaises(TypeError):
+            self.transaction.__dict__
+
+    def test_catbuffer(self):
+        catbuffer = self.transaction.to_catbuffer()
+        self.assertEqual(self.catbuffer, util.hexlify(catbuffer))
+        self.assertEqual(self.transaction, models.Transaction.from_catbuffer(catbuffer))
+
+        catbuffer = self.transaction_namespace.to_catbuffer()
+        self.assertEqual(self.catbuffer_namespace, util.hexlify(catbuffer))
+        self.assertEqual(self.transaction_namespace, models.Transaction.from_catbuffer(catbuffer))
+
+    def test_dto(self):
+        self.assertEqual(self.dto, self.transaction.to_dto())
+        self.assertEqual(self.dto_with_info, self.transaction_with_info.to_dto())
+        self.assertEqual(self.dto_namespace, self.transaction_namespace.to_dto())
+        self.assertEqual(self.transaction, models.Transaction.from_dto(self.dto))
+        self.assertEqual(self.transaction_with_info, models.Transaction.from_dto(self.dto_with_info))
+        self.assertEqual(self.transaction_namespace, models.Transaction.from_dto(self.dto_namespace))
+
+    def test_sign_with(self):
+        signed_transaction = self.transaction.sign_with(self.signer)
+        self.assertEqual(signed_transaction.payload, self.payload)
+        self.assertEqual(signed_transaction.hash, self.hash)
+        self.assertEqual(signed_transaction.signer, self.signer.public_key)
+        self.assertEqual(signed_transaction.type, models.TransactionType.TRANSFER)
+        self.assertEqual(signed_transaction.network_type, self.signer.network_type)
+
+    def test_to_aggregate(self):
+        inner = self.transaction.to_aggregate(self.signer.public_account)
+        catbuffer = inner.to_catbuffer()
+        self.assertEqual(self.embedded, util.hexlify(catbuffer))
+
+        with self.assertRaises(TypeError):
+            inner.__dict__

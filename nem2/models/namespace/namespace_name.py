@@ -23,15 +23,12 @@
 """
 
 from __future__ import annotations
-import typing
 
 from nem2 import util
 from .namespace_id import NamespaceId
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['NamespaceName']
-
-OptionalNetworkType = typing.Optional[NetworkType]
 
 
 @util.inherit_doc
@@ -48,7 +45,7 @@ class NamespaceName(util.DTO):
     name: str
 
     @classmethod
-    def create_from_name(cls, name: str) -> NamespaceName:
+    def create_from_name(cls, name: str):
         """
         Create namespace name and identifier from name.
 
@@ -59,7 +56,7 @@ class NamespaceName(util.DTO):
 
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
             'namespaceId': self.namespace_id.to_dto(network_type),
@@ -70,8 +67,8 @@ class NamespaceName(util.DTO):
     def from_dto(
         cls,
         data: dict,
-        network_type: OptionalNetworkType = None
-    ) -> NamespaceName:
+        network_type: OptionalNetworkType = None,
+    ):
         namespace_id = NamespaceId.from_dto(data['namespaceId'], network_type)
         name = data['name']
         return cls(namespace_id, name)

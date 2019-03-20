@@ -27,7 +27,6 @@ import contextlib
 import copy
 import dataclasses
 import inspect
-import re
 import typing
 
 __all__ = [
@@ -38,20 +37,28 @@ __all__ = [
     'dataclass',
 ]
 
-SNAKE_CASE = re.compile(r'(.*?)_([a-z])')
+# HELPERS
+
 Field = dataclasses.Field
 FrozenInstanceError = dataclasses.FrozenInstanceError
 InitVar = dataclasses.InitVar
 MISSING = dataclasses.MISSING
+# ForwardRef isn't part of the public API.
+# If it's not present, just skip it.
+ForwardRef = getattr(typing, 'ForwardRef', str)
+Vars = typing.Dict[str, typing.Any]
+DictType = typing.Mapping[str, typing.Any]
+TupleType = typing.Sequence[typing.Any]
+DictFactory = typing.Callable[..., DictType]
+TupleFactory = typing.Callable[..., TupleType]
+
+# NEW METHODS
 
 
-def snake_to_camel(name: str) -> str:
-    """Convert value with snake_case name to camelCase."""
-
-    return SNAKE_CASE.sub(lambda x: x.group(1) + x.group(2).upper(), name)
-
-
-def set_defaults(cls, defaults):
+def set_defaults(
+    cls: typing.Type,
+    defaults: Vars,
+) -> None:
     """Set and validate optional default arguments."""
 
     if not defaults:
@@ -70,7 +77,7 @@ def set_defaults(cls, defaults):
     init.__defaults__ = tuple(defaults.values())
 
 
-def fix_annotation(type, global_vars, local_vars):
+def fix_annotation(type, global_vars: Vars, local_vars: Vars):
     """Fix annotation for field with type."""
 
     if isinstance(type, str):
@@ -78,11 +85,11 @@ def fix_annotation(type, global_vars, local_vars):
             return eval(type, global_vars, local_vars)
         except NameError:
             return type
-    elif isinstance(type, typing.ForwardRef):
+    elif isinstance(type, ForwardRef):
         arg = fix_annotation(type.__forward_arg__, global_vars, local_vars)
         is_argument = type.__forward_is_argument__
         if isinstance(arg, str):
-            return typing.ForwardRef(arg, is_argument)
+            return ForwardRef(arg, is_argument)
         return arg
     elif hasattr(type, '__args__'):
         args = type.__args__
@@ -92,7 +99,12 @@ def fix_annotation(type, global_vars, local_vars):
     return type
 
 
-def fix_annotations(cls, clsdict, global_vars, local_vars):
+def fix_annotations(
+    cls: typing.Type,
+    clsdict: Vars,
+    global_vars: Vars,
+    local_vars: Vars,
+) -> None:
     """Fix any forward references to variables defined in the callee scope."""
 
     # Don't care except when enforcing types.
@@ -105,7 +117,7 @@ def fix_annotations(cls, clsdict, global_vars, local_vars):
         annotations[field] = type
 
 
-def is_classvar(x, global_vars, local_vars):
+def is_classvar(x, global_vars: Vars, local_vars: Vars) -> bool:
     """Determine if x is a ClassVar."""
 
     if isinstance(x, str):
@@ -113,7 +125,13 @@ def is_classvar(x, global_vars, local_vars):
     return getattr(x, '__origin__', None) is typing.ClassVar
 
 
-def set_slots(cls, clsdict, slots, global_vars, local_vars):
+def set_slots(
+    cls: typing.Type,
+    clsdict: Vars,
+    slots: bool,
+    global_vars: Vars,
+    local_vars: Vars,
+) -> None:
     """Set default __slots__ implementation."""
 
     if not slots or '__slots__' in clsdict:
@@ -124,7 +142,11 @@ def set_slots(cls, clsdict, slots, global_vars, local_vars):
     clsdict['__slots__'] = tuple(slots)
 
 
-def set_copy(cls, clsdict, copy) -> None:
+def set_copy(
+    cls: typing.Type,
+    clsdict: Vars,
+    copy: bool,
+) -> None:
     """Set default __copy__ implementation."""
 
     if not copy or '__copy__' in clsdict:
@@ -139,14 +161,18 @@ def set_copy(cls, clsdict, copy) -> None:
     clsdict['__copy__'] = func
 
 
-def set_deepcopy(cls, clsdict, deepcopy):
+def set_deepcopy(
+    cls: typing.Type,
+    clsdict: Vars,
+    deepcopy: bool,
+) -> None:
     """Set default __deepcopy__ implementation."""
 
     if not deepcopy or '__deepcopy__' in clsdict:
         return
 
     def func(self, memo=None):
-        data = copy.deepcopy(dataclasses.asdict(self), memo)
+        data = copy.deepcopy(shallow_asdict(self), memo)
         return type(self)(**data)
 
     func.__name__ = '__deepcopy__'
@@ -155,14 +181,33 @@ def set_deepcopy(cls, clsdict, deepcopy):
     clsdict['__deepcopy__'] = func
 
 
-def set_asdict(cls, clsdict, asdict):
+def shallow_asdict(self, dict_factory: DictFactory = dict) -> DictType:
+    names = [i.name for i in dataclasses.fields(self)]
+    return dict_factory([(i, getattr(self, i)) for i in names])
+
+
+def deep_asdict(self, dict_factory: DictFactory = dict) -> DictType:
+    return dataclasses.asdict(self, dict_factory=dict_factory)
+
+
+def set_asdict(
+    cls: typing.Type,
+    clsdict: Vars,
+    asdict: bool,
+) -> None:
     """Set default asdict implementation."""
 
     if not asdict or 'asdict' in clsdict:
         return
 
-    def func(self, dict_factory=dict) -> dict:
-        return dataclasses.asdict(self, dict_factory=dict_factory)
+    def func(
+        self,
+        recurse: bool = True,
+        dict_factory: DictFactory = dict,
+    ) -> DictType:
+        if recurse:
+            return deep_asdict(self, dict_factory=dict_factory)
+        return shallow_asdict(self, dict_factory=dict_factory)
 
     func.__name__ = 'asdict'
     func.__qualname__ = f'{cls.__qualname__}.asdict'
@@ -170,14 +215,33 @@ def set_asdict(cls, clsdict, asdict):
     clsdict['asdict'] = func
 
 
-def set_astuple(cls, clsdict, astuple):
+def shallow_astuple(self, tuple_factory: TupleFactory = tuple) -> TupleType:
+    names = [i.name for i in dataclasses.fields(self)]
+    return tuple_factory([getattr(self, i) for i in names])
+
+
+def deep_astuple(self, tuple_factory: TupleFactory = tuple) -> TupleType:
+    return dataclasses.astuple(self, tuple_factory=tuple_factory)
+
+
+def set_astuple(
+    cls: typing.Type,
+    clsdict: Vars,
+    astuple: bool,
+) -> None:
     """Set default astuple implementation."""
 
     if not astuple or 'astuple' in clsdict:
         return
 
-    def func(self, tuple_factory=tuple) -> tuple:
-        return dataclasses.astuple(self, tuple_factory=tuple_factory)
+    def func(
+        self,
+        recurse: bool = True,
+        tuple_factory: TupleFactory = tuple,
+    ) -> TupleType:
+        if recurse:
+            return deep_astuple(self, tuple_factory=tuple_factory)
+        return shallow_astuple(self, tuple_factory=tuple_factory)
 
     func.__name__ = 'astuple'
     func.__qualname__ = f'{cls.__qualname__}.astuple'
@@ -185,7 +249,11 @@ def set_astuple(cls, clsdict, astuple):
     clsdict['astuple'] = func
 
 
-def set_fields(cls, clsdict, fields):
+def set_fields(
+    cls: typing.Type,
+    clsdict: Vars,
+    fields: bool,
+) -> None:
     """Set default fields implementation."""
 
     if not fields or 'fields' in clsdict:
@@ -200,7 +268,11 @@ def set_fields(cls, clsdict, fields):
     clsdict['fields'] = func
 
 
-def set_replace(cls, clsdict, replace):
+def set_replace(
+    cls: typing.Type,
+    clsdict: Vars,
+    replace: bool,
+) -> None:
     """Set default replace implementation."""
 
     if not replace or 'replace' in clsdict:
@@ -215,53 +287,27 @@ def set_replace(cls, clsdict, replace):
     clsdict['replace'] = func
 
 
-def set_camelcase_properties(cls, clsdict, camelcase_properties):
-    """Adds camelcase properties if desired."""
-
-    if not camelcase_properties:
-        return
-
-    def wrapper(field, type):
-        def fget(self):
-            return getattr(self, field)
-
-        def fset(self, value) -> None:
-            setattr(self, field, value)
-
-        def fdel(self) -> None:
-            delattr(self, field)
-
-        return fget, fset, fdel
-
-    for field, type in clsdict['__annotations__'].items():
-        camelcase = snake_to_camel(field)
-        if field != camelcase:
-            fget, fset, fdel = wrapper(field, type)
-            fget.__name__ = camelcase
-            fget.__qualname__ = f'{cls.__qualname__}.{camelcase}'
-            fget.__module__ = cls.__module__
-            clsdict[camelcase] = property(fget, fset, fdel)
-
-
-def set_miscellaneous(cls, clsdict):
+def set_miscellaneous(cls: typing.Type, clsdict: Vars) -> None:
     """Set miscellaneous data for the class."""
 
     clsdict['_set'] = object.__setattr__
 
 
+# DATACLASS METACLASS
+
+
 def wrap_dataclass(
-    cls,
-    global_vars,
-    local_vars,
-    slots=True,
-    copy=True,
-    deepcopy=True,
-    asdict=True,
-    astuple=True,
-    fields=True,
-    replace=True,
-    camelcase_properties=True
-):
+    cls: typing.Type,
+    global_vars: typing.Dict[str, typing.Any],
+    local_vars: typing.Dict[str, typing.Any],
+    slots: bool = True,
+    copy: bool = True,
+    deepcopy: bool = True,
+    asdict: bool = True,
+    astuple: bool = True,
+    fields: bool = True,
+    replace: bool = True,
+) -> typing.Type:
     """Wrap a dataclass base with the desired methods."""
 
     mcls = cls.__class__
@@ -277,19 +323,28 @@ def wrap_dataclass(
     set_astuple(cls, clsdict, astuple)
     set_fields(cls, clsdict, fields)
     set_replace(cls, clsdict, replace)
-    set_camelcase_properties(cls, clsdict, camelcase_properties)
     set_miscellaneous(cls, clsdict)
 
     return mcls.__new__(mcls, name, bases, clsdict)
 
 
-def update_closure(cls, new_cls):
+# PATCHES
+
+
+def update_method(
+    cls: typing.Type,
+    new_cls: typing.Type,
+    func,
+) -> None:
     """
     Due to our dynamic creation of a new class, our old class may still
-    be present in some closures, and injected later on, through __class__.
-    Most notably, this is pernicious with super(), especially in __init__.
+    be present in some function closures, through `super()/__class__`.
+    We should not have remnants of the old class anywhere else, since
+    that would require hard-coding the actual class name, which should
+    not be done for obvious reasons.
+
     To rectify this, we can check if '__class__' is in nonlocal vars
-    for the function (`func.__code__.co_freevars`), and if it is,
+    for each function (`func.__code__.co_freevars`), and if it is,
     and the old class is bound, update it.
 
     This is all well-documented in the Python data model:
@@ -303,42 +358,79 @@ def update_closure(cls, new_cls):
     class is bound to `__class__`, and if so, overwrite it.
     """
 
+    code = func.__code__
+    closure = func.__closure__
+    freevars = code.co_freevars
+    if closure and freevars and '__class__' in freevars:
+        # Have a specified class in freevars, must fix in closure.
+        # Only change if the cell_contents is the old cls,
+        # which we need to replace with the new cls.
+        for cell in closure:
+            if cell.cell_contents is cls:
+                cell.cell_contents = new_cls
+
+
+def update_methods(cls: typing.Type, new_cls: typing.Type) -> None:
+    """Replace all instances of `super()/__class__` with the new class."""
+
     funcs = inspect.getmembers(new_cls, inspect.isroutine)
     for _, func in funcs:
         # Unwrap method if applicable.
         func = getattr(func, '__func__', func)
         with contextlib.suppress(AttributeError):
             # Builtin functions won't have __code__.
-            code = func.__code__
-            closure = func.__closure__
-            freevars = code.co_freevars
-            if closure and freevars and '__class__' in freevars:
-                # Have a specified class in freevars, must fix in closure.
-                # Only change if the cell_contents is the old cls,
-                # which we need to replace with the new cls.
-                for cell in closure:
-                    if cell.cell_contents is cls:
-                        cell.cell_contents = new_cls
+            update_method(cls, new_cls, func)
+
+
+def update_classvars(cls: typing.Type, new_cls: typing.Type) -> None:
+    """Replace all instances of the old class in class variables."""
+
+    # We're going to cheat, since this is a painfully long process.
+    # We know the only classvars that can be present are in:
+    #   1. TYPE_MAP
+
+    # Mapping of transaction type to transactions.
+    # We use a bidict to get O(1) inverse lookup times.
+    type_map = getattr(cls, 'TYPE_MAP', None)
+    if type_map is not None and cls in type_map.inverse:
+        type = type_map.inverse.pop(cls)
+        type_map[type] = new_cls
+
+
+def update_closure(cls: typing.Type, new_cls: typing.Type) -> None:
+    """
+    Due to our dynamic creation of a new class, our old class
+    may be present in our new class definition.
+
+    Most notably, it may be present in:
+        1. Methods using `super()/__class__`.
+        2. Any class variables.
+    """
+
+    update_methods(cls, new_cls)
+    update_classvars(cls, new_cls)
+
+
+# DATACLASS
 
 
 def dataclass(
-    cls=None,
+    cls: typing.Optional[typing.Type] = None,
     *,
-    init=True,
-    repr=True,
-    eq=True,
-    order=False,
-    unsafe_hash=False,
-    frozen=False,
-    slots=True,
-    copy=True,
-    deepcopy=True,
-    asdict=True,
-    astuple=True,
-    fields=True,
-    replace=True,
-    camelcase_properties=True,
-    **defaults
+    init: bool = True,
+    repr: bool = True,
+    eq: bool = True,
+    order: bool = False,
+    unsafe_hash: bool = False,
+    frozen: bool = False,
+    slots: bool = True,
+    copy: bool = True,
+    deepcopy: bool = True,
+    asdict: bool = True,
+    astuple: bool = True,
+    fields: bool = True,
+    replace: bool = True,
+    **defaults: typing.Any
 ):
     """Generate a slotted dataclass with optional default arguments."""
 
@@ -361,10 +453,9 @@ def dataclass(
         'astuple': astuple,
         'fields': fields,
         'replace': replace,
-        'camelcase_properties': camelcase_properties,
     }
 
-    def wrap(cls):
+    def wrap(cls: typing.Type) -> typing.Type:
         base = wrap_dataclass(cls, global_vars, local_vars, **wrap_kwds)
         new_cls = dataclasses.dataclass(**dataclass_kwds)(base)
         set_defaults(new_cls, defaults)

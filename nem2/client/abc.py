@@ -43,7 +43,7 @@ MessageType = typing.Union[
 # ----
 
 
-class HTTPSharedBase:
+class HTTPSharedBase(util.Object):
     """Shared, abstract base class for sync and async HTTP clients."""
 
     _endpoint: str
@@ -70,10 +70,6 @@ class HTTPSharedBase:
     def network_type(self):
         """Get network type for client."""
         raise util.AbstractMethodError
-
-    @property
-    def networkType(self):
-        return self.network_type
 
     @classmethod
     def from_http(cls: typing.Type[T], http) -> T:
@@ -256,8 +252,6 @@ class AccountHTTP(HTTPSharedBase):
         """
         return self(nis.get_account_info, address, **kwds)
 
-    getAccountInfo = util.undoc(get_account_info)
-
     def get_accounts_info(
         self,
         addresses: typing.Sequence[models.Address],
@@ -270,8 +264,6 @@ class AccountHTTP(HTTPSharedBase):
         :return: List of account info objects.
         """
         return self(nis.get_accounts_info, addresses, **kwds)
-
-    getAccountsInfo = util.undoc(get_accounts_info)
 
     # TODO(ahuszagh)
     # getMultisigAccountInfo
@@ -295,8 +287,6 @@ class BlockchainHTTP(HTTPSharedBase):
         """
         return self(nis.get_block_by_height, height, **kwds)
 
-    getBlockByHeight = util.undoc(get_block_by_height)
-
     # TODO(ahuszagh)
     # getBlockTransactions
     # getBlocksByHeightWithLimit
@@ -309,8 +299,6 @@ class BlockchainHTTP(HTTPSharedBase):
         """
         return self(nis.get_blockchain_height, **kwds)
 
-    getBlockchainHeight = util.undoc(get_blockchain_height)
-
     def get_blockchain_score(self, **kwds):
         """
         Get current blockchain score.
@@ -319,8 +307,6 @@ class BlockchainHTTP(HTTPSharedBase):
         """
         return self(nis.get_blockchain_score, **kwds)
 
-    getBlockchainScore = util.undoc(get_blockchain_score)
-
     def get_diagnostic_storage(self, **kwds):
         """
         Get diagnostic storage information for blockchain.
@@ -328,8 +314,6 @@ class BlockchainHTTP(HTTPSharedBase):
         :return: Blockchain diagnostic storage information.
         """
         return self(nis.get_diagnostic_storage, **kwds)
-
-    getDiagnosticStorage = util.undoc(get_diagnostic_storage)
 
 
 class MosaicHTTP(HTTPSharedBase):
@@ -347,8 +331,6 @@ class MosaicHTTP(HTTPSharedBase):
         :return: Mosaic names for IDS.
         """
         return self(nis.get_mosaic_names, ids, **kwds)
-
-    getMosaicNames = util.undoc(get_mosaic_names)
 
     # TODO(ahuszagh)
     # getMosaic
@@ -371,8 +353,6 @@ class NamespaceHTTP(HTTPSharedBase):
         """
         return self(nis.get_namespace, namespace_id, **kwds)
 
-    getNamespace = util.undoc(get_namespace)
-
     def get_namespaces_from_account(
         self,
         address: models.Address,
@@ -385,8 +365,6 @@ class NamespaceHTTP(HTTPSharedBase):
         :return: List of namespace information objects.
         """
         return self(nis.get_namespaces_from_account, address, **kwds)
-
-    getNamespacesFromAccount = util.undoc(get_namespaces_from_account)
 
     def get_namespaces_from_accounts(
         self,
@@ -401,8 +379,6 @@ class NamespaceHTTP(HTTPSharedBase):
         """
         return self(nis.get_namespaces_from_accounts, addresses, **kwds)
 
-    getNamespacesFromAccounts = util.undoc(get_namespaces_from_accounts)
-
     def get_namespace_names(
         self,
         ids: typing.Sequence[models.NamespaceId],
@@ -415,8 +391,6 @@ class NamespaceHTTP(HTTPSharedBase):
         :return: Namespace names for IDS.
         """
         return self(nis.get_namespace_names, ids, **kwds)
-
-    getNamespaceNames = util.undoc(get_namespace_names)
 
     def get_linked_mosaic_id(
         self,
@@ -431,8 +405,6 @@ class NamespaceHTTP(HTTPSharedBase):
         """
         return self(nis.get_linked_mosaic_id, namespace_id, **kwds)
 
-    getLinkedMosaicId = util.undoc(get_linked_mosaic_id)
-
     def get_linked_address(
         self,
         namespace_id: models.NamespaceId,
@@ -446,8 +418,6 @@ class NamespaceHTTP(HTTPSharedBase):
         """
         return self(nis.get_linked_address, namespace_id, **kwds)
 
-    getLinkedAddress = util.undoc(get_linked_address)
-
 
 class NetworkHTTP(HTTPSharedBase):
     """Abstract base class for the network HTTP client."""
@@ -459,8 +429,6 @@ class NetworkHTTP(HTTPSharedBase):
         :return: Network type.
         """
         return self(nis.get_network_type, network_type=self._none, **kwds)
-
-    getNetworkType = util.undoc(get_network_type)
 
 
 class TransactionHTTP(HTTPSharedBase):
@@ -475,8 +443,6 @@ class TransactionHTTP(HTTPSharedBase):
         """
         return self(nis.get_transaction, hash, **kwds)
 
-    getTransaction = util.undoc(get_transaction)
-
     def get_transactions(self, hashes: typing.Sequence[str], **kwds):
         """
         Get transaction info by hash.
@@ -485,8 +451,6 @@ class TransactionHTTP(HTTPSharedBase):
         :return: Transaction info.
         """
         return self(nis.get_transactions, hashes, **kwds)
-
-    getTransactions = util.undoc(get_transactions)
 
     def get_transaction_status(self, hash: str, **kwds):
         """
@@ -497,8 +461,6 @@ class TransactionHTTP(HTTPSharedBase):
         """
         return self(nis.get_transaction_status, hash, **kwds)
 
-    getTransactionStatus = util.undoc(get_transaction_status)
-
     def get_transaction_statuses(self, hashes: typing.Sequence[str], **kwds):
         """
         Get transaction status by sequence of hashes.
@@ -507,8 +469,6 @@ class TransactionHTTP(HTTPSharedBase):
         :return: List of transaction statuses.
         """
         return self(nis.get_transaction_statuses, hashes, **kwds)
-
-    getTransactionStatuses = util.undoc(get_transaction_statuses)
 
     # TODO(ahuszagh)
     # announceAggregateBonded
@@ -540,15 +500,13 @@ class TransactionHTTP(HTTPSharedBase):
         """
         return self(nis.announce_sync, transaction, **kwds)
 
-    announceSync = util.undoc(announce_sync)
-
 
 # WEBSOCKET
 # ---------
 
 
 @util.dataclass(frozen=True)
-class ListenerMessage:
+class ListenerMessage(util.Object):
     """Message from a listener."""
 
     channel_name: str
@@ -556,7 +514,7 @@ class ListenerMessage:
 
 
 @util.observable
-class Listener:
+class Listener(util.Object):
     """
     Abstract base class for the websockets-based listener.
 
@@ -652,36 +610,30 @@ class Listener:
         """Emit message when new transactions are confirmed for a given address."""
         await self.subscribe(f'confirmedAdded/{address.address}')
 
-    confirmed_added = confirmed
-    confirmedAdded = util.undoc(confirmed_added)
+    @util.observable
+    async def confirmed_added(self, address: models.Address) -> None:
+        """Emit message when new transactions are confirmed for a given address."""
+        await self.confirmed(address)
 
     @util.observable
     async def unconfirmed_added(self, address: models.Address) -> None:
         """Emit message for unconfirmed transactions are announced."""
         await self.subscribe(f'confirmedAdded/{address.address}')
 
-    unconfirmedAdded = util.undoc(unconfirmed_added)
-
     @util.observable
     async def unconfirmed_removed(self, address: models.Address) -> None:
         """Emit message when unconfirmed transactions change state."""
         await self.subscribe(f'unconfirmedRemoved/{address.address}')
-
-    unconfirmedRemoved = util.undoc(unconfirmed_removed)
 
     @util.observable
     async def aggregate_bonded_added(self, address: models.Address) -> None:
         """Emit message when new, unconfirmed, aggregate transactions are announced."""
         await self.subscribe(f'partialAdded/{address.address}')
 
-    aggregateBondedAdded = util.undoc(aggregate_bonded_added)
-
     @util.observable
     async def aggregate_bonded_removed(self, address: models.Address) -> None:
         """Emit message when unconfirmed, aggregate transactions change state."""
         await self.subscribe(f'partialRemoved/{address.address}')
-
-    aggregateBondedRemoved = util.undoc(aggregate_bonded_removed)
 
     @util.observable
     async def status(self, address: models.Address) -> None:

@@ -24,13 +24,12 @@
 
 from __future__ import annotations
 import hashlib
-
-from .types import OptionalBytesType
+import typing
 
 # API
 
 
-def ripemd160(data: OptionalBytesType = None):
+def ripemd160(data: typing.Optional[bytes] = None):
     """Returns a RIPEMD160 hash object; optionally initialized with a string."""
 
     if data is None:

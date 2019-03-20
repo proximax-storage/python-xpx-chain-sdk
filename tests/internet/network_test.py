@@ -14,4 +14,3 @@ class TestNetwork(harness.TestCase):
         async with with_cb(data(responses.ENDPOINT)) as http:
             self.assertIsInstance(await await_cb(http.network_type), models.NetworkType)
             self.assertIsInstance(await await_cb(http.get_network_type()), models.NetworkType)
-            self.assertIsInstance(await await_cb(http.getNetworkType()), models.NetworkType)

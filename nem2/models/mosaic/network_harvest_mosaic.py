@@ -25,7 +25,6 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .mosaic import Mosaic
 from .mosaic_id import MosaicId
 from ..namespace.namespace_id import NamespaceId
@@ -59,7 +58,7 @@ class NetworkHarvestMosaic(Mosaic):
         super().__init__(mosaic_id, amount)
 
     @classmethod
-    def create_relative(cls, amount: int) -> NetworkHarvestMosaic:
+    def create_relative(cls, amount: int):
         """
         Create `NetworkHarvestMosaic` using relative (divisibility) units.
 
@@ -71,12 +70,10 @@ class NetworkHarvestMosaic(Mosaic):
                 >>> NetworkHarvestMosaic.create_relative(1).amount
                 1000
         """
-        return NetworkHarvestMosaic(amount * 10 ** cls.DIVISIBILITY)
-
-    createRelative = util.undoc(create_relative)
+        return cls(amount * 10 ** cls.DIVISIBILITY)
 
     @classmethod
-    def create_absolute(cls, amount: int) -> NetworkHarvestMosaic:
+    def create_absolute(cls, amount: int):
         """
         Create `NetworkHarvestMosaic` using absolute (smallest) units.
 
@@ -89,6 +86,4 @@ class NetworkHarvestMosaic(Mosaic):
                 >>> NetworkHarvestMosaic.create_relative(1).amount
                 1
         """
-        return NetworkHarvestMosaic(amount)
-
-    createAbsolute = util.undoc(create_absolute)
+        return cls(amount)

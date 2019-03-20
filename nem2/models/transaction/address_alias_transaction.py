@@ -26,9 +26,9 @@ from __future__ import annotations
 import typing
 
 from nem2 import util
-from .alias_transaction import AliasTransaction
 from .deadline import Deadline
 from .inner_transaction import InnerTransaction
+from .registry import register_transaction
 from .transaction import Transaction
 from .transaction_info import TransactionInfo
 from .transaction_type import TransactionType
@@ -44,12 +44,11 @@ __all__ = [
     'AddressAliasInnerTransaction',
 ]
 
-OptionalNetworkType = typing.Optional[NetworkType]
-
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AddressAliasTransaction(AliasTransaction):
+@register_transaction('ADDRESS_ALIAS')
+class AddressAliasTransaction(Transaction):
     """
     Address alias transaction.
 
@@ -60,6 +59,7 @@ class AddressAliasTransaction(AliasTransaction):
     :param action_type: Alias action type.
     :param namespace_id: Resulting namespace ID that will be an alias.
     :param address: Address to be aliased.
+    :param type: Transaction type.
     :param signature: (Optional) Transaction signature (missing if aggregate transaction).
     :param signer: (Optional) Account of transaction creator.
     :param transaction_info: (Optional) Transaction metadata.
@@ -78,12 +78,15 @@ class AddressAliasTransaction(AliasTransaction):
         action_type: AliasActionType,
         namespace_id: NamespaceId,
         address: Address,
+        type: TransactionType = TransactionType.ADDRESS_ALIAS,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
-    ):
+    ) -> None:
+        if type != TransactionType.ADDRESS_ALIAS:
+            raise ValueError('Invalid transaction type.')
         super().__init__(
-            TransactionType.ADDRESS_ALIAS,
+            type,
             network_type,
             version,
             deadline,
@@ -104,7 +107,7 @@ class AddressAliasTransaction(AliasTransaction):
         namespace_id: NamespaceId,
         address: Address,
         network_type: NetworkType,
-    ) -> AddressAliasTransaction:
+    ):
         """
         Create new address alias transaction.
 
@@ -114,7 +117,7 @@ class AddressAliasTransaction(AliasTransaction):
         :param address: Address to be aliased.
         :param network_type: Network type.
         """
-        return AddressAliasTransaction(
+        return cls(
             network_type,
             TransactionVersion.ADDRESS_ALIAS,
             deadline,
@@ -124,6 +127,8 @@ class AddressAliasTransaction(AliasTransaction):
             address
         )
 
+    # CATBUFFER
+
     def catbuffer_size_specific(self) -> int:
         action_type_size = AliasActionType.CATBUFFER_SIZE
         namespace_id_size = NamespaceId.CATBUFFER_SIZE
@@ -132,23 +137,23 @@ class AddressAliasTransaction(AliasTransaction):
 
     def to_catbuffer_specific(
         self,
-        network_type: OptionalNetworkType = None,
+        network_type: NetworkType,
     ) -> bytes:
         """Export address alias-specific data to catbuffer."""
 
         # uint8_t action_type
         # NamespaceId namespace_id
         # Address address
-        action_type = self.action_type.to_catbuffer()
-        namespace_id = self.namespace_id.to_catbuffer()
-        address = self.address.to_catbuffer()
+        action_type = self.action_type.to_catbuffer(network_type)
+        namespace_id = self.namespace_id.to_catbuffer(network_type)
+        address = self.address.to_catbuffer(network_type)
 
         return action_type + namespace_id + address
 
     def load_catbuffer_specific(
         self,
         data: bytes,
-        network_type: OptionalNetworkType = None,
+        network_type: NetworkType,
     ) -> bytes:
         """Load address alias-specific data data from catbuffer."""
 
@@ -163,30 +168,36 @@ class AddressAliasTransaction(AliasTransaction):
         self._set('namespace_id', namespace_id)
         self._set('address', address)
 
-        return typing.cast(bytes, data)
+        return data
 
-    def to_aggregate(
+    # DTO
+
+    def to_dto_specific(
         self,
-        signer: PublicAccount
-    ) -> AddressAliasInnerTransaction:
-        """Convert transaction to inner transaction."""
-        inst = AddressAliasInnerTransaction.from_transaction(self, signer)
-        return typing.cast(AddressAliasInnerTransaction, inst)
+        network_type: NetworkType,
+    ) -> dict:
+        return {
+            'actionType': self.action_type.to_dto(network_type),
+            'namespaceId': self.namespace_id.to_dto(network_type),
+            'address': self.address.to_dto(network_type),
+        }
+
+    def load_dto_specific(
+        self,
+        data: dict,
+        network_type: NetworkType,
+    ) -> None:
+        action_type = AliasActionType.from_dto(data['actionType'], network_type)
+        namespace_id = NamespaceId.from_dto(data['namespaceId'], network_type)
+        address = Address.from_dto(data['address'], network_type)
+
+        self._set('action_type', action_type)
+        self._set('namespace_id', namespace_id)
+        self._set('address', address)
 
 
+@register_transaction('ADDRESS_ALIAS')
 class AddressAliasInnerTransaction(InnerTransaction, AddressAliasTransaction):
     """Embedded address alias transaction."""
 
     __slots__ = ()
-
-
-Transaction.HOOKS[TransactionType.ADDRESS_ALIAS] = (
-    AddressAliasTransaction.from_catbuffer_pair,
-    AddressAliasTransaction.from_dto,
-)
-
-
-InnerTransaction.HOOKS[TransactionType.ADDRESS_ALIAS] = (
-    AddressAliasInnerTransaction.from_catbuffer_pair,
-    AddressAliasInnerTransaction.from_dto,
-)

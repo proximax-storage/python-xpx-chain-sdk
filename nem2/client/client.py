@@ -57,7 +57,7 @@ def parse_ws_url(uri: str, scheme: str = 'ws') -> urllib3.util.Url:
 # HTTP
 
 
-class ClientSharedBase:
+class ClientSharedBase(util.Object):
     """Shared, abstract base class for sync and async HTTP clients."""
 
     _session: typing.Any
@@ -242,7 +242,7 @@ def catch_deprecation_warning():
         yield
 
 
-class WebsocketClient:
+class WebsocketClient(util.Object):
     """Asynchronous host using websockets."""
 
     _session: typing.Any

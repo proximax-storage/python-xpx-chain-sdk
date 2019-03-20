@@ -28,11 +28,12 @@ import enum
 import typing
 
 from nem2 import util
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 
-__all__ = ['ChronoUnit', 'Deadline']
-
-OptionalNetworkType = typing.Optional[NetworkType]
+__all__ = [
+    'ChronoUnit',
+    'Deadline',
+]
 
 
 @util.inherit_doc
@@ -94,7 +95,7 @@ class Deadline(util.U64Mixin):
         cls,
         deadline: int = 2,
         unit: ChronoUnit = ChronoUnit.HOURS
-    ) -> Deadline:
+    ):
         """
         Create deadline relative to current local time.
 
@@ -119,10 +120,8 @@ class Deadline(util.U64Mixin):
         utc = self.deadline.replace(tzinfo=datetime.timezone.utc)
         return int(utc.timestamp())
 
-    toTimestamp = util.undoc(to_timestamp)
-
     @classmethod
-    def from_timestamp(cls, timestamp: int) -> Deadline:
+    def from_timestamp(cls, timestamp: int):
         """
         Create deadline from UTC timestamp.
 
@@ -132,11 +131,9 @@ class Deadline(util.U64Mixin):
         local = utc.replace(tzinfo=None)
         return cls(local)
 
-    fromTimestamp = util.undoc(from_timestamp)
-
     def to_dto(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> util.U64DTOType:
         return util.u64_to_dto(self.to_timestamp())
 
@@ -145,12 +142,12 @@ class Deadline(util.U64Mixin):
         cls,
         data: util.U64DTOType,
         network_type: OptionalNetworkType = None,
-    ) -> Deadline:
+    ):
         return cls.from_timestamp(util.u64_from_dto(data))
 
     def to_catbuffer(
         self,
-        network_type: OptionalNetworkType = None
+        network_type: OptionalNetworkType = None,
     ) -> bytes:
         return util.u64_to_catbuffer(self.to_timestamp())
 
@@ -159,5 +156,5 @@ class Deadline(util.U64Mixin):
         cls,
         data: bytes,
         network_type: OptionalNetworkType = None,
-    ) -> Deadline:
+    ):
         return cls.from_timestamp(util.u64_from_catbuffer(data))

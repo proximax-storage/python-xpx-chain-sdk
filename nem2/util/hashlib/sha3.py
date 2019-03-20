@@ -24,13 +24,12 @@
 
 from __future__ import annotations
 import hashlib
-
-from .types import OptionalBytesType
+import typing
 
 # API
 
 
-def sha3_224(data: OptionalBytesType = None):
+def sha3_224(data: typing.Optional[bytes] = None):
     """Returns a sha3_224 hash object; optionally initialized with a string."""
 
     if data is None:
@@ -38,7 +37,7 @@ def sha3_224(data: OptionalBytesType = None):
     return hashlib.sha3_224(data)
 
 
-def sha3_256(data: OptionalBytesType = None):
+def sha3_256(data: typing.Optional[bytes] = None):
     """Returns a sha3_256 hash object; optionally initialized with a string."""
 
     if data is None:
@@ -46,7 +45,7 @@ def sha3_256(data: OptionalBytesType = None):
     return hashlib.sha3_256(data)
 
 
-def sha3_384(data: OptionalBytesType = None):
+def sha3_384(data: typing.Optional[bytes] = None):
     """Returns a sha3_384 hash object; optionally initialized with a string."""
 
     if data is None:
@@ -54,7 +53,7 @@ def sha3_384(data: OptionalBytesType = None):
     return hashlib.sha3_384(data)
 
 
-def sha3_512(data: OptionalBytesType = None):
+def sha3_512(data: typing.Optional[bytes] = None):
     """Returns a sha3_512 hash object; optionally initialized with a string."""
 
     if data is None:
