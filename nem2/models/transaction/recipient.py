@@ -62,7 +62,7 @@ class Recipient(util.Object):
             return obj.encoded
         # TODO(ahuszagh) Verify this is actually the format
         #   https://nem2.slack.com/archives/CEZKUE4KB/p1553108893144300
-        leading = util.u8_to_catbuffer(int(network_type) + 1)
+        leading = b'\x91'
         trailing = bytes(16)
         return leading + util.unhexlify(obj.encoded) + trailing
 

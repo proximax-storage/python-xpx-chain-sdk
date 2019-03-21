@@ -38,7 +38,7 @@ ValueType = typing.Optional[typing.Union[Address, MosaicId]]
 
 
 @util.inherit_doc
-@util.dataclass(frozen=True)
+@util.dataclass(frozen=True, type=AliasType.NONE, value=None)
 class Alias(util.DTO):
     """
     Alias for type definitions.
@@ -49,16 +49,17 @@ class Alias(util.DTO):
     type: AliasType
     value: ValueType
 
-    def __init__(self, value: ValueType = None) -> None:
-        self._set("value", value)
-        if isinstance(value, Address):
-            self._set("type", AliasType.ADDRESS)
-        elif isinstance(value, MosaicId):
-            self._set("type", AliasType.MOSAIC_ID)
-        elif value is None:
-            self._set("type", AliasType.NONE)
+    def __post_init__(self):
+        if self.type == AliasType.ADDRESS:
+            same_type = isinstance(self.value, Address)
+        elif self.type == AliasType.MOSAIC_ID:
+            same_type = isinstance(self.value, MosaicId)
+        elif self.type == AliasType.NONE:
+            same_type = self.value is None
         else:
-            raise TypeError("Got invalid value type for Alias.")
+            same_type = False
+        if not same_type:
+            raise TypeError("Alias value and type do not match.")
 
     @property
     def address(self) -> Address:
@@ -103,7 +104,7 @@ class Alias(util.DTO):
 
         type = AliasType.from_dto(data['type'], network_type)
         if type == AliasType.ADDRESS:
-            return cls(Address.from_dto(data['address'], network_type))
+            return cls(type, Address.from_dto(data['address'], network_type))
         elif type == AliasType.MOSAIC_ID:
-            return cls(MosaicId.from_dto(data['mosaicId'], network_type))
+            return cls(type, MosaicId.from_dto(data['mosaicId'], network_type))
         raise ValueError("Invalid data for Alias.from_dto.")

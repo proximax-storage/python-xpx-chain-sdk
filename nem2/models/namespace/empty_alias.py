@@ -23,6 +23,7 @@
 """
 
 from .alias import Alias
+from .alias_type import AliasType
 
 __all__ = ['EmptyAlias']
 
@@ -33,4 +34,4 @@ class EmptyAlias(Alias):
     __slots__ = ()
 
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__(AliasType.NONE, None)

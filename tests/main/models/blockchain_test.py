@@ -165,6 +165,12 @@ class TestBlockInfo(harness.TestCase):
         dto = block_info.to_dto(self.network_type)
         self.assertEqual(block_info, models.BlockInfo.from_dto(dto, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.block_info, self.block_info.replace())
+        self.assertIsInstance(self.block_info.asdict(), dict)
+        self.assertIsInstance(self.block_info.astuple(), tuple)
+        self.assertIsInstance(self.block_info.fields(), tuple)
+
 
 class TestBlockchainScore(harness.TestCase):
 
@@ -187,6 +193,12 @@ class TestBlockchainScore(harness.TestCase):
     def test_from_dto(self):
         self.assertEqual(self.score, models.BlockchainScore.from_dto(self.dto, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.score, self.score.replace())
+        self.assertIsInstance(self.score.asdict(), dict)
+        self.assertIsInstance(self.score.astuple(), tuple)
+        self.assertIsInstance(self.score.fields(), tuple)
+
 
 class TestBlockchainStorageInfo(harness.TestCase):
 
@@ -204,6 +216,12 @@ class TestBlockchainStorageInfo(harness.TestCase):
 
     def test_from_dto(self):
         self.assertEqual(self.info, models.BlockchainStorageInfo.from_dto(self.dto, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.info, self.info.replace())
+        self.assertIsInstance(self.info.asdict(), dict)
+        self.assertIsInstance(self.info.astuple(), tuple)
+        self.assertIsInstance(self.info.fields(), tuple)
 
 
 class TestNetworkType(harness.TestCase):

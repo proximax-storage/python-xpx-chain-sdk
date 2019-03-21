@@ -57,8 +57,7 @@ class SecretProofTransaction(Transaction):
     :param hash_type: Hash algorithm secret was generated with.
     :param secret: Hex-encoded seed-proof hash.
     :param proof: Hex-encoded seed proof.
-    :param type: Transaction type.
-    :param signature: (Optional) Transaction signature (missing if inner transaction).
+    :param signature: (Optional) Transaction signature (missing if embedded transaction).
     :param signer: (Optional) Account of transaction creator.
     :param transaction_info: (Optional) Transaction metadata.
     """
@@ -76,17 +75,14 @@ class SecretProofTransaction(Transaction):
         hash_type: HashType,
         secret: str,
         proof: str,
-        type: TransactionType = TransactionType.SECRET_PROOF,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
     ) -> None:
-        if type != TransactionType.SECRET_PROOF:
-            raise ValueError('Invalid transaction type.')
         if not hash_type.validate(secret):
             raise ValueError("HashType and secret have incompatible lengths.")
         super().__init__(
-            type,
+            TransactionType.SECRET_PROOF,
             network_type,
             version,
             deadline,

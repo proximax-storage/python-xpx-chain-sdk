@@ -59,8 +59,7 @@ class AddressAliasTransaction(Transaction):
     :param action_type: Alias action type.
     :param namespace_id: Resulting namespace ID that will be an alias.
     :param address: Address to be aliased.
-    :param type: Transaction type.
-    :param signature: (Optional) Transaction signature (missing if aggregate transaction).
+    :param signature: (Optional) Transaction signature (missing if embedded transaction).
     :param signer: (Optional) Account of transaction creator.
     :param transaction_info: (Optional) Transaction metadata.
     """
@@ -78,15 +77,12 @@ class AddressAliasTransaction(Transaction):
         action_type: AliasActionType,
         namespace_id: NamespaceId,
         address: Address,
-        type: TransactionType = TransactionType.ADDRESS_ALIAS,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
     ) -> None:
-        if type != TransactionType.ADDRESS_ALIAS:
-            raise ValueError('Invalid transaction type.')
         super().__init__(
-            type,
+            TransactionType.ADDRESS_ALIAS,
             network_type,
             version,
             deadline,

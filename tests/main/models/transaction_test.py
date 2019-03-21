@@ -74,6 +74,12 @@ class TestAddressAliasTransaction(harness.TestCase):
         with self.assertRaises(TypeError):
             inner.__dict__
 
+    def test_dataclasses(self):
+        self.assertEqual(self.transaction, self.transaction.replace())
+        self.assertIsInstance(self.transaction.asdict(), dict)
+        self.assertIsInstance(self.transaction.astuple(), tuple)
+        self.assertIsInstance(self.transaction.fields(), tuple)
+
 
 class TestAggregateTransactionCosignature(harness.TestCase):
 
@@ -108,6 +114,12 @@ class TestAggregateTransactionCosignature(harness.TestCase):
     def test_from_catbuffer(self):
         self.assertEqual(self.cosignature, models.AggregateTransactionCosignature.from_catbuffer(self.catbuffer, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.cosignature, self.cosignature.replace())
+        self.assertIsInstance(self.cosignature.asdict(), dict)
+        self.assertIsInstance(self.cosignature.astuple(), tuple)
+        self.assertIsInstance(self.cosignature.fields(), tuple)
+
 
 class TestAggregateTransactionInfo(harness.TestCase):
 
@@ -138,6 +150,12 @@ class TestAggregateTransactionInfo(harness.TestCase):
     def test_from_dto(self):
         self.assertEqual(self.transaction_info, models.AggregateTransactionInfo.from_dto(self.dto, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.transaction_info, self.transaction_info.replace())
+        self.assertIsInstance(self.transaction_info.asdict(), dict)
+        self.assertIsInstance(self.transaction_info.astuple(), tuple)
+        self.assertIsInstance(self.transaction_info.fields(), tuple)
+
 
 class TestAliasTransaction(harness.TestCase):
     pass        # TODO(ahuszagh) Implement
@@ -166,6 +184,12 @@ class TestCosignatureSignedTransaction(harness.TestCase):
 
     def test_from_dto(self):
         self.assertEqual(self.cosignature, models.CosignatureSignedTransaction.from_dto(self.dto, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.cosignature, self.cosignature.replace())
+        self.assertIsInstance(self.cosignature.asdict(), dict)
+        self.assertIsInstance(self.cosignature.astuple(), tuple)
+        self.assertIsInstance(self.cosignature.fields(), tuple)
 
 
 class TestDeadline(harness.TestCase):
@@ -198,6 +222,12 @@ class TestDeadline(harness.TestCase):
 
     def test_from_dto(self):
         self.assertEqual(self.deadline, models.Deadline.from_dto(self.dto, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.deadline, self.deadline.replace())
+        self.assertIsInstance(self.deadline.asdict(), dict)
+        self.assertIsInstance(self.deadline.astuple(), tuple)
+        self.assertIsInstance(self.deadline.fields(), tuple)
 
 
 class TestHashType(harness.TestCase):
@@ -258,7 +288,6 @@ class TestInnnerTransaction(harness.TestCase):
     def test_from_catbuffer(self):
         network_type = models.NetworkType.MIJIN_TEST
         private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
-        signer = models.Account.create_from_private_key(private_key, network_type)
         transactions = [
             (models.TransactionType.ADDRESS_ALIAS, '4a0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e42004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'),
             (models.TransactionType.MOSAIC_ALIAS, '390000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e43004471f4e23b4cb688a6c03b484fd6f72f'),
@@ -361,6 +390,12 @@ class TestMosaicAliasTransaction(harness.TestCase):
         with self.assertRaises(TypeError):
             inner.__dict__
 
+    def test_dataclasses(self):
+        self.assertEqual(self.transaction, self.transaction.replace())
+        self.assertIsInstance(self.transaction.asdict(), dict)
+        self.assertIsInstance(self.transaction.astuple(), tuple)
+        self.assertIsInstance(self.transaction.fields(), tuple)
+
 
 class TestMultisigCosignatoryModificationType(harness.TestCase):
 
@@ -422,6 +457,12 @@ class TestPlainMessage(harness.TestCase):
 
     def test_from_catbuffer(self):
         self.assertEqual(self.message, models.PlainMessage.from_catbuffer(self.catbuffer, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.message, self.message.replace())
+        self.assertIsInstance(self.message.asdict(), dict)
+        self.assertIsInstance(self.message.astuple(), tuple)
+        self.assertIsInstance(self.message.fields(), tuple)
 
 
 class TestSecretProofTransaction(harness.TestCase):
@@ -493,6 +534,12 @@ class TestSecretProofTransaction(harness.TestCase):
         with self.assertRaises(TypeError):
             inner.__dict__
 
+    def test_dataclasses(self):
+        self.assertEqual(self.transaction, self.transaction.replace())
+        self.assertIsInstance(self.transaction.asdict(), dict)
+        self.assertIsInstance(self.transaction.astuple(), tuple)
+        self.assertIsInstance(self.transaction.fields(), tuple)
+
 
 class TestSignedTransaction(harness.TestCase):
 
@@ -514,6 +561,12 @@ class TestSignedTransaction(harness.TestCase):
     def test_slots(self):
         with self.assertRaises(TypeError):
             self.transaction.__dict__
+
+    def test_dataclasses(self):
+        self.assertEqual(self.transaction, self.transaction.replace())
+        self.assertIsInstance(self.transaction.asdict(), dict)
+        self.assertIsInstance(self.transaction.astuple(), tuple)
+        self.assertIsInstance(self.transaction.fields(), tuple)
 
 
 class TestSyncAnnounce(harness.TestCase):
@@ -540,6 +593,12 @@ class TestSyncAnnounce(harness.TestCase):
         with self.assertRaises(TypeError):
             self.sync.__dict__
 
+    def test_dataclasses(self):
+        self.assertEqual(self.sync, self.sync.replace())
+        self.assertIsInstance(self.sync.asdict(), dict)
+        self.assertIsInstance(self.sync.astuple(), tuple)
+        self.assertIsInstance(self.sync.fields(), tuple)
+
 
 class TestTransaction(harness.TestCase):
 
@@ -554,7 +613,6 @@ class TestTransaction(harness.TestCase):
     def test_from_catbuffer(self):
         network_type = models.NetworkType.MIJIN_TEST
         private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
-        signer = models.Account.create_from_private_key(private_key, network_type)
         transactions = [
             (models.TransactionType.ADDRESS_ALIAS, '9a000000102e9c68fe9cbaa5d1d27ad35f9e386b42c265749be0e27182b8a9ebf18a0357332ef4ee350b648ea00437790c70471959b9334aea2e2e89356d52613fd385021b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'),
             (models.TransactionType.MOSAIC_ALIAS, '890000004643c4a57eccb783217473cf11bd6642e754d8362a552266fc6e332f523550b3e4431f468c942a1c43748b12f16112b63c282fa48a674a3cb66df33ec8ad100f1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e430000000000000000f1b4815c00000000004471f4e23b4cb688a6c03b484fd6f72f'),
@@ -592,6 +650,12 @@ class TestTransactionAnnounceResponse(harness.TestCase):
     def test_from_dto(self):
         self.assertEqual(self.response, models.TransactionAnnounceResponse.from_dto(self.dto, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.response, self.response.replace())
+        self.assertIsInstance(self.response.asdict(), dict)
+        self.assertIsInstance(self.response.astuple(), tuple)
+        self.assertIsInstance(self.response.fields(), tuple)
+
 
 class TestTransactionInfo(harness.TestCase):
 
@@ -627,6 +691,12 @@ class TestTransactionInfo(harness.TestCase):
     def test_from_dto(self):
         self.assertEqual(self.transaction_info, models.TransactionInfo.from_dto(self.dto, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.transaction_info, self.transaction_info.replace())
+        self.assertIsInstance(self.transaction_info.asdict(), dict)
+        self.assertIsInstance(self.transaction_info.astuple(), tuple)
+        self.assertIsInstance(self.transaction_info.fields(), tuple)
+
 
 class TestTransactionStatus(harness.TestCase):
 
@@ -657,6 +727,12 @@ class TestTransactionStatus(harness.TestCase):
     def test_from_dto(self):
         self.assertEqual(self.transaction_status, models.TransactionStatus.from_dto(self.dto, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.transaction_status, self.transaction_status.replace())
+        self.assertIsInstance(self.transaction_status.asdict(), dict)
+        self.assertIsInstance(self.transaction_status.astuple(), tuple)
+        self.assertIsInstance(self.transaction_status.fields(), tuple)
+
 
 class TestTransactionStatusError(harness.TestCase):
 
@@ -681,6 +757,12 @@ class TestTransactionStatusError(harness.TestCase):
 
     def test_from_dto(self):
         self.assertEqual(self.error, models.TransactionStatusError.from_dto(self.dto, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.error, self.error.replace())
+        self.assertIsInstance(self.error.asdict(), dict)
+        self.assertIsInstance(self.error.astuple(), tuple)
+        self.assertIsInstance(self.error.fields(), tuple)
 
 
 class TestTransactionStatusGroup(harness.TestCase):
@@ -860,3 +942,9 @@ class TestTransferTransaction(harness.TestCase):
 
         with self.assertRaises(TypeError):
             inner.__dict__
+
+    def test_dataclasses(self):
+        self.assertEqual(self.transaction, self.transaction.replace())
+        self.assertIsInstance(self.transaction.asdict(), dict)
+        self.assertIsInstance(self.transaction.astuple(), tuple)
+        self.assertIsInstance(self.transaction.fields(), tuple)

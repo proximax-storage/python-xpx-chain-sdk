@@ -109,6 +109,12 @@ class TestAccount(harness.TestCase):
         self.assertFalse(a2 == a3)
         self.assertTrue(a3 == a3)
 
+    def test_dataclasses(self):
+        self.assertEqual(self.account, self.account.replace())
+        self.assertIsInstance(self.account.asdict(), dict)
+        self.assertIsInstance(self.account.astuple(), tuple)
+        self.assertIsInstance(self.account.fields(), tuple)
+
 
 class TestAccountInfo(harness.TestCase):
 
@@ -165,6 +171,12 @@ class TestAccountInfo(harness.TestCase):
 
     def test_from_dto(self):
         self.assertEqual(self.info, models.AccountInfo.from_dto(self.dto, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.info, self.info.replace())
+        self.assertIsInstance(self.info.asdict(), dict)
+        self.assertIsInstance(self.info.astuple(), tuple)
+        self.assertIsInstance(self.info.fields(), tuple)
 
 
 class TestAddress(harness.TestCase):
@@ -265,6 +277,16 @@ class TestAddress(harness.TestCase):
 
         self.assertEqual(self.address, models.Address.from_catbuffer(self.encoded, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.address, self.address.replace())
+        self.assertIsInstance(self.address.asdict(), dict)
+        self.assertIsInstance(self.address.astuple(), tuple)
+        self.assertIsInstance(self.address.fields(), tuple)
+
+
+class TestAccountMetadata(harness.TestCase):
+    pass    # TODO(ahuszagh) Implement...
+
 
 class TestMultisigAccountGraphInfo(harness.TestCase):
     pass    # TODO(ahuszagh) Implement...
@@ -344,3 +366,9 @@ class TestPublicAccount(harness.TestCase):
 
     def test_from_catbuffer(self):
         self.assertEqual(self.public_account, models.PublicAccount.from_catbuffer(self.catbuffer, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.public_account, self.public_account.replace())
+        self.assertIsInstance(self.public_account.asdict(), dict)
+        self.assertIsInstance(self.public_account.astuple(), tuple)
+        self.assertIsInstance(self.public_account.fields(), tuple)

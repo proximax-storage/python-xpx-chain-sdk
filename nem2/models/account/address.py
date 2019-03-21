@@ -99,19 +99,13 @@ class Address(util.Model):
     network_type: NetworkType
     CATBUFFER_SIZE: typing.ClassVar[int] = 25 * util.U8_BYTES
 
-    def __init__(
-        self,
-        address: str,
-        network_type: OptionalNetworkType = None,
-    ) -> None:
+    def __init__(self, address: str) -> None:
         plain = address.strip().upper().replace('-', '')
-        nt = NetworkType.create_from_raw_address(plain)
+        network_type = NetworkType.create_from_raw_address(plain)
         if len(plain) != 40:
             raise ValueError(f"{address} is not a valid raw address")
-        if network_type is not None and network_type != nt:
-            raise ValueError('Network type does not match address.')
         self._set('address', plain)
-        self._set('network_type', nt)
+        self._set('network_type', network_type)
 
     @property
     def encoded(self) -> bytes:

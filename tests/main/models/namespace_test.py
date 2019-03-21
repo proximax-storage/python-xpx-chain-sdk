@@ -20,8 +20,8 @@ class TestAddressAlias(harness.TestCase):
         self.assertEqual(repr(self.alias), "AddressAlias(type=<AliasType.ADDRESS: 2>, value=Address(address='SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', network_type=<NetworkType.MIJIN_TEST: 144>))")
         self.assertEqual(str(self.alias), repr(self.alias))
         self.assertNotEqual(self.alias, models.Alias())
-        self.assertEqual(self.alias, models.Alias(self.address))
-        self.assertNotEqual(self.alias, models.Alias(self.mosaic_id))
+        self.assertEqual(self.alias, models.Alias(models.AliasType.ADDRESS, self.address))
+        self.assertNotEqual(self.alias, models.Alias(models.AliasType.MOSAIC_ID, self.mosaic_id))
 
         with self.assertRaises(ValueError):
             self.alias.mosaic_id
@@ -37,6 +37,12 @@ class TestAddressAlias(harness.TestCase):
         with self.assertRaises(TypeError):
             self.alias.__dict__
 
+    def test_dataclasses(self):
+        self.assertEqual(self.alias, self.alias.replace())
+        self.assertIsInstance(self.alias.asdict(), dict)
+        self.assertIsInstance(self.alias.astuple(), tuple)
+        self.assertIsInstance(self.alias.fields(), tuple)
+
 
 class TestAlias(harness.TestCase):
 
@@ -47,9 +53,9 @@ class TestAlias(harness.TestCase):
         self.mosaic_id = models.MosaicId(5)
         self.empty_alias = models.Alias()
         self.empty_dto = None
-        self.address_alias = models.Alias(self.address)
+        self.address_alias = models.Alias(models.AliasType.ADDRESS, self.address)
         self.address_dto = {'type': 2, 'address': {'address': 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', 'networkType': 144}}
-        self.mosaic_alias = models.Alias(self.mosaic_id)
+        self.mosaic_alias = models.Alias(models.AliasType.MOSAIC_ID, self.mosaic_id)
         self.mosaic_dto = {'type': 1, 'mosaicId': [5, 0]}
 
     def test_none(self):
@@ -59,8 +65,8 @@ class TestAlias(harness.TestCase):
         self.assertEqual(repr(self.empty_alias), 'Alias(type=<AliasType.NONE: 0>, value=None)')
         self.assertEqual(str(self.empty_alias), repr(self.empty_alias))
         self.assertEqual(self.empty_alias, models.Alias())
-        self.assertNotEqual(self.empty_alias, models.Alias(self.address))
-        self.assertNotEqual(self.empty_alias, models.Alias(self.mosaic_id))
+        self.assertNotEqual(self.empty_alias, models.Alias(models.AliasType.ADDRESS, self.address))
+        self.assertNotEqual(self.empty_alias, models.Alias(models.AliasType.MOSAIC_ID, self.mosaic_id))
 
         with self.assertRaises(ValueError):
             self.empty_alias.address
@@ -80,8 +86,8 @@ class TestAlias(harness.TestCase):
         self.assertEqual(repr(self.address_alias), "Alias(type=<AliasType.ADDRESS: 2>, value=Address(address='SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54', network_type=<NetworkType.MIJIN_TEST: 144>))")
         self.assertEqual(str(self.address_alias), repr(self.address_alias))
         self.assertNotEqual(self.address_alias, models.Alias())
-        self.assertEqual(self.address_alias, models.Alias(self.address))
-        self.assertNotEqual(self.address_alias, models.Alias(self.mosaic_id))
+        self.assertEqual(self.address_alias, models.Alias(models.AliasType.ADDRESS, self.address))
+        self.assertNotEqual(self.address_alias, models.Alias(models.AliasType.MOSAIC_ID, self.mosaic_id))
 
         with self.assertRaises(ValueError):
             self.address_alias.mosaic_id
@@ -103,8 +109,8 @@ class TestAlias(harness.TestCase):
         self.assertEqual(repr(self.mosaic_alias), "Alias(type=<AliasType.MOSAIC_ID: 1>, value=MosaicId(id=5))")
         self.assertEqual(str(self.mosaic_alias), repr(self.mosaic_alias))
         self.assertNotEqual(self.mosaic_alias, models.Alias())
-        self.assertNotEqual(self.mosaic_alias, models.Alias(self.address))
-        self.assertEqual(self.mosaic_alias, models.Alias(self.mosaic_id))
+        self.assertNotEqual(self.mosaic_alias, models.Alias(models.AliasType.ADDRESS, self.address))
+        self.assertEqual(self.mosaic_alias, models.Alias(models.AliasType.MOSAIC_ID, self.mosaic_id))
 
         with self.assertRaises(ValueError):
             self.mosaic_alias.address
@@ -113,6 +119,12 @@ class TestAlias(harness.TestCase):
 
         self.assertEqual(self.mosaic_alias.to_dto(self.network_type), self.mosaic_dto)
         self.assertEqual(models.Alias.from_dto(self.mosaic_dto, self.network_type), self.mosaic_alias)
+
+    def test_dataclasses(self):
+        self.assertEqual(self.empty_alias, self.empty_alias.replace())
+        self.assertIsInstance(self.empty_alias.asdict(), dict)
+        self.assertIsInstance(self.empty_alias.astuple(), tuple)
+        self.assertIsInstance(self.empty_alias.fields(), tuple)
 
 
 class TestAliasActionType(harness.TestCase):
@@ -199,8 +211,8 @@ class TestEmptyAlias(harness.TestCase):
         self.assertEqual(repr(self.alias), 'EmptyAlias(type=<AliasType.NONE: 0>, value=None)')
         self.assertEqual(str(self.alias), repr(self.alias))
         self.assertEqual(self.alias, models.Alias())
-        self.assertNotEqual(self.alias, models.Alias(self.address))
-        self.assertNotEqual(self.alias, models.Alias(self.mosaic_id))
+        self.assertNotEqual(self.alias, models.Alias(models.AliasType.ADDRESS, self.address))
+        self.assertNotEqual(self.alias, models.Alias(models.AliasType.MOSAIC_ID, self.mosaic_id))
 
         with self.assertRaises(ValueError):
             self.alias.address
@@ -209,6 +221,12 @@ class TestEmptyAlias(harness.TestCase):
 
         self.assertEqual(self.alias.to_dto(self.network_type), self.dto)
         self.assertEqual(self.alias, models.Alias.from_dto(self.dto, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.alias, self.alias.replace())
+        self.assertIsInstance(self.alias.asdict(), dict)
+        self.assertIsInstance(self.alias.astuple(), tuple)
+        self.assertIsInstance(self.alias.fields(), tuple)
 
 
 class TestMosaicAlias(harness.TestCase):
@@ -233,14 +251,20 @@ class TestMosaicAlias(harness.TestCase):
         self.assertEqual(repr(self.alias), "MosaicAlias(type=<AliasType.MOSAIC_ID: 1>, value=MosaicId(id=5))")
         self.assertEqual(str(self.alias), repr(self.alias))
         self.assertNotEqual(self.alias, models.Alias())
-        self.assertNotEqual(self.alias, models.Alias(self.address))
-        self.assertEqual(self.alias, models.Alias(self.mosaic_id))
+        self.assertNotEqual(self.alias, models.Alias(models.AliasType.ADDRESS, self.address))
+        self.assertEqual(self.alias, models.Alias(models.AliasType.MOSAIC_ID, self.mosaic_id))
 
         with self.assertRaises(ValueError):
             self.alias.address
 
         self.assertEqual(self.alias.to_dto(self.network_type), self.dto)
         self.assertEqual(self.alias, models.Alias.from_dto(self.dto, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.alias, self.alias.replace())
+        self.assertIsInstance(self.alias.asdict(), dict)
+        self.assertIsInstance(self.alias.astuple(), tuple)
+        self.assertIsInstance(self.alias.fields(), tuple)
 
 
 class TestNamespaceId(harness.TestCase):
@@ -340,6 +364,12 @@ class TestNamespaceId(harness.TestCase):
     def test_from_catbuffer(self):
         self.assertEqual(self.namespace_id, models.NamespaceId.from_catbuffer(self.catbuffer, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.namespace_id, self.namespace_id.replace())
+        self.assertIsInstance(self.namespace_id.asdict(), dict)
+        self.assertIsInstance(self.namespace_id.astuple(), tuple)
+        self.assertIsInstance(self.namespace_id.fields(), tuple)
+
 
 class TestNamespaceInfo(harness.TestCase):
     # TODO(ahuszagh) Implement...
@@ -391,6 +421,12 @@ class TestNamespaceName(harness.TestCase):
 
     def test_from_dto(self):
         self.assertEqual(self.namespace_name, models.NamespaceName.from_dto(self.dto, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.namespace_name, self.namespace_name.replace())
+        self.assertIsInstance(self.namespace_name.asdict(), dict)
+        self.assertIsInstance(self.namespace_name.astuple(), tuple)
+        self.assertIsInstance(self.namespace_name.fields(), tuple)
 
 
 class TestNamespaceType(harness.TestCase):

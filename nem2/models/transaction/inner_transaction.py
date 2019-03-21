@@ -90,7 +90,7 @@ class InnerTransaction(TransactionBase):
 
         data = transaction.asdict(recurse=False)
         data['signer'] = signer
-        aggregate_cls: typing.Type[T3] = cls.TYPE_MAP[data['type']]
+        aggregate_cls: typing.Type[T3] = cls.TYPE_MAP[data.pop('type')]
         return aggregate_cls(**data)
 
     # CATBUFFER

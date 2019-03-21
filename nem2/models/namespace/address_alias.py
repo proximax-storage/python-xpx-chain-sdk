@@ -23,6 +23,7 @@
 """
 
 from .alias import Alias
+from .alias_type import AliasType
 from ..account.address import Address
 
 __all__ = ['AddressAlias']
@@ -38,4 +39,4 @@ class AddressAlias(Alias):
     __slots__ = ()
 
     def __init__(self, value: Address) -> None:
-        super().__init__(value)
+        super().__init__(AliasType.ADDRESS, value)

@@ -28,9 +28,11 @@ import typing
 from nem2 import util
 from .mosaic_id import MosaicId
 from ..blockchain.network_type import OptionalNetworkType
+from ..namespace.namespace_id import NamespaceId
 
 __all__ = ['Mosaic']
 
+IdType = typing.Union[MosaicId, NamespaceId]
 SIZE = MosaicId.CATBUFFER_SIZE + util.U64_BYTES
 
 
@@ -44,7 +46,7 @@ class Mosaic(util.Model):
     :param amount: Mosaic quantity in the smallest unit possible.
     """
 
-    id: MosaicId
+    id: IdType
     amount: int
     CATBUFFER_SIZE: typing.ClassVar[int] = SIZE
 

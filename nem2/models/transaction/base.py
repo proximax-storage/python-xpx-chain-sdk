@@ -51,7 +51,7 @@ class TransactionBase(util.Model):
     :param version: Transaction version.
     :param deadline: Deadline to include transaction.
     :param fee: Fee for the transaction. Higher fees increase transaction priority.
-    :param signature: Transaction signature (missing if aggregate transaction).
+    :param signature: Transaction signature (missing if embedded transaction).
     :param signer: Account of transaction creator.
     :param transaction_info: Transaction metadata.
     """

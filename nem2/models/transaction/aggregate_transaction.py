@@ -44,6 +44,10 @@ __all__ = ['AggregateTransaction']
 
 Cosignature = AggregateTransactionCosignature
 Cosignatures = typing.Sequence[Cosignature]
+TYPES = (
+    TransactionType.AGGREGATE_BONDED,
+    TransactionType.AGGREGATE_COMPLETE,
+)
 
 
 @util.inherit_doc
@@ -55,13 +59,13 @@ class AggregateTransaction(Transaction):
     Transaction containing multiple inner transactions.
 
     :param network_type: Network type.
+    :param type: Transaction type.
     :param version: Transaction version.
     :param deadline: Deadline to include transaction.
     :param fee: Fee for the transaction. Higher fees increase transaction priority.
     :param inner_transactions: Inner transactions to be included.
     :param cosignatures: Transaction cosigner signatures.
-    :param type: Transaction type.
-    :param signature: Transaction signature.
+    :param signature: (Optional) Transaction signature.
     :param signer: (Optional) Account of transaction creator.
     :param transaction_info: (Optional) Transaction metadata.
     """
@@ -72,20 +76,17 @@ class AggregateTransaction(Transaction):
     def __init__(
         self,
         network_type: NetworkType,
+        type: TransactionType,
         version: TransactionVersion,
         deadline: Deadline,
         fee: int,
         inner_transactions: typing.Optional[InnerTransactionList] = None,
         cosignatures: typing.Optional[Cosignatures] = None,
-        type: TransactionType = TransactionType.AGGREGATE_COMPLETE,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
     ) -> None:
-        if (
-            type != TransactionType.AGGREGATE_COMPLETE
-            and type != TransactionType.AGGREGATE_BONDED
-        ):
+        if type not in TYPES:
             raise ValueError('Invalid transaction type.')
         super().__init__(
             type,

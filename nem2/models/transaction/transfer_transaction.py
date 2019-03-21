@@ -60,8 +60,7 @@ class TransferTransaction(Transaction):
     :param recipient: Address or namespace ID alias of recipient.
     :param mosaics: Sequence of mosaics.
     :param message: Transaction message (up to 2048 characters).
-    :param type: Transaction type.
-    :param signature: (Optional) Transaction signature (missing if inner transaction).
+    :param signature: (Optional) Transaction signature (missing if embedded transaction).
     :param signer: (Optional) Account of transaction creator.
     :param transaction_info: (Optional) Transaction metadata.
     """
@@ -79,15 +78,12 @@ class TransferTransaction(Transaction):
         recipient: RecipientType,
         mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
-        type: TransactionType = TransactionType.TRANSFER,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
     ) -> None:
-        if type != TransactionType.TRANSFER:
-            raise ValueError('Invalid transaction type.')
         super().__init__(
-            type,
+            TransactionType.TRANSFER,
             network_type,
             version,
             deadline,

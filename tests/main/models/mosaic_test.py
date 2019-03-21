@@ -65,6 +65,12 @@ class TestMosaic(harness.TestCase):
     def test_from_catbuffer(self):
         self.assertEqual(self.mosaic, models.Mosaic.from_catbuffer(self.catbuffer, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.mosaic, self.mosaic.replace())
+        self.assertIsInstance(self.mosaic.asdict(), dict)
+        self.assertIsInstance(self.mosaic.astuple(), tuple)
+        self.assertIsInstance(self.mosaic.fields(), tuple)
+
 
 class TestMosaicId(harness.TestCase):
 
@@ -134,6 +140,12 @@ class TestMosaicId(harness.TestCase):
 
     def test_from_catbuffer(self):
         self.assertEqual(self.mosaic_id, models.MosaicId.from_catbuffer(self.catbuffer, self.network_type))
+
+    def test_dataclasses(self):
+        self.assertEqual(self.mosaic_id, self.mosaic_id.replace())
+        self.assertIsInstance(self.mosaic_id.asdict(), dict)
+        self.assertIsInstance(self.mosaic_id.astuple(), tuple)
+        self.assertIsInstance(self.mosaic_id.fields(), tuple)
 
 
 class TestMosaicInfo(harness.TestCase):
@@ -251,6 +263,12 @@ class TestMosaicNonce(harness.TestCase):
     def test_from_catbuffer(self):
         self.assertEqual(self.nonce, models.MosaicNonce.from_catbuffer(self.catbuffer, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.nonce, self.nonce.replace())
+        self.assertIsInstance(self.nonce.asdict(), dict)
+        self.assertIsInstance(self.nonce.astuple(), tuple)
+        self.assertIsInstance(self.nonce.fields(), tuple)
+
 
 class TestMosaicProperties(harness.TestCase):
 
@@ -314,6 +332,12 @@ class TestMosaicProperties(harness.TestCase):
     def test_from_catbuffer(self):
         self.assertEqual(self.properties, models.MosaicProperties.from_catbuffer(self.catbuffer, self.network_type))
 
+    def test_dataclasses(self):
+        self.assertEqual(self.properties, self.properties.replace())
+        self.assertIsInstance(self.properties.asdict(), dict)
+        self.assertIsInstance(self.properties.astuple(), tuple)
+        self.assertIsInstance(self.properties.fields(), tuple)
+
 
 class TestMosaicSupplyType(harness.TestCase):
 
@@ -375,6 +399,12 @@ class TestNetworkCurrencyMosaic(harness.TestCase):
         value = models.NetworkCurrencyMosaic.create_absolute(1)
         self.assertEqual(value.amount, 1)
 
+    def test_dataclasses(self):
+        self.assertEqual(self.mosaic, self.mosaic.replace())
+        self.assertIsInstance(self.mosaic.asdict(), dict)
+        self.assertIsInstance(self.mosaic.astuple(), tuple)
+        self.assertIsInstance(self.mosaic.fields(), tuple)
+
 
 class TestNetworkHarvestMosaic(harness.TestCase):
 
@@ -405,3 +435,9 @@ class TestNetworkHarvestMosaic(harness.TestCase):
     def test_create_absolute(self):
         value = models.NetworkHarvestMosaic.create_absolute(1)
         self.assertEqual(value.amount, 1)
+
+    def test_dataclasses(self):
+        self.assertEqual(self.mosaic, self.mosaic.replace())
+        self.assertIsInstance(self.mosaic.asdict(), dict)
+        self.assertIsInstance(self.mosaic.astuple(), tuple)
+        self.assertIsInstance(self.mosaic.fields(), tuple)

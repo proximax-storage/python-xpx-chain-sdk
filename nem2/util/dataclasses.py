@@ -67,7 +67,8 @@ def set_defaults(
     # Need to validate we aren't adding defaults for interior items.
     init = cls.__init__
     code = init.__code__
-    varnames = code.co_varnames
+    argcount = code.co_argcount
+    varnames = code.co_varnames[:argcount]
     count = len(defaults)
     if not all(i in defaults for i in varnames[-count:]):
         raise SyntaxError("non-default argument follows default argument")
@@ -278,8 +279,20 @@ def set_replace(
     if not replace or 'replace' in clsdict:
         return
 
-    def func(self, **changes) -> tuple:
-        return dataclasses.replace(self, **changes)
+    def func(self, **changes):
+        # Get all positional arguments in __init__, including named
+        # and named optional arguments.
+        # This is a smart-replace, any fields that are not defined
+        # in the initializer are ignored, since it is assumed
+        # sensible defaults are automatically provided for those.
+        code = self.__init__.__func__.__code__
+        argcount = code.co_argcount
+        varnames = code.co_varnames[1:argcount]
+
+        # Convert to a dictionary and then call __init__.
+        asdict = {k: getattr(self, k) for k in varnames}
+        asdict.update(changes)
+        return self.__class__(**asdict)
 
     func.__name__ = 'replace'
     func.__qualname__ = f'{cls.__qualname__}.replace'

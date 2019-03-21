@@ -23,6 +23,7 @@
 """
 
 from .alias import Alias
+from .alias_type import AliasType
 from ..mosaic.mosaic_id import MosaicId
 
 __all__ = ['MosaicAlias']
@@ -38,4 +39,4 @@ class MosaicAlias(Alias):
     __slots__ = ()
 
     def __init__(self, value: MosaicId) -> None:
-        super().__init__(value)
+        super().__init__(AliasType.MOSAIC_ID, value)

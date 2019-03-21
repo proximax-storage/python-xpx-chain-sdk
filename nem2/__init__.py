@@ -1,5 +1,6 @@
-from .client import *   # type: ignore
-from .models import *   # type: ignore
+# type: ignore
+from .client import *
+from .models import *
 
 __all__ = (
     client.__all__

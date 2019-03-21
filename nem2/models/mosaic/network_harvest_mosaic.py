@@ -26,7 +26,6 @@ from __future__ import annotations
 import typing
 
 from .mosaic import Mosaic
-from .mosaic_id import MosaicId
 from ..namespace.namespace_id import NamespaceId
 
 __all__ = ['NetworkHarvestMosaic']
@@ -54,8 +53,7 @@ class NetworkHarvestMosaic(Mosaic):
     LEVY_MUTABLE: typing.ClassVar[bool] = False
 
     def __init__(self, amount: int) -> None:
-        mosaic_id = MosaicId(self.NAMESPACE_ID.id)
-        super().__init__(mosaic_id, amount)
+        super().__init__(self.NAMESPACE_ID, amount)
 
     @classmethod
     def create_relative(cls, amount: int):

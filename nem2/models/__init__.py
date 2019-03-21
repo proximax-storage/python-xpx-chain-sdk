@@ -2,8 +2,6 @@
 # __init__ of the subdirectories, since there is a
 # complicated web of inter-dependencies within models.
 # Just use glob imports at the models level.
-# Since we shadow `account`, `mosaic`, and `transaction` with
-# imports, MyPy complains, so silence MyPy.
 
 # Account
 from .account.account import *
@@ -13,7 +11,7 @@ from .account.address import *
 from .account.multisig_account_graph_info import *
 from .account.multisig_account_info import *
 from .account.public_account import *
-from .account import *      # type: ignore
+from .account import *
 
 # Blockchain
 from .blockchain.block_info import *
@@ -34,7 +32,7 @@ from .mosaic.mosaic_properties import *
 from .mosaic.mosaic_supply_type import *
 from .mosaic.network_currency_mosaic import *
 from .mosaic.network_harvest_mosaic import *
-from .mosaic import *       # type: ignore
+from .mosaic import *
 
 # Namespace
 from .namespace.address_alias import *
@@ -75,11 +73,11 @@ from .transaction.transaction_status_group import *
 from .transaction.transaction_type import *
 from .transaction.transaction_version import *
 from .transaction.transfer_transaction import *
-from .transaction import *  # type: ignore
+from .transaction import *
 
 __all__ = (
     # Account
-    account.__all__         # type: ignore
+    account.__all__
     + account_info.__all__
     + account_metadata.__all__
     + address.__all__
@@ -94,7 +92,7 @@ __all__ = (
     + network_type.__all__
 
     # Mosaic
-    + mosaic.__all__        # type: ignore
+    + mosaic.__all__
     + mosaic_id.__all__
     + mosaic_info.__all__
     + mosaic_levy.__all__
@@ -135,7 +133,7 @@ __all__ = (
     + secret_proof_transaction.__all__
     + signed_transaction.__all__
     + sync_announce.__all__
-    + transaction.__all__   # type: ignore
+    + transaction.__all__
     + transaction_announce_response.__all__
     + transaction_info.__all__
     + transaction_status.__all__
