@@ -55,8 +55,8 @@ class SecretProofTransaction(Transaction):
     :param deadline: Deadline to include transaction.
     :param fee: Fee for the transaction. Higher fees increase transaction priority.
     :param hash_type: Hash algorithm secret was generated with.
-    :param secret: Hex-encoded seed-proof hash.
-    :param proof: Hex-encoded seed proof.
+    :param secret: Hex-encoded or raw seed-proof hash.
+    :param proof: Hex-encoded or raw seed proof.
     :param signature: (Optional) Transaction signature (missing if embedded transaction).
     :param signer: (Optional) Account of transaction creator.
     :param transaction_info: (Optional) Transaction metadata.
@@ -73,12 +73,14 @@ class SecretProofTransaction(Transaction):
         deadline: Deadline,
         fee: int,
         hash_type: HashType,
-        secret: str,
-        proof: str,
+        secret: typing.AnyStr,
+        proof: typing.AnyStr,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
     ) -> None:
+        secret = util.encode_hex(secret)
+        proof = util.encode_hex(proof)
         if not hash_type.validate(secret):
             raise ValueError("HashType and secret have incompatible lengths.")
         super().__init__(
@@ -100,8 +102,8 @@ class SecretProofTransaction(Transaction):
         cls,
         deadline: Deadline,
         hash_type: HashType,
-        secret: str,
-        proof: str,
+        secret: typing.AnyStr,
+        proof: typing.AnyStr,
         network_type: NetworkType,
     ):
         """
@@ -109,8 +111,8 @@ class SecretProofTransaction(Transaction):
 
         :param deadline: Deadline to include transaction.
         :param hash_type: Hash algorithm secret was generated with.
-        :param secret: Hex-encoded seed-proof hash.
-        :param proof: Hex-encoded seed proof.
+        :param secret: Hex-encoded or raw seed-proof hash.
+        :param proof: Hex-encoded or raw seed proof.
         :param network_type: Network type.
         """
         return cls(
@@ -165,7 +167,7 @@ class SecretProofTransaction(Transaction):
         hash_type, data = HashType.from_catbuffer_pair(data, network_type)
         hash_length = hash_type.hash_length() // 2
         secret = util.hexlify(data[:hash_length])
-        data = data[hash_length:]
+        data = data[32:]
         proof_size = util.u16_from_catbuffer(data[:2])
         proof = util.hexlify(data[2: proof_size + 2])
 

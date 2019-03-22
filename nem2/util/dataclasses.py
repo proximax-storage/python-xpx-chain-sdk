@@ -55,6 +55,18 @@ TupleFactory = typing.Callable[..., TupleType]
 # NEW METHODS
 
 
+def get_argnames(func):
+    """Get the argument names from a function."""
+
+    # Get all positional arguments in __init__, including named
+    # and named optional arguments. `co_varnames` stores all argument
+    # names (including local variable names) in order, starting with
+    # function arguments, so only grab `co_argcount` varnames.
+    code = func.__code__
+    argcount = code.co_argcount
+    return code.co_varnames[:argcount]
+
+
 def set_defaults(
     cls: typing.Type,
     defaults: Vars,
@@ -66,9 +78,7 @@ def set_defaults(
 
     # Need to validate we aren't adding defaults for interior items.
     init = cls.__init__
-    code = init.__code__
-    argcount = code.co_argcount
-    varnames = code.co_varnames[:argcount]
+    varnames = get_argnames(init)
     count = len(defaults)
     if not all(i in defaults for i in varnames[-count:]):
         raise SyntaxError("non-default argument follows default argument")
@@ -154,7 +164,7 @@ def set_copy(
         return
 
     def func(self):
-        return dataclasses.replace(self)
+        return type(self)(**replace_dict(self))
 
     func.__name__ = '__copy__'
     func.__qualname__ = f'{cls.__qualname__}.__copy__'
@@ -173,7 +183,7 @@ def set_deepcopy(
         return
 
     def func(self, memo=None):
-        data = copy.deepcopy(shallow_asdict(self), memo)
+        data = copy.deepcopy(replace_dict(self), memo)
         return type(self)(**data)
 
     func.__name__ = '__deepcopy__'
@@ -269,6 +279,14 @@ def set_fields(
     clsdict['fields'] = func
 
 
+def replace_dict(self):
+    # This is a smart-replace, any fields that are not defined
+    # in the initializer are ignored, since it is assumed
+    # sensible defaults are automatically provided for those.
+    varnames = get_argnames(self.__init__.__func__)[1:]
+    return {k: getattr(self, k) for k in varnames}
+
+
 def set_replace(
     cls: typing.Type,
     clsdict: Vars,
@@ -280,17 +298,8 @@ def set_replace(
         return
 
     def func(self, **changes):
-        # Get all positional arguments in __init__, including named
-        # and named optional arguments.
-        # This is a smart-replace, any fields that are not defined
-        # in the initializer are ignored, since it is assumed
-        # sensible defaults are automatically provided for those.
-        code = self.__init__.__func__.__code__
-        argcount = code.co_argcount
-        varnames = code.co_varnames[1:argcount]
-
         # Convert to a dictionary and then call __init__.
-        asdict = {k: getattr(self, k) for k in varnames}
+        asdict = replace_dict(self)
         asdict.update(changes)
         return self.__class__(**asdict)
 

@@ -26,8 +26,10 @@ from __future__ import annotations
 import typing
 
 from nem2 import util
+from .block_type import BlockType
 from .network_type import NetworkType, OptionalNetworkType
 from ..account.public_account import PublicAccount
+from ..transaction.transaction_version import TransactionVersion
 
 __all__ = ['BlockInfo']
 
@@ -65,8 +67,8 @@ class BlockInfo(util.DTO):
     signature: str
     signer: PublicAccount
     network_type: NetworkType
-    version: int
-    type: int
+    version: TransactionVersion
+    type: BlockType
     height: int
     timestamp: int
     difficulty: int
@@ -83,8 +85,8 @@ class BlockInfo(util.DTO):
         signature: typing.AnyStr,
         signer: PublicAccount,
         network_type: NetworkType,
-        version: int,
-        type: int,
+        version: TransactionVersion,
+        type: BlockType,
         height: int,
         timestamp: int,
         difficulty: int,
@@ -126,8 +128,8 @@ class BlockInfo(util.DTO):
         block = {
             'signature': self.signature,
             'signer': self.signer.to_dto(network_type),
-            'version': self.version | (int(network_type) << 8),
-            'type': self.type,
+            'version': int(self.version) | (int(network_type) << 8),
+            'type': self.type.to_dto(network_type),
             'height': util.u64_to_dto(self.height),
             'timestamp': util.u64_to_dto(self.timestamp),
             'difficulty': util.u64_to_dto(self.difficulty),
@@ -163,8 +165,8 @@ class BlockInfo(util.DTO):
             signature=block['signature'],
             signer=PublicAccount.from_dto(block['signer'], network_type),
             network_type=network_type,
-            version=version & 0xFF,
-            type=block['type'],
+            version=TransactionVersion(version & 0xFF),
+            type=BlockType.from_dto(block['type'], network_type),
             height=util.u64_from_dto(block['height']),
             timestamp=util.u64_from_dto(block['timestamp']),
             difficulty=util.u64_from_dto(block['difficulty']),

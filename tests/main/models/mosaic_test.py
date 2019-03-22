@@ -2,150 +2,55 @@ from nem2 import models
 from tests import harness
 
 
+@harness.model_test_case({
+    'type': models.Mosaic,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'id': models.MosaicId(5),
+        'amount': 1000,
+    },
+    'dto': {
+        'id': [5, 0],
+        'amount': [1000, 0],
+    },
+    'catbuffer': b'\x05\x00\x00\x00\x00\x00\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00',
+})
 class TestMosaic(harness.TestCase):
-
-    def setUp(self):
-        self.network_type = models.NetworkType.MIJIN_TEST
-        self.mosaic_id = models.MosaicId(5)
-        self.mosaic = models.Mosaic(self.mosaic_id, 1000)
-        self.dto = {'amount': [1000, 0], 'id': [5, 0]}
-        self.catbuffer = b"\x05\x00\x00\x00\x00\x00\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00"
-
-    def test_init(self):
-        self.assertEqual(self.mosaic.id, self.mosaic_id)
-        self.assertEqual(self.mosaic.amount, 1000)
-
-    def test_slots(self):
-        with self.assertRaises(TypeError):
-            self.mosaic.__dict__
-
-    def test_properties(self):
-        self.assertEqual(self.mosaic.id, models.MosaicId(5))
-        self.assertEqual(self.mosaic.amount, 1000)
-
-        with self.assertRaises(AttributeError):
-            self.mosaic.id = models.MosaicId(10)
-        with self.assertRaises(AttributeError):
-            self.mosaic.id.id = 10
-        with self.assertRaises(AttributeError):
-            self.mosaic.amount = 10
-
-    def test_repr(self):
-        self.assertEqual(repr(self.mosaic), "Mosaic(id=MosaicId(id=5), amount=1000)")
-
-    def test_str(self):
-        self.assertEqual(str(self.mosaic), "Mosaic(id=MosaicId(id=5), amount=1000)")
-
-    def test_eq(self):
-        m1 = models.Mosaic(models.MosaicId(5), 1000)
-        m2 = models.Mosaic(models.MosaicId(5), 1000)
-        m3 = models.Mosaic(models.MosaicId(5), 500)
-        m4 = models.Mosaic(models.MosaicId(10), 1000)
-
-        self.assertTrue(m1 == m1)
-        self.assertTrue(m1 == m2)
-        self.assertFalse(m1 == m3)
-        self.assertFalse(m1 == m4)
-        self.assertTrue(m2 == m2)
-        self.assertFalse(m2 == m3)
-        self.assertFalse(m2 == m4)
-        self.assertTrue(m3 == m3)
-        self.assertFalse(m3 == m4)
-        self.assertTrue(m4 == m4)
-
-    def test_to_dto(self):
-        self.assertEqual(self.mosaic.to_dto(self.network_type), self.dto)
-
-    def test_from_dto(self):
-        self.assertEqual(self.mosaic, models.Mosaic.from_dto(self.dto, self.network_type))
-
-    def test_to_catbuffer(self):
-        self.assertEqual(self.mosaic.to_catbuffer(self.network_type), self.catbuffer)
-
-    def test_from_catbuffer(self):
-        self.assertEqual(self.mosaic, models.Mosaic.from_catbuffer(self.catbuffer, self.network_type))
-
-    def test_dataclasses(self):
-        self.assertEqual(self.mosaic, self.mosaic.replace())
-        self.assertIsInstance(self.mosaic.asdict(), dict)
-        self.assertIsInstance(self.mosaic.astuple(), tuple)
-        self.assertIsInstance(self.mosaic.fields(), tuple)
+    pass
 
 
+@harness.model_test_case({
+    'type': models.MosaicId,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'id': 5,
+    },
+    'dto': [5, 0],
+    'catbuffer': b'\x05\x00\x00\x00\x00\x00\x00\x00',
+    'extras': {
+        'nonce': models.MosaicNonce(b'\x00\x00\x00\x00'),
+        'public_key': '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246',
+    },
+})
 class TestMosaicId(harness.TestCase):
 
-    def setUp(self):
-        self.network_type = models.NetworkType.MIJIN_TEST
-        self.mosaic_id = models.MosaicId(5)
-        self.dto = [5, 0]
-        self.catbuffer = b"\x05\x00\x00\x00\x00\x00\x00\x00"
-
-    def test_init(self):
-        self.assertEqual(self.mosaic_id.id, 5)
-
-    def test_slots(self):
-        with self.assertRaises(TypeError):
-            self.mosaic_id.__dict__
-
-    def test_properties(self):
-        self.assertEqual(self.mosaic_id.id, 5)
-
-        with self.assertRaises(AttributeError):
-            self.mosaic_id.id = 10
-
     def test_int(self):
-        self.assertEqual(int(self.mosaic_id), 5)
+        self.assertEqual(int(self.model), 5)
 
     def test_index(self):
-        self.assertEqual(hex(self.mosaic_id), "0x5")
+        self.assertEqual(hex(self.model), "0x5")
 
     def test_format(self):
-        value = models.MosaicId(13)
+        value = self.type(13)
         self.assertEqual(f'{value:x}', 'd')
         self.assertEqual(f'{value:X}', 'D')
 
     def test_create_from_nonce(self):
-        nonce = models.MosaicNonce(b'\x00\x00\x00\x00')
-        public_key = '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246'
-        owner = models.PublicAccount.create_from_public_key(public_key, self.network_type)
-        value = models.MosaicId.create_from_nonce(nonce, owner)
+        #nonce = models.MosaicNonce(b'\x00\x00\x00\x00')
+        #public_key = '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246'
+        owner = models.PublicAccount.create_from_public_key(self.extras['public_key'], self.network_type)
+        value = self.type.create_from_nonce(self.extras['nonce'], owner)
         self.assertEqual(value.id, 0x2FF7D64F483BC0A6)
-
-    def test_repr(self):
-        self.assertEqual(repr(self.mosaic_id), "MosaicId(id=5)")
-
-    def test_str(self):
-        self.assertEqual(str(self.mosaic_id), repr(self.mosaic_id))
-
-    def test_eq(self):
-        id1 = models.MosaicId(5)
-        id2 = models.MosaicId(5)
-        id3 = models.MosaicId(8)
-
-        self.assertTrue(id1 == id1)
-        self.assertTrue(id1 == id2)
-        self.assertFalse(id1 == id3)
-        self.assertTrue(id2 == id2)
-        self.assertFalse(id2 == id3)
-        self.assertTrue(id3 == id3)
-
-    def test_to_dto(self):
-        self.assertEqual(self.mosaic_id.to_dto(self.network_type), self.dto)
-
-    def test_from_dto(self):
-        self.assertEqual(self.mosaic_id, models.MosaicId.from_dto(self.dto, self.network_type))
-
-    def test_to_catbuffer(self):
-        self.assertEqual(self.mosaic_id.to_catbuffer(self.network_type), self.catbuffer)
-
-    def test_from_catbuffer(self):
-        self.assertEqual(self.mosaic_id, models.MosaicId.from_catbuffer(self.catbuffer, self.network_type))
-
-    def test_dataclasses(self):
-        self.assertEqual(self.mosaic_id, self.mosaic_id.replace())
-        self.assertIsInstance(self.mosaic_id.asdict(), dict)
-        self.assertIsInstance(self.mosaic_id.astuple(), tuple)
-        self.assertIsInstance(self.mosaic_id.fields(), tuple)
 
 
 class TestMosaicInfo(harness.TestCase):
@@ -156,65 +61,60 @@ class TestMosaicLevy(harness.TestCase):
     pass
 
 
+@harness.enum_test_case({
+    'type': models.MosaicLevyType,
+    'enums': [
+        models.MosaicLevyType.ABSOLUTE,
+        models.MosaicLevyType.CALCULATED,
+    ],
+    'values': [
+        1,
+        2,
+    ],
+    'descriptions': [
+        "The levy is an absolute fee",
+        "The levy is calculated from",
+    ],
+    'dto': [
+        1,
+        2,
+    ],
+    'catbuffer': [
+        b'\x01',
+        b'\x02',
+    ],
+})
 class TestMosaicLevyType(harness.TestCase):
-
-    def setUp(self):
-        self.network_type = models.NetworkType.MIJIN_TEST
-        self.absolute = models.MosaicLevyType.ABSOLUTE
-        self.calculated = models.MosaicLevyType.CALCULATED
-        self.dto = 1
-        self.catbuffer = b'\x01'
-
-    def test_values(self):
-        self.assertEqual(self.absolute, 1)
-        self.assertEqual(self.calculated, 2)
-
-    def test_description(self):
-        self.assertTrue(self.absolute.description().startswith("The levy is an absolute fee."))
-        self.assertTrue(self.calculated.description().startswith("The levy is calculated"))
-
-    def test_to_dto(self):
-        self.assertEqual(self.absolute.to_dto(self.network_type), self.dto)
-
-    def test_from_dto(self):
-        self.assertEqual(self.absolute, models.MosaicLevyType.from_dto(self.dto, self.network_type))
-
-    def test_to_catbuffer(self):
-        self.assertEqual(self.absolute.to_catbuffer(self.network_type), self.catbuffer)
-
-    def test_from_catbuffer(self):
-        self.assertEqual(self.absolute, models.MosaicLevyType.from_catbuffer(self.catbuffer, self.network_type))
+    pass
 
 
+@harness.model_test_case({
+    'type': models.MosaicNonce,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'nonce': b'\x12\x34\x56\x78',
+    },
+    'dto': [0x12, 0x34, 0x56, 0x78],
+    'catbuffer': b'\x12\x34\x56\x78',
+    'extras': {
+        'nonce': models.MosaicNonce(b'\x12\x34\x56\x78'),
+        'public_key': '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246',
+    },
+})
 class TestMosaicNonce(harness.TestCase):
 
-    def setUp(self):
-        self.network_type = models.NetworkType.MIJIN_TEST
-        self.catbuffer = b'\x00\x00\x00\x00'
-        self.nonce = models.MosaicNonce(self.catbuffer)
-        self.dto = [0, 0, 0, 0]
-
-    def test_slots(self):
-        with self.assertRaises(TypeError):
-            self.nonce.__dict__
-
-    def test_properties(self):
-        self.assertEqual(self.nonce.nonce, self.catbuffer)
-        with self.assertRaises(AttributeError):
-            self.nonce.nonce = self.catbuffer
-
     def test_int(self):
-        self.assertEqual(int(self.nonce), 0)
+        self.assertEqual(int(self.model), 0x78563412)
 
     def test_index(self):
-        self.assertEqual(hex(self.nonce), "0x0")
+        self.assertEqual(hex(self.model), "0x78563412")
 
     def test_format(self):
-        value = models.MosaicNonce.create_from_int(5)
+        value = self.type(5)
         self.assertEqual(f'{value:x}', '5')
         self.assertEqual(f'{value:X}', '5')
 
-        value = models.MosaicNonce.create_from_int(13)
+        value = self.type(13)
         self.assertEqual(f'{value:x}', 'd')
         self.assertEqual(f'{value:X}', 'D')
 
@@ -222,52 +122,15 @@ class TestMosaicNonce(harness.TestCase):
         def fake_entropy(size: int):
             return b'4' * size
 
-        self.assertEqual(models.MosaicNonce.create_random(fake_entropy).nonce, b'4444')
-        models.MosaicNonce.create_random()
+        self.assertEqual(self.type.create_random(fake_entropy).nonce, b'4444')
+        self.type.create_random()
 
     def test_create_from_hex(self):
-        data = '00000000'
-        self.assertEqual(self.nonce, models.MosaicNonce.create_from_hex(data))
+        self.assertEqual(self.model, self.type.create_from_hex('12345678'))
 
     def test_create_from_int(self):
-        self.assertEqual(models.MosaicNonce.create_from_int(5).nonce, b'\x05\x00\x00\x00')
-        self.assertEqual(models.MosaicNonce.create_from_int(325).nonce, b'E\x01\x00\x00')
-
-    def test_repr(self):
-        self.assertEqual(repr(self.nonce), "MosaicNonce(nonce=b'\\x00\\x00\\x00\\x00')")
-
-    def test_str(self):
-        self.assertEqual(str(self.nonce), repr(self.nonce))
-
-    def test_eq(self):
-        n1 = models.MosaicNonce.create_from_hex('01234567')
-        n2 = models.MosaicNonce.create_from_hex('01234567')
-        n3 = models.MosaicNonce.create_from_hex('01234568')
-
-        self.assertTrue(n1 == n1)
-        self.assertTrue(n1 == n2)
-        self.assertFalse(n1 == n3)
-        self.assertTrue(n2 == n2)
-        self.assertFalse(n2 == n3)
-        self.assertTrue(n3 == n3)
-
-    def test_to_dto(self):
-        self.assertEqual(self.nonce.to_dto(self.network_type), self.dto)
-
-    def test_from_dto(self):
-        self.assertEqual(self.nonce, models.MosaicNonce.from_dto(self.dto, self.network_type))
-
-    def test_to_catbuffer(self):
-        self.assertEqual(self.nonce.to_catbuffer(self.network_type), self.catbuffer)
-
-    def test_from_catbuffer(self):
-        self.assertEqual(self.nonce, models.MosaicNonce.from_catbuffer(self.catbuffer, self.network_type))
-
-    def test_dataclasses(self):
-        self.assertEqual(self.nonce, self.nonce.replace())
-        self.assertIsInstance(self.nonce.asdict(), dict)
-        self.assertIsInstance(self.nonce.astuple(), tuple)
-        self.assertIsInstance(self.nonce.fields(), tuple)
+        self.assertEqual(self.type.create_from_int(5).nonce, b'\x05\x00\x00\x00')
+        self.assertEqual(self.type.create_from_int(325).nonce, b'E\x01\x00\x00')
 
 
 class TestMosaicProperties(harness.TestCase):

@@ -25,6 +25,8 @@
 import json
 import os
 
+from nem2 import models
+
 DIR = os.path.dirname(os.path.realpath(__file__))
 DATADIR = os.path.join(DIR, 'data')
 ENDPOINT = os.environ.get('NIS2_ENDPOINT', 'localhost:3000')
@@ -66,5 +68,5 @@ NAMESPACE_NAMES = {
 }
 
 NETWORK_TYPE = {
-    'MIJIN_TEST': load_response('network.json'),
+    'MIJIN_TEST': load_response('mijin_test_network.json'),
 }

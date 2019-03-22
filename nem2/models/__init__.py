@@ -15,6 +15,7 @@ from .account import *
 
 # Blockchain
 from .blockchain.block_info import *
+from .blockchain.block_type import *
 from .blockchain.blockchain_score import *
 from .blockchain.blockchain_storage_info import *
 from .blockchain.network_type import *
@@ -87,6 +88,7 @@ __all__ = (
 
     # Blockchain
     + block_info.__all__
+    + block_type.__all__
     + blockchain_score.__all__
     + blockchain_storage_info.__all__
     + network_type.__all__

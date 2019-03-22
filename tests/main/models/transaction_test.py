@@ -465,80 +465,44 @@ class TestPlainMessage(harness.TestCase):
         self.assertIsInstance(self.message.fields(), tuple)
 
 
+@harness.transaction_test_case({
+    'type': models.SecretProofTransaction,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'network_type': models.NetworkType.MIJIN_TEST,
+        'version': models.TransactionVersion.SECRET_PROOF,
+        'deadline': models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+        'fee': 0,
+        'signature': None,
+        'signer': None,
+        'transaction_info': None,
+        'hash_type': models.HashType.SHA3_256,
+        'secret': '9b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e',
+        'proof': 'b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7',
+    },
+    'dto': {
+        'transaction': {
+            'version': 36865,
+            'type': 16978,
+            'fee': [0, 0],
+            'deadline': [1552004337, 0],
+            'hashAlgorithm': 0,
+            'secret': '9b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e',
+            'proof': 'b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7',
+        },
+    },
+    'catbuffer': 'bb000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7',
+    'extras': {
+        'private_key': '97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca',
+        'signed': {
+            'payload': 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7',
+            'hash': 'd8949c87755cfd2c003fec4e1bd4aadb00b3f4838fc5ce7ffeded9385805fcdd',
+        },
+        'embedded': '6b0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501905242009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7',
+    },
+})
 class TestSecretProofTransaction(harness.TestCase):
-
-    def setUp(self):
-        self.deadline = models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57))
-        self.hash_type = models.HashType.SHA3_256
-        self.proof = 'b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
-        self.secret = util.hashlib.sha3_256(util.unhexlify(self.proof)).hexdigest()
-        self.network_type = models.NetworkType.MIJIN_TEST
-        self.transaction = models.SecretProofTransaction.create(
-            deadline=self.deadline,
-            hash_type=self.hash_type,
-            secret=self.secret,
-            proof=self.proof,
-            network_type=self.network_type,
-        )
-        self.dto = {
-            'transaction': {
-                'version': 36865,
-                'type': 16978,
-                'fee': [0, 0],
-                'deadline': [1552004337, 0],
-                'hashAlgorithm': int(self.hash_type),
-                'secret': self.secret,
-                'proof': self.proof,
-            },
-        }
-        private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
-        self.signer = models.Account.create_from_private_key(private_key, self.network_type)
-        self.catbuffer = 'bb000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
-        self.payload = 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
-        self.hash = 'd8949c87755cfd2c003fec4e1bd4aadb00b3f4838fc5ce7ffeded9385805fcdd'
-        self.embedded = '6b0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501905242009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
-
-    def test_init(self):
-        self.assertEqual(self.transaction.deadline, self.deadline)
-        self.assertEqual(self.transaction.hash_type, self.hash_type)
-        self.assertEqual(self.transaction.secret, self.secret)
-        self.assertEqual(self.transaction.proof, self.proof)
-        self.assertEqual(self.transaction.network_type, self.network_type)
-
-    def test_slots(self):
-        with self.assertRaises(TypeError):
-            self.transaction.__dict__
-
-    def test_catbuffer(self):
-        catbuffer = self.transaction.to_catbuffer()
-        self.assertEqual(self.catbuffer, util.hexlify(catbuffer))
-        self.assertEqual(self.transaction, models.Transaction.from_catbuffer(catbuffer))
-
-    def test_dto(self):
-        self.assertEqual(self.dto, self.transaction.to_dto())
-        self.assertEqual(self.transaction, models.Transaction.from_dto(self.dto))
-
-    def test_sign_with(self):
-        signed_transaction = self.transaction.sign_with(self.signer)
-        self.assertEqual(signed_transaction.payload, self.payload)
-        self.assertEqual(signed_transaction.hash, self.hash)
-        self.assertEqual(signed_transaction.signer, self.signer.public_key)
-        self.assertEqual(signed_transaction.type, models.TransactionType.SECRET_PROOF)
-        self.assertEqual(signed_transaction.network_type, self.signer.network_type)
-
-    def test_to_aggregate(self):
-        inner = self.transaction.to_aggregate(self.signer.public_account)
-        catbuffer = inner.to_catbuffer()
-        self.assertEqual(self.embedded, util.hexlify(catbuffer))
-
-        with self.assertRaises(TypeError):
-            inner.__dict__
-
-    def test_dataclasses(self):
-        self.assertEqual(self.transaction, self.transaction.replace())
-        self.assertIsInstance(self.transaction.asdict(), dict)
-        self.assertIsInstance(self.transaction.astuple(), tuple)
-        self.assertIsInstance(self.transaction.fields(), tuple)
+    pass
 
 
 class TestSignedTransaction(harness.TestCase):

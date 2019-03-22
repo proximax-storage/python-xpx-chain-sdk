@@ -28,7 +28,7 @@ class TestAsyncLoop(harness.TestCase):
 
 class TestHTTP(harness.TestCase):
 
-    @harness.test_case(
+    @harness.async_test(
         sync_data=(client.NetworkHTTP, requests, client.HTTPError),
         async_data=(client.AsyncNetworkHTTP, aiohttp, client.AsyncHTTPError)
     )
@@ -41,7 +41,7 @@ class TestHTTP(harness.TestCase):
                 with data[1].default_exception(ConnectionRefusedError):
                     await await_cb(http.get_network_type())
 
-    @harness.test_case(
+    @harness.async_test(
         sync_data=client.HTTP,
         async_data=client.AsyncHTTP
     )
@@ -50,7 +50,7 @@ class TestHTTP(harness.TestCase):
             copy = data.from_http(http)
             self.assertTrue(http.raw is copy.raw)
 
-    @harness.test_case(
+    @harness.async_test(
         sync_data=(client.HTTP, requests),
         async_data=(client.AsyncHTTP, aiohttp)
     )

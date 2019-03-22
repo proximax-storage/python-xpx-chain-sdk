@@ -3,14 +3,21 @@ from nem2 import models
 from tests import harness
 from tests import responses
 
+BLOCK_VALIDATOR = [
+    lambda x: (x.channel_name, 'block'),
+    lambda x: (isinstance(x.message, models.BlockInfo), True),
+    lambda x: (x.message.height >= 23230, True),
+]
 
+
+@harness.listener_test_case({
+    'tests': [
+        {
+            'name': 'test_new_block',
+            'subscriptions': ['new_block'],
+            'validation': [BLOCK_VALIDATOR],
+        },
+    ],
+})
 class TestListener(harness.TestCase):
-
-    async def test_block(self):
-        async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
-            await listener.new_block()
-            async for message in listener:
-                self.assertEqual(message.channel_name, 'block')
-                self.assertIsInstance(message.message, models.BlockInfo)
-                self.assertGreaterEqual(message.message.height, 23230)
-                break
+    pass
