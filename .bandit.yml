@@ -1,0 +1,3 @@
+tests:
+skips:
+- B101  # Ignore assertion warnings, they're only used to affirm priors already enforced.

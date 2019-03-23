@@ -93,7 +93,9 @@ def fix_annotation(type, global_vars: Vars, local_vars: Vars):
 
     if isinstance(type, str):
         try:
-            return eval(type, global_vars, local_vars)
+            # Silence a warning about sec, all the arguments passed.
+            # Eval only gets passed for internal type annotations.
+            return eval(type, global_vars, local_vars)  # nosec
         except NameError:
             return type
     elif isinstance(type, ForwardRef):
@@ -132,7 +134,9 @@ def is_classvar(x, global_vars: Vars, local_vars: Vars) -> bool:
     """Determine if x is a ClassVar."""
 
     if isinstance(x, str):
-        x = eval(x, global_vars, local_vars)
+        # Silence a warning about sec, all the arguments passed.
+        # Eval only gets passed for internal type annotations.
+        x = eval(x, global_vars, local_vars)    # nosec
     return getattr(x, '__origin__', None) is typing.ClassVar
 
 

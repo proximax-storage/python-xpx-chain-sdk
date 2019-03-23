@@ -62,6 +62,8 @@ from .transaction.message_type import *
 from .transaction.mosaic_alias_transaction import *
 from .transaction.multisig_cosignatory_modification_type import *
 from .transaction.plain_message import *
+from .transaction.register_namespace_transaction import *
+from .transaction.secret_lock_transaction import *
 from .transaction.secret_proof_transaction import *
 from .transaction.signed_transaction import *
 from .transaction.sync_announce import *
@@ -132,6 +134,8 @@ __all__ = (
     + mosaic_alias_transaction.__all__
     + multisig_cosignatory_modification_type.__all__
     + plain_message.__all__
+    + register_namespace_transaction.__all__
+    + secret_lock_transaction.__all__
     + secret_proof_transaction.__all__
     + signed_transaction.__all__
     + sync_announce.__all__

@@ -339,6 +339,61 @@ class TestPlainMessage(harness.TestCase):
 
 
 @harness.transaction_test_case({
+    'type': models.SecretLockTransaction,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'network_type': models.NetworkType.MIJIN_TEST,
+        'version': models.TransactionVersion.SECRET_LOCK,
+        'deadline': models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+        'fee': 0,
+        'signature': None,
+        'signer': None,
+        'transaction_info': None,
+        'mosaic': models.Mosaic(models.MosaicId(5), 1000),
+        'duration': 100,
+        'hash_type': models.HashType.SHA3_256,
+        'secret': '9b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e',
+        'recipient': models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54'),
+    },
+    'dto': {
+        'transaction': {
+            'version': 36865,
+            'type': 16722,
+            'fee': [0, 0],
+            'deadline': [1552004337, 0],
+            'mosaicId': [5, 0],
+            'amount': [1000, 0],
+            'duration': [100, 0],
+            'hashAlgorithm': 0,
+            'secret': '9b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e',
+            'recipient': '90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
+        },
+    },
+    'catbuffer': 'ca000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019052410000000000000000f1b4815c000000000500000000000000e8030000000000006400000000000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
+    'extras': {
+        'private_key': '97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca',
+        'signed': {
+            'payload': 'ca0000007c466426460932877777a0ecac6d0fb691a21fea28a5ec00e85d75c2c5527b84b817ff0a6afe3816d69d73d5f0e05ae18f447633862dc1fc109f1097732588081b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052410000000000000000f1b4815c000000000500000000000000e8030000000000006400000000000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
+            'hash': '3345a5f879c5043bd965d0df6060aaeb5ba7b35a102e19a93c2013fe32a371ca',
+        },
+        'embedded': '7a0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052410500000000000000e8030000000000006400000000000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
+    },
+})
+class TestSecretLockTransaction(harness.TestCase):
+
+    def test_create(self):
+        self.assertEqual(self.model, self.type.create(
+            deadline=self.data['deadline'],
+            mosaic=self.data['mosaic'],
+            duration=self.data['duration'],
+            hash_type=self.data['hash_type'],
+            secret=self.data['secret'],
+            recipient=self.data['recipient'],
+            network_type=self.data['network_type'],
+        ))
+
+
+@harness.transaction_test_case({
     'type': models.SecretProofTransaction,
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
@@ -443,10 +498,7 @@ class TestTransaction(harness.TestCase):
 
     # TODO(ahuszagh) Need to test the hooks.
     # Implement...
-    #   is_unconfirmed
-    #   is_confirmed
     #   has_missing_signatures
-    #   is_unannounced
 
 
 @harness.model_test_case({
@@ -487,6 +539,21 @@ class TestTransactionInfo(harness.TestCase):
         self.type(1, 0, '5c7c06ff5cc1fe000176fa12')
         self.type(1, 0, '5c7c06ff5cc1fe000176fa12', None)
         self.type(1, 0, '5c7c06ff5cc1fe000176fa12', None, None)
+
+    def test_is_unconfirmed(self):
+        self.assertFalse(self.model.is_unconfirmed())
+        unconfirmed = self.model.replace(height=0, hash=None, merkle_component_hash=None)
+        self.assertTrue(unconfirmed.is_unconfirmed())
+
+    def test_is_confirmed(self):
+        self.assertTrue(self.model.is_confirmed())
+        unconfirmed = self.model.replace(height=0)
+        self.assertFalse(unconfirmed.is_confirmed())
+
+    def test_has_missing_signatures(self):
+        self.assertFalse(self.model.has_missing_signatures())
+        missing = self.model.replace(height=0, merkle_component_hash='6a970a2e522bc32ed50590251c62fb6c9f934cb57f1266b0db4ec963ff2de2fe')
+        self.assertTrue(missing.has_missing_signatures())
 
 
 @harness.model_test_case({
@@ -706,7 +773,15 @@ class TestTransferTransaction(harness.TestCase):
     'sign_with': False,
 })
 class TestTransferTransactionWithInfo(harness.TestCase):
-    pass
+
+    def test_is_unconfirmed(self):
+        self.assertFalse(self.model.is_unconfirmed())
+
+    def test_is_confirmed(self):
+        self.assertTrue(self.model.is_confirmed())
+
+    def test_has_missing_signatures(self):
+        self.assertFalse(self.model.has_missing_signatures())
 
 
 @harness.transaction_test_case({
@@ -746,4 +821,6 @@ class TestTransferTransactionWithInfo(harness.TestCase):
     },
 })
 class TestTransferTransactionWithNamespace(harness.TestCase):
-    pass
+
+    def test_is_unannounced(self):
+        self.assertTrue(self.model.is_unannounced())

@@ -82,22 +82,43 @@ ENDPOINT = "localhost:3000"
 PROJECTDIR = os.path.dirname(os.path.realpath(__file__))
 MOCKDIR = os.path.join(PROJECTDIR, 'mock')
 COMMANDS = {
+    'bandit': shell_command(
+        command=[sys.executable, "-m", "bandit", "-r", "nem2", "-c", ".bandit.yml"],
+        short_description="Run bandit on project.",
+    ),
+    'coverage': shell_command(
+        command=[sys.executable, "-m", "nose2", "--config", ".nose2"],
+        short_description="Run main unittest suite.",
+        PYTHONPATH=MOCKDIR
+    ),
     'doc': shell_command(
         command=[sys.executable, "setup.py", "build_sphinx"],
         short_description="Build project documentation.",
         PYTHONPATH=MOCKDIR
     ),
+    'flake8': shell_command(
+        command=[sys.executable, "-m", "flake8", "--max-complexity", "10", "nem2"],
+        short_description="Run flake8 on project.",
+    ),
+    'flake8_tests': shell_command(
+        command=[sys.executable, "-m", "flake8", "tests"],
+        short_description="Run flake8 on unit tests.",
+    ),
     'mypy': shell_command(
         command=[sys.executable, "-m", "mypy", "nem2"],
         short_description="Run mypy on project.",
     ),
-    'lint': shell_command(
-        command=[sys.executable, "-m", "flake8"],
-        short_description="Run flake8 on project.",
+    'pylint': shell_command(
+        command=[sys.executable, "-m", "pylint", "nem2"],
+        short_description="Run pylint on project.",
     ),
-    'lint_tests': shell_command(
-        command=[sys.executable, "-m", "flake8", "tests"],
-        short_description="Run flake8 on unit tests.",
+    'radon_cc': shell_command(
+        command=[sys.executable, "-m", "radon", "cc", "--min", "C", "nem2"],
+        short_description="Run radon's code-complexity checker on project.",
+    ),
+    'radon_mi': shell_command(
+        command=[sys.executable, "-m", "radon", "mi", "--min", "B", "nem2"],
+        short_description="Run radon's maintainability index checker on project.",
     ),
     'test': shell_command(
         command=unittest_command("tests.main"),

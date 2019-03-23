@@ -38,6 +38,7 @@ from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic import Mosaic
+from ..mosaic.mosaic_id import MosaicId
 
 __all__ = [
     'SecretLockTransaction',
@@ -162,7 +163,6 @@ class SecretLockTransaction(Transaction):
         # uint8_t hash_type
         # uint8_t[32] secret
         # uint8_t[25] recipient
-        # TODO(ahuszagh) Double check.
         mosaic = self.mosaic.to_catbuffer(network_type)
         duration = util.u64_to_catbuffer(self.duration)
         hash_type = self.hash_type.to_catbuffer(network_type)
@@ -183,7 +183,6 @@ class SecretLockTransaction(Transaction):
         # uint8_t hash_type
         # uint8_t[32] secret
         # uint8_t[25] recipient
-        # TODO(ahuszagh) Double check.
         mosaic, data = Mosaic.from_catbuffer_pair(data, network_type)
         duration = util.u64_from_catbuffer(data[:8])
         hash_type, data = HashType.from_catbuffer_pair(data[8:], network_type)
@@ -206,14 +205,32 @@ class SecretLockTransaction(Transaction):
         self,
         network_type: NetworkType,
     ) -> dict:
-        raise NotImplementedError
+        return {
+            'mosaicId': self.mosaic.id.to_dto(network_type),
+            'amount': util.u64_to_dto(self.mosaic.amount),
+            'duration': util.u64_to_dto(self.duration),
+            'hashAlgorithm': self.hash_type.to_dto(network_type),
+            'secret': self.secret,
+            'recipient': Recipient.to_dto(self.recipient, network_type),
+        }
 
     def load_dto_specific(
         self,
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        raise NotImplementedError
+        mosaic_id = MosaicId.from_dto(data['mosaicId'], network_type)
+        amount = util.u64_from_dto(data['amount'])
+        mosaic = Mosaic(mosaic_id, amount)
+        duration = util.u64_from_dto(data['duration'])
+        hash_type = HashType.from_dto(data['hashAlgorithm'], network_type)
+        recipient = Recipient.from_dto(data['recipient'], network_type)
+
+        self._set('mosaic', mosaic)
+        self._set('duration', duration)
+        self._set('hash_type', hash_type)
+        self._set('secret', data['secret'])
+        self._set('recipient', recipient)
 
 
 @register_transaction('SECRET_LOCK')

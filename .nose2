@@ -1,0 +1,7 @@
+[unittest]
+start-dir = tests/main
+test-file-pattern = *_test.py
+test-method-prefix = test
+
+[coverage]
+always-on = True

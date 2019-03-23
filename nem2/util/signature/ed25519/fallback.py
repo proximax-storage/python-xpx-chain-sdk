@@ -60,7 +60,7 @@ class SecretsWarning(UserWarning):
 # API
 
 
-def generate_api(hash512: HashFuncType):
+def generate_api(hash512: HashFuncType):        # noqa: C901
     """Generate the ed25519 API from a hash function."""
 
     class BadSignatureError(Exception):

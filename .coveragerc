@@ -1,0 +1,22 @@
+[run]
+omit =
+    # Ignore any packaging files.
+    .eggs/*
+    .mypy_cache/*
+    .tox/*
+    doc/*
+    nem2.egg-info/*
+    # Ignore mocked libraries for unittests.
+    *mock*
+    # Ignore test directory utilities.
+    *tests*
+    # Ignore mypy plugins.
+    nem2mypy.py
+    # Ignore the setup script.
+    setup.py
+    # Ignore hash and signature implementations.
+    nem2/util/hashlib/*
+    nem2/util/signature/*
+    # Ignore RxPy extensions.
+    nem2/util/rx/*
+    nem2/util/reactive.py

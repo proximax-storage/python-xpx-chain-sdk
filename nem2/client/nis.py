@@ -59,13 +59,16 @@ def synchronous_request(name, doc="", raise_for_status=True):
 def asynchronous_request(name, doc="", raise_for_status=True):
     """Generate wrappers for an asynchronous request."""
 
-    async def f(client, network_type, *args, **kwds):
+    async def f(client, network_awaitable, *args, **kwds):
+        # Await the network type so if an exception is thrown, we
+        # don't forget to await the awaitable.
+        network_type = await network_awaitable
         async with REQUEST[name](client, *args, **kwds) as response:
             if raise_for_status:
                 response.raise_for_status()
             status = response.status
             json = await response.json()
-            return PROCESS[name](status, json, await network_type)
+            return PROCESS[name](status, json, network_type)
 
     f.__name__ = f"async_{name}"
     f.__doc__ = doc

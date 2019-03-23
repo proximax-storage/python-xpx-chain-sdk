@@ -22,8 +22,11 @@
     limitations under the License.
 """
 
+# Disable warnings for importing Keccak, PyCryptoDome is spuriously
+# flagged for using legacy hashes, but we need to use those hashes
+# for compatibility.
 from __future__ import annotations
-from Crypto.Hash import keccak
+from Crypto.Hash import keccak      # nosec
 import typing
 
 # API

@@ -32,6 +32,7 @@ from . import stdint
 
 __all__ = [
     'generate_mosaic_id',
+    'generate_sub_namespace_id',
     'generate_namespace_id',
 ]
 
@@ -72,6 +73,28 @@ def generate_mosaic_id(nonce: bytes, public_key: bytes) -> int:
     return stdint.u64_from_dto((result[0], result[1] & 0x7FFFFFFF))
 
 
+def generate_sub_namespace_id(parent_id: int, name: str) -> int:
+    """
+    Generate namespace ID from child namespace name and parent ID.
+
+    :param parent_id: Identifier for parent namespace.
+    :param name: Child namespace name.
+
+    Example:
+        .. code-block:: python
+
+           >>> generate_sub_namespace_id(0x84b3552d375ffa4b, "sample")
+    """
+
+    hasher = hashlib.sha3_256()
+    hasher.update(pack_u64(parent_id))
+    hasher.update(name.encode('ascii'))
+    result = unpack_u64_dto(hasher.digest())
+    child_id = stdint.u64_from_dto((result[0], result[1] | 0x80000000))
+
+    return child_id
+
+
 def generate_namespace_id(*names: str) -> typing.Sequence[int]:
     """
     Generate namespace ID from names.
@@ -98,11 +121,7 @@ def generate_namespace_id(*names: str) -> typing.Sequence[int]:
     ids = []
     parent_id = 0
     for name in names:
-        hasher = hashlib.sha3_256()
-        hasher.update(pack_u64(parent_id))
-        hasher.update(name.encode('ascii'))
-        result = unpack_u64_dto(hasher.digest())
-        parent_id = stdint.u64_from_dto((result[0], result[1] | 0x80000000))
+        parent_id = generate_sub_namespace_id(parent_id, name)
         ids.append(parent_id)
 
     return ids

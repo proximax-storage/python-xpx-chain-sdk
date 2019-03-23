@@ -48,7 +48,7 @@ import inspect
 
 __all__ = ['observable']
 
-try:
+try:            # noqa: C901
     # Have RxPy installed.
     from . import rx
 

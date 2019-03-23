@@ -28,7 +28,7 @@ import rx
 from rx.internal import extensionclassmethod
 
 
-def from_async_iterable(cls, asyncgen, scheduler=None, loop=None):
+def from_async_iterable(cls, asyncgen, scheduler=None, loop=None):      # noqa: C901
     """
     Generate observable from an asynchronous iterable.
 
