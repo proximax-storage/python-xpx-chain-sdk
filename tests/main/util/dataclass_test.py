@@ -77,3 +77,58 @@ class TestDataclass(harness.TestCase):
         self.assertTrue(ll2 == ll2)
         self.assertFalse(ll2 == ll3)
         self.assertTrue(ll3 == ll3)
+
+
+class TestDataclassErrors(harness.TestCase):
+
+    def test_noargs(self):
+        @util.dataclass
+        class Dataclass:
+            first: int
+            second: int
+
+        self.assertTrue(util.is_dataclass(Dataclass))
+
+    def test_defaults(self):
+        with self.assertRaises(SyntaxError):
+            @util.dataclass(frozen=True, first=0)
+            class Dataclass:
+                first: int
+                second: int
+
+        with self.assertRaises(SyntaxError):
+            @util.dataclass(second=0)
+            class Dataclass:
+                first: int
+                second: int
+
+                def __init__(self, first=0, second=0):
+                    pass
+
+    def test_slots(self):
+        @util.dataclass(slots=False)
+        class Dataclass:
+            first: int
+            second: int = 2
+
+        self.assertTrue(not hasattr(Dataclass, '__slots__'))
+        dataclass = Dataclass(1)
+        dataclass.third = 3
+
+    def test_copy(self):
+        @util.dataclass(copy=False, deepcopy=False)
+        class Dataclass:
+            first: int
+
+        self.assertTrue(not hasattr(Dataclass, '__copy__'))
+        self.assertTrue(not hasattr(Dataclass, '__deepcopy__'))
+
+    def test_dataclass_methods(self):
+        @util.dataclass(asdict=False, astuple=False, fields=False, replace=False)
+        class Dataclass:
+            first: int
+
+        self.assertTrue(not hasattr(Dataclass, 'asdict'))
+        self.assertTrue(not hasattr(Dataclass, 'astuple'))
+        self.assertTrue(not hasattr(Dataclass, 'fields'))
+        self.assertTrue(not hasattr(Dataclass, 'replace'))

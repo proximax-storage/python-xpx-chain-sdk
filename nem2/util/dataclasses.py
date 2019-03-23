@@ -35,6 +35,7 @@ __all__ = [
     'InitVar',
     'MISSING',
     'dataclass',
+    'is_dataclass',
 ]
 
 # HELPERS
@@ -43,6 +44,7 @@ Field = dataclasses.Field
 FrozenInstanceError = dataclasses.FrozenInstanceError
 InitVar = dataclasses.InitVar
 MISSING = dataclasses.MISSING
+is_dataclass = dataclasses.is_dataclass
 # ForwardRef isn't part of the public API.
 # If it's not present, just skip it.
 ForwardRef = getattr(typing, 'ForwardRef', str)
@@ -121,13 +123,11 @@ def fix_annotations(
     """Fix any forward references to variables defined in the callee scope."""
 
     # Don't care except when enforcing types.
-    if not typing.TYPE_CHECKING:
-        return
-
-    annotations = clsdict['__annotations__']
-    for field, type in annotations.items():
-        type = fix_annotation(type, global_vars, local_vars)
-        annotations[field] = type
+    if typing.TYPE_CHECKING:
+        annotations = clsdict['__annotations__']
+        for field, type in annotations.items():
+            type = fix_annotation(type, global_vars, local_vars)
+            annotations[field] = type
 
 
 def is_classvar(x, global_vars: Vars, local_vars: Vars) -> bool:

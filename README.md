@@ -4,8 +4,10 @@ NEM2 SDK Python
 **Table of Contents**
 
 - [Getting Started](#getting-started)
-- [License](License)
-- [Contributing](contributing)
+- [Optimization](#optimization)
+- [Testing](#testing)
+- [License](#license)
+- [Contributing](#contributing)
 
 # Getting Started
 
@@ -24,8 +26,11 @@ The NEM2 SDK uses numerous tools to ensure type correctness, robust testing, and
 ```bash
 # Run tox, which invokes numerous virtual envs to validate all configurations
 # Invokes the unittest suite.
-# Invokes the linter, flake8.
+# Invokes the linters, flake8 and pylint.
+# Invokes bandit, a which checks for possible security risks.
 # Invokes the type-checker, mypy.
+# Invokes the complexity and maintainability checker, radon.
+# Invokes the code coverage generator, coverage.
 # Invokes the documentation builder, Sphinx.
 $ tox
 ```

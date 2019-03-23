@@ -19,6 +19,42 @@ def run_test(case, name, items):
 
 class TestUint64(harness.TestCase):
 
+    def test_exceptions(self):
+        with self.assertRaises(OverflowError):
+            util.u8_high(1 << 8)
+        with self.assertRaises(OverflowError):
+            util.u8_low(1 << 8)
+        with self.assertRaises(OverflowError):
+            util.u8_from_catbuffer(b'\x00\x00')
+        with self.assertRaises(ValueError):
+            next(util.u16_iter_from_catbuffer(b'\x00'))
+        with self.assertRaises(OverflowError):
+            util.u8_to_dto(1 << 8)
+        with self.assertRaises(OverflowError):
+            util.u8_from_dto(1 << 8)
+        with self.assertRaises(OverflowError):
+            util.u16_to_dto(1 << 16)
+        with self.assertRaises(OverflowError):
+            util.u16_from_dto(1 << 16)
+        with self.assertRaises(OverflowError):
+            util.u32_to_dto(1 << 32)
+        with self.assertRaises(OverflowError):
+            util.u32_from_dto(1 << 32)
+        with self.assertRaises(OverflowError):
+            util.u64_to_dto(1 << 64)
+        with self.assertRaises(ArithmeticError):
+            util.u64_from_dto([1 << 32, 0])
+        with self.assertRaises(ArithmeticError):
+            util.u64_from_dto([0, 1 << 32])
+        with self.assertRaises(ArithmeticError):
+            util.u64_from_dto([0])
+        with self.assertRaises(ArithmeticError):
+            util.u64_from_dto([0, 0, 0])
+        with self.assertRaises(OverflowError):
+            util.u128_to_dto(1 << 128)
+        with self.assertRaises(ArithmeticError):
+            util.u128_from_dto([[1 << 32, 0]])
+
     def test_u8(self):
         run_test(
             case=self,

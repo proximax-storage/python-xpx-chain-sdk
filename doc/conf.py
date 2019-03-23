@@ -26,7 +26,6 @@ add_module_names = False
 autoclass_content = 'both'
 autodoc_default_options = {
     'members': None,
-    #'inherited-members': None,
     'undoc-members': None,
     'member-order': 'bysource',
 }

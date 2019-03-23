@@ -20,3 +20,14 @@ omit =
     # Ignore RxPy extensions.
     nem2/util/rx/*
     nem2/util/reactive.py
+
+[report]
+show_missing = True
+exclude_lines =
+    pragma: no cover
+    raise AbstractMethodError
+    raise abc.AbstractMethodError
+    raise util.AbstractMethodError
+    def fix_annotation
+    if typing.TYPE_CHECKING:
+    if MYPY:

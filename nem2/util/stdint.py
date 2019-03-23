@@ -262,11 +262,17 @@ def iter_from_dto(bits: int, cb):
 
 def u8_to_dto(value: int) -> U8DTOType:
     """Convert 8-bit int to DTO."""
+
+    if value > U8_MAX:
+        raise OverflowError
     return value
 
 
 def u8_from_dto(dto: U8DTOType) -> int:
     """Convert DTO to 8-bit int."""
+
+    if dto > U8_MAX:
+        raise OverflowError
     return dto
 
 
@@ -284,11 +290,17 @@ u8_iter_from_dto = iter_from_dto(U8_BITS, u8_from_dto)
 
 def u16_to_dto(value: int) -> U16DTOType:
     """Convert 16-bit int to DTO."""
+
+    if value > U16_MAX:
+        raise OverflowError
     return value
 
 
 def u16_from_dto(dto: U16DTOType) -> int:
     """Convert DTO to 16-bit int."""
+
+    if dto > U16_MAX:
+        raise OverflowError
     return dto
 
 
@@ -306,11 +318,17 @@ u16_iter_from_dto = iter_from_dto(U16_BITS, u16_from_dto)
 
 def u32_to_dto(value: int) -> U32DTOType:
     """Convert 32-bit int to DTO."""
+
+    if value > U32_MAX:
+        raise OverflowError
     return value
 
 
 def u32_from_dto(dto: U32DTOType) -> int:
     """Convert DTO to 32-bit int."""
+
+    if dto > U32_MAX:
+        raise OverflowError
     return dto
 
 
@@ -372,12 +390,7 @@ def u128_to_dto(value: int) -> U128DTOType:
 def u128_from_dto(dto: U128DTOType) -> int:
     """Convert DTO to 128-bit int."""
 
-    if not (
-        len(dto) == 2
-        and all(len(i) == 2 for i in dto)
-        and all(i <= U32_MAX for i in dto[0])
-        and all(i <= U32_MAX for i in dto[1])
-    ):
+    if len(dto) != 2:
         raise ArithmeticError
 
     low = u64_from_dto(dto[0])

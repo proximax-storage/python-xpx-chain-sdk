@@ -199,10 +199,18 @@ class TestDeadline(harness.TestCase):
             'callback': lambda self, x: x.validate(util.hexlify(psuedo_entropy(32))),
             'results': [True, True, False, True],
         },
+        {
+            'name': 'test_hash_length',
+            'callback': lambda self, x: x.hash_length(),
+            'results': [64, 64, 40, 64],
+        },
     ],
 })
 class TestHashType(harness.TestCase):
-    pass
+
+    def test_invalid_digits(self):
+        data = 'GqewCJhTUHlVOoQhRZIVHkbExIZjcmzNYDXErhZrYmhanFNagXPthmEapPPyGrlr'
+        self.assertFalse(self.enums[0].validate(data))
 
 
 class TestInnnerTransaction(harness.TestCase):
@@ -295,6 +303,22 @@ class TestMosaicAliasTransaction(harness.TestCase):
         ))
 
 
+@harness.model_test_case({
+    'type': models.MultisigCosignatoryModification,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'type': models.MultisigCosignatoryModificationType.ADD,
+        'cosignatory_public_account': models.PublicAccount.create_from_public_key('1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955', models.NetworkType.MIJIN_TEST),
+    },
+    'dto': {
+        'type': 0,
+        'cosignatoryPublicKey': '1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
+    },
+})
+class TestMultisigCosignatoryModification(harness.TestCase):
+    pass
+
+
 @harness.enum_test_case({
     'type': models.MultisigCosignatoryModificationType,
     'enums': [
@@ -381,6 +405,12 @@ class TestPlainMessage(harness.TestCase):
 })
 class TestSecretLockTransaction(harness.TestCase):
 
+    def test_secret(self):
+        with self.assertRaises(ValueError):
+            kwds = self.data.copy()
+            kwds['secret'] = kwds['secret'][:40]
+            self.type(**kwds)
+
     def test_create(self):
         self.assertEqual(self.model, self.type.create(
             deadline=self.data['deadline'],
@@ -431,6 +461,12 @@ class TestSecretLockTransaction(harness.TestCase):
 })
 class TestSecretProofTransaction(harness.TestCase):
 
+    def test_secret(self):
+        with self.assertRaises(ValueError):
+            kwds = self.data.copy()
+            kwds['secret'] = kwds['secret'][:40]
+            self.type(**kwds)
+
     def test_create(self):
         self.assertEqual(self.model, self.type.create(
             deadline=self.data['deadline'],
@@ -453,7 +489,18 @@ class TestSecretProofTransaction(harness.TestCase):
     },
 })
 class TestSignedTransaction(harness.TestCase):
-    pass
+
+    def test_hash(self):
+        with self.assertRaises(ValueError):
+            kwds = self.data.copy()
+            kwds['hash'] = kwds['hash'][:32]
+            self.type(**kwds)
+
+    def test_signer(self):
+        with self.assertRaises(ValueError):
+            kwds = self.data.copy()
+            kwds['signer'] = kwds['signer'][:32]
+            self.type(**kwds)
 
 
 @harness.model_test_case({
@@ -469,9 +516,28 @@ class TestSignedTransaction(harness.TestCase):
         'hash': 'd8949c87755cfd2c003fec4e1bd4aadb00b3f4838fc5ce7ffeded9385805fcdd',
         'address': 'SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG',
     },
+    'extras': {
+        'type': models.TransactionType.SECRET_PROOF,
+        'public_key': '1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
+    }
 })
 class TestSyncAnnounce(harness.TestCase):
-    pass
+
+    def test_hash(self):
+        with self.assertRaises(ValueError):
+            kwds = self.data.copy()
+            kwds['hash'] = kwds['hash'][:32]
+            self.type(**kwds)
+
+    def test_create(self):
+        signed_transaction = models.SignedTransaction(
+            payload=self.data['payload'],
+            hash=self.data['hash'],
+            signer=self.extras['public_key'],
+            type=self.extras['type'],
+            network_type=self.network_type,
+        )
+        self.assertEqual(self.model, self.type.create(signed_transaction))
 
 
 class TestTransaction(harness.TestCase):

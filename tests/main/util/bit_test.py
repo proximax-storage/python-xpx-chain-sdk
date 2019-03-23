@@ -48,6 +48,15 @@ class BitTest(harness.TestCase):
         self.assertEqual(bit.clear(y, 6), 0b00001101)
         self.assertEqual(bit.clear(y, 7), 0b01001101)
 
+    def test_assign(self):
+        x: int = 0b10110010
+        y: int = 0b01001101
+
+        self.assertEqual(bit.set(x, 0), bit.assign(x, 0, True))
+        self.assertEqual(bit.clear(x, 0), bit.assign(x, 0, False))
+        self.assertEqual(bit.set(y, 0), bit.assign(y, 0, True))
+        self.assertEqual(bit.clear(y, 0), bit.assign(y, 0, False))
+
     def test_toggle(self):
         x: int = 0b10110010
         y: int = 0b01001101
