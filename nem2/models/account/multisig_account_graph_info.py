@@ -49,8 +49,8 @@ class MultisigAccountGraphInfo(util.Object):
         self._multisig_accounts = dict(*args)
 
     @property
-    def multisig_account(self) -> GraphType:
-        return self._multisig_account
+    def multisig_accounts(self) -> GraphType:
+        return self._multisig_accounts
 
     def __contains__(self, key: int) -> bool:
         return key in self.multisig_accounts

@@ -59,10 +59,10 @@ class Recipient(util.Object):
         network_type: NetworkType,
     ) -> bytes:
         if isinstance(obj, Address):
+            # The first byte is always the network type.
             return obj.encoded
-        # TODO(ahuszagh) Verify this is actually the format
-        #   https://nem2.slack.com/archives/CEZKUE4KB/p1553108893144300
-        leading = b'\x91'
+        # The first byte is always the network type + 1.
+        leading = util.u8_to_catbuffer(int(network_type) + 1)
         trailing = bytes(16)
         return leading + util.unhexlify(obj.encoded) + trailing
 
@@ -75,6 +75,8 @@ class Recipient(util.Object):
         # which are always even. If it's odd, we have a namespace ID.
         # Otherwise, for the namespace ID, the first byte is a sentinel,
         # and the next 8 bytes are the relevant data.
+        # The first byte without the first bit is always the network type.
+        assert bit.clear(data[0], 0) == int(network_type)
         if bit.get(data[0], 0) == 0:
             return typing.cast(Address, Address.create_from_encoded(data[:25]))
         return typing.cast(NamespaceId, NamespaceId.create_from_encoded(data[1:9]))

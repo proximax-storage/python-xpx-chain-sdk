@@ -47,5 +47,5 @@ async def aslice(aiterable, *args):
         if index < start:
             continue
         elif index >= stop:
-            break;
+            break
         yield value

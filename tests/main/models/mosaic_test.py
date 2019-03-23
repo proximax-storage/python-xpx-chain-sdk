@@ -46,8 +46,6 @@ class TestMosaicId(harness.TestCase):
         self.assertEqual(f'{value:X}', 'D')
 
     def test_create_from_nonce(self):
-        #nonce = models.MosaicNonce(b'\x00\x00\x00\x00')
-        #public_key = '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246'
         owner = models.PublicAccount.create_from_public_key(self.extras['public_key'], self.network_type)
         value = self.type.create_from_nonce(self.extras['nonce'], owner)
         self.assertEqual(value.id, 0x2FF7D64F483BC0A6)
@@ -72,8 +70,8 @@ class TestMosaicLevy(harness.TestCase):
         2,
     ],
     'descriptions': [
-        "The levy is an absolute fee",
-        "The levy is calculated from",
+        'The levy is an absolute fee',
+        'The levy is calculated from',
     ],
     'dto': [
         1,
@@ -133,174 +131,105 @@ class TestMosaicNonce(harness.TestCase):
         self.assertEqual(self.type.create_from_int(325).nonce, b'E\x01\x00\x00')
 
 
+@harness.model_test_case({
+    'type': models.MosaicProperties,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'flags': 0x3,
+        'divisibility': 1,
+        'duration': 100,
+    },
+    'dto': [[3, 0], [1, 0], [100, 0]],
+    'catbuffer': b'\x01\x03\x01\x02d\x00\x00\x00\x00\x00\x00\x00',
+})
 class TestMosaicProperties(harness.TestCase):
 
-    def setUp(self):
-        self.network_type = models.NetworkType.MIJIN_TEST
-        self.properties = models.MosaicProperties.create(
-            supply_mutable=True,
-            transferable=True,
-            levy_mutable=False,
-            divisibility=1,
-            duration=100,
-        )
-        self.dto = [[3, 0], [1, 0], [100, 0]]
-        self.catbuffer = b'\x01\x03\x01\x02d\x00\x00\x00\x00\x00\x00\x00'
-
-    def test_slots(self):
-        with self.assertRaises(TypeError):
-            self.properties.__dict__
-
     def test_properties(self):
-        self.assertEqual(self.properties.flags, 3)
-        self.assertEqual(self.properties.supply_mutable, True)
-        self.assertEqual(self.properties.transferable, True)
-        self.assertEqual(self.properties.levy_mutable, False)
-        self.assertEqual(self.properties.divisibility, 1)
-        self.assertEqual(self.properties.duration, 100)
-
-    def test_create(self):
-        properties = models.MosaicProperties.create()
-        self.assertEqual(properties.flags, 2)
-        self.assertEqual(properties.divisibility, 0)
-        self.assertEqual(properties.duration, 0)
-
-    def test_repr(self):
-        self.assertEqual(repr(self.properties), "MosaicProperties(flags=3, divisibility=1, duration=100)")
-
-    def test_str(self):
-        self.assertEqual(str(self.properties), repr(self.properties))
-
-    def test_eq(self):
-        p1 = models.MosaicProperties.create(divisibility=2)
-        p2 = models.MosaicProperties.create(divisibility=2)
-        p3 = models.MosaicProperties.create()
-
-        self.assertTrue(p1 == p1)
-        self.assertTrue(p1 == p2)
-        self.assertFalse(p1 == p3)
-        self.assertTrue(p2 == p2)
-        self.assertFalse(p2 == p3)
-        self.assertTrue(p3 == p3)
-
-    def test_to_dto(self):
-        self.assertEqual(self.properties.to_dto(self.network_type), self.dto)
-
-    def test_from_dto(self):
-        self.assertEqual(self.properties, models.MosaicProperties.from_dto(self.dto, self.network_type))
-
-    def test_to_catbuffer(self):
-        self.assertEqual(self.properties.to_catbuffer(self.network_type), self.catbuffer)
-
-    def test_from_catbuffer(self):
-        self.assertEqual(self.properties, models.MosaicProperties.from_catbuffer(self.catbuffer, self.network_type))
-
-    def test_dataclasses(self):
-        self.assertEqual(self.properties, self.properties.replace())
-        self.assertIsInstance(self.properties.asdict(), dict)
-        self.assertIsInstance(self.properties.astuple(), tuple)
-        self.assertIsInstance(self.properties.fields(), tuple)
+        self.assertEqual(self.model.supply_mutable, True)
+        self.assertEqual(self.model.transferable, True)
+        self.assertEqual(self.model.levy_mutable, False)
 
 
+@harness.enum_test_case({
+    'type': models.MosaicSupplyType,
+    'enums': [
+        models.MosaicSupplyType.DECREASE,
+        models.MosaicSupplyType.INCREASE,
+    ],
+    'values': [
+        0,
+        1,
+    ],
+    'descriptions': [
+        'Decrease mosaic supply.',
+        'Increase mosaic supply.',
+    ],
+    'dto': [
+        0,
+        1,
+    ],
+    'catbuffer': [
+        b'\x00',
+        b'\x01',
+    ],
+})
 class TestMosaicSupplyType(harness.TestCase):
-
-    def setUp(self):
-        self.network_type = models.NetworkType.MIJIN_TEST
-        self.decrease = models.MosaicSupplyType.DECREASE
-        self.increase = models.MosaicSupplyType.INCREASE
-        self.dto = 0
-        self.catbuffer = b'\x00'
-
-    def test_values(self):
-        self.assertEqual(self.decrease, 0)
-        self.assertEqual(self.increase, 1)
-
-    def test_description(self):
-        self.assertEqual(self.decrease.description(), "Decrease mosaic supply.")
-        self.assertEqual(self.increase.description(), "Increase mosaic supply.")
-
-    def test_to_dto(self):
-        self.assertEqual(self.decrease.to_dto(self.network_type), self.dto)
-
-    def test_from_dto(self):
-        self.assertEqual(self.decrease, models.MosaicSupplyType.from_dto(self.dto, self.network_type))
-
-    def test_to_catbuffer(self):
-        self.assertEqual(self.decrease.to_catbuffer(self.network_type), self.catbuffer)
-
-    def test_from_catbuffer(self):
-        self.assertEqual(self.decrease, models.MosaicSupplyType.from_catbuffer(self.catbuffer, self.network_type))
+    pass
 
 
+@harness.model_test_case({
+    'type': models.NetworkCurrencyMosaic,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'amount': 1,
+    },
+    'dto': {
+        'amount': [1, 0],
+        'id': [3294802500, 2243684972],
+    },
+    'catbuffer': b'D\xb2b\xc4l\xea\xbb\x85\x01\x00\x00\x00\x00\x00\x00\x00',
+})
 class TestNetworkCurrencyMosaic(harness.TestCase):
 
-    def setUp(self):
-        self.mosaic = models.NetworkCurrencyMosaic(1)
-
-    def test_init(self):
-        self.assertEqual(self.mosaic.id.id, 0x85BBEA6CC462B244)
-        self.assertEqual(self.mosaic.amount, 1)
-
-    def test_slots(self):
-        with self.assertRaises(TypeError):
-            self.mosaic.__dict__
-
     def test_class_variables(self):
-        cls = models.NetworkCurrencyMosaic
-        self.assertEqual(cls.NAMESPACE_ID, models.NamespaceId(0x85BBEA6CC462B244))
-        self.assertEqual(cls.DIVISIBILITY, 6)
-        self.assertEqual(cls.INITIAL_SUPPLY, 8999999998)
-        self.assertEqual(cls.TRANSFERABLE, True)
-        self.assertEqual(cls.SUPPLY_MUTABLE, False)
-        self.assertEqual(cls.LEVY_MUTABLE, False)
+        self.assertEqual(self.type.NAMESPACE_ID, models.NamespaceId(0x85BBEA6CC462B244))
+        self.assertEqual(self.type.DIVISIBILITY, 6)
+        self.assertEqual(self.type.INITIAL_SUPPLY, 8999999998)
+        self.assertEqual(self.type.TRANSFERABLE, True)
+        self.assertEqual(self.type.SUPPLY_MUTABLE, False)
+        self.assertEqual(self.type.LEVY_MUTABLE, False)
 
     def test_create_relative(self):
-        value = models.NetworkCurrencyMosaic.create_relative(1)
-        self.assertEqual(value.amount, 1000000)
+        self.assertEqual(self.type.create_relative(1).amount, 1000000)
 
     def test_create_absolute(self):
-        value = models.NetworkCurrencyMosaic.create_absolute(1)
-        self.assertEqual(value.amount, 1)
-
-    def test_dataclasses(self):
-        self.assertEqual(self.mosaic, self.mosaic.replace())
-        self.assertIsInstance(self.mosaic.asdict(), dict)
-        self.assertIsInstance(self.mosaic.astuple(), tuple)
-        self.assertIsInstance(self.mosaic.fields(), tuple)
+        self.assertEqual(self.type.create_absolute(1).amount, 1)
 
 
+@harness.model_test_case({
+    'type': models.NetworkHarvestMosaic,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'amount': 1,
+    },
+    'dto': {
+        'amount': [1, 0],
+        'id': [3084986652, 2484246962],
+    },
+    'catbuffer': b'\x1c)\xe1\xb7\xb2\x99\x12\x94\x01\x00\x00\x00\x00\x00\x00\x00',
+})
 class TestNetworkHarvestMosaic(harness.TestCase):
 
-    def setUp(self):
-        self.mosaic = models.NetworkHarvestMosaic(1)
-
-    def test_init(self):
-        self.assertEqual(self.mosaic.id.id, 0x941299B2B7E1291C)
-        self.assertEqual(self.mosaic.amount, 1)
-
-    def test_slots(self):
-        with self.assertRaises(TypeError):
-            self.mosaic.__dict__
-
     def test_class_variables(self):
-        cls = models.NetworkHarvestMosaic
-        self.assertEqual(cls.NAMESPACE_ID, models.NamespaceId(0x941299B2B7E1291C))
-        self.assertEqual(cls.DIVISIBILITY, 3)
-        self.assertEqual(cls.INITIAL_SUPPLY, 15000000)
-        self.assertEqual(cls.TRANSFERABLE, True)
-        self.assertEqual(cls.SUPPLY_MUTABLE, True)
-        self.assertEqual(cls.LEVY_MUTABLE, False)
+        self.assertEqual(self.type.NAMESPACE_ID, models.NamespaceId(0x941299B2B7E1291C))
+        self.assertEqual(self.type.DIVISIBILITY, 3)
+        self.assertEqual(self.type.INITIAL_SUPPLY, 15000000)
+        self.assertEqual(self.type.TRANSFERABLE, True)
+        self.assertEqual(self.type.SUPPLY_MUTABLE, True)
+        self.assertEqual(self.type.LEVY_MUTABLE, False)
 
     def test_create_relative(self):
-        value = models.NetworkHarvestMosaic.create_relative(1)
-        self.assertEqual(value.amount, 1000)
+        self.assertEqual(self.type.create_relative(1).amount, 1000)
 
     def test_create_absolute(self):
-        value = models.NetworkHarvestMosaic.create_absolute(1)
-        self.assertEqual(value.amount, 1)
-
-    def test_dataclasses(self):
-        self.assertEqual(self.mosaic, self.mosaic.replace())
-        self.assertIsInstance(self.mosaic.asdict(), dict)
-        self.assertIsInstance(self.mosaic.astuple(), tuple)
-        self.assertIsInstance(self.mosaic.fields(), tuple)
+        self.assertEqual(self.type.create_absolute(1).amount, 1)

@@ -1,5 +1,3 @@
-import warnings
-
 from nem2 import models
 from nem2 import util
 from tests import harness

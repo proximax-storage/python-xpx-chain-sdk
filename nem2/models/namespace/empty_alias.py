@@ -22,8 +22,9 @@
     limitations under the License.
 """
 
-from .alias import Alias
+from .alias import Alias, dto_to_kwds
 from .alias_type import AliasType
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['EmptyAlias']
 
@@ -33,5 +34,16 @@ class EmptyAlias(Alias):
 
     __slots__ = ()
 
-    def __init__(self) -> None:
-        super().__init__(AliasType.NONE, None)
+    def __init__(self, value: None = None) -> None:
+        super().__init__(AliasType.NONE, value)
+
+    @classmethod
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ):
+        kwds = dto_to_kwds(data, network_type)
+        if kwds.pop('type') != AliasType.NONE:
+            raise ValueError('Alias type is not a none.')
+        return cls(**kwds)

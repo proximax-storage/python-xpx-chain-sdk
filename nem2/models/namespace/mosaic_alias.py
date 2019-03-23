@@ -22,8 +22,9 @@
     limitations under the License.
 """
 
-from .alias import Alias
+from .alias import Alias, dto_to_kwds
 from .alias_type import AliasType
+from ..blockchain.network_type import OptionalNetworkType
 from ..mosaic.mosaic_id import MosaicId
 
 __all__ = ['MosaicAlias']
@@ -40,3 +41,14 @@ class MosaicAlias(Alias):
 
     def __init__(self, value: MosaicId) -> None:
         super().__init__(AliasType.MOSAIC_ID, value)
+
+    @classmethod
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ):
+        kwds = dto_to_kwds(data, network_type)
+        if kwds.pop('type') != AliasType.MOSAIC_ID:
+            raise ValueError('Alias type is not a mosaic.')
+        return cls(**kwds)

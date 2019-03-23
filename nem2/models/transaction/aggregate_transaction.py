@@ -119,12 +119,12 @@ class AggregateTransaction(Transaction):
         """
         return cls(
             network_type,
+            TransactionType.AGGREGATE_COMPLETE,
             TransactionVersion.AGGREGATE_COMPLETE,
             deadline,
             0,
             inner_transactions,
             cosignatures,
-            TransactionType.AGGREGATE_COMPLETE,
         )
 
     @classmethod
@@ -145,12 +145,12 @@ class AggregateTransaction(Transaction):
         """
         return cls(
             network_type,
+            TransactionType.AGGREGATE_BONDED,
             TransactionVersion.AGGREGATE_BONDED,
             deadline,
             0,
             inner_transactions,
             cosignatures,
-            TransactionType.AGGREGATE_BONDED,
         )
 
     # SIGNING

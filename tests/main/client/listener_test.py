@@ -1,9 +1,5 @@
-import websockets
-
-from nem2 import client
 from nem2 import models
 from tests import harness
-from tests import responses
 
 BLOCK_VALIDATOR = [
     lambda x: (x.channel_name, 'block'),

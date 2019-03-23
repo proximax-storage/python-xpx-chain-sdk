@@ -28,12 +28,12 @@ import collections
 import contextlib
 import copy
 import dataclasses
+import datetime
 import enum
 import functools
 import inspect
 import json
 import math
-import random
 import requests
 import unittest
 import warnings
@@ -128,68 +128,70 @@ ENUM_TESTS = [
     'ord',
 ]
 
+
 def enum_test_description(self):
     """Test the enum description method."""
 
-    for enum, description in zip(self.enums, self.descriptions):
-        self.assertTrue(enum.description().startswith(description))
+    for enumeration, description in zip(self.enums, self.descriptions):
+        self.assertTrue(enumeration.description().startswith(description))
 
 
 def enum_test_value(self):
     """Test the enum value property."""
 
-    for enum, value in zip(self.enums, self.values):
-        self.assertEqual(value, enum.value)
+    for enumeration, value in zip(self.enums, self.values):
+        self.assertEqual(value, enumeration.value)
 
 
 def enum_test_repr(self):
     """Test the enum __repr__ method."""
 
     clsname = self.type.__name__
-    for enum in self.enums:
-        self.assertEqual(repr(enum), f'<{clsname}.{enum.name}: {enum.value}>')
+    for enumeration in self.enums:
+        expected = f'<{clsname}.{enumeration.name}: {repr(enumeration.value)}>'
+        self.assertEqual(repr(enumeration), expected)
 
 
 def enum_test_str(self):
     """Test the enum __str__ method."""
 
     clsname = self.type.__name__
-    for enum in self.enums:
-        self.assertEqual(str(enum), f'{clsname}.{enum.name}')
+    for enumeration in self.enums:
+        self.assertEqual(str(enumeration), f'{clsname}.{enumeration.name}')
 
 
 def enum_test_eq(self):
     """Test the enum __eq__ method."""
 
     enums = list(set(self.enums))
-    for index, enum in enumerate(enums):
-        self.assertEqual(enum, enums[index])
-        for other in enums[index+1:]:
-            self.assertNotEqual(enum, other)
+    for index, enumeration in enumerate(enums):
+        self.assertEqual(enumeration, enums[index])
+        for other in enums[index + 1:]:
+            self.assertNotEqual(enumeration, other)
 
 
 def enum_test_ord(self):
     """Test the enum __lt__ method."""
 
     enums = sorted(set(self.enums))
-    for index, enum in enumerate(enums):
-        self.assertLessEqual(enum, enums[index])
-        for other in enums[index+1:]:
-            self.assertLess(enum, other)
+    for index, enumeration in enumerate(enums):
+        self.assertLessEqual(enumeration, enums[index])
+        for other in enums[index + 1:]:
+            self.assertLess(enumeration, other)
 
 
 def enum_test_dto(self):
     """Test the conversion to and from DTO."""
 
-    for enum, dto in zip(self.enums, self.dto):
-        self.assertEqual(dto, enum.to_dto())
+    for enumeration, dto in zip(self.enums, self.dto):
+        self.assertEqual(dto, enumeration.to_dto())
 
 
 def enum_test_catbuffer(self):
     """Test the conversion to and from catbuffer."""
 
-    for enum, catbuffer in zip(self.enums, self.catbuffer):
-        self.assertEqual(catbuffer, enum.to_catbuffer())
+    for enumeration, catbuffer in zip(self.enums, self.catbuffer):
+        self.assertEqual(catbuffer, enumeration.to_catbuffer())
 
 
 def enum_setup_fn(attrs):
@@ -305,11 +307,22 @@ def model_test_slots(self):
         self.model.__dict__
 
 
+def next_byte_power(value):
+    """Calculate the next power of 2 from a value."""
+
+    char_bit = 8
+    byte_length = int(math.ceil(value.bit_length() / char_bit))
+    return 2 ** (char_bit * byte_length)
+
+
 def bitwise_not(value):
     """Calculate bitwise not of value as an unsigned integer."""
-    length = int(math.ceil(value.bit_length() / 8))
-    data = int.to_bytes(~value, length, 'little', signed=True)
-    return int.from_bytes(data, 'little')
+    # We want to get 1 - next power of 2, so we can get the 0xFF bit pattern.
+    # We can then use xor to invert all the bits in the input.
+    # We want to use value + 1, since if the value is, say, 256, it requires
+    # 9 bits of storage, not 8.
+    max_int = next_byte_power(value + 1) - 1
+    return max_int ^ value
 
 
 def model_test_eq(self):
@@ -325,9 +338,13 @@ def model_test_eq(self):
         # In bytes and strings, the first 2 values may be used as a
         # sentinel. We want to keep those the same. 1 for bytes,
         # 2 for hex.
-        value_type = type(value)
         if isinstance(value, enum.Enum):
             return value
+        if isinstance(value, datetime.datetime):
+            timestamp = value.replace(tzinfo=datetime.timezone.utc).timestamp()
+            negated = bitwise_not(int(timestamp))
+            utc = datetime.datetime.fromtimestamp(negated, datetime.timezone.utc)
+            return utc.replace(tzinfo=None)
         elif isinstance(value, int):
             return bitwise_not(value)
         elif isinstance(value, (bytes, bytearray)):
@@ -442,6 +459,7 @@ def model_setup_fn(attrs):
     """Generate the setup function for models."""
 
     model = load_model(attrs['type'], attrs['data'])
+
     def func(self):
         self.model = model
         self.type = attrs['type']
@@ -612,7 +630,6 @@ def mocked_http_test(cls, network_type, sync_client, async_client, test):
     method = test['method']
     params = test['params']
     error = test.get('error')
-    validation = test.get('validation')
 
     @async_test(sync_data, async_data)
     async def func(self, data, await_cb, with_cb):
@@ -628,7 +645,7 @@ def mocked_http_test(cls, network_type, sync_client, async_client, test):
                         await await_cb(make_request(http, method, params))
                 else:
                     response = await await_cb(make_request(http, method, params))
-                    for validator in test['validation']:
+                    for validator in test.get('validation', ()):
                         self.assertEqual(*validator(response))
 
     func.__name__ = test['name']

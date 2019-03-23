@@ -67,6 +67,7 @@ class SecretLockTransaction(Transaction):
     """
 
     mosaic: Mosaic
+    duration: int
     hash_type: HashType
     secret: str
     recipient: RecipientType
@@ -95,8 +96,6 @@ class SecretLockTransaction(Transaction):
             version,
             deadline,
             fee,
-            mosaic,
-            duration,
             signature,
             signer,
             transaction_info,

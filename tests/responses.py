@@ -25,8 +25,6 @@
 import json
 import os
 
-from nem2 import models
-
 DIR = os.path.dirname(os.path.realpath(__file__))
 DATADIR = os.path.join(DIR, 'data')
 ENDPOINT = os.environ.get('NIS2_ENDPOINT', 'localhost:3000')

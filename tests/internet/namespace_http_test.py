@@ -1,7 +1,6 @@
 from nem2 import client
 from nem2 import models
 from tests import harness
-from tests import responses
 
 
 @harness.http_test_case({

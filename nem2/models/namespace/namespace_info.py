@@ -37,7 +37,7 @@ __all__ = ['NamespaceInfo']
 
 
 @util.inherit_doc
-@util.dataclass(frozen=True)
+@util.dataclass(frozen=True, alias=Alias(AliasType.NONE, None))
 class NamespaceInfo(util.DTO):
     """
     Information describing a namespace.
@@ -119,9 +119,8 @@ class NamespaceInfo(util.DTO):
             namespace[key] = self.levels[i].to_dto(network_type)
 
         # Optional alias.
-        alias = self.alias.to_dto(network_type)
-        if alias is not None:
-            namespace['alias'] = alias
+        if self.alias.type != AliasType.NONE:
+            namespace['alias'] = self.alias.to_dto(network_type)
 
         return {
             'meta': meta,
@@ -139,10 +138,17 @@ class NamespaceInfo(util.DTO):
         address = Address.from_dto(namespace['ownerAddress'], network_type)
         network_type = address.network_type
         depth = namespace['depth']
-        alias = Alias.from_dto(namespace.get('alias'), network_type)
+
+        # Load the levels.
         levels = []
         for i in range(depth):
             levels.append(NamespaceId.from_dto(namespace[f'level{i}'], network_type))
+
+        # Load the alias.
+        try:
+            alias = Alias.from_dto(namespace['alias'], network_type)
+        except KeyError:
+            alias = Alias(AliasType.NONE, None)
 
         return cls(
             active=meta['active'],

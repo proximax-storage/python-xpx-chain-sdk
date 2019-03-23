@@ -25,7 +25,9 @@
 from __future__ import annotations
 import typing
 
+from nem2 import util
 from .mosaic import Mosaic
+from ..blockchain.network_type import OptionalNetworkType
 from ..namespace.namespace_id import NamespaceId
 
 __all__ = ['NetworkHarvestMosaic']
@@ -84,4 +86,28 @@ class NetworkHarvestMosaic(Mosaic):
                 >>> NetworkHarvestMosaic.create_relative(1).amount
                 1
         """
+        return cls(amount)
+
+    @classmethod
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ):
+        id = NamespaceId.from_dto(data['id'], network_type)
+        amount = util.u64_from_dto(data['amount'])
+        if int(id) != int(cls.NAMESPACE_ID):
+            raise ValueError('Network harvest mosaic ID does not match.')
+        return cls(amount)
+
+    @classmethod
+    def from_catbuffer(
+        cls,
+        data: bytes,
+        network_type: OptionalNetworkType = None,
+    ):
+        id, data = NamespaceId.from_catbuffer_pair(data, network_type)
+        amount = util.u64_from_catbuffer(data)
+        if int(id) != int(cls.NAMESPACE_ID):
+            raise ValueError('Network harvest mosaic ID does not match.')
         return cls(amount)

@@ -33,8 +33,26 @@ from ..mosaic.mosaic_id import MosaicId
 
 __all__ = ['Alias']
 
-DTOType = typing.Optional[dict]
 ValueType = typing.Optional[typing.Union[Address, MosaicId]]
+
+
+def dto_to_kwds(
+    data: dict,
+    network_type: OptionalNetworkType = None,
+) -> dict:
+    """Convert data transfer object to keywords for initializer."""
+
+    kwds: dict = {'type': AliasType.from_dto(data['type'], network_type)}
+    if data['type'] == AliasType.NONE:
+        kwds['value'] = None
+    elif data['type'] == AliasType.ADDRESS:
+        kwds['value'] = Address.from_dto(data['address'], network_type)
+    elif data['type'] == AliasType.MOSAIC_ID:
+        kwds['value'] = MosaicId.from_dto(data['mosaicId'], network_type)
+    else:
+        raise ValueError("Invalid data for Alias.from_dto.")
+
+    return kwds
 
 
 @util.inherit_doc
@@ -81,30 +99,23 @@ class Alias(util.DTO):
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
-    ) -> DTOType:
+    ) -> dict:
+        data: dict = {'type': self.type.to_dto(network_type)}
         if self.type == AliasType.NONE:
-            return None
-
-        type = self.type.to_dto(network_type)
-        value = self.value.to_dto(network_type)
-        if self.type == AliasType.ADDRESS:
-            return {'type': type, 'address': value}
+            pass
+        elif self.type == AliasType.ADDRESS:
+            data['address'] = self.value.to_dto(network_type)
         elif self.type == AliasType.MOSAIC_ID:
-            return {'type': type, 'mosaicId': value}
-        raise ValueError("Invalid data for Alias.to_dto.")
+            data['mosaicId'] = self.value.to_dto(network_type)
+        else:
+            raise ValueError("Invalid data for Alias.to_dto.")
+
+        return data
 
     @classmethod
     def from_dto(
         cls,
-        data: DTOType,
+        data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        if data is None:
-            return cls()
-
-        type = AliasType.from_dto(data['type'], network_type)
-        if type == AliasType.ADDRESS:
-            return cls(type, Address.from_dto(data['address'], network_type))
-        elif type == AliasType.MOSAIC_ID:
-            return cls(type, MosaicId.from_dto(data['mosaicId'], network_type))
-        raise ValueError("Invalid data for Alias.from_dto.")
+        return cls(**dto_to_kwds(data, network_type))

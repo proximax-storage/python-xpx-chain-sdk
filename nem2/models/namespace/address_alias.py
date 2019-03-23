@@ -22,9 +22,10 @@
     limitations under the License.
 """
 
-from .alias import Alias
+from .alias import Alias, dto_to_kwds
 from .alias_type import AliasType
 from ..account.address import Address
+from ..blockchain.network_type import OptionalNetworkType
 
 __all__ = ['AddressAlias']
 
@@ -40,3 +41,14 @@ class AddressAlias(Alias):
 
     def __init__(self, value: Address) -> None:
         super().__init__(AliasType.ADDRESS, value)
+
+    @classmethod
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ):
+        kwds = dto_to_kwds(data, network_type)
+        if kwds.pop('type') != AliasType.ADDRESS:
+            raise ValueError('Alias type is not an address.')
+        return cls(**kwds)

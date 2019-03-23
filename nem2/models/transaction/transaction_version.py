@@ -46,3 +46,13 @@ class TransactionVersion(util.U8Mixin, enum.IntEnum):
     SECRET_PROOF = 1
     ADDRESS_ALIAS = 1
     MOSAIC_ALIAS = 1
+
+    def description(self) -> str:
+        return DESCRIPTION[self]
+
+
+DESCRIPTION = {
+    TransactionVersion.LOCK: "Transaction version 1.",
+    TransactionVersion.AGGREGATE_BONDED: "Transaction version 2.",
+    TransactionVersion.TRANSFER: "Transaction version 3.",
+}

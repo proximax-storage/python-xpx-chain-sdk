@@ -83,9 +83,8 @@ class Mosaic(util.Model):
         data: bytes,
         network_type: OptionalNetworkType = None,
     ):
-        id_size = MosaicId.CATBUFFER_SIZE
-        mosaic_id = MosaicId.from_catbuffer(data, network_type)
-        amount = util.u64_from_catbuffer(data[id_size:])
+        mosaic_id, data = MosaicId.from_catbuffer_pair(data, network_type)
+        amount = util.u64_from_catbuffer(data)
         return cls(mosaic_id, amount)
 
 

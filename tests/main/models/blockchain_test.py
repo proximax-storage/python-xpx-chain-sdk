@@ -1,5 +1,4 @@
 from nem2 import models
-from nem2 import util
 from tests import harness
 
 
@@ -168,7 +167,6 @@ class TestBlockInfo(harness.TestCase):
 
         self.assertEqual(dto, block_info.to_dto(self.network_type))
         self.assertEqual(block_info, self.type.from_dto(dto, self.network_type))
-
 
 
 @harness.enum_test_case({
