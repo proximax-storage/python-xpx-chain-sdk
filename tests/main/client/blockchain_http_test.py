@@ -31,6 +31,39 @@ from tests import responses
                 lambda x: (x.merkle_tree[0], "smNSI9tFz7tOIc38NZ/n8iKm5fYADJnKnnKdsC5mYfU="),
             ]
         },
+        {
+            'name': 'test_get_blockchain_height',
+            'response': responses.CHAIN_HEIGHT["Ok"],
+            'params': [],
+            'method': 'get_blockchain_height',
+            'validation': [
+                lambda x: (x, 53577),
+            ]
+        },
+        {
+            'name': 'test_get_blockchain_score',
+            'response': responses.CHAIN_SCORE["Ok"],
+            'params': [],
+            'method': 'get_blockchain_score',
+            'validation': [
+                lambda x: (isinstance(x, models.BlockchainScore), True),
+                lambda x: (x.score, 0x791f69c466a3658),
+                lambda x: (x.score_low, 0x791f69c466a3658),
+                lambda x: (x.score_high, 0),
+            ]
+        },
+        {
+            'name': 'test_get_diagnostic_storage',
+            'response': responses.DIAGNOSTIC_STORAGE["Ok"],
+            'params': [],
+            'method': 'get_diagnostic_storage',
+            'validation': [
+                lambda x: (isinstance(x, models.BlockchainStorageInfo), True),
+                lambda x: (x.num_blocks, 53582),
+                lambda x: (x.num_transactions, 25),
+                lambda x: (x.num_accounts, 25),
+            ]
+        },
     ],
 })
 class TestBlockchainHTTP(harness.TestCase):

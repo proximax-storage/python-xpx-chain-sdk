@@ -33,6 +33,10 @@ class TestAddressAlias(harness.TestCase):
         with self.assertRaises(ValueError):
             self.model.mosaic_id
 
+    def test_from_invalid_dto(self):
+        with self.assertRaises(ValueError):
+            self.type.from_dto({'type': 0})
+
 
 @harness.model_test_case({
     'type': models.Alias,
@@ -49,7 +53,13 @@ class TestAddressAlias(harness.TestCase):
     },
 })
 class TestAliasAddress(harness.TestCase):
-    pass
+
+    def test_invalid_init(self):
+        with self.assertRaises(TypeError):
+            self.type(self.data['type'], None)
+
+    def test_properties(self):
+        self.assertEqual(self.model.address, self.data['value'])
 
 
 @harness.model_test_case({
@@ -81,7 +91,14 @@ class TestAliasEmpty(harness.TestCase):
     },
 })
 class TestAliasMosaicId(harness.TestCase):
-    pass
+
+    def test_properties(self):
+        self.assertEqual(self.model.mosaic_id, self.data['value'])
+
+    def test_eq(self):
+        self.assertEqual(self.model, self.model.replace())
+        self.assertNotEqual(self.model, self.type())
+        self.assertNotEqual(self.model, None)
 
 
 @harness.enum_test_case({
@@ -175,6 +192,10 @@ class TestEmptyAlias(harness.TestCase):
         with self.assertRaises(ValueError):
             self.model.mosaic_id
 
+    def test_from_invalid_dto(self):
+        with self.assertRaises(ValueError):
+            self.type.from_dto({'type': 1, 'mosaicId': [5, 0]})
+
 
 @harness.model_test_case({
     'type': models.MosaicAlias,
@@ -204,6 +225,10 @@ class TestMosaicAlias(harness.TestCase):
     def test_properties(self):
         with self.assertRaises(ValueError):
             self.model.address
+
+    def test_from_invalid_dto(self):
+        with self.assertRaises(ValueError):
+            self.type.from_dto({'type': 0})
 
 
 @harness.model_test_case({
@@ -265,6 +290,10 @@ class TestNamespaceId(harness.TestCase):
         self.assertEqual(f'{value:x}', 'd')
         self.assertEqual(f'{value:X}', 'D')
 
+    def test_invalid_id(self):
+        with self.assertRaises(TypeError):
+            self.type(b'')
+
 
 @harness.model_test_case({
     'type': models.NamespaceInfo,
@@ -301,6 +330,11 @@ class TestNamespaceId(harness.TestCase):
             'endHeight': [4294967295, 4294967295]
         }
     },
+    'extras': {
+        'parent': models.NamespaceId(0x88B64C3BE2F47144),
+        'child': models.NamespaceId(0xFA9429715A71ACC9),
+        'address': models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54'),
+    }
 })
 class TestNamespaceInfo(harness.TestCase):
 
@@ -312,6 +346,22 @@ class TestNamespaceInfo(harness.TestCase):
 
         with self.assertRaises(ValueError):
             self.model.parent_namespace_id()
+
+        sub_namespace = self.model.replace(
+            type=models.NamespaceType.SUB_NAMESPACE,
+            parent_id=self.extras['parent'],
+            levels=[self.extras['child']],
+        )
+        self.assertEqual(sub_namespace.parent_namespace_id(), self.extras['parent'])
+
+    def test_alias_to_dto(self):
+        model = self.model.replace(alias=models.AddressAlias(self.extras['address']))
+        dto = model.to_dto(self.network_type)
+        self.assertEqual(dto['namespace'].pop('alias'), {
+            'type': 2,
+            'address': '90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
+        })
+        self.assertEqual(dto, self.dto)
 
 
 @harness.model_test_case({

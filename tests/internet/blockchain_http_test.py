@@ -15,6 +15,15 @@ from tests import harness
             ]
         },
         {
+            'name': 'test_get_blockchain_height',
+            'params': [],
+            'method': 'get_blockchain_height',
+            'validation': [
+                lambda x: (isinstance(x, int), True),
+                lambda x: (x >= 11402, True),
+            ]
+        },
+        {
             'name': 'test_get_blockchain_score',
             'params': [],
             'method': 'get_blockchain_score',

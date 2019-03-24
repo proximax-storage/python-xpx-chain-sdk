@@ -67,6 +67,12 @@ class TestAccount(harness.TestCase):
         payload = 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
         self.assertTrue(self.model.verify_transaction(payload))
 
+    def test_invalid_keys(self):
+        with self.assertRaises(ValueError):
+            self.type(self.data['address'], self.data['public_key'], '')
+        with self.assertRaises(ValueError):
+            self.type(self.data['address'], '', self.data['private_key'])
+
 
 @harness.model_test_case({
     'type': models.AccountInfo,
@@ -155,6 +161,14 @@ class TestAddress(harness.TestCase):
         self.assertTrue(self.type.create_from_raw_address(self.extras['pretty']).is_valid())
         self.assertFalse(self.type.create_from_raw_address(self.extras['invalid']).is_valid())
 
+    def test_invalid_address(self):
+        with self.assertRaises(ValueError):
+            self.type('')
+        with self.assertRaises(ValueError):
+            self.type.create_from_encoded('')
+        with self.assertRaises(ValueError):
+            self.type.create_from_public_key('', self.network_type)
+
 
 class TestAccountMetadata(harness.TestCase):
     pass    # TODO(ahuszagh) Implement...
@@ -185,6 +199,10 @@ class TestMultisigAccountInfo(harness.TestCase):
 })
 class TestPublicAccount(harness.TestCase):
 
+    def test_invalid_public_key(self):
+        with self.assertRaises(ValueError):
+            self.type(self.data['address'], '')
+
     def test_properties(self):
         self.assertEqual(self.model.network_type, self.network_type)
 
@@ -194,6 +212,9 @@ class TestPublicAccount(harness.TestCase):
     @harness.ignore_warnings_test
     def test_verify_signature(self):
         self.assertTrue(self.model.verify_signature(self.extras['message'], self.extras['signature']))
+        self.assertFalse(self.model.verify_signature(self.extras['message'], '0' * 128))
+        with self.assertRaises(ValueError):
+            self.assertTrue(self.model.verify_signature(self.extras['message'], ''))
 
     @harness.ignore_warnings_test
     def test_verify_transaction(self):

@@ -49,7 +49,7 @@ def dto_to_kwds(
         kwds['value'] = Address.from_dto(data['address'], network_type)
     elif data['type'] == AliasType.MOSAIC_ID:
         kwds['value'] = MosaicId.from_dto(data['mosaicId'], network_type)
-    else:
+    else:       # pragma: unreachable
         raise ValueError("Invalid data for Alias.from_dto.")
 
     return kwds
@@ -74,7 +74,7 @@ class Alias(util.DTO):
             same_type = isinstance(self.value, MosaicId)
         elif self.type == AliasType.NONE:
             same_type = self.value is None
-        else:
+        else:       # pragma: unreachable
             same_type = False
         if not same_type:
             raise TypeError("Alias value and type do not match.")
@@ -107,7 +107,7 @@ class Alias(util.DTO):
             data['address'] = self.value.to_dto(network_type)
         elif self.type == AliasType.MOSAIC_ID:
             data['mosaicId'] = self.value.to_dto(network_type)
-        else:
+        else:       # pragma: unreachable
             raise ValueError("Invalid data for Alias.to_dto.")
 
         return data

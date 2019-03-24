@@ -101,9 +101,9 @@ class Address(util.Model):
 
     def __init__(self, address: str) -> None:
         plain = address.strip().upper().replace('-', '')
-        network_type = NetworkType.create_from_raw_address(plain)
         if len(plain) != 40:
             raise ValueError(f"{address} is not a valid raw address")
+        network_type = NetworkType.create_from_raw_address(plain)
         self._set('address', plain)
         self._set('network_type', network_type)
 

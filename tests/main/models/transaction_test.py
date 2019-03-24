@@ -96,7 +96,10 @@ class TestAddressAliasTransaction(harness.TestCase):
     'catbuffer': b'\xa5\xf8.\xc8\xeb\xb3AB{g\x85\xc8\x11\x19\x06\xcd\r\xf1\x888\xfb\x11\xb5\x1c\xe0\xe1\x8b^y\xdf\xf60W\x80\xc8\xdf\x9dF\xba+\xcf\x02\x9d\xcc];\xf5_\xe1\xcb[\xe7\xab\xcf08|F7\xdd\xed\xfc!Rp<\xa0\xad\x95\xf2\x1b\xb9\xb9B\xf3\xccR\xfc\xfc d\xc7\xb8L\xf6\r\x1a\x9ei\x19_\x19C\x15l\x07',
 })
 class TestAggregateTransactionCosignature(harness.TestCase):
-    pass
+
+    def test_invalid_signature(self):
+        with self.assertRaises(ValueError):
+            self.type(signature='', signer=self.data['signer'])
 
 
 @harness.model_test_case({
@@ -143,6 +146,41 @@ class TestCosignatureSignedTransaction(harness.TestCase):
     pass
 
 
+@harness.enum_test_case({
+    'type': models.ChronoUnit,
+    'enums': [
+        models.ChronoUnit.MICROSECONDS,
+        models.ChronoUnit.MILLISECONDS,
+        models.ChronoUnit.SECONDS,
+        models.ChronoUnit.MINUTES,
+        models.ChronoUnit.HOURS,
+    ],
+    'values': [
+        0,
+        1,
+        2,
+        3,
+        4,
+    ],
+    'descriptions': [
+        'Microseconds.',
+        'Milliseconds.',
+        'Seconds.',
+        'Minutes.',
+        'Hours.',
+    ],
+    'custom': [
+        {
+            'name': 'test_to_timedelta',
+            'callback': lambda self, x: str(x.to_timedelta(1)),
+            'results': ['0:00:00.000001', '0:00:00.001000', '0:00:01', '0:01:00', '1:00:00'],
+        },
+    ],
+})
+class TestChronoUnit(harness.TestCase):
+    pass
+
+
 @harness.model_test_case({
     'type': models.Deadline,
     'network_type': models.NetworkType.MIJIN_TEST,
@@ -153,7 +191,14 @@ class TestCosignatureSignedTransaction(harness.TestCase):
     'catbuffer': b'\xf1\xb4\x81\\\x00\x00\x00\x00',
 })
 class TestDeadline(harness.TestCase):
-    pass
+
+    def test_create(self):
+        with self.assertRaises(ValueError):
+            self.type.create(-1)
+        with self.assertRaises(ValueError):
+            self.type.create(25, models.ChronoUnit.HOURS)
+
+        self.type.create(23, models.ChronoUnit.HOURS)
 
 
 @harness.enum_test_case({
@@ -554,12 +599,57 @@ class TestTransaction(harness.TestCase):
         transactions = [
             (models.TransactionType.ADDRESS_ALIAS, '9a000000102e9c68fe9cbaa5d1d27ad35f9e386b42c265749be0e27182b8a9ebf18a0357332ef4ee350b648ea00437790c70471959b9334aea2e2e89356d52613fd385021b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'),
             (models.TransactionType.MOSAIC_ALIAS, '890000004643c4a57eccb783217473cf11bd6642e754d8362a552266fc6e332f523550b3e4431f468c942a1c43748b12f16112b63c282fa48a674a3cb66df33ec8ad100f1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e430000000000000000f1b4815c00000000004471f4e23b4cb688a6c03b484fd6f72f'),
+            (models.TransactionType.SECRET_LOCK, 'ca000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019052410000000000000000f1b4815c000000000500000000000000e8030000000000006400000000000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'),
             (models.TransactionType.SECRET_PROOF, 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'),
             (models.TransactionType.TRANSFER, 'b0000000edbf8094c382ddb1c2341ea861ad979eee4b576b1050bfb5b306cf07d6b378e7c58761a7e5980c09f65b15b5b8caea5d631f9e533c04d33b71961e5ad7b27e0f1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955039054410000000000000000f1b4815c0000000090fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc0c000148656c6c6f20776f726c64210500000000000000e803000000000000'),
         ]
 
         for type, payload in transactions:
             transaction = models.Transaction.from_catbuffer(payload)
+            self.assertEqual(transaction.type, type)
+
+    def test_from_dto(self):
+        transactions = [
+            (models.TransactionType.SECRET_LOCK, {
+                'transaction': {
+                    'version': 36865,
+                    'type': 16722,
+                    'fee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'mosaicId': [5, 0],
+                    'amount': [1000, 0],
+                    'duration': [100, 0],
+                    'hashAlgorithm': 0,
+                    'secret': '9b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e',
+                    'recipient': '90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
+                },
+            }),
+            (models.TransactionType.SECRET_PROOF, {
+                'transaction': {
+                    'version': 36865,
+                    'type': 16978,
+                    'fee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'hashAlgorithm': 0,
+                    'secret': '9b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e',
+                    'proof': 'b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7',
+                },
+            }),
+            (models.TransactionType.TRANSFER, {
+                'transaction': {
+                    'version': 36867,
+                    'type': 16724,
+                    'fee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'recipient': '914bfa5f372d55b38400000000000000000000000000000000',
+                    'mosaics': [{'amount': [1000, 0], 'id': [5, 0]}],
+                    'message': {'type': 0, 'payload': '48656c6c6f20776f726c6421'}
+                },
+            }),
+        ]
+
+        for type, dto in transactions:
+            transaction = models.Transaction.from_dto(dto)
             self.assertEqual(transaction.type, type)
 
     # TODO(ahuszagh) Need to test the hooks.
@@ -794,6 +884,22 @@ class TestTransferTransaction(harness.TestCase):
             message=self.data['message'],
             network_type=self.data['network_type'],
         ))
+
+    def test_invalid_network_type(self):
+        with self.assertRaises(ValueError):
+            self.model.to_catbuffer(models.NetworkType.MIJIN)
+        with self.assertRaises(ValueError):
+            self.type.from_catbuffer(self.catbuffer, models.NetworkType.MIJIN)
+        with self.assertRaises(ValueError):
+            self.model.to_dto(models.NetworkType.MIJIN)
+        with self.assertRaises(ValueError):
+            self.type.from_dto(self.dto, models.NetworkType.MIJIN)
+        with self.assertRaises(ValueError):
+            self.type.from_catbuffer(b'', self.network_type)
+        with self.assertRaises(ValueError):
+            size = util.hexlify(util.u32_to_catbuffer(1 << 31))
+            catbuffer = size + self.catbuffer[8:]
+            self.type.from_catbuffer(catbuffer, self.network_type)
 
 
 @harness.transaction_test_case({

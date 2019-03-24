@@ -87,6 +87,24 @@ class TestMosaicLevyType(harness.TestCase):
 
 
 @harness.model_test_case({
+    'type': models.MosaicName,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'mosaic_id': models.MosaicId(0xd525ad41d95fcf29),
+        'name': 'xem',
+        'parent_id': models.NamespaceId(0x84b3552d375ffa4b),
+    },
+    'dto': {
+        'mosaicId': [0xd95fcf29, 0xd525ad41],
+        'name': 'xem',
+        'parentId': [0x375ffa4b, 0x84b3552d]
+    },
+})
+class TestMosaicName(harness.TestCase):
+    pass
+
+
+@harness.model_test_case({
     'type': models.MosaicNonce,
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
@@ -100,6 +118,15 @@ class TestMosaicLevyType(harness.TestCase):
     },
 })
 class TestMosaicNonce(harness.TestCase):
+
+    def test_rich_init(self):
+        self.assertEqual(self.model, self.type('12345678'))
+        with self.assertRaises(ValueError):
+            self.type('12')
+        with self.assertRaises(ValueError):
+            self.type(b'\x12')
+        with self.assertRaises(TypeError):
+            self.type(None)
 
     def test_int(self):
         self.assertEqual(int(self.model), 0x78563412)
@@ -148,6 +175,13 @@ class TestMosaicProperties(harness.TestCase):
         self.assertEqual(self.model.supply_mutable, True)
         self.assertEqual(self.model.transferable, True)
         self.assertEqual(self.model.levy_mutable, False)
+
+    def test_create(self):
+        self.assertEqual(self.type.create().flags, 0x2)
+        self.assertEqual(self.type.create(supply_mutable=True).flags, 0x3)
+        self.assertEqual(self.type.create(transferable=True).flags, 0x2)
+        self.assertEqual(self.type.create(transferable=False).flags, 0x0)
+        self.assertEqual(self.type.create(levy_mutable=True).flags, 0x6)
 
 
 @harness.enum_test_case({
@@ -205,6 +239,15 @@ class TestNetworkCurrencyMosaic(harness.TestCase):
     def test_create_absolute(self):
         self.assertEqual(self.type.create_absolute(1).amount, 1)
 
+    def test_from_invalid_dto(self):
+        with self.assertRaises(ValueError):
+            self.type.from_dto({'amount': [1, 0], 'id': [0, 0]})
+
+    def test_from_invalid_catbuffer(self):
+        with self.assertRaises(ValueError):
+            catbuffer = bytes(8) + self.catbuffer[8:]
+            self.type.from_catbuffer(catbuffer)
+
 
 @harness.model_test_case({
     'type': models.NetworkHarvestMosaic,
@@ -233,3 +276,12 @@ class TestNetworkHarvestMosaic(harness.TestCase):
 
     def test_create_absolute(self):
         self.assertEqual(self.type.create_absolute(1).amount, 1)
+
+    def test_from_invalid_dto(self):
+        with self.assertRaises(ValueError):
+            self.type.from_dto({'amount': [1, 0], 'id': [0, 0]})
+
+    def test_from_invalid_catbuffer(self):
+        with self.assertRaises(ValueError):
+            catbuffer = bytes(8) + self.catbuffer[8:]
+            self.type.from_catbuffer(catbuffer)

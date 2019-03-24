@@ -62,7 +62,7 @@ class MosaicNonce(util.IntMixin, util.Model):
     nonce: bytes
     CATBUFFER_SIZE = util.U32_BYTES
 
-    def __init__(self, nonce: typing.Union[int, bytes]) -> None:
+    def __init__(self, nonce: typing.Union[int, str, bytes]) -> None:
         self._set('nonce', nonce_as_bytes(nonce))
         if len(self.nonce) != 4:
             raise ValueError(f"Nonce length is incorrect.")

@@ -49,6 +49,18 @@ BLOCK_INFO = {
     'Ok': load_response('block_info.json'),
 }
 
+CHAIN_HEIGHT = {
+    'Ok': load_response('chain_height.json'),
+}
+
+CHAIN_SCORE = {
+    'Ok': load_response('chain_score.json'),
+}
+
+DIAGNOSTIC_STORAGE = {
+    'Ok': load_response('diagnostic_storage.json'),
+}
+
 MOSAIC_INFO = {
     'Ok': load_response('mosaic_info.json'),
 }

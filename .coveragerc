@@ -20,10 +20,15 @@ omit =
     # Ignore RxPy extensions.
     nem2/util/rx/*
     nem2/util/reactive.py
+    # Ignore incomplete or not yet implemented models in the catapult API.
+    # TODO: Restore these models when they are stabilized in catapult.
+    nem2/models/mosaic/mosaic_info.py
+    nem2/models/mosaic/mosaic_levy.py
 
 [report]
 show_missing = True
 exclude_lines =
+    pragma: unreachable
     pragma: no cover
     raise AbstractMethodError
     raise abc.AbstractMethodError
