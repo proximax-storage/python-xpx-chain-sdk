@@ -71,9 +71,29 @@ TESTS_REQUIRE = [
 ]
 
 EXTRAS_REQUIRE = {
-    'sphinx': ['sphinx_rtd_theme>=0.4', 'sphinx_autodoc_typehints'],
+    # FEATURES
+
+    # Use C-extensions for cryptographic libraries for performance and security.
     'crypto': ['pycryptodome>=3.4', 'ed25519>=1.4', 'ed25519sha3>=1.4'],
+    # Use ReactiveX for asynchronous code scheduling.
     'reactive': ['rx>=1.6'],
+
+    # TESTING / DOCUMENTATION
+
+    # Use Bandit to detect potential code security risks.
+    'bandit': ['bandit>=1.5'],
+    # Determine and report code coverage from unittests.
+    'coverage': ['flake8>=4.5', 'nose2>=0.9'],
+    # Use PyFlake8 to lint code, detect logic errors, and check code complexity.
+    'flake8': ['flake8>=3.7', 'mccabe>=0.6'],
+    # Use Pylint to lint code and report code quality.
+    'pylint': ['pylint>=2.3'],
+    # Use rstr to generate random data for unit testing.
+    'random': ['rstr>=2.2'],
+    # Use radon to check code complexity and maintainability.
+    'radon': ['radon>=3.0'],
+    # Use Sphinx to build project documentation.
+    'sphinx': ['sphinx_rtd_theme>=0.4', 'sphinx_autodoc_typehints'],
 }
 
 # Define endpoint for internet tests in a single place.
@@ -119,6 +139,10 @@ COMMANDS = {
     'radon_mi': shell_command(
         command=[sys.executable, "-m", "radon", "mi", "--min", "B", "nem2"],
         short_description="Run radon's maintainability index checker on project.",
+    ),
+    'random': shell_command(
+        command=unittest_command("tests.random"),
+        short_description="Run randomly-generated unittest suite.",
     ),
     'test': shell_command(
         command=unittest_command("tests.main"),

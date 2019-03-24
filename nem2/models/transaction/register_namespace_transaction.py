@@ -158,14 +158,14 @@ class RegisterNamespaceTransaction(Transaction):
         :param network_type: Network type.
         """
         parent_id = to_namespace_id(parent_namespace)
-        id = util.generate_sub_namespace_id(parent_id, namespace_name)
+        id = util.generate_sub_namespace_id(parent_id.id, namespace_name)
         return cls(
             network_type,
             TransactionVersion.REGISTER_NAMESPACE,
             deadline,
             0,
             NamespaceType.SUB_NAMESPACE,
-            NamespaceName(id, namespace_name),
+            NamespaceName(NamespaceId(id), namespace_name),
             None,
             parent_id
         )

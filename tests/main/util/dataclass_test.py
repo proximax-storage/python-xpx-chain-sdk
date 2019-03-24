@@ -92,13 +92,13 @@ class TestDataclassErrors(harness.TestCase):
     def test_defaults(self):
         with self.assertRaises(SyntaxError):
             @util.dataclass(frozen=True, first=0)
-            class Dataclass:
+            class Dataclass1:
                 first: int
                 second: int
 
         with self.assertRaises(SyntaxError):
             @util.dataclass(second=0)
-            class Dataclass:
+            class Dataclass2:
                 first: int
                 second: int
 

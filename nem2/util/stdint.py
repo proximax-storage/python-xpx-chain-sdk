@@ -131,10 +131,15 @@ YieldBytesType = typing.Generator[bytes, None, None]
 # HELPERS
 
 
+def check_overflow(within_range: bool):
+    """Raise exception if overflow."""
+    if not within_range:
+        raise OverflowError
+
+
 def high(max: int, bits: int, mask: int) -> typing.Callable[[int], int]:
     def wrapper(value: int) -> int:
-        if value > max:
-            raise OverflowError
+        check_overflow(0 <= value <= max)
         return (value >> bits) & mask
 
     wrapper.__name__ = f'u{2*bits}_high'
@@ -146,8 +151,7 @@ def high(max: int, bits: int, mask: int) -> typing.Callable[[int], int]:
 
 def low(max: int, bits: int, mask: int) -> typing.Callable[[int], int]:
     def wrapper(value: int) -> int:
-        if value > max:
-            raise OverflowError
+        check_overflow(0 <= value <= max)
         return value & mask
 
     wrapper.__name__ = f'u{2*bits}_low'
@@ -263,16 +267,14 @@ def iter_from_dto(bits: int, cb):
 def u8_to_dto(value: int) -> U8DTOType:
     """Convert 8-bit int to DTO."""
 
-    if value > U8_MAX:
-        raise OverflowError
+    check_overflow(0 <= value <= U8_MAX)
     return value
 
 
 def u8_from_dto(dto: U8DTOType) -> int:
     """Convert DTO to 8-bit int."""
 
-    if dto > U8_MAX:
-        raise OverflowError
+    check_overflow(0 <= dto <= U8_MAX)
     return dto
 
 
@@ -291,16 +293,14 @@ u8_iter_from_dto = iter_from_dto(U8_BITS, u8_from_dto)
 def u16_to_dto(value: int) -> U16DTOType:
     """Convert 16-bit int to DTO."""
 
-    if value > U16_MAX:
-        raise OverflowError
+    check_overflow(0 <= value <= U16_MAX)
     return value
 
 
 def u16_from_dto(dto: U16DTOType) -> int:
     """Convert DTO to 16-bit int."""
 
-    if dto > U16_MAX:
-        raise OverflowError
+    check_overflow(0 <= dto <= U16_MAX)
     return dto
 
 
@@ -319,16 +319,14 @@ u16_iter_from_dto = iter_from_dto(U16_BITS, u16_from_dto)
 def u32_to_dto(value: int) -> U32DTOType:
     """Convert 32-bit int to DTO."""
 
-    if value > U32_MAX:
-        raise OverflowError
+    check_overflow(0 <= value <= U32_MAX)
     return value
 
 
 def u32_from_dto(dto: U32DTOType) -> int:
     """Convert DTO to 32-bit int."""
 
-    if dto > U32_MAX:
-        raise OverflowError
+    check_overflow(0 <= dto <= U32_MAX)
     return dto
 
 
@@ -347,8 +345,7 @@ u32_iter_from_dto = iter_from_dto(U32_BITS, u32_from_dto)
 def u64_to_dto(value: int) -> U64DTOType:
     """Convert 64-bit int to DTO."""
 
-    if value > U64_MAX:
-        raise OverflowError
+    check_overflow(0 <= value <= U64_MAX)
     return [u64_low(value), u64_high(value)]
 
 
@@ -380,8 +377,7 @@ u64_iter_from_dto = iter_from_dto(U64_BITS, u64_from_dto)
 def u128_to_dto(value: int) -> U128DTOType:
     """Convert 128-bit int to DTO."""
 
-    if value > U128_MAX:
-        raise OverflowError
+    check_overflow(0 <= value <= U128_MAX)
     low = u128_low(value)
     high = u128_high(value)
     return [u64_to_dto(low), u64_to_dto(high)]

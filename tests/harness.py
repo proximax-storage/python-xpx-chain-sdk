@@ -35,6 +35,10 @@ import inspect
 import json
 import math
 import requests
+import string
+import struct
+import sys
+import typing
 import unittest
 import warnings
 import websockets
@@ -788,3 +792,328 @@ def ignore_warnings_test(test):
             test(self, *args, **kwds)
 
     return wrapper
+
+
+# RANDOM
+
+with contextlib.suppress(ImportError):
+    # Check we can import all our dependencies and generate the decorators.
+    from collections import deque
+    import random
+    import rstr
+
+    # CONFIG
+    DEFAULT_CALLS = 20
+    DEFAULT_MIN_STRLEN = 5
+    DEFAULT_MAX_STRLEN = 40
+    DEFAULT_MIN_SEQLEN = 1
+    DEFAULT_MAX_SEQLEN = 10
+    DEFAULT_MIN_MAPLEN = 1
+    DEFAULT_MAX_MAPLEN = 10
+
+    # TYPE HINTS
+    # Define type hints so we can generate random data within the expected
+    # bounds.
+    U8 = typing.TypeVar('U8', bound=int)
+    U16 = typing.TypeVar('U16', bound=int)
+    U32 = typing.TypeVar('U32', bound=int)
+    U64 = typing.TypeVar('U64', bound=int)
+    U128 = typing.TypeVar('U128', bound=int)
+    I8 = typing.TypeVar('I8', bound=int)
+    I16 = typing.TypeVar('I16', bound=int)
+    I32 = typing.TypeVar('I32', bound=int)
+    I64 = typing.TypeVar('I64', bound=int)
+    I128 = typing.TypeVar('I128', bound=int)
+    F32 = typing.TypeVar('F32', bound=float)
+    F64 = typing.TypeVar('F64', bound=float)
+
+    class BytesPattern(bytes):
+        """Indicates you want to match against a bytes regular expression."""
+
+    class StrPattern(str):
+        """Indicates you want to match against a str regular expression."""
+
+    def boolgen():
+        """Define a new generator for boolean values."""
+
+        def generator() -> bool:
+            return random.choice([True, False])
+
+        return generator
+
+    def intgen(min_value: int = -sys.maxsize, max_value: int = sys.maxsize):
+        """Define a new generator for integral values."""
+
+        def generator() -> int:
+            return random.randint(min_value, max_value)
+
+        return generator
+
+    def structgen(bits: int, format: str):
+        """Generate data from random bytes."""
+
+        assert struct.calcsize(f'<{format}') == bits // 8
+        nbytes = bits // 8
+
+        def generator():
+            data = int.to_bytes(random.getrandbits(bits), nbytes, 'little')
+            return struct.unpack(f'<{format}', data)[0]
+
+        return generator
+
+    def floatgen(
+        min_magnitude: float = 1e-7,
+        max_magnitude: float = 1e10,
+        positive: bool = False,
+        **kwds
+    ):
+        """
+        Define a new generator for floating-point values.
+        Chance of 0 scales with the size of the range.
+        """
+
+        next_pos = boolgen()
+        zero_bits = kwds.get('zero_bits', int(math.log2(max_magnitude - min_magnitude)))
+
+        def generator() -> float:
+            # Floats have a symmetric range for both positive and negative
+            # values due to dedicated sign bit in IEEE754.
+            if random.getrandbits(zero_bits) == 0:
+                return 0.0
+            elif positive or next_pos():
+                return random.uniform(min_magnitude, max_magnitude)
+            return random.uniform(-min_magnitude, -max_magnitude)
+
+        return generator
+
+    def regen(pattern: str):
+        """Define a new generator based off a regular expression."""
+
+        def generator() -> str:
+            return rstr.xeger(pattern)
+
+        return generator
+
+    def lettergen(letters: str = string.printable, **kwds):
+        """Define new letter-based string generator."""
+
+        fixed_length = kwds.get('fixed_length')
+        if fixed_length is not None:
+            min_length = fixed_length
+            max_length = fixed_length
+        else:
+            min_length = kwds.get('min_length', DEFAULT_MIN_STRLEN)
+            max_length = kwds.get('max_length', DEFAULT_MAX_STRLEN)
+
+        def generator() -> str:
+            return rstr.rstr(letters, min_length, max_length)
+
+        return generator
+
+    def strgen(**kwds):
+        """Define a new generator for str."""
+
+        if 'pattern' in kwds:
+            return regen(kwds.pop('pattern'), **kwds)
+        return lettergen(**kwds)
+
+    def bytesgen(**kwds):
+        """Define a new generator for bytes."""
+
+        encoding = kwds.pop('encoding', 'utf8')
+        if 'pattern' in kwds:
+            kwds['pattern'] = kwds['pattern'].decode(encoding)
+        if 'letters' in kwds:
+            kwds['letters'] = kwds['letters'].decode(encoding)
+        str_generator = strgen(**kwds)
+
+        def generator() -> bytes:
+            return str_generator().encode(encoding)
+
+        return generator
+
+    _T = typing.TypeVar('_T')
+    _U = typing.TypeVar('_U')
+
+    def _generator(type: typing.Type, kwds: typing.Optional[dict] = None):
+        """Convert a type annotation and keyword arguments to a new generator."""
+
+        kwds = kwds or {}
+        # First try pre-defined generators.
+        with contextlib.suppress(KeyError):
+            return GENERATORS[type]
+
+        # Try a sequence or mapping type. This will fail for TypeVars and Unions,
+        # raising a KeyError by design. Ignore that.
+        with contextlib.suppress(AttributeError):
+            origin = type.__origin__
+            args = type.__args__
+            return PROTO_GENERATORS[origin](*args, **kwds)
+
+        # Go to our fallback.
+        return PROTO_GENERATORS[type](**kwds)
+
+    def _seqgen(value_type: typing.Type[_T], **kwds):
+        """Generate sequence type with defined value type."""
+
+        # Process our arguments for the value type generator.
+        valuegen = _generator(value_type, kwds.get('value'))
+
+        # Process our arguments for the sequence generator.
+        fixed_length = kwds.get('fixed_length')
+        if fixed_length is not None:
+            min_length = fixed_length
+            max_length = fixed_length
+        else:
+            min_length = kwds.get('min_length', DEFAULT_MIN_SEQLEN)
+            max_length = kwds.get('max_length', DEFAULT_MAX_SEQLEN)
+
+        def generator() -> typing.Sequence[_T]:
+            length = random.randint(min_length, max_length)
+            return [valuegen() for _ in range(length)]
+
+        return generator
+
+    def _mapgen(key_type: typing.Type[_T], value_type: typing.Type[_U], **kwds):
+        """Generate mapping type with defined key/value types."""
+
+        # Process our arguments for the key and value type generators.
+        keygen = _generator(key_type, kwds.get('key'))
+        valuegen = _generator(value_type, kwds.get('value'))
+
+        # Process our arguments for the sequence generator.
+        fixed_length = kwds.get('fixed_length')
+        if fixed_length is not None:
+            min_length = fixed_length
+            max_length = fixed_length
+        else:
+            min_length = kwds.get('min_length', DEFAULT_MIN_SEQLEN)
+            max_length = kwds.get('max_length', DEFAULT_MAX_SEQLEN)
+
+        def generator() -> typing.Mapping[_T, _U]:
+            length = random.randint(min_length, max_length)
+            return {keygen(): valuegen() for _ in range(length)}
+
+        return generator
+
+    def listgen(value_type: typing.Type[_T], **kwds):
+        """Generate sequence of values as list."""
+
+        seq_generator = _seqgen(value_type, **kwds)
+
+        def generator() -> typing.List[_T]:
+            return list(seq_generator())
+
+        return generator
+
+    def setgen(value_type: typing.Type[_T], **kwds):
+        """Generate sequence of values as set."""
+
+        seq_generator = _seqgen(value_type, **kwds)
+
+        def generator() -> typing.Set[_T]:
+            return set(seq_generator())
+
+        return generator
+
+    def frozensetgen(value_type: typing.Type[_T], **kwds):
+        """Generate sequence of values as frozenset."""
+
+        seq_generator = _seqgen(value_type, **kwds)
+
+        def generator() -> typing.FrozenSet[_T]:
+            return frozenset(seq_generator())
+
+        return generator
+
+    def dequegen(value_type: typing.Type[_T], **kwds):
+        """Generate sequence of values as deque."""
+
+        seq_generator = _seqgen(value_type, **kwds)
+
+        def generator() -> typing.Deque[_T]:
+            return deque(seq_generator())
+
+        return generator
+
+    def dictgen(key_type: typing.Type[_T], value_type: typing.Type[_U], **kwds):
+        """Generate mapping of keys and values as dict."""
+
+        map_generator = _mapgen(key_type, value_type, **kwds)
+
+        def generator() -> typing.Dict[_T, _U]:
+            return dict(map_generator())
+
+        return generator
+
+    PROTO_GENERATORS = {
+        bool: boolgen,
+        int: intgen,
+        float: floatgen,
+        str: strgen,
+        bytes: bytesgen,
+        list: listgen,
+        set: setgen,
+        frozenset: frozensetgen,
+        deque: dequegen,
+        dict: dictgen,
+    }
+
+    GENERATORS = {
+        # INT
+        U8: intgen(0, (1 << 8) - 1),
+        U16: intgen(0, (1 << 16) - 1),
+        U32: intgen(0, (1 << 32) - 1),
+        U64: intgen(0, (1 << 64) - 1),
+        U128: intgen(0, (1 << 128) - 1),
+        I8: intgen(-(1 << 7), (1 << 7) - 1),
+        I16: intgen(-(1 << 15), (1 << 15) - 1),
+        I32: intgen(-(1 << 31), (1 << 31) - 1),
+        I64: intgen(-(1 << 63), (1 << 63) - 1),
+        I128: intgen(-(1 << 127), (1 << 127) - 1),
+
+        # FLOAT
+        F32: structgen(32, 'f'),
+        F64: structgen(64, 'd'),
+    }
+
+    def randomize_function(f, **kwds):
+        """Determine the type signature of the function and provide random data."""
+
+        # Get global/local vars to evaluate forward refs.
+        frame = inspect.stack()[1].frame
+        gv = frame.f_globals
+        lv = frame.f_locals
+
+        # Unwrap our annotations to determine our argument types.
+        calls = kwds.get('calls', DEFAULT_CALLS)
+        args = f.__annotations__.copy()
+        args.pop('self', None)
+        args.pop('return', None)
+        args = {k: eval(v, gv, lv) if isinstance(v, str) else v for k, v in args.items()}
+        generators = {n: _generator(t, kwds.get(n)) for n, t in args.items()}
+
+        @functools.wraps(f)
+        def test(self):
+            for _ in range(calls):
+                arguments = {k: v() for k, v in generators.items()}
+                f(self, **arguments)
+
+        return test
+
+    def randomize_kwds(kwds):
+        """Generator a function decorator with the bound keywords."""
+
+        def decorator(f):
+            return randomize_function(f, **kwds)
+
+        return decorator
+
+    def randomize(*args, **kwds):
+        """Randomize arguments to a function call."""
+
+        if len(args) == 1 and callable(args[0]) and not kwds:
+            return randomize_function(args[0])
+        elif len(args):
+            raise ValueError('randomize does not support positional arguments.')
+        return randomize_kwds(kwds)
