@@ -906,7 +906,8 @@ with contextlib.suppress(ImportError):
             max_length = kwds.get('max_length', DEFAULT_MAX_STRLEN)
 
         def generator() -> str:
-            return rstr.rstr(letters, min_length, max_length)
+            length = random.randint(min_length, max_length)
+            return ''.join([random.choice(letters) for i in range(length)])
 
         return generator
 
@@ -917,18 +918,30 @@ with contextlib.suppress(ImportError):
             return regen(kwds.pop('pattern'), **kwds)
         return lettergen(**kwds)
 
-    def bytesgen(**kwds):
+    def bytesgen(letters: bytes = bytes(range(256)), **kwds):
         """Define a new generator for bytes."""
 
-        encoding = kwds.pop('encoding', 'utf8')
-        if 'pattern' in kwds:
-            kwds['pattern'] = kwds['pattern'].decode(encoding)
-        if 'letters' in kwds:
-            kwds['letters'] = kwds['letters'].decode(encoding)
-        str_generator = strgen(**kwds)
+        fixed_length = kwds.get('fixed_length')
+        if fixed_length is not None:
+            min_length = fixed_length
+            max_length = fixed_length
+        else:
+            min_length = kwds.get('min_length', DEFAULT_MIN_STRLEN)
+            max_length = kwds.get('max_length', DEFAULT_MAX_STRLEN)
 
         def generator() -> bytes:
-            return str_generator().encode(encoding)
+            length = random.randint(min_length, max_length)
+            return bytes([random.choice(letters) for i in range(length)])
+
+        return generator
+
+    def enumgen(type: typing.Type[enum.Enum]):
+        """Randomly generate variants of an enumeration."""
+
+        members = list(type.__members__.values())
+
+        def generator() -> enum.Enum:
+            return random.choice(members)
 
         return generator
 
@@ -938,13 +951,17 @@ with contextlib.suppress(ImportError):
     def _generator(type: typing.Type, kwds: typing.Optional[dict] = None):
         """Convert a type annotation and keyword arguments to a new generator."""
 
-        kwds = kwds or {}
-        # First try pre-defined generators.
+        # First, try an enumeration.
+        if inspect.isclass(type) and issubclass(type, enum.Enum):
+            return enumgen(type)
+
+        # Next, try pre-defined generators.
         with contextlib.suppress(KeyError):
             return GENERATORS[type]
 
         # Try a sequence or mapping type. This will fail for TypeVars and Unions,
         # raising a KeyError by design. Ignore that.
+        kwds = kwds or {}
         with contextlib.suppress(AttributeError):
             origin = type.__origin__
             args = type.__args__
@@ -1077,13 +1094,8 @@ with contextlib.suppress(ImportError):
         F64: structgen(64, 'd'),
     }
 
-    def randomize_function(f, **kwds):
+    def randomize_function(f, gv, lv, **kwds):
         """Determine the type signature of the function and provide random data."""
-
-        # Get global/local vars to evaluate forward refs.
-        frame = inspect.stack()[1].frame
-        gv = frame.f_globals
-        lv = frame.f_locals
 
         # Unwrap our annotations to determine our argument types.
         calls = kwds.get('calls', DEFAULT_CALLS)
@@ -1101,19 +1113,25 @@ with contextlib.suppress(ImportError):
 
         return test
 
-    def randomize_kwds(kwds):
+    def randomize_kwds(gv, lv, kwds):
         """Generator a function decorator with the bound keywords."""
 
         def decorator(f):
-            return randomize_function(f, **kwds)
+            return randomize_function(f, gv, lv, **kwds)
 
         return decorator
 
     def randomize(*args, **kwds):
         """Randomize arguments to a function call."""
 
+        # Get global/local vars to evaluate forward refs.
+        frame = inspect.stack()[1].frame
+        gv = frame.f_globals
+        lv = frame.f_locals
+
+        # Process our arguments.
         if len(args) == 1 and callable(args[0]) and not kwds:
-            return randomize_function(args[0])
+            return randomize_function(args[0], gv, lv)
         elif len(args):
             raise ValueError('randomize does not support positional arguments.')
-        return randomize_kwds(kwds)
+        return randomize_kwds(gv, lv, kwds)

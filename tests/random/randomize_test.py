@@ -2,12 +2,19 @@
 # generating random data for our arguments.
 
 from collections import deque
+import enum
 import math
 import re
 import string
 import typing
 
 from tests import harness
+
+
+class Colors(enum.IntEnum):
+    RED = 1 << 16
+    GREEN = 1 << 8
+    BLUE = 1
 
 
 class TestRandomize(harness.TestCase):
@@ -18,6 +25,10 @@ class TestRandomize(harness.TestCase):
     @harness.randomize
     def test_noargs_nokwds(self):
         pass
+
+    @harness.randomize
+    def test_enum(self, x: Colors):
+        self.assertIsInstance(x, Colors)
 
     @harness.randomize
     def test_bool_nokwds(self, x: bool):
@@ -145,7 +156,20 @@ class TestRandomize(harness.TestCase):
     def test_bytes_nokwds(self, x: bytes):
         self.assertIsInstance(x, bytes)
 
-    # TODO(ahuszagh) Repeat tests above for bytes.
+    @harness.randomize(x={'letters': string.hexdigits.encode('ascii')})
+    def test_bytes_letters(self, x: bytes):
+        self.assertIsInstance(x, bytes)
+        self.assertTrue(re.match(rb'[A-Fa-f0-9]+', x))
+
+    @harness.randomize(x={'min_length': 3, 'max_length': 4})
+    def test_bytes_min_max_length(self, x: bytes):
+        self.assertIsInstance(x, bytes)
+        self.assertTrue(len(x) in (3, 4))
+
+    @harness.randomize(x={'fixed_length': 10})
+    def test_bytes_fixed_length(self, x: bytes):
+        self.assertIsInstance(x, bytes)
+        self.assertEqual(len(x), 10)
 
     @harness.randomize
     def test_list_nokwds(self, x: typing.List[int]):
@@ -159,6 +183,49 @@ class TestRandomize(harness.TestCase):
         for xi in x:
             self.assertIsInstance(xi, int)
 
+    @harness.randomize(x={'value': {'min_value': 5, 'max_value': 10}})
+    def test_list_args(self, x: typing.List[int]):
+        self.assertIsInstance(x, list)
+        for xi in x:
+            self.assertIsInstance(xi, int)
+            self.assertGreaterEqual(xi, 5)
+            self.assertLessEqual(xi, 10)
+
+    @harness.randomize
+    def test_set_nokwds(self, x: typing.Set[int]):
+        self.assertIsInstance(x, set)
+        for xi in x:
+            self.assertIsInstance(xi, int)
+
+    @harness.randomize
+    def test_frozenset_kwds(self, x: typing.FrozenSet[int]):
+        self.assertIsInstance(x, frozenset)
+        for xi in x:
+            self.assertIsInstance(xi, int)
+
+    @harness.randomize
+    def test_deque_nokwds(self, x: typing.Deque[int]):
+        self.assertIsInstance(x, deque)
+        for xi in x:
+            self.assertIsInstance(xi, int)
+
+    @harness.randomize
+    def test_dict_nokwds(self, x: typing.Dict[str, int]):
+        self.assertIsInstance(x, dict)
+        for ki, vi in x.items():
+            self.assertIsInstance(ki, str)
+            self.assertIsInstance(vi, int)
+
+    @harness.randomize(x={
+        'key': {'fixed_length': 0},
+        'value': {'min_value': 0, 'max_value': 0},
+    })
+    def test_dict_kwds(self, x: typing.Dict[str, int]):
+        self.assertIsInstance(x, dict)
+        for ki, vi in x.items():
+            self.assertEqual(ki, '')
+            self.assertEqual(vi, 0)
+
 
 class TestRandomizeForwardRef(harness.TestCase):
 
@@ -168,6 +235,10 @@ class TestRandomizeForwardRef(harness.TestCase):
     @harness.randomize
     def test_noargs_nokwds(self):
         pass
+
+    @harness.randomize
+    def test_enum(self, x: 'Colors'):
+        self.assertIsInstance(x, Colors)
 
     @harness.randomize
     def test_bool_nokwds(self, x: 'bool'):
