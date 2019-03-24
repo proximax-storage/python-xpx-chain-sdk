@@ -26,6 +26,7 @@ The NEM2 SDK uses numerous tools to ensure type correctness, robust testing, and
 ```bash
 # Run tox, which invokes numerous virtual envs to validate all configurations
 # Invokes the unittest suite.
+# Invokes the randomly-generated unittest suite.
 # Invokes the linters, flake8 and pylint.
 # Invokes bandit, a which checks for possible security risks.
 # Invokes the type-checker, mypy.
