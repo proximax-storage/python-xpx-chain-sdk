@@ -17,7 +17,7 @@ def run_test(case, name, items):
         case.assertEqual(next(get(f'{name}_iter_to_dto')([value])), dto)
 
 
-class TestUint64(harness.TestCase):
+class TestUnsignedInt(harness.TestCase):
 
     def test_exceptions(self):
         with self.assertRaises(OverflowError):
