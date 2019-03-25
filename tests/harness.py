@@ -37,7 +37,6 @@ import math
 import requests
 import string
 import struct
-import sys
 import typing
 import unittest
 import warnings
@@ -799,8 +798,12 @@ def ignore_warnings_test(test):
 with contextlib.suppress(ImportError):
     # Check we can import all our dependencies and generate the decorators.
     from collections import deque
+    import datetime
+    import logging
+    import os.path
     import random
     import rstr
+    import sys
 
     # CONFIG
     DEFAULT_CALLS = 20
@@ -1094,6 +1097,31 @@ with contextlib.suppress(ImportError):
         F64: structgen(64, 'd'),
     }
 
+    INITIALIZED_LOGGER = False
+
+    def log_error(error, testname, arguments, exc_info):
+        """Log error, and if not present, seed."""
+
+        global INITIALIZED_LOGGER
+        testdir = '.test_harness'
+
+        if not os.path.exists(testdir):
+            os.mkdir(testdir)
+        if not INITIALIZED_LOGGER:
+            now = datetime.datetime.now()
+            strtime = now.strftime("%Y-%m-%d-%H-%M-%S")
+            logging.basicConfig(filename=f'{testdir}/random-{strtime}.log')
+            INITIALIZED_LOGGER = True
+            with open(f'{testdir}/random-{strtime}.seed', 'w') as f:
+                f.write(str(random.getstate()))
+
+        argstr = ', '.join(f'{k}={v!r}' for k, v in arguments.items())
+        logging.error(
+            f'Exception in randomly-generated unittest'
+            f' {testname}, arguments were: ({argstr})',
+            exc_info=exc_info
+        )
+
     def randomize_function(f, gv, lv, **kwds):
         """Determine the type signature of the function and provide random data."""
 
@@ -1109,7 +1137,13 @@ with contextlib.suppress(ImportError):
         def test(self):
             for _ in range(calls):
                 arguments = {k: v() for k, v in generators.items()}
-                f(self, **arguments)
+                try:
+                    f(self, **arguments)
+                except Exception as error:
+                    testname = f'{self.__class__.__name__}.{f.__name__}'
+                    exc_info = sys.exc_info()
+                    log_error(error, testname, arguments, exc_info)
+                    raise
 
         return test
 

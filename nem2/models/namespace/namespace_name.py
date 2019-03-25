@@ -23,6 +23,7 @@
 """
 
 from __future__ import annotations
+import re
 
 from nem2 import util
 from .namespace_id import NamespaceId
@@ -53,6 +54,13 @@ class NamespaceName(util.DTO):
         """
         namespace_id = NamespaceId(name)
         return cls(namespace_id, name)
+
+    def is_valid(self) -> bool:
+        """Determine if the namespace name is valid."""
+        return (
+            len(self.name) <= 64
+            and re.match(r'\A[a-z0-9_-]+\Z', self.name) is not None
+        )
 
     def to_dto(
         self,

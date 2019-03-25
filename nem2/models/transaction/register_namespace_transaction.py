@@ -201,36 +201,32 @@ class RegisterNamespaceTransaction(Transaction):
         # uint8_t namespace_name_size
         # uint8_t[namespace_name_size] namespace_name
 
-#        recipient = Recipient.to_catbuffer(self.recipient, network_type)
-#        message_size = util.u16_to_catbuffer(len(self.message.payload))
-#        mosaics_count = util.u8_to_catbuffer(len(self.mosaics))
-#        message = self.message.payload
-#        mosaics = self.to_mosaics_bytes(network_type)
-#
-#        return recipient + message_size + mosaics_count + message + mosaics
-#
-#    def load_mosaics_bytes(
-#        self,
-#        data: bytes,
-#        count: int,
-#        network_type: NetworkType,
-#    ) -> bytes:
-#        """Load mosaics data from catbuffer."""
-#        mosaics, data = Mosaic.sequence_from_catbuffer_pair(data, count, network_type)
-#        self._set('mosaics', mosaics)
-#        return data
-#
-#    def load_catbuffer_specific(
-#        self,
-#        data: bytes,
-#        network_type: NetworkType,
-#    ) -> bytes:
-#        """Load transfer-specific data from catbuffer."""
-#
-#        # uint8_t[25] recipient
-#        # uint16_t message_size
-#        # uint8_t mosaics_count
-#        # uint8_t[message_size] message
+        type = self.namespace_type.to_catbuffer(network_type)
+        if self.duration is not None:
+            duration_or_id = util.u64_to_catbuffer(self.duration)
+        else:
+            duration_or_id = self.parent_id.to_catbuffer(network_type)
+        namespace_id = self.namespace_name.namespace_id.to_catbuffer(network_type)
+        name_size = util.u8_to_catbuffer(len(self.namespace_name.name))
+        name = self.namespace_name.name.encode('utf-8')
+
+        return type + duration_or_id + namespace_id + name_size + name
+
+    def load_catbuffer_specific(
+        self,
+        data: bytes,
+        network_type: NetworkType,
+    ) -> bytes:
+        """Load transfer-specific data from catbuffer."""
+
+        # uint8_t namespace_type
+        # uint64_t duration || parent_id
+        # uint64_t namespace_id
+        # uint8_t namespace_name_size
+        # uint8_t[namespace_name_size] namespace_name
+
+        type, data = NamespaceType.from_catbuffer_pair(data, network_type)
+
 #        # Mosaic[mosaics_count] mosaics
 #        recipient, data = Recipient.from_catbuffer_pair(data, network_type)
 #        message_size = util.u16_from_catbuffer(data[:2])

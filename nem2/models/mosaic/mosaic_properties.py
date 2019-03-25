@@ -144,6 +144,8 @@ class MosaicProperties(util.Model):
         self,
         network_type: OptionalNetworkType = None,
     ) -> bytes:
+        # TODO(ahuszagh) Is this even correct?
+        # TODO(ahuszagh) Likely fix.
         version = util.u8_to_catbuffer(VERSION)
         flags = util.u8_to_catbuffer(self.flags)
         divisibility = util.u8_to_catbuffer(self.divisibility)
@@ -156,6 +158,9 @@ class MosaicProperties(util.Model):
         data: bytes,
         network_type: OptionalNetworkType = None,
     ):
+        # TODO(ahuszagh) Is this even correct?
+        # TODO(ahuszagh) Likely fix.
+
         # Read the array count, property flags and divisibility.
         count = util.u8_from_catbuffer(data[:1])
         flags = util.u8_from_catbuffer(data[1:2])

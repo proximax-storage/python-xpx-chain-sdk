@@ -381,6 +381,19 @@ class TestNamespaceNameDepth1(harness.TestCase):
     def test_create_from_name(self):
         self.assertEqual(self.model, self.type.create_from_name("sample"))
 
+    def test_valid(self):
+        def create(name):
+            # Create_from_name will detect the name is invalid, just do this.
+            return self.type(models.NamespaceId(0), name)
+
+        self.assertTrue(self.model.is_valid())
+        self.assertFalse(create('').is_valid())
+        self.assertTrue(create('lorem-ipsum-dolor-sit').is_valid())
+        self.assertTrue(create('lorem_ipsum_dolor_sit').is_valid())
+        self.assertFalse(create('Lorem_Ipsum_Dolor_Sit').is_valid())
+        self.assertFalse(create('lorem ipsum dolor sit').is_valid())
+        self.assertFalse(create('lorem_ipsum_dolor_sit_amet_consectetur_adipiscing_elit_sed_non_risus_suspendisse_lectus_tortor').is_valid())
+
 
 @harness.model_test_case({
     'type': models.NamespaceName,

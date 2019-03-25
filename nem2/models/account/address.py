@@ -135,6 +135,7 @@ class Address(util.Model):
         if len(address) != 25:
             raise ValueError(f"{address} is not a valid encoded address")
         raw_address = util.b32encode(address)
+        print(raw_address)  # TODO(ahuszagh) Remove
         return cls.create_from_raw_address(raw_address)
 
     @classmethod

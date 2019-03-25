@@ -38,7 +38,7 @@ $ tox
 
 # License
 
-Lexical is licensed under the Apache 2.0 license. See the LICENCE for more information. 
+Lexical is licensed under the Apache 2.0 license. See the LICENSE for more information. 
 
 # Contributing
 
