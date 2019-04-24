@@ -25,7 +25,6 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .deadline import Deadline
 from .inner_transaction import InnerTransaction
 from .registry import register_transaction
@@ -38,6 +37,7 @@ from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ..namespace.alias_action_type import AliasActionType
 from ..namespace.namespace_id import NamespaceId
+from ... import util
 
 __all__ = [
     'AddressAliasTransaction',
@@ -55,7 +55,7 @@ class AddressAliasTransaction(Transaction):
     :param network_type: Network type.
     :param version: Transaction version.
     :param deadline: Deadline to include transaction.
-    :param fee: Fee for the transaction. Higher fees increase transaction priority.
+    :param max_fee: Max fee for the transaction. Higher fees increase priority.
     :param action_type: Alias action type.
     :param namespace_id: Resulting namespace ID that will be an alias.
     :param address: Address to be aliased.
@@ -73,7 +73,7 @@ class AddressAliasTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        fee: int,
+        max_fee: int,
         action_type: AliasActionType,
         namespace_id: NamespaceId,
         address: Address,
@@ -86,7 +86,7 @@ class AddressAliasTransaction(Transaction):
             network_type,
             version,
             deadline,
-            fee,
+            max_fee,
             signature,
             signer,
             transaction_info,
@@ -103,6 +103,7 @@ class AddressAliasTransaction(Transaction):
         namespace_id: NamespaceId,
         address: Address,
         network_type: NetworkType,
+        max_fee: int = 0,
     ):
         """
         Create new address alias transaction.
@@ -112,12 +113,13 @@ class AddressAliasTransaction(Transaction):
         :param namespace_id: Resulting namespace ID that will be an alias.
         :param address: Address to be aliased.
         :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
         """
         return cls(
             network_type,
             TransactionVersion.ADDRESS_ALIAS,
             deadline,
-            0,
+            max_fee,
             action_type,
             namespace_id,
             address

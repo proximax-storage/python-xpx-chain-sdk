@@ -26,7 +26,6 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .aggregate_transaction_cosignature import AggregateTransactionCosignature
 from .deadline import Deadline
 from .inner_transaction import InnerTransaction, InnerTransactionList
@@ -39,6 +38,7 @@ from .transaction_version import TransactionVersion
 from ..account.account import Account
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
+from ... import util
 
 __all__ = ['AggregateTransaction']
 
@@ -52,8 +52,6 @@ TYPES = (
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-@register_transaction('AGGREGATE_BONDED')
-@register_transaction('AGGREGATE_COMPLETE')
 class AggregateTransaction(Transaction):
     """
     Transaction containing multiple inner transactions.
@@ -62,7 +60,7 @@ class AggregateTransaction(Transaction):
     :param type: Transaction type.
     :param version: Transaction version.
     :param deadline: Deadline to include transaction.
-    :param fee: Fee for the transaction. Higher fees increase transaction priority.
+    :param max_fee: Max fee for the transaction. Higher fees increase priority.
     :param inner_transactions: Inner transactions to be included.
     :param cosignatures: Transaction cosigner signatures.
     :param signature: (Optional) Transaction signature.
@@ -79,7 +77,7 @@ class AggregateTransaction(Transaction):
         type: TransactionType,
         version: TransactionVersion,
         deadline: Deadline,
-        fee: int,
+        max_fee: int,
         inner_transactions: typing.Optional[InnerTransactionList] = None,
         cosignatures: typing.Optional[Cosignatures] = None,
         signature: typing.Optional[str] = None,
@@ -93,7 +91,7 @@ class AggregateTransaction(Transaction):
             network_type,
             version,
             deadline,
-            fee,
+            max_fee,
             signature,
             signer,
             transaction_info,
@@ -108,6 +106,7 @@ class AggregateTransaction(Transaction):
         inner_transactions: typing.Optional[InnerTransactionList],
         cosignatures: typing.Optional[Cosignatures],
         network_type: NetworkType,
+        max_fee: int = 0,
     ):
         """
         Create aggregate complete transaction object.
@@ -116,13 +115,14 @@ class AggregateTransaction(Transaction):
         :param inner_transactions: Inner transactions to be included.
         :param cosignatures: Transaction cosigner signatures.
         :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
         """
         return cls(
             network_type,
             TransactionType.AGGREGATE_COMPLETE,
             TransactionVersion.AGGREGATE_COMPLETE,
             deadline,
-            0,
+            max_fee,
             inner_transactions,
             cosignatures,
         )
@@ -134,6 +134,7 @@ class AggregateTransaction(Transaction):
         inner_transactions: typing.Optional[InnerTransactionList],
         cosignatures: Cosignatures,
         network_type: NetworkType,
+        max_fee: int = 0,
     ):
         """
         Create aggregate bonded transaction object.
@@ -142,13 +143,14 @@ class AggregateTransaction(Transaction):
         :param inner_transactions: Inner transactions to be included.
         :param cosignatures: Transaction cosigner signatures.
         :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
         """
         return cls(
             network_type,
             TransactionType.AGGREGATE_BONDED,
             TransactionVersion.AGGREGATE_BONDED,
             deadline,
-            0,
+            max_fee,
             inner_transactions,
             cosignatures,
         )
@@ -279,3 +281,71 @@ class AggregateTransaction(Transaction):
         raise NotImplementedError
 
     # DTO
+
+    # TODO(ahuszagh) Implement...
+
+
+@util.inherit_doc
+@register_transaction('AGGREGATE_BONDED')
+class AggregateBondedTransaction(AggregateTransaction):
+
+    @classmethod
+    def create(
+        cls,
+        deadline: Deadline,
+        inner_transactions: typing.Optional[InnerTransactionList],
+        cosignatures: Cosignatures,
+        network_type: NetworkType,
+        max_fee: int = 0,
+    ):
+        """
+        Create aggregate bonded transaction object.
+
+        :param deadline: Deadline to include transaction.
+        :param inner_transactions: Inner transactions to be included.
+        :param cosignatures: Transaction cosigner signatures.
+        :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
+        """
+        return cls.create_bonded(
+            network_type,
+            TransactionType.AGGREGATE_BONDED,
+            TransactionVersion.AGGREGATE_BONDED,
+            deadline,
+            max_fee,
+            inner_transactions,
+            cosignatures,
+        )
+
+
+@util.inherit_doc
+@register_transaction('AGGREGATE_COMPLETE')
+class AggregateCompleteTransaction(AggregateTransaction):
+
+    @classmethod
+    def create(
+        cls,
+        deadline: Deadline,
+        inner_transactions: typing.Optional[InnerTransactionList],
+        cosignatures: typing.Optional[Cosignatures],
+        network_type: NetworkType,
+        max_fee: int = 0,
+    ):
+        """
+        Create aggregate complete transaction object.
+
+        :param deadline: Deadline to include transaction.
+        :param inner_transactions: Inner transactions to be included.
+        :param cosignatures: Transaction cosigner signatures.
+        :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
+        """
+        return cls.create_complete(
+            network_type,
+            TransactionType.AGGREGATE_COMPLETE,
+            TransactionVersion.AGGREGATE_COMPLETE,
+            deadline,
+            max_fee,
+            inner_transactions,
+            cosignatures,
+        )

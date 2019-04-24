@@ -25,8 +25,8 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .multisig_account_info import MultisigAccountInfo
+from ... import util
 
 __all__ = ['MultisigAccountGraphInfo']
 

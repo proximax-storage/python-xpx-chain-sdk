@@ -26,6 +26,7 @@ from __future__ import annotations
 import typing
 
 from . import abc
+from . import binascii
 from . import documentation
 from . import stdint
 
@@ -81,6 +82,9 @@ class IntMixin:
 
         :param data: Hex-encoded ID data (with or without '0x' prefix).
         """
+
+        # Assumes the number is encoded as if a 0x{hex} literal.
+        # Same as the NEM2 library.
         return cls(int(data, 16))   # type: ignore
 
 

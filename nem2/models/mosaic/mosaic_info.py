@@ -24,22 +24,17 @@
 
 from __future__ import annotations
 
-from nem2 import util
 from .mosaic_id import MosaicId
 from .mosaic_levy import OptionalMosaicLevyType
 from .mosaic_nonce import MosaicNonce
 from .mosaic_properties import MosaicProperties
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import OptionalNetworkType
+from ... import util
 
 __all__ = ['MosaicInfo']
 
 
-# TODO(ahuszagh) Needs to/from dto.
-#   Issues:
-#       nonce cannot be generated from the data provided.
-#           Mosaic ID is a hash of nonce + public key, cannot reverse.
-#       namespace ID is missing in info, not in DTO.
 @util.inherit_doc
 @util.dataclass(frozen=True, levy=None)
 class MosaicInfo(util.DTO):
@@ -58,14 +53,12 @@ class MosaicInfo(util.DTO):
     :param levy: (Optional) Levy for mosaic.
     """
 
-    active: bool
-    index: int
     meta_id: str
     mosaic_id: MosaicId
-    nonce: MosaicNonce
     supply: int
     height: int
     owner: PublicAccount
+    revision: int
     properties: MosaicProperties
     levy: OptionalMosaicLevyType
 
@@ -95,29 +88,20 @@ class MosaicInfo(util.DTO):
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        # TODO(ahuszagh) This differs, since it seems the old
-        # way was a mosaic name.
-        #
-        # levy = self.levy.to_dto() if self.levy else {}
-        # mosaic_id = MosaicId.create_from_nonce(self.nonce, self.owner)
-        # return {
-        #     'meta': {
-        #         'active': self.active,
-        #         'index': self.index,
-        #         'id': self.meta_id,
-        #     },
-        #     'mosaic': {
-        #         # TODO(ahuszagh)
-        #         #'namespaceId'
-        #         'mosaicId': self.mosaic_id.to_dto(),
-        #         'supply': util.uint64_to_dto(self.supply),
-        #         'height': util.uint64_to_dto(self.height),
-        #         'owner': self.owner.to_dto(network_type),
-        #         'properties': self.properties.to_dto(),
-        #         'levy': levy,
-        #     },
-        # }
-        raise NotImplementedError
+        return {
+            'meta': {
+                'id': self.meta_id,
+            },
+             'mosaic': {
+                 'mosaicId': self.mosaic_id.to_dto(),
+                 'supply': util.u64_to_dto(self.supply),
+                 'height': util.u64_to_dto(self.height),
+                 'owner': self.owner.to_dto(network_type),
+                 'revision': util.u32_to_dto(self.revision),
+                 'properties': self.properties.to_dto(),
+                 'levy': {},
+             },
+        }
 
     @classmethod
     def from_dto(
@@ -125,30 +109,17 @@ class MosaicInfo(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        # Namespace ID is clearly the parent ID.
-        # Nonce is clearly found somewhere???
-        # TODO(ahuszagh) We obviously cannot get the nonce...
-        # So remove it?
-        # TODO(ahuszagh) need network type...
-        # TODO(ahuszagh) This differs, since it seems the old
-        # way was a mosaic name.
-        #
-        # meta = data['meta']
-        # mosaic = data['mosaic']
-        # levy = mosaic['levy']
-        # levy = MosaicLevy.from_dto(levy) if levy else None
-        # mosaic_id = MosaicId.from_dto(mosaic['mosaicId'])
-        # return cls(
-        #     active=meta['active'],
-        #     index=meta['index'],
-        #     meta_id=meta['id'],
-        #     # TODO(ahuszagh) Likely remove.
-        #     #'nonce'
-        #     mosaic_id=mosaic_id,
-        #     supply=util.dto_to_uint64(mosaic['supply']),
-        #     height=util.dto_to_uint64(mosaic['height']),
-        #     owner=PublicAccount.from_dto(mosaic['owner'], network_type),
-        #     properties=MosaicProperties.from_dto(mosaic['properties']),
-        #     levy=levy,
-        # )
-        raise NotImplementedError
+        meta_dto = data['meta']
+        mosaic_dto = data['mosaic']
+        levy_dto = mosaic_dto['levy']
+        levy = MosaicLevy.from_dto(levy_dto) if levy_dto else None
+        return cls(
+            meta_id=meta_dto['id'],
+            mosaic_id=MosaicId.from_dto(mosaic_dto['mosaicId']),
+            supply=util.u64_from_dto(mosaic_dto['supply']),
+            height=util.u64_from_dto(mosaic_dto['height']),
+            owner=PublicAccount.from_dto(mosaic_dto['owner'], network_type),
+            revision=util.u32_from_dto(mosaic_dto['revision']),
+            properties=MosaicProperties.from_dto(mosaic_dto['properties']),
+            levy=levy,
+        )

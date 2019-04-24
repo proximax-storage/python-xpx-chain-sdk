@@ -25,7 +25,6 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .aggregate_transaction_info import AggregateTransactionInfo
 from .deadline import Deadline
 from .transaction_info import TransactionInfo
@@ -33,6 +32,7 @@ from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
+from ... import util
 
 
 class FormatBase(util.Object):
@@ -127,7 +127,7 @@ SAVE_CATBUFFER = {
     'version': lambda x, n: x.to_catbuffer(n),
     'network_type': lambda x, n: x.to_catbuffer(n),
     'type': lambda x, n: x.to_catbuffer(n),
-    'fee': lambda x, n: util.u64_to_catbuffer(x),
+    'max_fee': lambda x, n: util.u64_to_catbuffer(x),
     'deadline': lambda x, n: x.to_catbuffer(n),
 }
 
@@ -151,7 +151,7 @@ LOAD_CATBUFFER = {
     'version': TransactionVersion.from_catbuffer,
     'network_type': NetworkType.from_catbuffer,
     'type': TransactionType.from_catbuffer,
-    'fee': lambda x, n: util.u64_from_catbuffer(x),
+    'max_fee': lambda x, n: util.u64_from_catbuffer(x),
     'deadline': Deadline.from_catbuffer,
 }
 
@@ -180,7 +180,7 @@ SAVE_DTO = {
     'signer': save_signer_dto,
     'version': save_version_dto,
     'type': lambda x, n: x.to_dto(n),
-    'fee': lambda x, n: util.u64_to_dto(x),
+    'max_fee': lambda x, n: util.u64_to_dto(x),
     'deadline': lambda x, n: x.to_dto(n),
     'transaction_info': save_transaction_info_dto,
 }
@@ -214,7 +214,7 @@ LOAD_DTO = {
     'version': load_version_dto,
     'network_type': load_network_type_dto,
     'type': TransactionType.from_dto,
-    'fee': lambda x, n: util.u64_from_dto(x),
+    'max_fee': lambda x, n: util.u64_from_dto(x),
     'deadline': Deadline.from_dto,
     'transaction_info': load_transaction_info_dto,
 }

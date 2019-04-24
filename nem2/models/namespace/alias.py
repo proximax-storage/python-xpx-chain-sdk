@@ -25,11 +25,11 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .alias_type import AliasType
 from ..account.address import Address
 from ..blockchain.network_type import OptionalNetworkType
 from ..mosaic.mosaic_id import MosaicId
+from ... import util
 
 __all__ = ['Alias']
 

@@ -25,7 +25,6 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .deadline import Deadline
 from .inner_transaction import InnerTransaction
 from .registry import register_transaction
@@ -38,6 +37,7 @@ from ..blockchain.network_type import NetworkType
 from ..namespace.namespace_id import NamespaceId
 from ..namespace.namespace_name import NamespaceName
 from ..namespace.namespace_type import NamespaceType
+from ... import util
 
 __all__ = [
     'RegisterNamespaceTransaction',
@@ -63,7 +63,7 @@ class RegisterNamespaceTransaction(Transaction):
     :param network_type: Network type.
     :param version: Transaction version.
     :param deadline: Deadline to include transaction.
-    :param fee: Fee for the transaction. Higher fees increase transaction priority.
+    :param max_fee: Max fee for the transaction. Higher fees increase priority.
     :param namespace_type: Root or sub namespace.
     :param namespace_name: Name and ID of namespace to register.
     :param duration: (Optional) Duration of the namespace.
@@ -83,7 +83,7 @@ class RegisterNamespaceTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        fee: int,
+        max_fee: int,
         namespace_type: NamespaceType,
         namespace_name: NamespaceName,
         duration: typing.Optional[int] = None,
@@ -96,12 +96,14 @@ class RegisterNamespaceTransaction(Transaction):
             raise ValueError('Registering a root namespace without a duration.')
         elif namespace_type == NamespaceType.SUB_NAMESPACE and parent_id is None:
             raise ValueError('Registering a sub namespace without a parent.')
+        if duration is not None and parent_id is not None:
+            raise ValueError('Cannot have both namespace duration and parent.')
         super().__init__(
             TransactionType.REGISTER_NAMESPACE,
             network_type,
             version,
             deadline,
-            fee,
+            max_fee,
             signature,
             signer,
             transaction_info,
@@ -170,6 +172,16 @@ class RegisterNamespaceTransaction(Transaction):
             parent_id
         )
 
+    @property
+    def namespace_id(self) -> NamespaceId:
+        """Get the namespace ID from name struct."""
+        return self.namespace_name.namespace_id
+
+    @property
+    def name(self) -> str:
+        """Get the namespace name from name struct."""
+        return self.namespace_name.name
+
     # CATBUFFER
 
     def catbuffer_size_specific(self) -> int:
@@ -193,24 +205,18 @@ class RegisterNamespaceTransaction(Transaction):
         network_type: NetworkType,
     ) -> bytes:
         """Export register namespace-specific data to catbuffer."""
-        raise NotImplementedError
 
         # uint8_t namespace_type
         # uint64_t duration || parent_id
-        # uint64_t namespace_id
-        # uint8_t namespace_name_size
-        # uint8_t[namespace_name_size] namespace_name
-
-        type = self.namespace_type.to_catbuffer(network_type)
+        # NamespaceName namespace_name
+        namespace_type = self.namespace_type.to_catbuffer(network_type)
         if self.duration is not None:
             duration_or_id = util.u64_to_catbuffer(self.duration)
         else:
             duration_or_id = self.parent_id.to_catbuffer(network_type)
-        namespace_id = self.namespace_name.namespace_id.to_catbuffer(network_type)
-        name_size = util.u8_to_catbuffer(len(self.namespace_name.name))
-        name = self.namespace_name.name.encode('utf-8')
+        namespace_name = self.namespace_name.to_catbuffer(network_type)
 
-        return type + duration_or_id + namespace_id + name_size + name
+        return namespace_type + duration_or_id + namespace_name
 
     def load_catbuffer_specific(
         self,
@@ -221,25 +227,22 @@ class RegisterNamespaceTransaction(Transaction):
 
         # uint8_t namespace_type
         # uint64_t duration || parent_id
-        # uint64_t namespace_id
-        # uint8_t namespace_name_size
-        # uint8_t[namespace_name_size] namespace_name
+        # NamespaceName namespace_name
+        namespace_type, data = NamespaceType.from_catbuffer_pair(data, network_type)
+        if namespace_type == NamespaceType.ROOT_NAMESPACE:
+            duration = util.u64_from_catbuffer(data[:8])
+            parent_id = None
+        else:
+            duration = None
+            parent_id = NamespaceId.from_catbuffer(data, network_type)
+        namespace_name, data = NamespaceName.from_catbuffer_pair(data[8:], network_type)
 
-        type, data = NamespaceType.from_catbuffer_pair(data, network_type)
+        self._set('namespace_type', namespace_type)
+        self._set('namespace_name', namespace_name)
+        self._set('duration', duration)
+        self._set('parent_id', parent_id)
 
-#        # Mosaic[mosaics_count] mosaics
-#        recipient, data = Recipient.from_catbuffer_pair(data, network_type)
-#        message_size = util.u16_from_catbuffer(data[:2])
-#        mosaics_count = util.u8_from_catbuffer(data[2:3])
-#        data = data[3:]
-#        message = PlainMessage(data[:message_size])
-#        data = data[message_size:]
-#        data = self.load_mosaics_bytes(data, mosaics_count, network_type)
-#
-#        self._set('recipient', recipient)
-#        self._set('message', message)
-#
-#        return data
+        return data
 
     # DTO
 
@@ -247,11 +250,8 @@ class RegisterNamespaceTransaction(Transaction):
         self,
         network_type: NetworkType,
     ) -> dict:
-        data = {
-            'namespaceType': self.namespace_type.to_dto(network_type),
-            'name': self.namespace_name.name,
-            'namespaceId': self.namespace_name.namespace_id.to_dto(network_type),
-        }
+        data = self.namespace_name.to_dto(network_type)
+        data.update({'namespaceType': self.namespace_type.to_dto(network_type)})
 
         if self.duration is not None:
             data['duration'] = util.u64_to_dto(self.duration)
@@ -266,10 +266,7 @@ class RegisterNamespaceTransaction(Transaction):
         network_type: NetworkType,
     ) -> None:
         namespace_type = NamespaceType.from_dto(data['namespaceType'], network_type)
-        name = data['name']
-        namespace_id = NamespaceId.from_dto(data['namespaceId'], network_type)
-        namespace_name = NamespaceName(namespace_id, name)
-
+        namespace_name = NamespaceName.from_dto(data, network_type)
         if namespace_type == NamespaceType.ROOT_NAMESPACE:
             duration = util.u64_from_dto(data['duration'])
             parent_id = None

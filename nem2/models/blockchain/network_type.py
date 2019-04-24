@@ -26,7 +26,7 @@ from __future__ import annotations
 import enum
 import typing
 
-from nem2 import util
+from ... import util
 
 __all__ = ['NetworkType']
 

@@ -23,12 +23,13 @@
 """
 
 import enum
-from nem2 import util
+from ... import util
 
 __all__ = ['MosaicLevyType']
 
 
 # TODO(ahuszagh) This is not yet implemented in Catapult. Subject to change
+# Any commented-out code is identical to the first version of NEM.
 @util.inherit_doc
 class MosaicLevyType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """Mosaic levy type."""

@@ -22,11 +22,12 @@
     limitations under the License.
 """
 
-from .lock_funds_transaction import LockFundsTransaction
+from .lock_funds_transaction import *
 
-__all__ = ['HashLockTransaction']
+__all__ = [
+    'HashLockTransaction',
+    'HashLockInnerTransaction',
+]
 
-
-class HashLockTransaction(LockFundsTransaction):
-    # TODO(ahuszagh) Implement
-    pass
+HashLockTransaction = LockFundsTransaction
+HashLockInnerTransaction = LockFundsInnerTransaction

@@ -25,17 +25,21 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from ..blockchain.network_type import OptionalNetworkType
+from ... import util
 
 __all__ = ['MosaicProperties']
 
 DTOType = typing.Sequence[util.U64DTOType]
-VERSION = 1
+DTO2Type = typing.Sequence[dict]
+FLAGS_ID = 0
+DIVISIBILITY_ID =1
 DURATION_ID = 2
 PROPERTY_SIZE = 9
 PROPERTIES = {
-    DURATION_ID: 'duration'
+    FLAGS_ID: 'flags',
+    DIVISIBILITY_ID: 'divisibility',
+    DURATION_ID: 'duration',
 }
 
 
@@ -71,7 +75,7 @@ def property_from_catbuffer(catbuffer: bytes) -> typing.Tuple[int, int]:
 
 
 @util.inherit_doc
-@util.dataclass(frozen=True, duration=0)
+@util.dataclass(frozen=True)
 class MosaicProperties(util.Model):
     """
     Properties of an asset.
@@ -84,6 +88,20 @@ class MosaicProperties(util.Model):
     flags: int
     divisibility: int
     duration: int
+
+    def __init__(
+        self,
+        flags: int,
+        divisibility: int = 0,
+        duration: int = 0,
+    ):
+        if flags < 0 or flags > 7:
+            raise ValueError('Invalid flags, not in range [0-7].')
+        if divisibility < 0 or divisibility > 6:
+            raise ValueError('Invalid divisibility, not in range [0-6].')
+        self._set('flags', flags)
+        self._set('divisibility', divisibility)
+        self._set('duration', duration)
 
     @property
     def supply_mutable(self) -> bool:
@@ -119,15 +137,51 @@ class MosaicProperties(util.Model):
         flags = to_flags(supply_mutable, transferable, levy_mutable)
         return cls(flags, divisibility, duration)
 
+    def catbuffer_size(self) -> int:
+        """Get the mosaic properties size as catbuffer."""
+
+        # Get the number of optional properties.
+        count = 0
+        if self.duration != 0:
+            count += 1
+
+        # uint8 count
+        # uint8 flags
+        # uint8 divisibility
+        # typedef MosaicProperty { id: uint8, value: uint64 }
+        # MosaicProperty[count] properties
+        count_size = util.U8_BYTES
+        flags_size = util.U8_BYTES
+        divisibility_size = util.U8_BYTES
+        property_size = util.U64_BYTES + util.U8_BYTES
+        return count_size + flags_size + divisibility_size + count * property_size
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
     ) -> DTOType:
+        # For indefinite mosaics, the duration is optional (default 0).
         return [
             util.u64_to_dto(self.flags),
             util.u64_to_dto(self.divisibility),
             util.u64_to_dto(self.duration),
         ]
+
+    def to_dto_v2(
+        self,
+        network_type: OptionalNetworkType = None,
+    ):
+        # A newer version of DTO, which is used in MosaicDefinitionTransactions.
+        # Wait for merging from:
+        #   https://nem2.slack.com/archives/CEZKUE4KB/p1556125862102400
+        data = [
+            {'id': FLAGS_ID, 'value': util.u64_to_dto(self.flags)},
+            {'id': DIVISIBILITY_ID, 'value': util.u64_to_dto(self.divisibility)},
+        ]
+        if self.duration != 0:
+            data.append({'id': DURATION_ID, 'value': util.u64_to_dto(self.duration)})
+
+        return data
 
     @classmethod
     def from_dto(
@@ -135,22 +189,45 @@ class MosaicProperties(util.Model):
         data: DTOType,
         network_type: OptionalNetworkType = None,
     ):
+        # For indefinite mosaics, the duration is optional (default 0).
         flags = util.u64_from_dto(data[0])
         divisibility = util.u64_from_dto(data[1])
-        duration = util.u64_from_dto(data[2])
+        duration = 0
+        if len(data) == 3:
+            duration = util.u64_from_dto(data[2])
         return cls(flags, divisibility, duration)
+
+    @classmethod
+    def from_dto_v2(
+        cls,
+        data: DTO2Type,
+        network_type: OptionalNetworkType = None,
+    ):
+        # A newer version of DTO, which is used in MosaicDefinitionTransactions.
+        # Wait for merging from:
+        #   https://nem2.slack.com/archives/CEZKUE4KB/p1556125862102400
+        kwds = {}
+        for item in data:
+            kwds[PROPERTIES[item['id']]] = util.u64_from_dto(item['value'])
+        return cls(**kwds)
 
     def to_catbuffer(
         self,
         network_type: OptionalNetworkType = None,
     ) -> bytes:
-        # TODO(ahuszagh) Is this even correct?
-        # TODO(ahuszagh) Likely fix.
-        version = util.u8_to_catbuffer(VERSION)
+        # Serialize the required properties.
         flags = util.u8_to_catbuffer(self.flags)
         divisibility = util.u8_to_catbuffer(self.divisibility)
-        duration = property_to_catbuffer(DURATION_ID, self.duration)
-        return version + flags + divisibility + duration
+
+        # Serialize the optional properties.
+        properties_count = 0
+        optional_properties = b''
+        if self.duration != 0:
+            properties_count += 1
+            optional_properties += property_to_catbuffer(DURATION_ID, self.duration)
+
+        count = util.u8_to_catbuffer(properties_count)
+        return count + flags + divisibility + optional_properties
 
     @classmethod
     def from_catbuffer_pair(
@@ -158,9 +235,6 @@ class MosaicProperties(util.Model):
         data: bytes,
         network_type: OptionalNetworkType = None,
     ):
-        # TODO(ahuszagh) Is this even correct?
-        # TODO(ahuszagh) Likely fix.
-
         # Read the array count, property flags and divisibility.
         count = util.u8_from_catbuffer(data[:1])
         flags = util.u8_from_catbuffer(data[1:2])
@@ -182,3 +256,14 @@ class MosaicProperties(util.Model):
         inst = cls(flags, divisibility, **kwds)
         remaining = data[size:]
         return inst, remaining
+
+    # TESTING
+    # Private, internal helper for testing only.
+
+    def _permute_(self, cb) -> MosaicProperties:
+        """Permute data inside self."""
+
+        flags = 0x7 - self.flags
+        divisibility = 6 - self.divisibility
+        duration = cb(self.duration)
+        return MosaicProperties(flags, divisibility, duration)

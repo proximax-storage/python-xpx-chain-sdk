@@ -26,7 +26,6 @@ from __future__ import annotations
 import bidict
 import typing
 
-from nem2 import util
 from .base import TransactionBase, TypeMap
 from .format import CatbufferFormat, DTOFormat
 from .inner_transaction import InnerTransaction
@@ -34,6 +33,7 @@ from .signed_transaction import SignedTransaction
 from ..account.account import Account
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
+from ... import util
 
 __all__ = ['Transaction']
 
@@ -53,7 +53,7 @@ class Transaction(TransactionBase):
         #   uint8_t version
         #   uint8_t network_type
         #   uint16_t type
-        #   uint64_t fee
+        #   uint64_t max_fee
         #   uint64_t deadline
         slices={
             # Main fields.
@@ -63,7 +63,7 @@ class Transaction(TransactionBase):
             'version': slice(100, 101),
             'network_type': slice(101, 102),
             'type': slice(102, 104),
-            'fee': slice(104, 112),
+            'max_fee': slice(104, 112),
             'deadline': slice(112, 120),
             # Helpers.
             'signature_half': slice(4, 36),
@@ -78,7 +78,7 @@ class Transaction(TransactionBase):
             'version': 'version',
             'network_type': 'version',
             'type': 'type',
-            'fee': 'fee',
+            'max_fee': 'maxFee',
             'deadline': 'deadline',
             'transaction_info': 'meta',
         },
@@ -166,7 +166,7 @@ class Transaction(TransactionBase):
         cb_get('version')
         cb_get('network_type')
         cb_get('type')
-        cb_get('fee')
+        cb_get('max_fee')
         cb_get('deadline')
 
         return bytes(data)
@@ -186,7 +186,7 @@ class Transaction(TransactionBase):
         cb_set('version')
         self._set('network_type', network_type)
         cb_set('type')
-        cb_set('fee')
+        cb_set('max_fee')
         cb_set('deadline')
         self._set('transaction_info', None)
 
@@ -210,7 +210,7 @@ class Transaction(TransactionBase):
         cb_get('signer')
         cb_get('version')
         cb_get('type')
-        cb_get('fee')
+        cb_get('max_fee')
         cb_get('deadline')
         cb_get('transaction_info')
 
@@ -231,6 +231,6 @@ class Transaction(TransactionBase):
         cb_set('version')
         self._set('network_type', network_type)
         cb_set('type')
-        cb_set('fee')
+        cb_set('max_fee')
         cb_set('deadline')
         cb_set('transaction_info')

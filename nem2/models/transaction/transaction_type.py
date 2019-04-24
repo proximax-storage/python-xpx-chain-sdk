@@ -24,7 +24,8 @@
 
 from __future__ import annotations
 import enum
-from nem2 import util
+
+from ... import util
 
 __all__ = ['TransactionType']
 

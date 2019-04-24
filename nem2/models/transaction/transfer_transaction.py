@@ -25,7 +25,6 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .deadline import Deadline
 from .inner_transaction import InnerTransaction
 from .message import Message
@@ -39,6 +38,7 @@ from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic import Mosaic, MosaicList
+from ... import util
 
 __all__ = [
     'TransferTransaction',
@@ -56,7 +56,7 @@ class TransferTransaction(Transaction):
     :param network_type: Network type.
     :param version: Transaction version.
     :param deadline: Deadline to include transaction.
-    :param fee: Fee for the transaction. Higher fees increase transaction priority.
+    :param max_fee: Max fee for the transaction. Higher fees increase priority.
     :param recipient: Address or namespace ID alias of recipient.
     :param mosaics: Sequence of mosaics.
     :param message: Transaction message (up to 2048 characters).
@@ -74,7 +74,7 @@ class TransferTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        fee: int,
+        max_fee: int,
         recipient: RecipientType,
         mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
@@ -87,7 +87,7 @@ class TransferTransaction(Transaction):
             network_type,
             version,
             deadline,
-            fee,
+            max_fee,
             signature,
             signer,
             transaction_info,
@@ -104,6 +104,7 @@ class TransferTransaction(Transaction):
         mosaics: typing.Optional[MosaicList],
         message: Message,
         network_type: NetworkType,
+        max_fee: int = 0,
     ):
         """
         Create new transfer transaction.
@@ -113,12 +114,13 @@ class TransferTransaction(Transaction):
         :param mosaics: Sequence of mosaics.
         :param message: Transaction message (up to 2048 characters).
         :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
         """
         return cls(
             network_type,
             TransactionVersion.TRANSFER,
             deadline,
-            0,
+            max_fee,
             recipient,
             mosaics,
             message
@@ -168,6 +170,7 @@ class TransferTransaction(Transaction):
         network_type: NetworkType,
     ) -> bytes:
         """Load mosaics data from catbuffer."""
+
         mosaics, data = Mosaic.sequence_from_catbuffer_pair(data, count, network_type)
         self._set('mosaics', mosaics)
         return data
@@ -185,9 +188,10 @@ class TransferTransaction(Transaction):
         # uint8_t[message_size] message
         # Mosaic[mosaics_count] mosaics
         recipient, data = Recipient.from_catbuffer_pair(data, network_type)
-        message_size = util.u16_from_catbuffer(data[:2])
-        mosaics_count = util.u8_from_catbuffer(data[2:3])
-        data = data[3:]
+        message_size = util.u16_from_catbuffer(data[:util.U16_BYTES])
+        data = data[util.U16_BYTES:]
+        mosaics_count = util.u8_from_catbuffer(data[:util.U8_BYTES])
+        data = data[util.U8_BYTES:]
         message = PlainMessage(data[:message_size])
         data = data[message_size:]
         data = self.load_mosaics_bytes(data, mosaics_count, network_type)

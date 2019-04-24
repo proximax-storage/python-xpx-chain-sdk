@@ -25,11 +25,11 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
-from nem2.util.signature import ed25519
 from .address import Address
 from .public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
+from ... import util
+from ...util.signature import ed25519
 
 __all__ = ['Account']
 

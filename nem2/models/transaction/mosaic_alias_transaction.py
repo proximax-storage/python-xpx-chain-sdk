@@ -25,7 +25,6 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .deadline import Deadline
 from .inner_transaction import InnerTransaction
 from .registry import register_transaction
@@ -38,6 +37,7 @@ from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic_id import MosaicId
 from ..namespace.alias_action_type import AliasActionType
 from ..namespace.namespace_id import NamespaceId
+from ... import util
 
 __all__ = ['MosaicAliasTransaction']
 
@@ -52,7 +52,7 @@ class MosaicAliasTransaction(Transaction):
     :param network_type: Network type.
     :param version: Transaction version.
     :param deadline: Deadline to include transaction.
-    :param fee: Fee for the transaction. Higher fees increase transaction priority.
+    :param max_fee: Max fee for the transaction. Higher fees increase priority.
     :param action_type: Alias action type.
     :param namespace_id: Resulting namespace ID that will be an alias.
     :param mosaic_id: Mosaic to be aliased.
@@ -70,7 +70,7 @@ class MosaicAliasTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        fee: int,
+        max_fee: int,
         action_type: AliasActionType,
         namespace_id: NamespaceId,
         mosaic_id: MosaicId,
@@ -83,7 +83,7 @@ class MosaicAliasTransaction(Transaction):
             network_type,
             version,
             deadline,
-            fee,
+            max_fee,
             signature,
             signer,
             transaction_info,
@@ -100,6 +100,7 @@ class MosaicAliasTransaction(Transaction):
         namespace_id: NamespaceId,
         mosaic_id: MosaicId,
         network_type: NetworkType,
+        max_fee: int = 0,
     ):
         """
         Create new mosaic alias transaction.
@@ -109,12 +110,13 @@ class MosaicAliasTransaction(Transaction):
         :param namespace_id: Resulting namespace ID that will be an alias.
         :param mosaic_id: Mosaic to be aliased.
         :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
         """
         return cls(
             network_type,
             TransactionVersion.MOSAIC_ALIAS,
             deadline,
-            0,
+            max_fee,
             action_type,
             namespace_id,
             mosaic_id

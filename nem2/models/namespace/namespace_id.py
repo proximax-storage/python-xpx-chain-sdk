@@ -23,7 +23,7 @@
 """
 
 import typing
-from nem2 import util
+from ... import util
 
 __all__ = ['NamespaceId']
 

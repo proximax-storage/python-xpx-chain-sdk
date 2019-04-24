@@ -25,9 +25,9 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .transaction_type import TransactionType
 from ..blockchain.network_type import NetworkType
+from ... import util
 
 __all__ = ['SignedTransaction']
 
@@ -54,8 +54,8 @@ class SignedTransaction(util.Object):
     def __init__(
         self,
         payload: typing.AnyStr,
-        hash: str,
-        signer: str,
+        hash: typing.AnyStr,
+        signer: typing.AnyStr,
         type: TransactionType,
         network_type: NetworkType,
     ) -> None:
@@ -64,10 +64,35 @@ class SignedTransaction(util.Object):
         signer = util.encode_hex(signer)
         if len(hash) != 64:
             raise ValueError('Transaction hash must be 64 characters long.')
-        if len(signer) != 64:
-            raise ValueError('Signer public key must be 64 characters long.')
+        if len(signer) not in (0, 64):
+            raise ValueError('Signer public key must be empty or 64 characters long.')
         self._set('payload', payload)
         self._set('hash', hash)
         self._set('signer', signer)
         self._set('type', type)
         self._set('network_type', network_type)
+
+    @classmethod
+    def create_from_announced(
+        cls,
+        hash: str,
+        type: TransactionType,
+        network_type: NetworkType,
+    ):
+        """
+        Create minimal signed transaction from announced transaction hash and type.
+
+        :param hash: Transaction hash.
+        :param type: Transaction type.
+        :param network_type: Signer network type.
+        """
+        return cls('', hash, '', type, network_type)
+
+    def __eq__(self, other) -> bool:
+        # Since we may use `create_from_announced` and we want it
+        # to compare equal, we ignore payload and signer in equality checks.
+        if not isinstance(other, SignedTransaction):
+            return False
+        lhs = (self.hash, self.type, self.network_type)
+        rhs = (other.hash, other.type, other.network_type)
+        return lhs == rhs

@@ -29,12 +29,11 @@ from __future__ import annotations
 import os
 import typing
 
-from nem2 import util
 from ..blockchain.network_type import OptionalNetworkType
+from ... import util
 
 __all__ = ['MosaicNonce']
 
-DTOType = typing.Sequence[int]
 RawNonceType = typing.Union[int, bytes, str]
 
 
@@ -101,16 +100,16 @@ class MosaicNonce(util.IntMixin, util.Model):
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
-    ) -> DTOType:
-        return list(self.nonce)
+    ) -> int:
+        return int(self)
 
     @classmethod
     def from_dto(
         cls,
-        data: DTOType,
+        data: int,
         network_type: OptionalNetworkType = None,
     ):
-        return cls(bytes(data))
+        return cls(data)
 
     def to_catbuffer(
         self,

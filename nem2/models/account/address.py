@@ -25,8 +25,8 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from ..blockchain.network_type import NetworkType, OptionalNetworkType
+from ... import util
 
 __all__ = ['Address']
 
@@ -135,7 +135,6 @@ class Address(util.Model):
         if len(address) != 25:
             raise ValueError(f"{address} is not a valid encoded address")
         raw_address = util.b32encode(address)
-        print(raw_address)  # TODO(ahuszagh) Remove
         return cls.create_from_raw_address(raw_address)
 
     @classmethod

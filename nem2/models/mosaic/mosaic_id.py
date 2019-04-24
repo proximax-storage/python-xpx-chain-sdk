@@ -24,9 +24,9 @@
 
 from __future__ import annotations
 
-from nem2 import util
 from .mosaic_nonce import MosaicNonce
 from ..account.public_account import PublicAccount
+from ... import util
 
 __all__ = ['MosaicId']
 

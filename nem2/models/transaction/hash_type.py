@@ -25,7 +25,7 @@
 import enum
 import string
 
-from nem2 import util
+from ... import util
 
 __all__ = ['HashType']
 

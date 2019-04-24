@@ -25,11 +25,11 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .block_type import BlockType
 from .network_type import NetworkType, OptionalNetworkType
 from ..account.public_account import PublicAccount
 from ..transaction.transaction_version import TransactionVersion
+from ... import util
 
 __all__ = ['BlockInfo']
 

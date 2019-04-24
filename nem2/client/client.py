@@ -13,7 +13,7 @@ import urllib.error
 import urllib3
 import warnings
 
-from nem2 import util
+from .. import util
 
 # UTILITY
 

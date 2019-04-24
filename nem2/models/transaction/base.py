@@ -25,7 +25,6 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .aggregate_transaction_info import AggregateTransactionInfo
 from .deadline import Deadline
 from .format import CatbufferFormat, DTOFormat
@@ -34,6 +33,7 @@ from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType, OptionalNetworkType
+from ... import util
 
 TransactionInfoType = typing.Union[TransactionInfo, AggregateTransactionInfo]
 TransactionBaseType = typing.TypeVar('TransactionBaseType', bound='TransactionBase')
@@ -50,7 +50,7 @@ class TransactionBase(util.Model):
     :param network_type: Network type.
     :param version: Transaction version.
     :param deadline: Deadline to include transaction.
-    :param fee: Fee for the transaction. Higher fees increase transaction priority.
+    :param max_fee: Max fee for the transaction. Higher fees increase priority.
     :param signature: Transaction signature (missing if embedded transaction).
     :param signer: Account of transaction creator.
     :param transaction_info: Transaction metadata.
@@ -62,7 +62,7 @@ class TransactionBase(util.Model):
     network_type: NetworkType
     version: TransactionVersion
     deadline: typing.Optional[Deadline]
-    fee: typing.Optional[int]
+    max_fee: typing.Optional[int]
     signature: typing.Optional[str]
     signer: typing.Optional[PublicAccount]
     transaction_info: typing.Optional[TransactionInfoType]

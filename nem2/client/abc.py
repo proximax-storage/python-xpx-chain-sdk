@@ -26,10 +26,10 @@ from __future__ import annotations
 import json
 import typing
 
-from nem2 import models
-from nem2 import util
 from . import client
 from . import nis
+from .. import models
+from .. import util
 
 T = typing.TypeVar('T')
 MessageType = typing.Union[
@@ -319,6 +319,32 @@ class BlockchainHTTP(HTTPSharedBase):
 class MosaicHTTP(HTTPSharedBase):
     """Abstract base class for the mosaic HTTP client."""
 
+    def get_mosaic(
+        self,
+        id: models.MosaicId,
+        **kwds
+    ):
+        """
+        Get mosaic info from ID.
+
+        :param id: Mosaic ID.
+        :return: Mosaic info for ID.
+        """
+        return self(nis.get_mosaic, id, **kwds)
+
+    def get_mosaics(
+        self,
+        ids: typing.Sequence[models.MosaicId],
+        **kwds
+    ):
+        """
+        Get mosaic info from IDs.
+
+        :param ids: Sequence of mosaic IDs.
+        :return: Mosaic info list for IDS.
+        """
+        return self(nis.get_mosaics, ids, **kwds)
+
     def get_mosaic_names(
         self,
         ids: typing.Sequence[models.MosaicId],
@@ -331,10 +357,6 @@ class MosaicHTTP(HTTPSharedBase):
         :return: Mosaic names for IDS.
         """
         return self(nis.get_mosaic_names, ids, **kwds)
-
-    # TODO(ahuszagh)
-    # getMosaic
-    # getMosaics
 
 
 class NamespaceHTTP(HTTPSharedBase):
@@ -575,10 +597,10 @@ class Listener(util.Object):
         message: bytes = await self._iter.__anext__()
         data = json.loads(message)
         if 'transaction' in data:
+            # New transaction data.
             channel_name = typing.cast(str, data['meta'].pop('channelName'))
-            # TODO(ahuszagh) Implement.
-            # Requires implementing a general deserializer for the transaction
-            raise NotImplementedError
+            transaction = models.Transaction.from_dto(data)
+            return ListenerMessage(channel_name, transaction)
         elif 'block' in data:
             # New block info.
             block = models.BlockInfo.from_dto(data)
@@ -588,10 +610,12 @@ class Listener(util.Object):
             error = models.TransactionStatusError.from_dto(data)
             return ListenerMessage('status', error)
         elif 'meta' in data:
+            # New metadata.
             channel_name = typing.cast(str, data['meta']['channelName'])
             hash = typing.cast(str, data['meta']['hash'])
             return ListenerMessage(channel_name, hash)
         elif 'parentHash' in data:
+            # New cosignature for transaction.
             cosignature = models.CosignatureSignedTransaction.from_dto(data)
             return ListenerMessage('cosignature', cosignature)
         else:

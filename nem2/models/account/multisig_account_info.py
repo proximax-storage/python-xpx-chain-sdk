@@ -24,8 +24,8 @@
 
 from __future__ import annotations
 
-from nem2 import util
 from .public_account import PublicAccount, PublicAccountList
+from ... import util
 
 __all__ = ['MultisigAccountInfo']
 

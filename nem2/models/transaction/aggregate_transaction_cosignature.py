@@ -25,9 +25,9 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import OptionalNetworkType
+from ... import util
 
 __all__ = ['AggregateTransactionCosignature']
 

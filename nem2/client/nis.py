@@ -28,9 +28,9 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
-from nem2 import models
 from . import client
+from .. import util
+from .. import models
 
 OptionalNetworkType = typing.Optional[models.NetworkType]
 
@@ -294,6 +294,77 @@ get_diagnostic_storage = request("get_diagnostic_storage")
 # -----------
 
 
+def request_get_mosaic(
+    client: client.Client,
+    id: models.MosaicId,
+    **kwds
+):
+    """
+    Make "/mosaic/{id}" request.
+
+    :param client: Wrapper for client.
+    :param id: Mosaic ID to request info for.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/mosaic/{id:x}", **kwds)
+
+
+def process_get_mosaic(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.MosaicName]:
+    """
+    Process the "/mosaic/{id}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return models.MosaicInfo.from_dto(json, network_type)
+
+
+get_mosaic = request("get_mosaic")
+
+
+def request_get_mosaics(
+    client: client.Client,
+    ids: typing.Sequence[models.MosaicId],
+    **kwds
+):
+    """
+    Make "/mosaic" request.
+
+    :param client: Wrapper for client.
+    :param ids: Mosaic IDs to request names for.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    json = {"mosaicIds": [f"{i:x}" for i in ids]}
+    return client.post("/mosaic", json=json, **kwds)
+
+
+def process_get_mosaics(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.MosaicName]:
+    """
+    Process the "/mosaic" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return [models.MosaicInfo.from_dto(i, network_type) for i in json]
+
+
+get_mosaics = request("get_mosaics")
+
+
 def request_get_mosaic_names(
     client: client.Client,
     ids: typing.Sequence[models.MosaicId],
@@ -303,7 +374,7 @@ def request_get_mosaic_names(
     Make "/mosaic/names" request.
 
     :param client: Wrapper for client.
-    :param ids: Namespace IDs to request names for.
+    :param ids: Mosaic IDs to request names for.
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
@@ -602,7 +673,6 @@ def request_get_transaction(client: client.Client, hash: str, **kwds):
     return client.get(f"/transaction/{hash}", **kwds)
 
 
-# TODO(ahuszagh) Annotate
 def process_get_transaction(
     status: int,
     json: dict,
@@ -616,8 +686,7 @@ def process_get_transaction(
     """
 
     assert status == 200
-    # TODO(ahuszagh) Implement..
-    raise NotImplementedError
+    return models.Transaction.from_dto(json, network_type)
 
 
 get_transaction = request("get_transaction")
@@ -639,7 +708,6 @@ def request_get_transactions(
     return client.get(f"/transaction/{hash}", **kwds)
 
 
-# TODO(ahuszagh) Annotate
 def process_get_transactions(
     status: int,
     json: list,
@@ -653,8 +721,7 @@ def process_get_transactions(
     """
 
     assert status == 200
-    # TODO(ahuszagh) Implement..
-    raise NotImplementedError
+    return [models.Transaction.from_dto(i, network_type) for i in json]
 
 
 get_transactions = request("get_transactions")
@@ -822,6 +889,8 @@ REQUEST = {
     'get_diagnostic_storage': request_get_diagnostic_storage,
 
     # MOSAIC
+    'get_mosaic': request_get_mosaic,
+    'get_mosaics': request_get_mosaics,
     'get_mosaic_names': request_get_mosaic_names,
 
     # NAMESPACE
@@ -856,6 +925,8 @@ PROCESS = {
     'get_diagnostic_storage': process_get_diagnostic_storage,
 
     # MOSAIC
+    'get_mosaic': process_get_mosaic,
+    'get_mosaics': process_get_mosaics,
     'get_mosaic_names': process_get_mosaic_names,
 
     # NAMESPACE

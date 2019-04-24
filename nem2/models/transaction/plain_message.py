@@ -25,9 +25,9 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .message import Message
 from .message_type import MessageType
+from ... import util
 
 __all__ = ['PlainMessage']
 

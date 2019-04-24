@@ -25,7 +25,6 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .deadline import Deadline
 from .hash_type import HashType
 from .inner_transaction import InnerTransaction
@@ -36,6 +35,7 @@ from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
+from ... import util
 
 __all__ = [
     'SecretProofTransaction',
@@ -53,7 +53,7 @@ class SecretProofTransaction(Transaction):
     :param network_type: Network type.
     :param version: Transaction version.
     :param deadline: Deadline to include transaction.
-    :param fee: Fee for the transaction. Higher fees increase transaction priority.
+    :param max_fee: Max fee for the transaction. Higher fees increase priority.
     :param hash_type: Hash algorithm secret was generated with.
     :param secret: Hex-encoded or raw seed-proof hash.
     :param proof: Hex-encoded or raw seed proof.
@@ -71,7 +71,7 @@ class SecretProofTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        fee: int,
+        max_fee: int,
         hash_type: HashType,
         secret: typing.AnyStr,
         proof: typing.AnyStr,
@@ -88,7 +88,7 @@ class SecretProofTransaction(Transaction):
             network_type,
             version,
             deadline,
-            fee,
+            max_fee,
             signature,
             signer,
             transaction_info,
@@ -105,6 +105,7 @@ class SecretProofTransaction(Transaction):
         secret: typing.AnyStr,
         proof: typing.AnyStr,
         network_type: NetworkType,
+        max_fee: int = 0,
     ):
         """
         Create new secret proof transaction.
@@ -114,12 +115,13 @@ class SecretProofTransaction(Transaction):
         :param secret: Hex-encoded or raw seed-proof hash.
         :param proof: Hex-encoded or raw seed proof.
         :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
         """
         return cls(
             network_type,
             TransactionVersion.SECRET_PROOF,
             deadline,
-            0,
+            max_fee,
             hash_type,
             secret,
             proof

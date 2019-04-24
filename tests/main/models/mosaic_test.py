@@ -51,6 +51,34 @@ class TestMosaicId(harness.TestCase):
         self.assertEqual(value.id, 0x2FF7D64F483BC0A6)
 
 
+@harness.model_test_case({
+    'type': models.MosaicInfo,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'meta_id': '5cc07cbc3a48065f47d6df80',
+        'mosaic_id': models.MosaicId.from_hex('6c699a1517bea955'),
+        'supply': 8999999998000000,
+        'height': 1,
+        'owner': models.PublicAccount.create_from_public_key('a04335f99d9ee3787528a16c7a302f80d511e9cf71d97d95c2182e0ea75a1ef9', models.NetworkType.MIJIN_TEST),
+        'revision': 1,
+        'properties': models.MosaicProperties(0x2, 6, 0),
+        'levy': None,
+    },
+    'dto': {
+        'meta': {
+            'id': '5cc07cbc3a48065f47d6df80',
+        },
+        'mosaic': {
+            'mosaicId': [398371157, 1818860053],
+            'supply': [3403414400, 2095475],
+            'height': [1, 0],
+            'owner': 'a04335f99d9ee3787528a16c7a302f80d511e9cf71d97d95c2182e0ea75a1ef9',
+            'revision': 1,
+            'properties': [[2, 0], [6, 0], [0, 0]],
+            'levy': {},
+        },
+    },
+})
 class TestMosaicInfo(harness.TestCase):
     pass
 
@@ -110,7 +138,7 @@ class TestMosaicName(harness.TestCase):
     'data': {
         'nonce': b'\x12\x34\x56\x78',
     },
-    'dto': [0x12, 0x34, 0x56, 0x78],
+    'dto': 0x78563412,
     'catbuffer': b'\x12\x34\x56\x78',
     'extras': {
         'nonce': models.MosaicNonce(b'\x12\x34\x56\x78'),
@@ -182,6 +210,16 @@ class TestMosaicProperties(harness.TestCase):
         self.assertEqual(self.type.create(transferable=True).flags, 0x2)
         self.assertEqual(self.type.create(transferable=False).flags, 0x0)
         self.assertEqual(self.type.create(levy_mutable=True).flags, 0x6)
+
+    def test_dto_v2(self):
+        # TODO(ahuszagh) Remove when the format becomes stabilized.
+        dto2 = self.model.to_dto_v2(self.network_type)
+        self.assertEqual(dto2, [
+            {'id': 0, 'value': [3, 0]},
+            {'id': 1, 'value': [1, 0]},
+            {'id': 2, 'value': [100, 0]}
+        ])
+        self.assertEqual(self.model, self.type.from_dto_v2(dto2, self.network_type))
 
 
 @harness.enum_test_case({

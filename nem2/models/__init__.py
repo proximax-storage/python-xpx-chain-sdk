@@ -54,12 +54,17 @@ from .transaction.aggregate_transaction_cosignature import *
 from .transaction.aggregate_transaction_info import *
 from .transaction.alias_transaction import *
 from .transaction.cosignature_signed_transaction import *
+from .transaction.cosignature_transaction import *
 from .transaction.deadline import *
+from .transaction.hash_lock_transaction import *
 from .transaction.hash_type import *
 from .transaction.inner_transaction import *
+from .transaction.lock_funds_transaction import *
 from .transaction.message import *
 from .transaction.message_type import *
 from .transaction.mosaic_alias_transaction import *
+from .transaction.mosaic_definition_transaction import *
+from .transaction.mosaic_supply_change_transaction import *
 from .transaction.multisig_cosignatory_modification import *
 from .transaction.multisig_cosignatory_modification_type import *
 from .transaction.plain_message import *
@@ -127,12 +132,17 @@ __all__ = (
     + aggregate_transaction_info.__all__
     + alias_transaction.__all__
     + cosignature_signed_transaction.__all__
+    + cosignature_transaction.__all__
     + deadline.__all__
+    + hash_lock_transaction.__all__
     + hash_type.__all__
     + inner_transaction.__all__
+    + lock_funds_transaction.__all__
     + message.__all__
     + message_type.__all__
     + mosaic_alias_transaction.__all__
+    + mosaic_definition_transaction.__all__
+    + mosaic_supply_change_transaction.__all__
     + multisig_cosignatory_modification.__all__
     + multisig_cosignatory_modification_type.__all__
     + plain_message.__all__

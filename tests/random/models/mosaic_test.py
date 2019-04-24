@@ -42,7 +42,7 @@ class TestMosaicId(harness.TestCase):
             model.to_dto(network_type)
 
 
-class TestMosaicName(harness.TestCase):
+class TestMosaicNonce(harness.TestCase):
 
     @harness.randomize(nonce={'fixed_length': 4})
     def test_valid_bytes(self, nonce: bytes):
@@ -86,4 +86,42 @@ class TestMosaicName(harness.TestCase):
         with self.assertRaises(OverflowError):
             models.MosaicNonce(nonce)
 
-# TODO(ahuszagh) Add mosaic properties after stabilized.
+
+class TestMosaicProperties(harness.TestCase):
+
+    @harness.randomize(divisibility={'min_value': 0, 'max_value': 6})
+    def test_create(
+        self,
+        supply_mutable: bool,
+        transferable: bool,
+        levy_mutable: bool,
+        divisibility: int,
+        duration: harness.U64,
+    ):
+        properties = models.MosaicProperties.create(
+            supply_mutable=supply_mutable,
+            transferable=transferable,
+            levy_mutable=levy_mutable,
+            divisibility=divisibility,
+            duration=duration,
+        )
+        self.assertEqual(properties.supply_mutable, supply_mutable)
+        self.assertEqual(properties.transferable, transferable)
+        self.assertEqual(properties.levy_mutable, levy_mutable)
+        self.assertLessEqual(properties.flags, 7)
+        self.assertEqual(properties.divisibility, divisibility)
+        self.assertEqual(properties.duration, duration)
+        self.assertEqual(properties, models.MosaicProperties.from_dto(properties.to_dto()))
+        self.assertEqual(properties, models.MosaicProperties.from_catbuffer(properties.to_catbuffer()))
+
+    @harness.randomize(divisibility={'min_value': 7, 'max_value': 1<<31})
+    def test_invalid_divisibility(self, divisibility: int):
+        with self.assertRaises(ValueError):
+            models.MosaicProperties.create(divisibility=divisibility)
+        with self.assertRaises(ValueError):
+            models.MosaicProperties.create(divisibility=-divisibility)
+
+
+# TODO(ahuszagh) Add supply type...
+# TODO(ahuszagh) Add network currency type...
+# TODO(ahuszagh) Add network harvest type...

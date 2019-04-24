@@ -341,9 +341,12 @@ def model_test_eq(self):
         # In bytes and strings, the first 2 values may be used as a
         # sentinel. We want to keep those the same. 1 for bytes,
         # 2 for hex.
-        if isinstance(value, enum.Enum):
+        if hasattr(value, '_permute_'):
+            # Specialized method for testing.
+            return value._permute_(permute)
+        elif isinstance(value, enum.Enum):
             return value
-        if isinstance(value, datetime.datetime):
+        elif isinstance(value, datetime.datetime):
             timestamp = value.replace(tzinfo=datetime.timezone.utc).timestamp()
             negated = bitwise_not(int(timestamp))
             utc = datetime.datetime.fromtimestamp(negated, datetime.timezone.utc)
@@ -448,9 +451,10 @@ def model_test_catbuffer(self):
     """Test the conversion to and from catbuffer."""
 
     nt = self.network_type
-    cats = util.decode_hex(self.catbuffer)
-    self.assertEqual(self.model.to_catbuffer(nt), cats)
-    self.assertEqual(self.model, self.type.from_catbuffer(cats, nt))
+    encoded = util.encode_hex(self.catbuffer)
+    decoded = util.decode_hex(self.catbuffer)
+    self.assertEqual(util.hexlify(self.model.to_catbuffer(nt)), encoded)
+    self.assertEqual(self.model, self.type.from_catbuffer(decoded, nt))
 
 
 def load_model(model_type, data):
@@ -845,7 +849,7 @@ with contextlib.suppress(ImportError):
         return generator
 
     def intgen(min_value: int = -sys.maxsize, max_value: int = sys.maxsize):
-        """Define a new generator for integral values."""
+        """Define a new generator for integral values (inclusive)."""
 
         def generator() -> int:
             return random.randint(min_value, max_value)

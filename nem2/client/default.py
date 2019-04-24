@@ -30,9 +30,9 @@ import aiohttp
 import requests
 import websockets
 
-from nem2 import util
 from . import abc
 from . import client
+from .. import util
 
 __all__ = [
     # Synchronous

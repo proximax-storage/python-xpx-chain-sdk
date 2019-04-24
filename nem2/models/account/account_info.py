@@ -24,12 +24,12 @@
 
 from __future__ import annotations
 
-from nem2 import util
 from .account_metadata import OptionalAccountMetadata
 from .address import Address
 from .public_account import PublicAccount
 from ..blockchain.network_type import OptionalNetworkType
 from ..mosaic.mosaic import Mosaic, MosaicList
+from ... import util
 
 __all__ = ['AccountInfo']
 

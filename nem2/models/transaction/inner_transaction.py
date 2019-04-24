@@ -26,11 +26,11 @@ from __future__ import annotations
 import bidict
 import typing
 
-from nem2 import util
 from .base import TransactionBase, TypeMap
 from .format import CatbufferFormat, DTOFormat
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
+from ... import util
 
 __all__ = ['InnerTransaction']
 
@@ -128,7 +128,7 @@ class InnerTransaction(TransactionBase):
         cb_set('version')
         self._set('network_type', network_type)
         cb_set('type')
-        self._set('fee', None)
+        self._set('max_fee', None)
         self._set('deadline', None)
         self._set('transaction_info', None)
 
@@ -169,7 +169,7 @@ class InnerTransaction(TransactionBase):
         cb_set('version')
         self._set('network_type', network_type)
         cb_set('type')
-        self._set('fee', None)
+        self._set('max_fee', None)
         self._set('deadline', None)
         cb_set('transaction_info')
 

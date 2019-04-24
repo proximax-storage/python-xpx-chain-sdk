@@ -25,11 +25,11 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
-from nem2.util import bit
 from ..account.address import Address
 from ..blockchain.network_type import NetworkType
 from ..namespace.namespace_id import NamespaceId
+from ... import util
+from ...util import bit
 
 RecipientType = typing.Union[Address, NamespaceId]
 

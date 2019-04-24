@@ -25,10 +25,10 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .mosaic import Mosaic
 from ..blockchain.network_type import OptionalNetworkType
 from ..namespace.namespace_id import NamespaceId
+from ... import util
 
 __all__ = ['NetworkCurrencyMosaic']
 

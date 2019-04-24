@@ -24,7 +24,6 @@
 
 from __future__ import annotations
 
-from nem2 import util
 from .alias import Alias
 from .alias_type import AliasType
 from .namespace_id import NamespaceId, NamespaceIdList
@@ -32,6 +31,7 @@ from .namespace_type import NamespaceType
 from ..account.address import Address
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import OptionalNetworkType
+from ... import util
 
 __all__ = ['NamespaceInfo']
 

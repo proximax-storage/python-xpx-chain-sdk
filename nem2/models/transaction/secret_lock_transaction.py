@@ -25,7 +25,6 @@
 from __future__ import annotations
 import typing
 
-from nem2 import util
 from .deadline import Deadline
 from .hash_type import HashType
 from .inner_transaction import InnerTransaction
@@ -39,6 +38,7 @@ from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic import Mosaic
 from ..mosaic.mosaic_id import MosaicId
+from ... import util
 
 __all__ = [
     'SecretLockTransaction',
@@ -56,7 +56,7 @@ class SecretLockTransaction(Transaction):
     :param network_type: Network type.
     :param version: Transaction version.
     :param deadline: Deadline to include transaction.
-    :param fee: Fee for the transaction. Higher fees increase transaction priority.
+    :param max_fee: Max fee for the transaction. Higher fees increase priority.
     :param mosaic: Mosaic to be locked.
     :param duration: Duration for funds to be released or returned.
     :param hash_type: Hash algorithm secret was generated with.
@@ -78,7 +78,7 @@ class SecretLockTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        fee: int,
+        max_fee: int,
         mosaic: Mosaic,
         duration: int,
         hash_type: HashType,
@@ -96,7 +96,7 @@ class SecretLockTransaction(Transaction):
             network_type,
             version,
             deadline,
-            fee,
+            max_fee,
             signature,
             signer,
             transaction_info,
@@ -117,6 +117,7 @@ class SecretLockTransaction(Transaction):
         secret: typing.AnyStr,
         recipient: RecipientType,
         network_type: NetworkType,
+        max_fee: int = 0,
     ):
         """
         Create new secret proof transaction.
@@ -128,12 +129,13 @@ class SecretLockTransaction(Transaction):
         :param secret: Hex-encoded or raw seed-proof hash.
         :param recipient: Recipient of funds.
         :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
         """
         return cls(
             network_type,
             TransactionVersion.SECRET_LOCK,
             deadline,
-            0,
+            max_fee,
             mosaic,
             duration,
             hash_type,

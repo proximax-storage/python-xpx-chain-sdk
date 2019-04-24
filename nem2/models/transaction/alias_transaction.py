@@ -49,6 +49,7 @@ class AliasTransaction(TransactionBase):
         namespace_id: NamespaceId,
         address: Address,
         network_type: NetworkType,
+        max_fee: int = 0,
     ):
         """
         Create new address alias transaction.
@@ -58,6 +59,7 @@ class AliasTransaction(TransactionBase):
         :param namespace_id: Resulting namespace ID that will be an alias.
         :param address: Address to be aliased.
         :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
         """
 
         return AddressAliasTransaction.create(
@@ -66,6 +68,7 @@ class AliasTransaction(TransactionBase):
             namespace_id,
             address,
             network_type,
+            max_fee,
         )
 
     @staticmethod
@@ -75,6 +78,7 @@ class AliasTransaction(TransactionBase):
         namespace_id: NamespaceId,
         mosaic_id: MosaicId,
         network_type: NetworkType,
+        max_fee: int = 0,
     ):
         """
         Create new mosaic alias transaction.
@@ -84,6 +88,7 @@ class AliasTransaction(TransactionBase):
         :param namespace_id: Resulting namespace ID that will be an alias.
         :param mosaic_id: Mosaic to be aliased.
         :param network_type: Network type.
+        :param max_fee: (Optional) Max fee defined by sender.
         """
 
         return MosaicAliasTransaction.create(
@@ -92,4 +97,5 @@ class AliasTransaction(TransactionBase):
             namespace_id,
             mosaic_id,
             network_type,
+            max_fee,
         )

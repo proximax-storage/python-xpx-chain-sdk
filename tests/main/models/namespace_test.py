@@ -371,6 +371,7 @@ class TestNamespaceInfo(harness.TestCase):
         'namespace_id': models.NamespaceId(0x88b64c3be2f47144),
         'name': 'sample'
     },
+    'catbuffer': b'Dq\xf4\xe2;L\xb6\x88\x06sample',
     'dto': {
         'namespaceId': [0xe2f47144, 0x88b64c3b],
         'name': 'sample'
@@ -380,6 +381,7 @@ class TestNamespaceNameDepth1(harness.TestCase):
 
     def test_create_from_name(self):
         self.assertEqual(self.model, self.type.create_from_name("sample"))
+        self.assertTrue(self.model.is_valid())
 
     def test_valid(self):
         def create(name):
@@ -400,17 +402,19 @@ class TestNamespaceNameDepth1(harness.TestCase):
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
         'namespace_id': models.NamespaceId(0xfa9429715a71acc9),
-        'name': 'sample.sub'
+        'name': 'sub'
     },
+    'catbuffer': b'\xc9\xacqZq)\x94\xfa\x03sub',
     'dto': {
         'namespaceId': [0x5a71acc9, 0xfa942971],
-        'name': 'sample.sub'
+        'name': 'sub'
     },
 })
 class TestNamespaceNameDepth2(harness.TestCase):
 
     def test_create_from_name(self):
         self.assertEqual(self.model, self.type.create_from_name("sample.sub"))
+        self.assertTrue(self.model.is_valid())
 
 
 @harness.model_test_case({
@@ -418,17 +422,19 @@ class TestNamespaceNameDepth2(harness.TestCase):
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
         'namespace_id': models.NamespaceId(0x8bc7011b0b344c54),
-        'name': 'sample.sub.full'
+        'name': 'full'
     },
+    'catbuffer': b'TL4\x0b\x1b\x01\xc7\x8b\x04full',
     'dto': {
         'namespaceId': [0x0b344c54, 0x8bc7011b],
-        'name': 'sample.sub.full'
+        'name': 'full'
     },
 })
 class TestNamespaceNameDepth3(harness.TestCase):
 
     def test_create_from_name(self):
         self.assertEqual(self.model, self.type.create_from_name("sample.sub.full"))
+        self.assertTrue(self.model.is_valid())
 
 
 @harness.enum_test_case({

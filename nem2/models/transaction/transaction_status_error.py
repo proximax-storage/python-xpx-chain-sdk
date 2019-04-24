@@ -24,9 +24,9 @@
 
 from __future__ import annotations
 
-from nem2 import util
 from .deadline import Deadline
 from ..blockchain.network_type import OptionalNetworkType
+from ... import util
 
 __all__ = ['TransactionStatusError']
 

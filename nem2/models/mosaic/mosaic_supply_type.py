@@ -23,7 +23,7 @@
 """
 
 import enum
-from nem2 import util
+from ... import util
 
 __all__ = ['MosaicSupplyType']
 
