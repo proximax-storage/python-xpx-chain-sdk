@@ -265,14 +265,122 @@ class AccountHTTP(HTTPSharedBase):
         """
         return self(nis.get_accounts_info, addresses, **kwds)
 
-    # TODO(ahuszagh)
-    # getMultisigAccountInfo
-    # getMultisigAccountGraphInfo
-    # transactions
-    # incomingTransactions
-    # outgoingTransactions
-    # unconfirmedTransactions
-    # aggregateBondedTransactions
+    def get_account_property(
+        self,
+        address: models.Address,
+        **kwds
+    ):
+        """
+        Get properties information for account.
+
+        :param address: Account address.
+        :return: AccountPropertiesInfo object.
+        """
+        return self(nis.get_account_property, addresses, **kwds)
+
+    def get_account_properties(
+        self,
+        addresses: typing.Sequence[models.Address],
+        **kwds
+    ):
+        """
+        Get properties information for accounts.
+
+        :param addresses: Sequence of account addresses.
+        :return: AccountPropertiesInfo object.
+        """
+        return self(nis.get_account_properties, addresses, **kwds)
+
+    def get_multisig_account_info(
+        self,
+        address: models.Address,
+        **kwds
+    ):
+        """
+        Get multisig account information for account.
+
+        :param address: Account address.
+        :return: MultisigAccountInfo object.
+        """
+        return self(nis.get_multisig_account_info, address, **kwds)
+
+    def get_multisig_account_graph_info(
+        self,
+        address: models.Address,
+        **kwds
+    ):
+        """
+        Get multisig account graph information for account.
+
+        :param address: Account address.
+        :return: MultisigAccountGraphInfo object.
+        """
+        return self(nis.get_multisig_account_graph_info, address, **kwds)
+
+    def transactions(
+        self,
+        public_account: models.PublicAccount,
+        **kwds
+    ):
+        """
+        Get all transactions for account.
+
+        :param public_account: Public key and address for account.
+        :return: List of transaction objects.
+        """
+        return self(nis.get_account_transactions, public_account, **kwds)
+
+    def incoming_transactions(
+        self,
+        public_account: models.PublicAccount,
+        **kwds
+    ):
+        """
+        Get all incoming transactions for account.
+
+        :param public_account: Public key and address for account.
+        :return: List of incoming transaction objects.
+        """
+        return self(nis.get_account_incoming_transactions, public_account, **kwds)
+
+    def outgoing_transactions(
+        self,
+        public_account: models.PublicAccount
+        **kwds
+    ):
+        """
+        Get all outgoing transactions for account.
+
+        :param public_account: Public key and address for account.
+        :return: List of outgoing transaction objects.
+        """
+        return self(nis.get_account_outgoing_transactions, public_account, **kwds)
+
+    def unconfirmed_transactions(
+        self,
+        public_account: models.PublicAccount,
+        **kwds
+    ):
+        """
+        Get all unconfirmed transactions for account.
+
+        :param public_account: Public key and address for account.
+        :return: List of unconfirmed transaction objects.
+        """
+        return self(nis.get_account_unconfirmed_transactions, public_account, **kwds)
+
+    def aggregate_bonded_transactions(
+        self,
+        public_account: models.PublicAccount,
+        **kwds
+    ):
+        """
+        Get all aggregate bonded transactions for account.
+
+        :param public_account: Public key and address for account.
+        :return: List of aggregate bonded transaction objects.
+        """
+        return self(nis.get_account_partial_transactions, public_account, **kwds)
 
 
 class BlockchainHTTP(HTTPSharedBase):
@@ -287,9 +395,45 @@ class BlockchainHTTP(HTTPSharedBase):
         """
         return self(nis.get_block_by_height, height, **kwds)
 
-    # TODO(ahuszagh)
-    # getBlockTransactions
-    # getBlocksByHeightWithLimit
+    def get_blocks_by_height_and_limit(self, height: int, limit: int, **kwds):
+        """
+        Get information for blocks between [height, height+limit].
+
+        :param height: Block height.
+        :param limit: Maximum number of blocks to return.
+        :return: Sequence of information models describing blocks.
+        """
+        return self(nis.get_blocks_by_height_and_limit, height, limit, **kwds)
+
+    def get_block_transactions(self, height: int, **kwds):
+        """
+        Get information for all transactions included in a block by height.
+
+        :param height: Block height.
+        :return: Sequence of information models describing transactions.
+        """
+        return self(nis.get_block_transactions, height, **kwds)
+
+    # TODO(ahuszagh) Bugs.
+    #   getBlockByTransactionMerkle produces a 500 internal server error.
+    #       Response 500.
+    #       > GET {{url}}/block/{{height}}/transaction/{{transactionId}}/merkle
+    #       {
+    #           "code": "Internal",
+    #           "message": "Cannot read property 'queryDocument' of undefined"
+    #       }
+    #
+    #   getBlockReceipts produces a 500 internal server error.
+    #       Response 500.
+    #       > GET {{url}}/block/{{height}}/receipts
+    #       {
+    #           "code": "Internal",
+    #           "message": "db.chainInfo is not a function"
+    #       }
+    #
+    #   getBlockReceiptsByTransactionMerkle produces a 500 internal server error.
+    #       Response 500.
+    #       > GET {url}}/block/{{height}}/receipt/{{transactionId}}/merkle
 
     def get_blockchain_height(self, **kwds):
         """
@@ -306,6 +450,16 @@ class BlockchainHTTP(HTTPSharedBase):
         :return: Blockchain score.
         """
         return self(nis.get_blockchain_score, **kwds)
+
+    def get_diagnostic_blocks_by_height_and_limit(self, height: int, limit: int, **kwds):
+        """
+        Get diagnostic information for blocks between [height, height+limit].
+
+        :param height: Block height.
+        :param limit: Maximum number of blocks to return.
+        :return: Sequence of information models describing blocks.
+        """
+        return self(nis.get_diagnostic_blocks_by_height_and_limit, height, limit, **kwds)
 
     def get_diagnostic_storage(self, **kwds):
         """

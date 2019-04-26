@@ -29,6 +29,16 @@ from tests import responses
                 lambda x: (x[0].mosaics, []),
             ]
         },
+        #  TODO(ahuszagh) Add more examples...
+        # get_account_property
+        # get_account_properties
+        # get_multisig_account_info
+        # get_multisig_account_graph_info
+        # transactions
+        # incoming_transactions
+        # outgoing_transactions
+        # unconfirmed_transactions
+        # aggregate_bonded_transactions
     ],
 })
 class TestAccountHTTP(harness.TestCase):

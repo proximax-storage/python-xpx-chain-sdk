@@ -107,6 +107,26 @@ class TestAccountInfo(harness.TestCase):
         self.assertEqual(self.model.public_account, public_account)
 
 
+class TestAccountMetadata(harness.TestCase):
+    pass    # TODO(ahuszagh) Implement...
+
+
+class TestAccountProperty(harness.TestCase):
+    pass    # TODO(ahuszagh) Implement...
+
+
+class TestAccountProperties(harness.TestCase):
+    pass    # TODO(ahuszagh) Implement...
+
+
+class TestAccountPropertiesInfo(harness.TestCase):
+    pass    # TODO(ahuszagh) Implement...
+
+
+class TestAccountPropertiesMetadata(harness.TestCase):
+    pass    # TODO(ahuszagh) Implement...
+
+
 @harness.model_test_case({
     'type': models.Address,
     'network_type': models.NetworkType.MIJIN_TEST,
@@ -170,16 +190,18 @@ class TestAddress(harness.TestCase):
             self.type.create_from_public_key('', self.network_type)
 
 
-class TestAccountMetadata(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement...
-
-
 class TestMultisigAccountGraphInfo(harness.TestCase):
     pass    # TODO(ahuszagh) Implement...
 
 
 class TestMultisigAccountInfo(harness.TestCase):
     pass    # TODO(ahuszagh) Implement...
+    # Now supports DTO, must include that.
+
+
+class TestPropertyType(harness.TestCase):
+    pass    # TODO(ahuszagh) Implement...
+    # Now supports DTO/catbuffer, must include that.
 
 
 @harness.model_test_case({

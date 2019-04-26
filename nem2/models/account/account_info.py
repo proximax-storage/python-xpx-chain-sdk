@@ -75,7 +75,7 @@ class AccountInfo(util.DTO):
                 'addressHeight': util.u64_to_dto(self.address_height),
                 'publicKey': self.public_key,
                 'publicKeyHeight': util.u64_to_dto(self.public_key_height),
-                'mosaics': [i.to_dto(network_type) for i in self.mosaics],
+                'mosaics': Mosaic.sequence_to_dto(self.mosaics, network_type),
                 'importance': util.u64_to_dto(self.importance),
                 'importanceHeight': util.u64_to_dto(self.importance_height),
             }
@@ -89,14 +89,13 @@ class AccountInfo(util.DTO):
     ):
         assert data['meta'] == {}
         account = data['account']
-        mosaics = account.get('mosaics', [])
         return cls(
             meta=None,
             address=Address.from_dto(account['address'], network_type),
             address_height=util.u64_from_dto(account.get('addressHeight', [0, 0])),
             public_key=account['publicKey'],
             public_key_height=util.u64_from_dto(account.get('publicKeyHeight', [0, 0])),
-            mosaics=[Mosaic.from_dto(i, network_type) for i in mosaics],
+            mosaics=Mosaic.sequence_from_dto(account.get('mosaics', []), network_type),
             importance=util.u64_from_dto(account.get('importance', [0, 0])),
             importance_height=util.u64_from_dto(account.get('importanceHeight', [0, 0])),
         )

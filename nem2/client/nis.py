@@ -33,6 +33,7 @@ from .. import util
 from .. import models
 
 OptionalNetworkType = typing.Optional[models.NetworkType]
+TransactionType = typing.TypeVar('TransactionType', bound=models.Transaction)
 
 # BOILERPLATE
 # -----------
@@ -101,7 +102,6 @@ def request_get_account_info(
     :param address: Account address.
     :param timeout: (Optional) timeout for request (in seconds).
     """
-
     return client.get(f"/account/{address.address}", **kwds)
 
 
@@ -161,6 +161,330 @@ def process_get_accounts_info(
 
 get_accounts_info = request("get_accounts_info")
 
+
+def request_get_account_property(
+    client: client.Client,
+    address: models.Address,
+    **kwds
+):
+    """
+    Make "/account/properties/{address}" request.
+
+    :param client: Wrapper for client.
+    :param address: Account address.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+    return client.get(f"/account/properties/{address.address}", **kwds)
+
+
+def process_get_account_property(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> AccountPropertiesInfo:
+    """
+    Process the "/account/properties/{address}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return models.AccountPropertiesInfo.from_dto(json, network_type)
+
+
+get_account_property = request("get_account_property")
+
+
+def request_get_account_properties(
+    client: client.Client,
+    addresses: typing.Sequence[models.Address],
+    **kwds
+):
+    """
+    Make "/account/properties" request.
+
+    :param client: Wrapper for client.
+    :param addresses: Sequence of account addresses.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    json = {"addresses": [i.address for i in addresses]}
+    return client.post(f"/account/properties", json=json, **kwds)
+
+
+def process_get_account_properties(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> AccountPropertiesInfo:
+    """
+    Process the "/account/properties" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return models.AccountPropertiesInfo.from_dto(json, network_type)
+
+
+get_account_properties = request("get_account_properties")
+
+
+def request_get_multisig_account_info(
+    client: client.Client,
+    address: models.Address,
+    **kwds
+):
+    """
+    Make "/account/{address}/multisig" request.
+
+    :param client: Wrapper for client.
+    :param address: Account address.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/account/{address.address}/multisig", **kwds)
+
+
+def process_get_multisig_account_info(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.MultisigAccountInfo:
+    """
+    Process the "/account/{address}/multisig" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return models.MultisigAccountInfo.from_dto(json, network_type)
+
+
+get_multisig_account_info = request("get_multisig_account_info")
+
+
+def request_get_multisig_account_graph_info(
+    client: client.Client,
+    address: models.Address,
+    **kwds
+):
+    """
+    Make "/account/{address}/multisig/graph" request.
+
+    :param client: Wrapper for client.
+    :param address: Account address.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/account/{address.address}/multisig/graph", **kwds)
+
+
+def process_get_multisig_account_graph_info(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.MultisigAccountInfo:
+    """
+    Process the "/account/{address}/multisig/graph" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return models.MultisigAccountGraphInfo.from_dto(json, network_type)
+
+
+get_multisig_account_graph_info = request("get_multisig_account_graph_info")
+
+
+def request_get_account_transactions(
+    client: client.Client,
+    public_account: models.PublicAccount,
+    **kwds
+):
+    """
+    Make "/account/{public_key}/transactions" request.
+
+    :param client: Wrapper for client.
+    :param height: Height of block.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/account/{public_account.public_key}/transactions", **kwds)
+
+
+def process_get_account_transactions(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[TransactionType]:
+    """
+    Process the "/account/{public_key}/transactions" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return [models.Transaction.from_dto(i, network_type) for i in json]
+
+
+get_account_transactions = request("get_account_transactions")
+
+
+def request_get_account_incoming_transactions(
+    client: client.Client,
+    public_account: models.PublicAccount,
+    **kwds
+):
+    """
+    Make "/account/{public_key}/transactions/incoming" request.
+
+    :param client: Wrapper for client.
+    :param height: Height of block.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/account/{public_account.public_key}/transactions/incoming", **kwds)
+
+
+def process_get_account_incoming_transactions(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[TransactionType]:
+    """
+    Process the "/account/{public_key}/transactions/incoming" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return [models.Transaction.from_dto(i, network_type) for i in json]
+
+
+get_account_incoming_transactions = request("get_account_incoming_transactions")
+
+
+def request_get_account_outgoing_transactions(
+    client: client.Client,
+    public_account: models.PublicAccount,
+    **kwds
+):
+    """
+    Make "/account/{public_key}/transactions/outgoing" request.
+
+    :param client: Wrapper for client.
+    :param height: Height of block.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/account/{public_account.public_key}/transactions/outgoing", **kwds)
+
+
+def process_get_account_outgoing_transactions(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[TransactionType]:
+    """
+    Process the "/account/{public_key}/transactions/outgoing" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return [models.Transaction.from_dto(i, network_type) for i in json]
+
+
+get_account_outgoing_transactions = request("get_account_outgoing_transactions")
+
+
+def request_get_account_unconfirmed_transactions(
+    client: client.Client,
+    public_account: models.PublicAccount,
+    **kwds
+):
+    """
+    Make "/account/{public_key}/transactions/unconfirmed" request.
+
+    :param client: Wrapper for client.
+    :param height: Height of block.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/account/{public_account.public_key}/transactions/unconfirmed", **kwds)
+
+
+def process_get_account_unconfirmed_transactions(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[TransactionType]:
+    """
+    Process the "/account/{public_key}/transactions/unconfirmed" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return [models.Transaction.from_dto(i, network_type) for i in json]
+
+
+get_account_unconfirmed_transactions = request("get_account_unconfirmed_transactions")
+
+
+def request_get_account_partial_transactions(
+    client: client.Client,
+    public_account: models.PublicAccount,
+    **kwds
+):
+    """
+    Make "/account/{public_key}/transactions/partial" request.
+
+    :param client: Wrapper for client.
+    :param height: Height of block.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/account/{public_account.public_key}/transactions/partial", **kwds)
+
+
+def process_get_account_partial_transactions(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[TransactionType]:
+    """
+    Process the "/account/{public_key}/transactions/partial" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return [models.Transaction.from_dto(i, network_type) for i in json]
+
+
+get_account_partial_transactions = request("get_account_partial_transactions")
+
 # BLOCKCHAIN HTTP
 # ---------------
 
@@ -199,6 +523,80 @@ def process_get_block_by_height(
 
 
 get_block_by_height = request("get_block_by_height")
+
+
+def request_get_blocks_by_height_and_limit(
+    client: client.Client,
+    height: int,
+    limit: int,
+    **kwds
+):
+    """
+    Make "/blocks/{height}/limit/{limit}" request.
+
+    :param client: Wrapper for client.
+    :param height: Height of block.
+    :param limit: Maximum number of blocks to return.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/blocks/{height}/limit/{limit}", **kwds)
+
+
+def process_get_blocks_by_height_and_limit(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.BlockInfo]:
+    """
+    Process the "/blocks/{height}/limit/{limit}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return [models.BlockInfo.from_dto(i, network_type) for i in json]
+
+
+get_blocks_by_height_and_limit = request("get_blocks_by_height_and_limit")
+
+
+def request_get_block_transactions(
+    client: client.Client,
+    height: int,
+    **kwds
+):
+    """
+    Make "/blocks/{height}/transactions" request.
+
+    :param client: Wrapper for client.
+    :param height: Height of block.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/blocks/{height}/transactions", **kwds)
+
+
+def process_get_block_transactions(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[TransactionType]:
+    """
+    Process the "/blocks/{height}/transactions" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return [models.Transaction.from_dto(i, network_type) for i in json]
+
+
+get_block_transactions = request("get_block_transactions")
 
 
 def request_get_blockchain_height(client: client.Client, **kwds):
@@ -259,6 +657,44 @@ def process_get_blockchain_score(
 
 
 get_blockchain_score = request("get_blockchain_score")
+
+
+def request_get_diagnostic_blocks_by_height_and_limit(
+    client: client.Client,
+    height: int,
+    limit: int,
+    **kwds
+):
+    """
+    Make "/diagnostic/blocks/{height}/limit/{limit}" request.
+
+    :param client: Wrapper for client.
+    :param height: Height of block.
+    :param limit: Maximum number of blocks to return.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    return client.get(f"/diagnostic/blocks/{height}/limit/{limit}", **kwds)
+
+
+def process_get_diagnostic_blocks_by_height_and_limit(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.BlockInfo]:
+    """
+    Process the "/diagnostic/blocks/{height}/limit/{limit}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return [models.BlockInfo.from_dto(i, network_type) for i in json]
+
+
+get_diagnostic_blocks_by_height_and_limit = request("get_diagnostic_blocks_by_height_and_limit")
 
 
 def request_get_diagnostic_storage(client: client.Client, **kwds):
@@ -881,11 +1317,23 @@ REQUEST = {
     # ACCOUNT
     'get_account_info': request_get_account_info,
     'get_accounts_info': request_get_accounts_info,
+    'get_account_property': request_get_account_property,
+    'get_account_properties': request_get_account_properties,
+    'get_multisig_account_info': request_get_multisig_account_info,
+    'get_multisig_account_graph_info': request_get_multisig_account_graph_info,
+    'get_account_transactions': request_get_account_transactions,
+    'get_account_incoming_transactions': request_get_account_incoming_transactions,
+    'get_account_outgoing_transactions': request_get_account_outgoing_transactions,
+    'get_account_unconfirmed_transactions': request_get_account_unconfirmed_transactions,
+    'get_account_partial_transactions': request_get_account_partial_transactions,
 
     # BLOCKCHAIN
     'get_block_by_height': request_get_block_by_height,
+    'get_blocks_by_height_and_limit': request_get_blocks_by_height_and_limit,
+    'get_block_transactions': request_get_block_transactions,
     'get_blockchain_height': request_get_blockchain_height,
     'get_blockchain_score': request_get_blockchain_score,
+    'get_diagnostic_blocks_by_height_and_limit': request_get_diagnostic_blocks_by_height_and_limit,
     'get_diagnostic_storage': request_get_diagnostic_storage,
 
     # MOSAIC
@@ -917,11 +1365,23 @@ PROCESS = {
     # ACCOUNT
     'get_account_info': process_get_account_info,
     'get_accounts_info': process_get_accounts_info,
+    'get_account_property': process_get_account_property,
+    'get_account_properties': process_get_account_properties,
+    'get_multisig_account_info': process_get_multisig_account_info,
+    'get_multisig_account_graph_info': process_get_multisig_account_graph_info,
+    'get_account_transactions': process_get_account_transactions,
+    'get_account_incoming_transactions': process_get_account_incoming_transactions,
+    'get_account_outgoing_transactions': process_get_account_outgoing_transactions,
+    'get_account_unconfirmed_transactions': process_get_account_unconfirmed_transactions,
+    'get_account_partial_transactions': process_get_account_partial_transactions,
 
     # BLOCKCHAIN
     'get_block_by_height': process_get_block_by_height,
+    'get_blocks_by_height_and_limit': process_get_blocks_by_height_and_limit,
+    'get_block_transactions': process_get_block_transactions,
     'get_blockchain_height': process_get_blockchain_height,
     'get_blockchain_score': process_get_blockchain_score,
+    'get_diagnostic_blocks_by_height_and_limit': process_get_diagnostic_blocks_by_height_and_limit,
     'get_diagnostic_storage': process_get_diagnostic_storage,
 
     # MOSAIC

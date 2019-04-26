@@ -31,6 +31,10 @@ __all__ = [
     'b32decode',
     'b64encode',
     'b64decode',
+    'decode_base32',
+    'decode_base64',
+    'encode_base32',
+    'encode_base64',
 ]
 
 
@@ -38,9 +42,15 @@ def b32encode(data: bytes, with_suffix=True) -> str:
     """Encode bytes data to a base32-encoded string."""
 
     encoded = base64.b32encode(data).decode('ascii')
-    if not with_suffix:
-        encoded = encoded.rstrip('=')
-    return encoded
+    return remove_suffix(encoded, with_suffix=with_suffix)
+
+
+def encode_base32(data: typing.AnyStr, with_suffix=True) -> str:
+    """Encodes raw bytes to base32."""
+
+    if isinstance(data, str):
+        return remove_suffix(data, with_suffix=with_suffix)
+    return b32encode(data, with_suffix=with_suffix)
 
 
 def b32decode(data: typing.AnyStr, with_suffix=True) -> bytes:
@@ -51,13 +61,27 @@ def b32decode(data: typing.AnyStr, with_suffix=True) -> bytes:
     return base64.b32decode(data)
 
 
+def decode_base32(data: typing.AnyStr, with_suffix=True) -> bytes:
+    """Decode base32 data to raw bytes."""
+
+    if isinstance(data, (bytes, bytearray)):
+        return data
+    return b32decode(data, with_suffix=with_suffix)
+
+
 def b64encode(data: bytes, altchars=None, with_suffix=True) -> str:
     """Encode bytes data to a base64-encoded string."""
 
     encoded = base64.b64encode(data, altchars=altchars).decode('ascii')
-    if not with_suffix:
-        encoded = encoded.rstrip('=')
-    return encoded
+    return remove_suffix(encoded, with_suffix=with_suffix)
+
+
+def encode_base64(data: typing.AnyStr, altchars=None, with_suffix=True) -> str:
+    """Encodes raw bytes to base64."""
+
+    if isinstance(data, str):
+        return remove_suffix(data, with_suffix=with_suffix)
+    return b64encode(data, altchars=altchars, with_suffix=with_suffix)
 
 
 def b64decode(data: typing.AnyStr, altchars=None, with_suffix=True) -> bytes:
@@ -66,6 +90,14 @@ def b64decode(data: typing.AnyStr, altchars=None, with_suffix=True) -> bytes:
     if not with_suffix:
         data = add_suffix(data, 4)
     return base64.b64decode(data, altchars=altchars)
+
+
+def decode_base64(data: typing.AnyStr, altchars=None, with_suffix=True) -> bytes:
+    """Decode base64 data to raw bytes."""
+
+    if isinstance(data, (bytes, bytearray)):
+        return data
+    return b64decode(data, altchars=altchars, with_suffix=with_suffix)
 
 
 @typing.no_type_check
@@ -82,4 +114,12 @@ def add_suffix(data: typing.AnyStr, width: int) -> typing.AnyStr:
         pad = width - trailing
         data = data + padchar * pad
 
+    return data
+
+
+def remove_suffix(data: str, with_suffix=True) -> str:
+    """Remove '=' suffix from encoded str."""
+
+    if not with_suffix:
+        return data.rstrip('=')
     return data

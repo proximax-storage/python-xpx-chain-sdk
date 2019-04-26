@@ -25,6 +25,7 @@
 from __future__ import annotations
 
 from .public_account import PublicAccount, PublicAccountList
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['MultisigAccountInfo']
@@ -32,7 +33,7 @@ __all__ = ['MultisigAccountInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MultisigAccountInfo(util.Object):
+class MultisigAccountInfo(util.DTO):
     """
     Information describing a multisig account.
 
@@ -74,3 +75,38 @@ class MultisigAccountInfo(util.Object):
         """
 
         return account in self.multisig_accounts
+
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None,
+    ) -> dict:
+        cosignatories = [i.public_key for i in self.cosignatories]
+        multisig_accounts = [i.public_key for i in self.multisig_accounts]
+        return {
+            'multisig': {
+                'account': self.account.public_key,
+                'minApproval': util.u32_to_dto(self.min_approval),
+                'minRemoval': util.u32_to_dto(self.min_removal),
+                'cosignatories': cosignatories,
+                'multisigAccounts': multisig_accounts,
+            }
+        }
+
+    @classmethod
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ):
+        assert network_type is not None
+
+        multisig = data['multisig']
+        cosignatories = [PublicAccount.create_from_public_key(i, network_type) for i in multisig['cosignatories']]
+        multisig_accounts = [PublicAccount.create_from_public_key(i, network_type) for i in multisig['multisigAccounts']]
+        return cls(
+            account=PublicAccount.create_from_public_key(multisig['account'], network_type),
+            min_approval=util.u32_from_dto(multisig['minApproval']),
+            min_removal=util.u32_from_dto(multisig['minRemoval']),
+            cosignatories=cosignatories,
+            multisig_accounts=multisig_accounts
+        )

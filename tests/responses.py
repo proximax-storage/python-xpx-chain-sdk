@@ -49,6 +49,10 @@ BLOCK_INFO = {
     'Ok': load_response('block_info.json'),
 }
 
+BLOCKS_INFO = {
+    'Ok': load_response('blocks_info.json'),
+}
+
 CHAIN_HEIGHT = {
     'Ok': load_response('chain_height.json'),
 }
@@ -57,12 +61,20 @@ CHAIN_SCORE = {
     'Ok': load_response('chain_score.json'),
 }
 
+DIAGNOSTIC_BLOCKS_INFO = {
+    'Ok': load_response('diagnostic_blocks_info.json'),
+}
+
 DIAGNOSTIC_STORAGE = {
     'Ok': load_response('diagnostic_storage.json'),
 }
 
 MOSAIC_INFO = {
     'Ok': load_response('mosaic_info.json'),
+}
+
+MOSAICS_INFO = {
+    'Ok': load_response('mosaics_info.json'),
 }
 
 NAMESPACE = {
@@ -79,4 +91,8 @@ NAMESPACE_NAMES = {
 
 NETWORK_TYPE = {
     'MIJIN_TEST': load_response('mijin_test_network.json'),
+}
+
+TRANSACTIONS = {
+    'Ok': load_response('transactions.json'),
 }

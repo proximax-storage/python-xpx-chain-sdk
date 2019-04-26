@@ -7,9 +7,14 @@
 from .account.account import *
 from .account.account_info import *
 from .account.account_metadata import *
+from .account.account_property import *
+from .account.account_properties import *
+from .account.account_properties_info import *
+from .account.account_properties_metadata import *
 from .account.address import *
 from .account.multisig_account_graph_info import *
 from .account.multisig_account_info import *
+from .account.property_type import *
 from .account.public_account import *
 from .account import *
 
@@ -89,9 +94,14 @@ __all__ = (
     account.__all__
     + account_info.__all__
     + account_metadata.__all__
+    + account_property.__all__
+    + account_properties.__all__
+    + account_properties_info.__all__
+    + account_properties_metadata.__all__
     + address.__all__
     + multisig_account_graph_info.__all__
     + multisig_account_info.__all__
+    + property_type.__all__
     + public_account.__all__
 
     # Blockchain
