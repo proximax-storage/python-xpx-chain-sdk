@@ -29,10 +29,10 @@ from tests import responses
             ]
         },
         {
-            'name': 'test_get_namespace_names',
+            'name': 'test_get_namespaces_name',
             'response': responses.NAMESPACE_NAMES['nem'],
             'params': [[models.NamespaceId.from_hex('84b3552d375ffa4b')]],
-            'method': 'get_namespace_names',
+            'method': 'get_namespaces_name',
             'validation': [
                 lambda x: (len(x), 1),
                 lambda x: (x[0].namespace_id.encoded, '4bfa5f372d55b384'),

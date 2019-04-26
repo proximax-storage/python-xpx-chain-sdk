@@ -525,7 +525,7 @@ def process_get_block_by_height(
 get_block_by_height = request("get_block_by_height")
 
 
-def request_get_blocks_by_height_and_limit(
+def request_get_blocks_by_height_with_limit(
     client: client.Client,
     height: int,
     limit: int,
@@ -543,7 +543,7 @@ def request_get_blocks_by_height_and_limit(
     return client.get(f"/blocks/{height}/limit/{limit}", **kwds)
 
 
-def process_get_blocks_by_height_and_limit(
+def process_get_blocks_by_height_with_limit(
     status: int,
     json: list,
     network_type: models.NetworkType,
@@ -560,7 +560,7 @@ def process_get_blocks_by_height_and_limit(
     return [models.BlockInfo.from_dto(i, network_type) for i in json]
 
 
-get_blocks_by_height_and_limit = request("get_blocks_by_height_and_limit")
+get_blocks_by_height_with_limit = request("get_blocks_by_height_with_limit")
 
 
 def request_get_block_transactions(
@@ -659,7 +659,7 @@ def process_get_blockchain_score(
 get_blockchain_score = request("get_blockchain_score")
 
 
-def request_get_diagnostic_blocks_by_height_and_limit(
+def request_get_diagnostic_blocks_by_height_with_limit(
     client: client.Client,
     height: int,
     limit: int,
@@ -677,7 +677,7 @@ def request_get_diagnostic_blocks_by_height_and_limit(
     return client.get(f"/diagnostic/blocks/{height}/limit/{limit}", **kwds)
 
 
-def process_get_diagnostic_blocks_by_height_and_limit(
+def process_get_diagnostic_blocks_by_height_with_limit(
     status: int,
     json: list,
     network_type: models.NetworkType,
@@ -694,7 +694,7 @@ def process_get_diagnostic_blocks_by_height_and_limit(
     return [models.BlockInfo.from_dto(i, network_type) for i in json]
 
 
-get_diagnostic_blocks_by_height_and_limit = request("get_diagnostic_blocks_by_height_and_limit")
+get_diagnostic_blocks_by_height_with_limit = request("get_diagnostic_blocks_by_height_with_limit")
 
 
 def request_get_diagnostic_storage(client: client.Client, **kwds):
@@ -875,7 +875,7 @@ def process_get_namespace(
 get_namespace = request("get_namespace")
 
 
-def request_get_namespace_names(
+def request_get_namespaces_name(
     client: client.Client,
     ids: typing.Sequence[models.NamespaceId],
     **kwds
@@ -892,7 +892,7 @@ def request_get_namespace_names(
     return client.post("/namespace/names", json=json, **kwds)
 
 
-def process_get_namespace_names(
+def process_get_namespaces_name(
     status: int,
     json: list,
     network_type: models.NetworkType,
@@ -908,7 +908,7 @@ def process_get_namespace_names(
     return [models.NamespaceName.from_dto(i, network_type) for i in json]
 
 
-get_namespace_names = request("get_namespace_names")
+get_namespaces_name = request("get_namespaces_name")
 
 
 def request_get_namespaces_from_account(
@@ -1329,11 +1329,11 @@ REQUEST = {
 
     # BLOCKCHAIN
     'get_block_by_height': request_get_block_by_height,
-    'get_blocks_by_height_and_limit': request_get_blocks_by_height_and_limit,
+    'get_blocks_by_height_with_limit': request_get_blocks_by_height_with_limit,
     'get_block_transactions': request_get_block_transactions,
     'get_blockchain_height': request_get_blockchain_height,
     'get_blockchain_score': request_get_blockchain_score,
-    'get_diagnostic_blocks_by_height_and_limit': request_get_diagnostic_blocks_by_height_and_limit,
+    'get_diagnostic_blocks_by_height_with_limit': request_get_diagnostic_blocks_by_height_with_limit,
     'get_diagnostic_storage': request_get_diagnostic_storage,
 
     # MOSAIC
@@ -1343,7 +1343,7 @@ REQUEST = {
 
     # NAMESPACE
     'get_namespace': request_get_namespace,
-    'get_namespace_names': request_get_namespace_names,
+    'get_namespaces_name': request_get_namespaces_name,
     'get_namespaces_from_account': request_get_namespaces_from_account,
     'get_namespaces_from_accounts': request_get_namespaces_from_accounts,
     'get_linked_mosaic_id': request_get_linked_mosaic_id,
@@ -1377,11 +1377,11 @@ PROCESS = {
 
     # BLOCKCHAIN
     'get_block_by_height': process_get_block_by_height,
-    'get_blocks_by_height_and_limit': process_get_blocks_by_height_and_limit,
+    'get_blocks_by_height_with_limit': process_get_blocks_by_height_with_limit,
     'get_block_transactions': process_get_block_transactions,
     'get_blockchain_height': process_get_blockchain_height,
     'get_blockchain_score': process_get_blockchain_score,
-    'get_diagnostic_blocks_by_height_and_limit': process_get_diagnostic_blocks_by_height_and_limit,
+    'get_diagnostic_blocks_by_height_with_limit': process_get_diagnostic_blocks_by_height_with_limit,
     'get_diagnostic_storage': process_get_diagnostic_storage,
 
     # MOSAIC
@@ -1391,7 +1391,7 @@ PROCESS = {
 
     # NAMESPACE
     'get_namespace': process_get_namespace,
-    'get_namespace_names': process_get_namespace_names,
+    'get_namespaces_name': process_get_namespaces_name,
     'get_namespaces_from_account': process_get_namespaces_from_account,
     'get_namespaces_from_accounts': process_get_namespaces_from_accounts,
     'get_linked_mosaic_id': process_get_linked_mosaic_id,

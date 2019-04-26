@@ -395,7 +395,7 @@ class BlockchainHTTP(HTTPSharedBase):
         """
         return self(nis.get_block_by_height, height, **kwds)
 
-    def get_blocks_by_height_and_limit(self, height: int, limit: int, **kwds):
+    def get_blocks_by_height_with_limit(self, height: int, limit: int, **kwds):
         """
         Get information for blocks between [height, height+limit].
 
@@ -403,7 +403,7 @@ class BlockchainHTTP(HTTPSharedBase):
         :param limit: Maximum number of blocks to return.
         :return: Sequence of information models describing blocks.
         """
-        return self(nis.get_blocks_by_height_and_limit, height, limit, **kwds)
+        return self(nis.get_blocks_by_height_with_limit, height, limit, **kwds)
 
     def get_block_transactions(self, height: int, **kwds):
         """
@@ -451,7 +451,7 @@ class BlockchainHTTP(HTTPSharedBase):
         """
         return self(nis.get_blockchain_score, **kwds)
 
-    def get_diagnostic_blocks_by_height_and_limit(self, height: int, limit: int, **kwds):
+    def get_diagnostic_blocks_by_height_with_limit(self, height: int, limit: int, **kwds):
         """
         Get diagnostic information for blocks between [height, height+limit].
 
@@ -459,7 +459,7 @@ class BlockchainHTTP(HTTPSharedBase):
         :param limit: Maximum number of blocks to return.
         :return: Sequence of information models describing blocks.
         """
-        return self(nis.get_diagnostic_blocks_by_height_and_limit, height, limit, **kwds)
+        return self(nis.get_diagnostic_blocks_by_height_with_limit, height, limit, **kwds)
 
     def get_diagnostic_storage(self, **kwds):
         """
@@ -555,7 +555,7 @@ class NamespaceHTTP(HTTPSharedBase):
         """
         return self(nis.get_namespaces_from_accounts, addresses, **kwds)
 
-    def get_namespace_names(
+    def get_namespaces_name(
         self,
         ids: typing.Sequence[models.NamespaceId],
         **kwds
@@ -566,7 +566,7 @@ class NamespaceHTTP(HTTPSharedBase):
         :param ids: Sequence of namespace IDs.
         :return: Namespace names for IDS.
         """
-        return self(nis.get_namespace_names, ids, **kwds)
+        return self(nis.get_namespaces_name, ids, **kwds)
 
     def get_linked_mosaic_id(
         self,
@@ -649,6 +649,7 @@ class TransactionHTTP(HTTPSharedBase):
     # TODO(ahuszagh)
     # announceAggregateBonded
     # announceAggregateBondedCosignature
+    # getTransactionEffectiveFee
 
     def announce(
         self,

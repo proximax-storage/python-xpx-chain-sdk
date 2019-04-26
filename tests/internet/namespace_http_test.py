@@ -25,9 +25,9 @@ from tests import harness
             ]
         },
         {
-            'name': 'test_get_namespace_names',
+            'name': 'test_get_namespaces_name',
             'params': [[models.NamespaceId.from_hex('84b3552d375ffa4b')]],
-            'method': 'get_namespace_names',
+            'method': 'get_namespaces_name',
             'validation': [
                 lambda x: (len(x), 1),
                 lambda x: (x[0].name, 'nem'),
