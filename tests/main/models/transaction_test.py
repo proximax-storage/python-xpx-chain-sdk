@@ -320,6 +320,12 @@ class TestMessageType(harness.TestCase):
     pass
 
 
+
+# TODO(ahuszagh) Implement...
+class TestModifyMultisigAccountTransaction(harness.TestCase):
+    pass
+
+
 @harness.transaction_test_case({
     'type': models.MosaicAliasTransaction,
     'network_type': models.NetworkType.MIJIN_TEST,
@@ -468,6 +474,7 @@ class TestMosaicSupplyChangeTransaction(harness.TestCase):
         'type': 0,
         'cosignatoryPublicKey': '1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
     },
+    'catbuffer': '001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
 })
 class TestMultisigCosignatoryModification(harness.TestCase):
     pass

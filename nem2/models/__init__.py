@@ -67,6 +67,7 @@ from .transaction.inner_transaction import *
 from .transaction.lock_funds_transaction import *
 from .transaction.message import *
 from .transaction.message_type import *
+from .transaction.modify_multisig_account_transaction import *
 from .transaction.mosaic_alias_transaction import *
 from .transaction.mosaic_definition_transaction import *
 from .transaction.mosaic_supply_change_transaction import *
@@ -150,6 +151,7 @@ __all__ = (
     + lock_funds_transaction.__all__
     + message.__all__
     + message_type.__all__
+    + modify_multisig_account_transaction.__all__
     + mosaic_alias_transaction.__all__
     + mosaic_definition_transaction.__all__
     + mosaic_supply_change_transaction.__all__

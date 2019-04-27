@@ -25,6 +25,7 @@
 """
 
 from __future__ import annotations
+import typing
 
 from .multisig_cosignatory_modification_type import MultisigCosignatoryModificationType
 from ..account.public_account import PublicAccount
@@ -33,10 +34,12 @@ from ... import util
 
 __all__ = ['MultisigCosignatoryModification']
 
+ModificationType = MultisigCosignatoryModificationType
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MultisigCosignatoryModification(util.DTO):
+class MultisigCosignatoryModification(util.Model):
     """
     Multisig cosignatory modification.
 
@@ -44,8 +47,9 @@ class MultisigCosignatoryModification(util.DTO):
     :param cosignatory_public_account: Cosignatory public account.
     """
 
-    type: MultisigCosignatoryModificationType
+    type: ModificationType
     cosignatory_public_account: PublicAccount
+    CATBUFFER_SIZE: typing.ClassVar[int] = 33 * util.U8_BYTES
 
     def to_dto(
         self,
@@ -63,6 +67,24 @@ class MultisigCosignatoryModification(util.DTO):
         network_type: OptionalNetworkType = None,
     ):
         public_key = data['cosignatoryPublicKey']
-        type = MultisigCosignatoryModificationType.from_dto(data['type'], network_type)
+        type = ModificationType.from_dto(data['type'], network_type)
         public_account = PublicAccount.from_dto(public_key, network_type)
         return cls(type, public_account)
+
+    def to_catbuffer(
+        self,
+        network_type: OptionalNetworkType = None,
+    ) -> bytes:
+        type = self.type.to_catbuffer(network_type)
+        cosignatory = self.cosignatory_public_account.to_catbuffer(network_type)
+        return type + cosignatory
+
+    @classmethod
+    def from_catbuffer(
+        cls,
+        data: bytes,
+        network_type: OptionalNetworkType = None,
+    ):
+        type, data = ModificationType.from_catbuffer_pair(data, network_type)
+        cosignatory = PublicAccount.from_catbuffer(data, network_type)
+        return cls(type, cosignatory)

@@ -36,10 +36,10 @@ from tests import responses
             ]
         },
         {
-            'name': 'test_get_blocks_by_height_and_limit',
+            'name': 'test_get_blocks_by_height_with_limit',
             'response': responses.BLOCKS_INFO["Ok"],
             'params': [1, 1],
-            'method': 'get_blocks_by_height_and_limit',
+            'method': 'get_blocks_by_height_with_limit',
             'validation': [
                 lambda x: (len(x), 1),
                 lambda x: (x[0].hash, '04628F15E89936912DCA6345D60E668F513D50E7FC6BAF3F1C723C92CFC4FED6'),
@@ -88,10 +88,10 @@ from tests import responses
             ]
         },
         {
-            'name': 'test_get_diagnostic_blocks_by_height_and_limit',
+            'name': 'test_get_diagnostic_blocks_by_height_with_limit',
             'response': responses.DIAGNOSTIC_BLOCKS_INFO["Ok"],
             'params': [1, 5],
-            'method': 'get_diagnostic_blocks_by_height_and_limit',
+            'method': 'get_diagnostic_blocks_by_height_with_limit',
             'validation': [
                 lambda x: (len(x), 5),
                 lambda x: (x[0].hash, '22A2B807BF395CC9432DB4075B8A6D412EF7FD0892D266959D02D942C0F48576'),
