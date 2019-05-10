@@ -25,6 +25,7 @@
 import aiohttp
 import asyncio
 import collections
+from collections import abc
 import contextlib
 import copy
 import dataclasses
@@ -289,24 +290,42 @@ MODEL_TESTS = [
 def model_test_init(self):
     """Test if the model fields are properly set from the initializer."""
 
-    for name, value in self.data.items():
-        self.assertEqual(getattr(self.model, name), value)
+    if dataclasses.is_dataclass(self.type):
+        for name, value in self.data.items():
+            self.assertEqual(getattr(self.model, name), value)
+    elif issubclass(self.type, abc.Sequence):
+        self.assertEqual(tuple(self.data), tuple(self.model))
+    elif issubclass(self.type, abc.Mapping):
+        self.assertEqual(dict(self.data), dict(self.model))
+    else:
+        raise NotImplementedError
 
 
 def model_test_frozen(self):
     """Test the model's attributes are frozen."""
 
-    fields = [i.name for i in dataclasses.fields(self.model)]
-    for field in fields:
-        value = getattr(self.model, field)
-        with self.assertRaises(dataclasses.FrozenInstanceError):
-            setattr(self.model, field, value)
+    if dataclasses.is_dataclass(self.type):
+        fields = [i.name for i in dataclasses.fields(self.model)]
+        for field in fields:
+            value = getattr(self.model, field)
+            with self.assertRaises(dataclasses.FrozenInstanceError):
+                setattr(self.model, field, value)
+    elif issubclass(self.type, abc.Sequence):
+        for index, value in enumerate(self.model):
+            with self.assertRaises(TypeError):
+                self.model[index] = value
+    elif issubclass(self.type, abc.Mapping):
+        for key, value in self.model.items():
+            with self.assertRaises(TypeError):
+                self.model[key] = value
+    else:
+        raise NotImplementedError
 
 
 def model_test_slots(self):
     """Test if the model has slots, and therefore is efficiently stored."""
 
-    with self.assertRaises(TypeError):
+    with self.assertRaises((TypeError, AttributeError)):
         self.model.__dict__
 
 
@@ -331,11 +350,11 @@ def bitwise_not(value):
 def model_test_eq(self):
     """Test the model __eq__ method."""
 
-    def permute_list(data):
-        return [permute(i) for i in data]
+    def permute_sequence(data):
+        return type(data)([permute(i) for i in data])
 
-    def permute_dict(data):
-        return {k: permute(v) for k, v in data.items()}
+    def permute_mapping(data):
+        return type(data)([(k, permute(v)) for k, v in data.items()])
 
     def permute(value):
         # In bytes and strings, the first 2 values may be used as a
@@ -357,14 +376,14 @@ def model_test_eq(self):
             return value[:1] + value[-2::-1]
         elif isinstance(value, str):
             return value[:2] + value[-3::-1]
-        elif isinstance(value, list):
-            return permute_list(value)
-        elif isinstance(value, dict):
-            return permute_dict(value)
+        elif isinstance(value, abc.Sequence):
+            return permute_sequence(value)
+        elif isinstance(value, abc.Mapping):
+            return permute_mapping(value)
         elif dataclasses.is_dataclass(value):
             fields = get_argnames(value.__init__)[1:]
             asdict = {i: getattr(value, i) for i in fields}
-            return type(value)(**permute_dict(asdict))
+            return type(value)(**permute_mapping(asdict))
         return value
 
     m1 = copy.copy(self.model)
@@ -383,10 +402,17 @@ def model_test_repr(self):
     """Test the model __repr__ method."""
 
     name = type(self.model).__name__
-    fields = [i.name for i in dataclasses.fields(self.model)]
-    values = [getattr(self.model, i) for i in fields]
-    tupletype = collections.namedtuple(name, fields)
-    self.assertEqual(repr(tupletype(*values)), repr(self.model))
+    if dataclasses.is_dataclass(self.type):
+        fields = [i.name for i in dataclasses.fields(self.model)]
+        values = [getattr(self.model, i) for i in fields]
+        tupletype = collections.namedtuple(name, fields)
+        self.assertEqual(repr(tupletype(*values)), repr(self.model))
+    elif issubclass(self.type, abc.Sequence):
+        self.assertEqual(repr(self.model), f'{name}({repr(list(self.model))})')
+    elif issubclass(self.type, abc.Mapping):
+        self.assertEqual(repr(self.model), f'{name}({repr(dict(self.model))})')
+    else:
+        raise NotImplementedError
 
 
 def model_test_str(self):
@@ -413,22 +439,35 @@ def model_test_asdict(self):
     """Test the model asdict method."""
 
     asdict = self.model.asdict(recurse=False)
-    fields = [i.name for i in dataclasses.fields(self.model)]
-    self.assertIsInstance(asdict, dict)
-    self.assertEqual(len(asdict), len(fields))
-    for field in fields:
-        self.assertEqual(asdict[field], getattr(self.model, field))
+    if dataclasses.is_dataclass(self.type):
+        fields = [i.name for i in dataclasses.fields(self.model)]
+        self.assertIsInstance(asdict, dict)
+        self.assertEqual(len(asdict), len(fields))
+        for field in fields:
+            self.assertEqual(asdict[field], getattr(self.model, field))
+    elif issubclass(self.type, abc.Mapping):
+        for key, value in self.model.items():
+            self.assertEqual(asdict[key], value)
+    else:
+        raise NotImplementedError
 
 
 def model_test_astuple(self):
     """Test the model astuple method."""
 
     astuple = self.model.astuple(recurse=False)
-    fields = [i.name for i in dataclasses.fields(self.model)]
-    self.assertIsInstance(astuple, tuple)
-    self.assertEqual(len(astuple), len(fields))
-    for index, field in enumerate(fields):
-        self.assertEqual(astuple[index], getattr(self.model, field))
+    if dataclasses.is_dataclass(self.type):
+        fields = [i.name for i in dataclasses.fields(self.model)]
+        self.assertIsInstance(astuple, tuple)
+        self.assertEqual(len(astuple), len(fields))
+        for index, field in enumerate(fields):
+            self.assertEqual(astuple[index], getattr(self.model, field))
+    elif issubclass(self.type, abc.Mapping):
+        self.assertEqual(astuple, tuple(self.model.values()))
+    elif issubclass(self.type, abc.Sequence):
+        self.assertEqual(astuple, tuple(self.model))
+    else:
+        raise NotImplementedError
 
 
 def model_test_fields(self):
@@ -459,6 +498,9 @@ def model_test_catbuffer(self):
 
 def load_model(model_type, data):
     """Generate the model from the provided data."""
+
+    if issubclass(model_type, (abc.Sequence, abc.Mapping)):
+        return model_type(data)
     return model_type(**data)
 
 
@@ -802,7 +844,6 @@ def ignore_warnings_test(test):
 with contextlib.suppress(ImportError):
     # Check we can import all our dependencies and generate the decorators.
     from collections import deque
-    import datetime
     import logging
     import os.path
     import random

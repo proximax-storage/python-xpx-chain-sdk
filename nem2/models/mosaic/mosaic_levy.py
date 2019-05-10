@@ -22,16 +22,18 @@
     limitations under the License.
 """
 
+# type: ignore
+# flake8: noqa
 # TODO(ahuszagh) This is not yet implemented in Catapult. Subject to change
 # Any commented-out code is identical to the first version of NEM.
 
 from __future__ import annotations
 import typing
 
-#from .mosaic_id import MosaicId
-#from .mosaic_levy_type import MosaicLevyType
-#from ..account.address import Address
-#from ..blockchain.network_type import OptionalNetworkType
+# #from .mosaic_id import MosaicId
+# #from .mosaic_levy_type import MosaicLevyType
+# #from ..account.address import Address
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['MosaicLevy']
@@ -49,22 +51,22 @@ class MosaicLevy(util.DTO):
     :param fee: Fee amount for levy.
     """
 
-    #type: MosaicLevyType
-    #recipient: Address
-    #mosaic_id: MosaicId
-    #fee: int
+    # #type: MosaicLevyType
+    # #recipient: Address
+    # #mosaic_id: MosaicId
+    # #fee: int
 
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
         raise NotImplementedError
-        #return {
-        #    'type': self.type.to_dto(),
-        #    'recipient': self.recipient.to_dto(),
-        #    'mosaicId': self.mosaic_id.to_dto(),
-        #    'fee': self.fee
-        #}
+        # #return {
+        # #    'type': self.type.to_dto(),
+        # #    'recipient': self.recipient.to_dto(),
+        # #    'mosaicId': self.mosaic_id.to_dto(),
+        # #    'fee': self.fee
+        # #}
 
     @classmethod
     def from_dto(
@@ -73,12 +75,12 @@ class MosaicLevy(util.DTO):
         network_type: OptionalNetworkType = None,
     ):
         raise NotImplementedError
-        #return cls(
-        #    type=MosaicLevyType.from_dto(data['type']),
-        #    recipient=Address.from_dto(data['recipient']),
-        #    mosaic_id=MosaicId.from_dto(data['mosaicId']),
-        #    fee=data['fee'],
-        #)
+        # #return cls(
+        # #    type=MosaicLevyType.from_dto(data['type']),
+        # #    recipient=Address.from_dto(data['recipient']),
+        # #    mosaic_id=MosaicId.from_dto(data['mosaicId']),
+        # #    fee=data['fee'],
+        # #)
 
 
 OptionalMosaicLevyType = typing.Optional[MosaicLevy]

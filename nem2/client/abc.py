@@ -35,8 +35,9 @@ T = typing.TypeVar('T')
 MessageType = typing.Union[
     models.BlockInfo,
     models.CosignatureSignedTransaction,
+    models.Transaction,
     models.TransactionStatusError,
-    str
+    str,
 ]
 
 # HTTP
@@ -276,7 +277,7 @@ class AccountHTTP(HTTPSharedBase):
         :param address: Account address.
         :return: AccountPropertiesInfo object.
         """
-        return self(nis.get_account_property, addresses, **kwds)
+        return self(nis.get_account_property, address, **kwds)
 
     def get_account_properties(
         self,
@@ -345,7 +346,7 @@ class AccountHTTP(HTTPSharedBase):
 
     def outgoing_transactions(
         self,
-        public_account: models.PublicAccount
+        public_account: models.PublicAccount,
         **kwds
     ):
         """

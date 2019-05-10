@@ -35,7 +35,6 @@ from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic_id import MosaicId
-from ..mosaic.mosaic_nonce import MosaicNonce
 from ..mosaic.mosaic_supply_type import MosaicSupplyType
 from ... import util
 

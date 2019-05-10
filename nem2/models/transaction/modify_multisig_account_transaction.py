@@ -148,7 +148,10 @@ class ModifyMultisigAccountTransaction(Transaction):
         removal = util.u8_to_catbuffer(self.min_removal_delta)
         approval = util.u8_to_catbuffer(self.min_approval_delta)
         modifications_count = util.u8_to_catbuffer(len(self.modifications))
-        modifications = MultisigCosignatoryModification.sequence_to_catbuffer(self.modifications)
+        modifications = MultisigCosignatoryModification.sequence_to_catbuffer(
+            self.modifications,
+            network_type
+        )
 
         return removal + approval + modifications_count + modifications
 
@@ -159,6 +162,7 @@ class ModifyMultisigAccountTransaction(Transaction):
     ) -> bytes:
         """Load modify multisig account-specific data from catbuffer."""
 
+        from_catbuffer = MultisigCosignatoryModification.sequence_from_catbuffer_pair
         # uint8 min_removal_delta
         # uint8 min_approval_delta
         # uint8 modifications_count
@@ -168,11 +172,7 @@ class ModifyMultisigAccountTransaction(Transaction):
         approval = util.u8_from_catbuffer(data[1:2])
         modifications_count = util.u8_from_catbuffer(data[2:3])
         data = data[3:]
-        modifications, data = MultisigCosignatoryModification.sequence_from_catbuffer_pair(
-            data,
-            modifications_count,
-            network_type
-        )
+        modifications, data = from_catbuffer(data, modifications_count, network_type)
 
         self._set('min_removal_delta', removal)
         self._set('min_approval_delta', approval)
@@ -189,7 +189,10 @@ class ModifyMultisigAccountTransaction(Transaction):
         return {
             'minApprovalDelta': util.u8_to_dto(self.min_approval_delta),
             'minRemovalDelta': util.u8_to_dto(self.min_removal_delta),
-            'modifications': MultisigCosignatoryModification.sequence_to_dto(self.modifications, network_type),
+            'modifications': MultisigCosignatoryModification.sequence_to_dto(
+                self.modifications,
+                network_type
+            ),
         }
 
     def load_dto_specific(
@@ -199,7 +202,10 @@ class ModifyMultisigAccountTransaction(Transaction):
     ) -> None:
         approval = util.u8_from_dto(data['minApprovalDelta'])
         removal = util.u8_from_dto(data['minRemovalDelta'])
-        modifications = MultisigCosignatoryModification.sequence_from_dto(data.get('modifications', []), network_type),
+        modifications = MultisigCosignatoryModification.sequence_from_dto(
+            data.get('modifications', []),
+            network_type
+        )
 
         self._set('approval', approval)
         self._set('removal', removal)
@@ -207,7 +213,10 @@ class ModifyMultisigAccountTransaction(Transaction):
 
 
 @register_transaction('MODIFY_MULTISIG_ACCOUNT')
-class ModifyMultisigAccountInnerTransaction(InnerTransaction, ModifyMultisigAccountTransaction):
+class ModifyMultisigAccountInnerTransaction(
+    InnerTransaction,
+    ModifyMultisigAccountTransaction
+):
     """Embedded modify multisig account transaction."""
 
     __slots__ = ()

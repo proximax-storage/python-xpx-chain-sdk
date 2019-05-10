@@ -24,6 +24,7 @@
 
 from __future__ import annotations
 
+from .address import Address
 from .public_account import PublicAccount, PublicAccountList
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
@@ -85,6 +86,7 @@ class MultisigAccountInfo(util.DTO):
         return {
             'multisig': {
                 'account': self.account.public_key,
+                'accountAddress': self.account.address.to_dto(network_type),
                 'minApproval': util.u32_to_dto(self.min_approval),
                 'minRemoval': util.u32_to_dto(self.min_removal),
                 'cosignatories': cosignatories,
@@ -98,13 +100,17 @@ class MultisigAccountInfo(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        # Normalize the network type if it's not provided.
+        if network_type is None and 'accountAddress' in data:
+            network_type = Address(data['accountAddress']).network_type
         assert network_type is not None
 
         multisig = data['multisig']
-        cosignatories = [PublicAccount.create_from_public_key(i, network_type) for i in multisig['cosignatories']]
-        multisig_accounts = [PublicAccount.create_from_public_key(i, network_type) for i in multisig['multisigAccounts']]
+        create_account = lambda x: PublicAccount.create_from_public_key(x, network_type)
+        cosignatories = [create_account(i) for i in multisig['cosignatories']]
+        multisig_accounts = [create_account(i) for i in multisig['multisigAccounts']]
         return cls(
-            account=PublicAccount.create_from_public_key(multisig['account'], network_type),
+            account=create_account(multisig['account']),
             min_approval=util.u32_from_dto(multisig['minApproval']),
             min_removal=util.u32_from_dto(multisig['minRemoval']),
             cosignatories=cosignatories,

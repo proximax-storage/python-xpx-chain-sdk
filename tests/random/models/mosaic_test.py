@@ -114,7 +114,7 @@ class TestMosaicProperties(harness.TestCase):
         self.assertEqual(properties, models.MosaicProperties.from_dto(properties.to_dto()))
         self.assertEqual(properties, models.MosaicProperties.from_catbuffer(properties.to_catbuffer()))
 
-    @harness.randomize(divisibility={'min_value': 7, 'max_value': 1<<31})
+    @harness.randomize(divisibility={'min_value': 7, 'max_value': 1 << 31})
     def test_invalid_divisibility(self, divisibility: int):
         with self.assertRaises(ValueError):
             models.MosaicProperties.create(divisibility=divisibility)

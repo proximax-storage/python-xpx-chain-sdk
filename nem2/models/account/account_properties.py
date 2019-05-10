@@ -27,6 +27,7 @@ import typing
 
 from .account_property import AccountProperty
 from .address import Address
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['AccountProperties']
@@ -61,8 +62,9 @@ class AccountProperties(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        properties = data.get('properties', [])
         return cls(
             # TODO(ahuszagh) Check when stabilized
             address=Address.from_dto(data['address'], network_type),
-            properties=AccountProperty.sequence_from_dto(data.get('properties', []), network_type),
+            properties=AccountProperty.sequence_from_dto(properties, network_type),
         )

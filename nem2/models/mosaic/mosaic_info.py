@@ -25,8 +25,7 @@
 from __future__ import annotations
 
 from .mosaic_id import MosaicId
-from .mosaic_levy import OptionalMosaicLevyType
-from .mosaic_nonce import MosaicNonce
+from .mosaic_levy import MosaicLevy, OptionalMosaicLevyType
 from .mosaic_properties import MosaicProperties
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import OptionalNetworkType
@@ -92,15 +91,15 @@ class MosaicInfo(util.DTO):
             'meta': {
                 'id': self.meta_id,
             },
-             'mosaic': {
-                 'mosaicId': self.mosaic_id.to_dto(),
-                 'supply': util.u64_to_dto(self.supply),
-                 'height': util.u64_to_dto(self.height),
-                 'owner': self.owner.to_dto(network_type),
-                 'revision': util.u32_to_dto(self.revision),
-                 'properties': self.properties.to_dto(),
-                 'levy': {},
-             },
+            'mosaic': {
+                'mosaicId': self.mosaic_id.to_dto(),
+                'supply': util.u64_to_dto(self.supply),
+                'height': util.u64_to_dto(self.height),
+                'owner': self.owner.to_dto(network_type),
+                'revision': util.u32_to_dto(self.revision),
+                'properties': self.properties.to_dto(),
+                'levy': {},
+            },
         }
 
     @classmethod

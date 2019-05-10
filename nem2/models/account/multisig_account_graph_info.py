@@ -23,6 +23,8 @@
 """
 
 from __future__ import annotations
+from collections import abc
+import copy
 import typing
 
 from .multisig_account_info import MultisigAccountInfo
@@ -34,11 +36,14 @@ __all__ = ['MultisigAccountGraphInfo']
 Key = int
 Value = typing.Sequence[MultisigAccountInfo]
 OptionalValue = typing.Optional[Value]
-GraphType = typing.Dict[int, Value]
+DictType = typing.Dict[int, Value]
+TupleType = typing.Sequence[Value]
+DictFactory = typing.Callable[..., DictType]
+TupleFactory = typing.Callable[..., TupleType]
 
 
 @util.inherit_doc
-class MultisigAccountGraphInfo(util.DTO):
+class MultisigAccountGraphInfo(util.DTO, abc.Mapping):
     """
     Graph info for multi-sig accounts.
 
@@ -46,62 +51,86 @@ class MultisigAccountGraphInfo(util.DTO):
     :param \\**kwds: (Optional) keyword arguments to initialize mapping.
     """
 
-    _multisig_accounts: GraphType
+    _multisig_accounts: DictType
+    __slots__ = ('_multisig_accounts',)
+
+    # DATACLASS-LIKE
 
     def __init__(self, *args) -> None:
         self._multisig_accounts = dict(*args)
 
-    @property
-    def multisig_accounts(self) -> GraphType:
-        return self._multisig_accounts
+    def __repr__(self) -> str:
+        return f'MultisigAccountGraphInfo({self._multisig_accounts})'
 
-    def __contains__(self, key: Key) -> bool:
-        return key in self.multisig_accounts
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, MultisigAccountGraphInfo):
+            return False
+        return self._multisig_accounts == other._multisig_accounts
 
-    def __getitem__(self, key: Key) -> Value:
-        return self.multisig_accounts[key]
+    def __hash__(self) -> int:
+        return hash(tuple(self.items()))
 
-    def __setitem__(self, key: Key, accounts: Value) -> None:
-        self.multisig_accounts[key] = accounts
+    def __copy__(self) -> MultisigAccountGraphInfo:
+        return self.copy()
 
-    def __delitem__(self, key: Key) -> None:
-        del self.multisig_accounts[key]
+    def __deepcopy__(self, memo=None) -> MultisigAccountGraphInfo:
+        data = copy.deepcopy(self._multisig_accounts, memo)
+        return MultisigAccountGraphInfo(data)
 
-    def __iter__(self) -> typing.Iterator[Key]:
-        return iter(self.multisig_accounts)
+    def asdict(
+        self,
+        recurse: bool = True,
+        dict_factory: DictFactory = dict,
+    ) -> DictType:
+        if not recurse:
+            return dict_factory(self.items())
 
-    def __len__(self) -> Key:
-        return len(self.multisig_accounts)
+        asdict = lambda x: x.asdict(recurse=True, dict_factory=dict_factory)
+        return dict_factory([(k, [asdict(i) for i in v]) for k, v in self.items()])
 
-    def clear(self) -> None:
-        self.multisig_accounts.clear()
+    def astuple(
+        self,
+        recurse: bool = True,
+        tuple_factory: TupleFactory = tuple,
+    ) -> TupleType:
+        if not recurse:
+            return tuple_factory(self.values())
+
+        astuple = lambda x: x.astuple(recurse=True, tuple_factory=tuple_factory)
+        return tuple_factory([[astuple(j) for j in i] for i in self.values()])
+
+    # MAPPING
+
+    def __contains__(self, key: Key) -> bool:   # type: ignore
+        return key in self._multisig_accounts
+
+    def __getitem__(self, key: Key) -> Value:   # type: ignore
+        return self._multisig_accounts[key]
+
+    def __iter__(self) -> typing.Iterator[Key]: # type: ignore
+        return iter(self._multisig_accounts)
+
+    def __len__(self) -> int:                   # type: ignore
+        return len(self._multisig_accounts)
 
     def copy(self) -> MultisigAccountGraphInfo:
-        return MultisigAccountGraphInfo(self.multisig_accounts)
+        return MultisigAccountGraphInfo(self._multisig_accounts)
 
-    def get(self, key: Key, default: OptionalValue = None) -> OptionalValue:
-        return self.multisig_accounts.get(key, default)
+    def get(                                    # type: ignore
+        self,
+        key: Key,
+        default: OptionalValue = None
+    ) -> OptionalValue:
+        return self._multisig_accounts.get(key, default)
 
     def items(self) -> typing.ItemsView[Key, Value]:
-        return self.multisig_accounts.items()
+        return self._multisig_accounts.items()
 
     def keys(self) -> typing.KeysView[Key]:
-        return self.multisig_accounts.keys()
+        return self._multisig_accounts.keys()
 
     def values(self) -> typing.ValuesView[Value]:
-        return self.multisig_accounts.values()
-
-    def pop(self, key: Key, *args: Value):
-        return self.multisig_accounts.pop(key, *args)
-
-    def popitem(self) -> typing.Tuple[Key, Value]:
-        return self.multisig_accounts.popitem()
-
-    def setdefault(self, key: Key, default: OptionalValue = None) -> OptionalValue:
-        return self.multisig_accounts.setdefault(key, default)
-
-    def update(self, *args, **kwds):
-        return self.multisig_accounts.update(*args, **kwds)
+        return self._multisig_accounts.values()
 
     def to_dto(
         self,
@@ -119,10 +148,10 @@ class MultisigAccountGraphInfo(util.DTO):
         data: list,
         network_type: OptionalNetworkType = None,
     ):
-        inst = cls()
+        graph = {}
         for item in data:
             key = item['level']
             entries = item['multisigEntries']
             value = MultisigAccountInfo.sequence_from_dto(entries, network_type)
-            inst[key] = value
-        return inst
+            graph[key] = value
+        return cls(graph)

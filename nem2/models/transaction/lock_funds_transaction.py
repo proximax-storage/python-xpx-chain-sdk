@@ -37,6 +37,7 @@ from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic import Mosaic
 from ..mosaic.mosaic_id import MosaicId
+from ..namespace.namespace_id import NamespaceId
 from ... import util
 
 __all__ = [
@@ -133,7 +134,7 @@ class LockFundsTransaction(Transaction):
         return self.signed_transaction.hash
 
     @property
-    def mosaic_id(self) -> MosaicId:
+    def mosaic_id(self) -> typing.Union[MosaicId, NamespaceId]:
         """Get mosaic ID from mosaic."""
         return self.mosaic.id
 
@@ -178,7 +179,7 @@ class LockFundsTransaction(Transaction):
         duration = util.u64_from_catbuffer(data[:util.U64_BYTES])
         data = data[util.U64_BYTES:]
         hash = data[:util.U8_BYTES * 32]
-        data = data[U8_BYTES * 32:]
+        data = data[util.U8_BYTES * 32:]
         signed_transaction = SignedTransaction.create_from_announced(
             hash,
             TransactionType.AGGREGATE_BONDED,

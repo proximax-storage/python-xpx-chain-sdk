@@ -27,6 +27,7 @@ import typing
 
 from .aggregate_transaction import AggregateTransaction
 from .cosignature_signed_transaction import CosignatureSignedTransaction
+from .transaction_info import TransactionInfo
 from ..account.account import Account
 from ... import util
 
@@ -60,7 +61,6 @@ class CosignatureTransaction(util.Object):
 
         :param account: Account to sign with.
         """
-
         return cls(transaction)
 
     def sign_with(self, account: Account) -> CosignatureSignedTransaction:
@@ -70,7 +70,10 @@ class CosignatureTransaction(util.Object):
         :param account: Account to sign with.
         """
 
-        parent_hash = self.transaction.transaction_info.hash
+        transaction_info = self.transaction.transaction_info
+        if transaction_info is None:
+            raise ValueError('Transaction info not present.')
+        parent_hash = typing.cast(TransactionInfo, transaction_info).hash
         if parent_hash is None:
             raise ValueError('Transaction info to cosign has no hash.')
 

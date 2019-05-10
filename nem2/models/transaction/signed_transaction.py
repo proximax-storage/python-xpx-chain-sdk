@@ -31,6 +31,10 @@ from ... import util
 
 __all__ = ['SignedTransaction']
 
+AnyStr1 = typing.TypeVar('AnyStr1', bytes, str)
+AnyStr2 = typing.TypeVar('AnyStr2', bytes, str)
+AnyStr3 = typing.TypeVar('AnyStr3', bytes, str)
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -53,9 +57,9 @@ class SignedTransaction(util.Object):
 
     def __init__(
         self,
-        payload: typing.AnyStr,
-        hash: typing.AnyStr,
-        signer: typing.AnyStr,
+        payload: AnyStr1,
+        hash: AnyStr2,
+        signer: AnyStr3,
         type: TransactionType,
         network_type: NetworkType,
     ) -> None:
@@ -75,7 +79,7 @@ class SignedTransaction(util.Object):
     @classmethod
     def create_from_announced(
         cls,
-        hash: str,
+        hash: typing.AnyStr,
         type: TransactionType,
         network_type: NetworkType,
     ):

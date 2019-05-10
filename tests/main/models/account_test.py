@@ -108,23 +108,23 @@ class TestAccountInfo(harness.TestCase):
 
 
 class TestAccountMetadata(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement...
+    pass    # TODO(ahuszagh) Implement when stabilized...
 
 
 class TestAccountProperty(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement...
+    pass    # TODO(ahuszagh) Implement when stabilized...
 
 
 class TestAccountProperties(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement...
+    pass    # TODO(ahuszagh) Implement when stabilized...
 
 
 class TestAccountPropertiesInfo(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement...
+    pass    # TODO(ahuszagh) Implement when stabilized...
 
 
 class TestAccountPropertiesMetadata(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement...
+    pass    # TODO(ahuszagh) Implement when stabilized...
 
 
 @harness.model_test_case({
@@ -190,18 +190,164 @@ class TestAddress(harness.TestCase):
             self.type.create_from_public_key('', self.network_type)
 
 
+@harness.model_test_case({
+    'type': models.MultisigAccountGraphInfo,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    # Not a dataclass, has no fields or replace methods.
+    'fields': False,
+    'replace': False,
+    'data': {
+        0: [
+            models.MultisigAccountInfo(
+                account=models.PublicAccount(
+                    address=models.Address(address='SA2AK4GEVSAX4NNG7KH4EGIXWNHMGEMWU7JT4RU5'),
+                    public_key='9b1d7f4f4c2a0471edbc78f95de54b6e432887fc0c6e4ceca800089dae2a4044'
+                ),
+                min_approval=2,
+                min_removal=2,
+                cosignatories=[
+                    models.PublicAccount(
+                        address=models.Address(address='SD5M23VRSNS3AI3NPFUFCIQQTQW2G4L5BLDLMLAJ'),
+                        public_key='6cb4caaacca7081c9e1471df8f6512abc99feb86efee7862ed7259397c5fdbdd'
+                    ),
+                    models.PublicAccount(
+                        address=models.Address(address='SBI7LMDC7Y4TDMU3BFNLR7KC7TBACCXBUZ6ZAO6F'),
+                        public_key='c5c55181284607954e56cd46de85f4f3ef4cc713cc2b95000fa741998558d268'
+                    ),
+                    models.PublicAccount(
+                        address=models.Address(address='SCSVO5XVNM4AICUEYXMUNEQSW5RUNUOVDLYHBCFM'),
+                        public_key='cae725538ebebf7778257a442b4a48e116636580ed630ad5cb8d668dff52a1a7'
+                    ),
+                ],
+                multisig_accounts=[],
+            ),
+        ],
+    },
+    'dto': [
+        {
+            'level': 0,
+            'multisigEntries': [
+                {
+                    'multisig': {
+                        'account': '9b1d7f4f4c2a0471edbc78f95de54b6e432887fc0c6e4ceca800089dae2a4044',
+                        'accountAddress': '90340570c4ac817e35a6fa8fc21917b34ec31196a7d33e469d',
+                        'minApproval': 2,
+                        'minRemoval': 2,
+                        'cosignatories': [
+                            '6cb4caaacca7081c9e1471df8f6512abc99feb86efee7862ed7259397c5fdbdd',
+                            'c5c55181284607954e56cd46de85f4f3ef4cc713cc2b95000fa741998558d268',
+                            'cae725538ebebf7778257a442b4a48e116636580ed630ad5cb8d668dff52a1a7'
+                        ],
+                        'multisigAccounts': []
+                    },
+                },
+            ],
+        },
+    ],
+})
 class TestMultisigAccountGraphInfo(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement...
+    pass
 
 
+@harness.model_test_case({
+    'type': models.MultisigAccountInfo,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'account': models.PublicAccount.create_from_public_key('9b1d7f4f4c2a0471edbc78f95de54b6e432887fc0c6e4ceca800089dae2a4044', models.NetworkType.MIJIN_TEST),
+        'min_approval': 2,
+        'min_removal': 2,
+        'cosignatories': [
+            models.PublicAccount.create_from_public_key('6cb4caaacca7081c9e1471df8f6512abc99feb86efee7862ed7259397c5fdbdd', models.NetworkType.MIJIN_TEST),
+            models.PublicAccount.create_from_public_key('c5c55181284607954e56cd46de85f4f3ef4cc713cc2b95000fa741998558d268', models.NetworkType.MIJIN_TEST),
+            models.PublicAccount.create_from_public_key('cae725538ebebf7778257a442b4a48e116636580ed630ad5cb8d668dff52a1a7', models.NetworkType.MIJIN_TEST),
+        ],
+        'multisig_accounts': [],
+    },
+    'dto': {
+        'multisig': {
+            'account': '9b1d7f4f4c2a0471edbc78f95de54b6e432887fc0c6e4ceca800089dae2a4044',
+            'accountAddress': '90340570c4ac817e35a6fa8fc21917b34ec31196a7d33e469d',
+            'minApproval': 2,
+            'minRemoval': 2,
+            'cosignatories': [
+                '6cb4caaacca7081c9e1471df8f6512abc99feb86efee7862ed7259397c5fdbdd',
+                'c5c55181284607954e56cd46de85f4f3ef4cc713cc2b95000fa741998558d268',
+                'cae725538ebebf7778257a442b4a48e116636580ed630ad5cb8d668dff52a1a7'
+            ],
+            'multisigAccounts': [],
+        },
+    },
+})
 class TestMultisigAccountInfo(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement...
-    # Now supports DTO, must include that.
+
+    def test_is_multisig(self):
+        self.assertTrue(self.model.is_multisig())
+
+    def test_has_cosigner(self):
+        for account in self.data['cosignatories']:
+            self.assertTrue(self.model.has_cosigner(account))
+        for account in self.data['multisig_accounts']:
+            self.assertFalse(self.model.has_cosigner(account))
+        self.assertFalse(self.model.has_cosigner(self.model.account))
+
+    def test_is_cosigner_of_multisig_account(self):
+        for account in self.data['cosignatories']:
+            self.assertFalse(self.model.is_cosigner_of_multisig_account(account))
+        for account in self.data['multisig_accounts']:
+            self.assertTrue(self.model.is_cosigner_of_multisig_account(account))
+        self.assertFalse(self.model.is_cosigner_of_multisig_account(self.model.account))
 
 
+@harness.enum_test_case({
+    'type': models.PropertyType,
+    'enums': [
+        models.PropertyType.ALLOW_ADDRESS,
+        models.PropertyType.ALLOW_MOSAIC,
+        models.PropertyType.ALLOW_TRANSACTION,
+        models.PropertyType.SENTINEL,
+        models.PropertyType.BLOCK_ADDRESS,
+        models.PropertyType.BLOCK_MOSAIC,
+        models.PropertyType.BLOCK_TRANSACTION,
+    ],
+    'values': [
+        0x01,
+        0x02,
+        0x04,
+        0x05,
+        0x81,
+        0x82,
+        0x84,
+    ],
+    'descriptions': [
+        "The property type is an address.",
+        "The property type is a mosaic id.",
+        "The property type is a transaction type.",
+        "Property type sentinel.",
+        "The property type is a blocking address operation.",
+        "The property type is a blocking mosaic id operation.",
+        "The property type is a blocking transaction type operation.",
+    ],
+    'dto': [
+        0x01,
+        0x02,
+        0x04,
+        0x05,
+        0x81,
+        0x82,
+        0x84,
+    ],
+    'catbuffer': [
+        b'\x01',
+        b'\x02',
+        b'\x04',
+        b'\x05',
+        b'\x81',
+        b'\x82',
+        b'\x84',
+    ],
+})
 class TestPropertyType(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement...
-    # Now supports DTO/catbuffer, must include that.
+    pass
 
 
 @harness.model_test_case({

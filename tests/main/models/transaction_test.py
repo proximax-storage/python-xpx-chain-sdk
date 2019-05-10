@@ -320,7 +320,6 @@ class TestMessageType(harness.TestCase):
     pass
 
 
-
 # TODO(ahuszagh) Implement...
 class TestModifyMultisigAccountTransaction(harness.TestCase):
     pass

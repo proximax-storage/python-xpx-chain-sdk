@@ -26,6 +26,7 @@ from __future__ import annotations
 import typing
 
 from .property_type import PropertyType
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['AccountProperty']
@@ -51,7 +52,7 @@ class AccountProperty(util.DTO):
         return {
             # TODO(ahuszagh) Check when stabilized
             'propertyType': self.property_type.to_dto(network_type),
-            'values': values,
+            'values': self.values,
         }
 
     @classmethod

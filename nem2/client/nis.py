@@ -33,7 +33,6 @@ from .. import util
 from .. import models
 
 OptionalNetworkType = typing.Optional[models.NetworkType]
-TransactionType = typing.TypeVar('TransactionType', bound=models.Transaction)
 
 # BOILERPLATE
 # -----------
@@ -43,12 +42,13 @@ def synchronous_request(name, doc="", raise_for_status=True):
     """Generate wrappers for a synchronous request."""
 
     def f(client, network_type, *args, **kwds):
-        response = REQUEST[name](client, *args, **kwds)
+        request, process = CLIENT_CB[name]
+        response = request(client, *args, **kwds)
         if raise_for_status:
             response.raise_for_status()
         status = response.status_code
         json = response.json()
-        return PROCESS[name](status, json, network_type)
+        return process(status, json, network_type)
 
     f.__name__ = name
     f.__doc__ = doc
@@ -63,13 +63,14 @@ def asynchronous_request(name, doc="", raise_for_status=True):
     async def f(client, network_awaitable, *args, **kwds):
         # Await the network type so if an exception is thrown, we
         # don't forget to await the awaitable.
+        request, process = CLIENT_CB[name]
         network_type = await network_awaitable
-        async with REQUEST[name](client, *args, **kwds) as response:
+        async with request(client, *args, **kwds) as response:
             if raise_for_status:
                 response.raise_for_status()
             status = response.status
             json = await response.json()
-            return PROCESS[name](status, json, network_type)
+            return process(status, json, network_type)
 
     f.__name__ = f"async_{name}"
     f.__doc__ = doc
@@ -102,7 +103,9 @@ def request_get_account_info(
     :param address: Account address.
     :param timeout: (Optional) timeout for request (in seconds).
     """
-    return client.get(f"/account/{address.address}", **kwds)
+
+    url = f"/account/{address.address}"
+    return client.get(url, **kwds)
 
 
 def process_get_account_info(
@@ -138,8 +141,9 @@ def request_get_accounts_info(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
+    url = f"/account"
     json = {"addresses": [i.address for i in addresses]}
-    return client.post(f"/account", json=json, **kwds)
+    return client.post(url, json=json, **kwds)
 
 
 def process_get_accounts_info(
@@ -174,14 +178,16 @@ def request_get_account_property(
     :param address: Account address.
     :param timeout: (Optional) timeout for request (in seconds).
     """
-    return client.get(f"/account/properties/{address.address}", **kwds)
+
+    url = f"/account/properties/{address.address}"
+    return client.get(url, **kwds)
 
 
 def process_get_account_property(
     status: int,
     json: dict,
     network_type: models.NetworkType,
-) -> AccountPropertiesInfo:
+) -> models.AccountPropertiesInfo:
     """
     Process the "/account/properties/{address}" HTTP response.
 
@@ -210,15 +216,16 @@ def request_get_account_properties(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
+    url = f"/account/properties"
     json = {"addresses": [i.address for i in addresses]}
-    return client.post(f"/account/properties", json=json, **kwds)
+    return client.post(url, json=json, **kwds)
 
 
 def process_get_account_properties(
     status: int,
     json: dict,
     network_type: models.NetworkType,
-) -> AccountPropertiesInfo:
+) -> models.AccountPropertiesInfo:
     """
     Process the "/account/properties" HTTP response.
 
@@ -247,7 +254,8 @@ def request_get_multisig_account_info(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/account/{address.address}/multisig", **kwds)
+    url = f"/account/{address.address}/multisig"
+    return client.get(url, **kwds)
 
 
 def process_get_multisig_account_info(
@@ -283,12 +291,13 @@ def request_get_multisig_account_graph_info(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/account/{address.address}/multisig/graph", **kwds)
+    url = f"/account/{address.address}/multisig/graph"
+    return client.get(url, **kwds)
 
 
 def process_get_multisig_account_graph_info(
     status: int,
-    json: dict,
+    json: list,
     network_type: models.NetworkType,
 ) -> models.MultisigAccountInfo:
     """
@@ -319,14 +328,15 @@ def request_get_account_transactions(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/account/{public_account.public_key}/transactions", **kwds)
+    url = f"/account/{public_account.public_key}/transactions"
+    return client.get(url, **kwds)
 
 
 def process_get_account_transactions(
     status: int,
     json: list,
     network_type: models.NetworkType,
-) -> typing.Sequence[TransactionType]:
+) -> typing.Sequence[models.Transaction]:
     """
     Process the "/account/{public_key}/transactions" HTTP response.
 
@@ -355,14 +365,15 @@ def request_get_account_incoming_transactions(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/account/{public_account.public_key}/transactions/incoming", **kwds)
+    url = f"/account/{public_account.public_key}/transactions/incoming"
+    return client.get(url, **kwds)
 
 
 def process_get_account_incoming_transactions(
     status: int,
     json: list,
     network_type: models.NetworkType,
-) -> typing.Sequence[TransactionType]:
+) -> typing.Sequence[models.Transaction]:
     """
     Process the "/account/{public_key}/transactions/incoming" HTTP response.
 
@@ -391,14 +402,15 @@ def request_get_account_outgoing_transactions(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/account/{public_account.public_key}/transactions/outgoing", **kwds)
+    url = f"/account/{public_account.public_key}/transactions/outgoing"
+    return client.get(url, **kwds)
 
 
 def process_get_account_outgoing_transactions(
     status: int,
     json: list,
     network_type: models.NetworkType,
-) -> typing.Sequence[TransactionType]:
+) -> typing.Sequence[models.Transaction]:
     """
     Process the "/account/{public_key}/transactions/outgoing" HTTP response.
 
@@ -427,14 +439,15 @@ def request_get_account_unconfirmed_transactions(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/account/{public_account.public_key}/transactions/unconfirmed", **kwds)
+    url = f"/account/{public_account.public_key}/transactions/unconfirmed"
+    return client.get(url, **kwds)
 
 
 def process_get_account_unconfirmed_transactions(
     status: int,
     json: list,
     network_type: models.NetworkType,
-) -> typing.Sequence[TransactionType]:
+) -> typing.Sequence[models.Transaction]:
     """
     Process the "/account/{public_key}/transactions/unconfirmed" HTTP response.
 
@@ -463,14 +476,15 @@ def request_get_account_partial_transactions(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/account/{public_account.public_key}/transactions/partial", **kwds)
+    url = f"/account/{public_account.public_key}/transactions/partial"
+    return client.get(url, **kwds)
 
 
 def process_get_account_partial_transactions(
     status: int,
     json: list,
     network_type: models.NetworkType,
-) -> typing.Sequence[TransactionType]:
+) -> typing.Sequence[models.Transaction]:
     """
     Process the "/account/{public_key}/transactions/partial" HTTP response.
 
@@ -502,7 +516,8 @@ def request_get_block_by_height(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/block/{height}", **kwds)
+    url = f"/block/{height}"
+    return client.get(url, **kwds)
 
 
 def process_get_block_by_height(
@@ -540,7 +555,8 @@ def request_get_blocks_by_height_with_limit(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/blocks/{height}/limit/{limit}", **kwds)
+    url = f"/blocks/{height}/limit/{limit}"
+    return client.get(url, **kwds)
 
 
 def process_get_blocks_by_height_with_limit(
@@ -576,14 +592,15 @@ def request_get_block_transactions(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/blocks/{height}/transactions", **kwds)
+    url = f"/blocks/{height}/transactions"
+    return client.get(url, **kwds)
 
 
 def process_get_block_transactions(
     status: int,
     json: list,
     network_type: models.NetworkType,
-) -> typing.Sequence[TransactionType]:
+) -> typing.Sequence[models.Transaction]:
     """
     Process the "/blocks/{height}/transactions" HTTP response.
 
@@ -607,7 +624,8 @@ def request_get_blockchain_height(client: client.Client, **kwds):
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get("/chain/height", **kwds)
+    url = "/chain/height"
+    return client.get(url, **kwds)
 
 
 def process_get_blockchain_height(
@@ -637,7 +655,8 @@ def request_get_blockchain_score(client: client.Client, **kwds):
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get("/chain/score", **kwds)
+    url = "/chain/score"
+    return client.get(url, **kwds)
 
 
 def process_get_blockchain_score(
@@ -674,7 +693,8 @@ def request_get_diagnostic_blocks_by_height_with_limit(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/diagnostic/blocks/{height}/limit/{limit}", **kwds)
+    url = f"/diagnostic/blocks/{height}/limit/{limit}"
+    return client.get(url, **kwds)
 
 
 def process_get_diagnostic_blocks_by_height_with_limit(
@@ -694,7 +714,9 @@ def process_get_diagnostic_blocks_by_height_with_limit(
     return [models.BlockInfo.from_dto(i, network_type) for i in json]
 
 
-get_diagnostic_blocks_by_height_with_limit = request("get_diagnostic_blocks_by_height_with_limit")
+get_diagnostic_blocks_by_height_with_limit = request(
+    "get_diagnostic_blocks_by_height_with_limit"
+)
 
 
 def request_get_diagnostic_storage(client: client.Client, **kwds):
@@ -705,7 +727,8 @@ def request_get_diagnostic_storage(client: client.Client, **kwds):
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get("/diagnostic/storage", **kwds)
+    url = "/diagnostic/storage"
+    return client.get(url, **kwds)
 
 
 def process_get_diagnostic_storage(
@@ -743,12 +766,13 @@ def request_get_mosaic(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/mosaic/{id:x}", **kwds)
+    url = f"/mosaic/{id:x}"
+    return client.get(url, **kwds)
 
 
 def process_get_mosaic(
     status: int,
-    json: list,
+    json: dict,
     network_type: models.NetworkType,
 ) -> typing.Sequence[models.MosaicName]:
     """
@@ -778,8 +802,9 @@ def request_get_mosaics(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
+    url = "/mosaic"
     json = {"mosaicIds": [f"{i:x}" for i in ids]}
-    return client.post("/mosaic", json=json, **kwds)
+    return client.post(url, json=json, **kwds)
 
 
 def process_get_mosaics(
@@ -814,8 +839,9 @@ def request_get_mosaic_names(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
+    url = "/mosaic/names"
     json = {"mosaicIds": [f"{i:x}" for i in ids]}
-    return client.post("/mosaic/names", json=json, **kwds)
+    return client.post(url, json=json, **kwds)
 
 
 def process_get_mosaic_names(
@@ -853,7 +879,8 @@ def request_get_namespace(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/namespace/{namespace_id:x}", **kwds)
+    url = f"/namespace/{namespace_id:x}"
+    return client.get(url, **kwds)
 
 
 def process_get_namespace(
@@ -888,8 +915,9 @@ def request_get_namespaces_name(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
+    url = "/namespace/names"
     json = {"namespaceIds": [f"{i:x}" for i in ids]}
-    return client.post("/namespace/names", json=json, **kwds)
+    return client.post(url, json=json, **kwds)
 
 
 def process_get_namespaces_name(
@@ -924,7 +952,8 @@ def request_get_namespaces_from_account(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/account/{address.address}/namespaces", **kwds)
+    url = f"/account/{address.address}/namespaces"
+    return client.get(url, **kwds)
 
 
 def process_get_namespaces_from_account(
@@ -959,8 +988,9 @@ def request_get_namespaces_from_accounts(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
+    url = "/account/namespaces"
     json = {"addresses": [i.address for i in addresses]}
-    return client.post("/account/namespaces", json=json, **kwds)
+    return client.post(url, json=json, **kwds)
 
 
 def process_get_namespaces_from_accounts(
@@ -1072,7 +1102,8 @@ def request_get_network_type(client: client.Client, **kwds):
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get("/network", **kwds)
+    url = "/network"
+    return client.get(url, **kwds)
 
 
 def process_get_network_type(
@@ -1106,7 +1137,8 @@ def request_get_transaction(client: client.Client, hash: str, **kwds):
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/transaction/{hash}", **kwds)
+    url = f"/transaction/{hash}"
+    return client.get(url, **kwds)
 
 
 def process_get_transaction(
@@ -1141,7 +1173,8 @@ def request_get_transactions(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/transaction/{hash}", **kwds)
+    url = f"/transaction/{hash}"
+    return client.get(url, **kwds)
 
 
 def process_get_transactions(
@@ -1176,7 +1209,8 @@ def request_get_transaction_status(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    return client.get(f"/transaction/{hash}/status", **kwds)
+    url = f"/transaction/{hash}/status"
+    return client.get(url, **kwds)
 
 
 def process_get_transaction_status(
@@ -1211,8 +1245,9 @@ def request_get_transaction_statuses(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
+    url = f"/transaction/statuses"
     json = {'hashes': list(hashes)}
-    return client.post(f"/transaction/statuses", json=json, **kwds)
+    return client.post(url, json=json, **kwds)
 
 
 def process_get_transaction_statuses(
@@ -1247,8 +1282,9 @@ def request_announce(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
+    url = f"/transaction"
     json = {'payload': transaction.payload}
-    return client.put(f"/transaction", json=json, **kwds)
+    return client.put(url, json=json, **kwds)
 
 
 def process_announce(
@@ -1283,9 +1319,10 @@ def request_announce_sync(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
+    url = f"/transaction/sync"
     sync = models.SyncAnnounce.create(transaction)
     json = sync.to_dto()
-    return client.post(f"/transaction/sync", json=json, **kwds)
+    return client.post(url, json=json, **kwds)
 
 
 def process_announce_sync(
@@ -1313,98 +1350,152 @@ announce_sync = request("announce_sync")
 # FORWARDERS
 # ----------
 
-REQUEST = {
+CLIENT_CB = {
     # ACCOUNT
-    'get_account_info': request_get_account_info,
-    'get_accounts_info': request_get_accounts_info,
-    'get_account_property': request_get_account_property,
-    'get_account_properties': request_get_account_properties,
-    'get_multisig_account_info': request_get_multisig_account_info,
-    'get_multisig_account_graph_info': request_get_multisig_account_graph_info,
-    'get_account_transactions': request_get_account_transactions,
-    'get_account_incoming_transactions': request_get_account_incoming_transactions,
-    'get_account_outgoing_transactions': request_get_account_outgoing_transactions,
-    'get_account_unconfirmed_transactions': request_get_account_unconfirmed_transactions,
-    'get_account_partial_transactions': request_get_account_partial_transactions,
+    'get_account_info': (
+        request_get_account_info,
+        process_get_account_info,
+    ),
+    'get_accounts_info': (
+        request_get_accounts_info,
+        process_get_accounts_info,
+    ),
+    'get_account_property': (
+        request_get_account_property,
+        process_get_account_property,
+    ),
+    'get_account_properties': (
+        request_get_account_properties,
+        process_get_account_properties,
+    ),
+    'get_multisig_account_info': (
+        request_get_multisig_account_info,
+        process_get_multisig_account_info,
+    ),
+    'get_multisig_account_graph_info': (
+        request_get_multisig_account_graph_info,
+        process_get_multisig_account_graph_info,
+    ),
+    'get_account_transactions': (
+        request_get_account_transactions,
+        process_get_account_transactions,
+    ),
+    'get_account_incoming_transactions': (
+        request_get_account_incoming_transactions,
+        process_get_account_incoming_transactions,
+    ),
+    'get_account_outgoing_transactions': (
+        request_get_account_outgoing_transactions,
+        process_get_account_outgoing_transactions,
+    ),
+    'get_account_unconfirmed_transactions': (
+        request_get_account_unconfirmed_transactions,
+        process_get_account_unconfirmed_transactions,
+    ),
+    'get_account_partial_transactions': (
+        request_get_account_partial_transactions,
+        process_get_account_partial_transactions,
+    ),
 
     # BLOCKCHAIN
-    'get_block_by_height': request_get_block_by_height,
-    'get_blocks_by_height_with_limit': request_get_blocks_by_height_with_limit,
-    'get_block_transactions': request_get_block_transactions,
-    'get_blockchain_height': request_get_blockchain_height,
-    'get_blockchain_score': request_get_blockchain_score,
-    'get_diagnostic_blocks_by_height_with_limit': request_get_diagnostic_blocks_by_height_with_limit,
-    'get_diagnostic_storage': request_get_diagnostic_storage,
+    'get_block_by_height': (
+        request_get_block_by_height,
+        process_get_block_by_height,
+    ),
+    'get_blocks_by_height_with_limit': (
+        request_get_blocks_by_height_with_limit,
+        process_get_blocks_by_height_with_limit,
+    ),
+    'get_block_transactions': (
+        request_get_block_transactions,
+        process_get_block_transactions,
+    ),
+    'get_blockchain_height': (
+        request_get_blockchain_height,
+        process_get_blockchain_height,
+    ),
+    'get_blockchain_score': (
+        request_get_blockchain_score,
+        process_get_blockchain_score,
+    ),
+    'get_diagnostic_blocks_by_height_with_limit': (
+        request_get_diagnostic_blocks_by_height_with_limit,
+        process_get_diagnostic_blocks_by_height_with_limit,
+    ),
+    'get_diagnostic_storage': (
+        request_get_diagnostic_storage,
+        process_get_diagnostic_storage,
+    ),
 
     # MOSAIC
-    'get_mosaic': request_get_mosaic,
-    'get_mosaics': request_get_mosaics,
-    'get_mosaic_names': request_get_mosaic_names,
+    'get_mosaic': (
+        request_get_mosaic,
+        process_get_mosaic,
+    ),
+    'get_mosaics': (
+        request_get_mosaics,
+        process_get_mosaics,
+    ),
+    'get_mosaic_names': (
+        request_get_mosaic_names,
+        process_get_mosaic_names,
+    ),
 
     # NAMESPACE
-    'get_namespace': request_get_namespace,
-    'get_namespaces_name': request_get_namespaces_name,
-    'get_namespaces_from_account': request_get_namespaces_from_account,
-    'get_namespaces_from_accounts': request_get_namespaces_from_accounts,
-    'get_linked_mosaic_id': request_get_linked_mosaic_id,
-    'get_linked_address': request_get_linked_address,
+    'get_namespace': (
+        request_get_namespace,
+        process_get_namespace,
+    ),
+    'get_namespaces_name': (
+        request_get_namespaces_name,
+        process_get_namespaces_name,
+    ),
+    'get_namespaces_from_account': (
+        request_get_namespaces_from_account,
+        process_get_namespaces_from_account,
+    ),
+    'get_namespaces_from_accounts': (
+        request_get_namespaces_from_accounts,
+        process_get_namespaces_from_accounts,
+    ),
+    'get_linked_mosaic_id': (
+        request_get_linked_mosaic_id,
+        process_get_linked_mosaic_id,
+    ),
+    'get_linked_address': (
+        request_get_linked_address,
+        process_get_linked_address,
+    ),
 
     # NETWORK
-    'get_network_type': request_get_network_type,
+    'get_network_type': (
+        request_get_network_type,
+        process_get_network_type,
+    ),
 
     # TRANSACTOON
-    'get_transaction': request_get_transaction,
-    'get_transactions': request_get_transactions,
-    'get_transaction_status': request_get_transaction_status,
-    'get_transaction_statuses': request_get_transaction_statuses,
-    'announce': request_announce,
-    'announce_sync': request_announce_sync,
-}
-
-PROCESS = {
-    # ACCOUNT
-    'get_account_info': process_get_account_info,
-    'get_accounts_info': process_get_accounts_info,
-    'get_account_property': process_get_account_property,
-    'get_account_properties': process_get_account_properties,
-    'get_multisig_account_info': process_get_multisig_account_info,
-    'get_multisig_account_graph_info': process_get_multisig_account_graph_info,
-    'get_account_transactions': process_get_account_transactions,
-    'get_account_incoming_transactions': process_get_account_incoming_transactions,
-    'get_account_outgoing_transactions': process_get_account_outgoing_transactions,
-    'get_account_unconfirmed_transactions': process_get_account_unconfirmed_transactions,
-    'get_account_partial_transactions': process_get_account_partial_transactions,
-
-    # BLOCKCHAIN
-    'get_block_by_height': process_get_block_by_height,
-    'get_blocks_by_height_with_limit': process_get_blocks_by_height_with_limit,
-    'get_block_transactions': process_get_block_transactions,
-    'get_blockchain_height': process_get_blockchain_height,
-    'get_blockchain_score': process_get_blockchain_score,
-    'get_diagnostic_blocks_by_height_with_limit': process_get_diagnostic_blocks_by_height_with_limit,
-    'get_diagnostic_storage': process_get_diagnostic_storage,
-
-    # MOSAIC
-    'get_mosaic': process_get_mosaic,
-    'get_mosaics': process_get_mosaics,
-    'get_mosaic_names': process_get_mosaic_names,
-
-    # NAMESPACE
-    'get_namespace': process_get_namespace,
-    'get_namespaces_name': process_get_namespaces_name,
-    'get_namespaces_from_account': process_get_namespaces_from_account,
-    'get_namespaces_from_accounts': process_get_namespaces_from_accounts,
-    'get_linked_mosaic_id': process_get_linked_mosaic_id,
-    'get_linked_address': process_get_linked_address,
-
-    # NETWORK
-    'get_network_type': process_get_network_type,
-
-    # TRANSACTOON
-    'get_transaction': process_get_transaction,
-    'get_transactions': process_get_transactions,
-    'get_transaction_status': process_get_transaction_status,
-    'get_transaction_statuses': process_get_transaction_statuses,
-    'announce': process_announce,
-    'announce_sync': process_announce_sync,
+    'get_transaction': (
+        request_get_transaction,
+        process_get_transaction,
+    ),
+    'get_transactions': (
+        request_get_transactions,
+        process_get_transactions,
+    ),
+    'get_transaction_status': (
+        request_get_transaction_status,
+        process_get_transaction_status,
+    ),
+    'get_transaction_statuses': (
+        request_get_transaction_statuses,
+        process_get_transaction_statuses,
+    ),
+    'announce': (
+        request_announce,
+        process_announce,
+    ),
+    'announce_sync': (
+        request_announce_sync,
+        process_announce_sync,
+    ),
 }

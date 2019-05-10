@@ -26,7 +26,6 @@ from __future__ import annotations
 import typing
 
 from . import abc
-from . import binascii
 from . import documentation
 from . import stdint
 

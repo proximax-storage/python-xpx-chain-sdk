@@ -242,7 +242,7 @@ class RegisterNamespaceTransaction(Transaction):
         self._set('duration', duration)
         self._set('parent_id', parent_id)
 
-        return data
+        return typing.cast(bytes, data)
 
     # DTO
 

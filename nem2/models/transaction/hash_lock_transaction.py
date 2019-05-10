@@ -22,7 +22,10 @@
     limitations under the License.
 """
 
-from .lock_funds_transaction import *
+from .lock_funds_transaction import (
+    LockFundsTransaction,
+    LockFundsInnerTransaction,
+)
 
 __all__ = [
     'HashLockTransaction',

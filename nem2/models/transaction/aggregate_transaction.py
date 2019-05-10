@@ -308,13 +308,11 @@ class AggregateBondedTransaction(AggregateTransaction):
         :param max_fee: (Optional) Max fee defined by sender.
         """
         return cls.create_bonded(
-            network_type,
-            TransactionType.AGGREGATE_BONDED,
-            TransactionVersion.AGGREGATE_BONDED,
             deadline,
-            max_fee,
             inner_transactions,
             cosignatures,
+            network_type,
+            max_fee,
         )
 
 
@@ -341,11 +339,9 @@ class AggregateCompleteTransaction(AggregateTransaction):
         :param max_fee: (Optional) Max fee defined by sender.
         """
         return cls.create_complete(
-            network_type,
-            TransactionType.AGGREGATE_COMPLETE,
-            TransactionVersion.AGGREGATE_COMPLETE,
             deadline,
-            max_fee,
             inner_transactions,
             cosignatures,
+            network_type,
+            max_fee,
         )

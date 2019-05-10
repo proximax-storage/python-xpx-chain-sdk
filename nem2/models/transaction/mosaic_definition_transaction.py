@@ -165,7 +165,7 @@ class MosaicDefinitionTransaction(Transaction):
         self._set('mosaic_id', mosaic_id)
         self._set('mosaic_properties', properties)
 
-        return data
+        return typing.cast(bytes, data)
 
     # DTO
 

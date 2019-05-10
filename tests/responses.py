@@ -77,6 +77,14 @@ MOSAICS_INFO = {
     'Ok': load_response('mosaics_info.json'),
 }
 
+MULTISIG_GRAPH_INFO = {
+    'Ok': load_response('multisig_graph_info.json'),
+}
+
+MULTISIG_INFO = {
+    'Ok': load_response('multisig_info.json'),
+}
+
 NAMESPACE = {
     'nem': load_response('namespace.json'),
 }

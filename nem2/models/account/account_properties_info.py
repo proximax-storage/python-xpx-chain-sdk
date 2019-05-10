@@ -27,6 +27,7 @@ import typing
 
 from .account_properties import AccountProperties
 from .account_properties_metadata import OptionalAccountPropertiesMetadata
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['AccountPropertiesInfo']
@@ -49,10 +50,11 @@ class AccountPropertiesInfo(util.DTO):
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
+        to_dto = AccountProperties.sequence_to_dto
         return {
             # TODO(ahuszagh) Check when stabilized
             'meta': {},
-            'accountProperties': AccountProperties.sequence_to_dto(self.account_properties, network_type),
+            'accountProperties': to_dto(self.account_properties, network_type),
         }
 
     @classmethod
@@ -62,8 +64,9 @@ class AccountPropertiesInfo(util.DTO):
         network_type: OptionalNetworkType = None,
     ):
         assert data['meta'] == {}
+        from_dto = AccountProperties.sequence_from_dto
         return cls(
             # TODO(ahuszagh) Check when stabilized
             meta=None,
-            account_properties=AccountProperties.sequence_from_dto(data.get('accountProperties', []), network_type),
+            account_properties=from_dto(data.get('accountProperties', []), network_type),
         )

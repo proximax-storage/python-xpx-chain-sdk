@@ -24,7 +24,6 @@
 
 from __future__ import annotations
 import enum
-import typing
 
 from ... import util
 
@@ -54,5 +53,5 @@ DESCRIPTION = {
     PropertyType.SENTINEL: "Property type sentinel.",
     PropertyType.BLOCK_ADDRESS: "The property type is a blocking address operation.",
     PropertyType.BLOCK_MOSAIC: "The property type is a blocking mosaic id operation.",
-    PropertyType.BLOCK_TRANSACTION: "The property type is a blocking transaction type operation.",
+    PropertyType.BLOCK_TRANSACTION: "The property type is a blocking transaction type operation.",  # noqa: E501
 }
