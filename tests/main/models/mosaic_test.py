@@ -212,7 +212,6 @@ class TestMosaicProperties(harness.TestCase):
         self.assertEqual(self.type.create(levy_mutable=True).flags, 0x6)
 
     def test_dto_v2(self):
-        # TODO(ahuszagh) Remove when the format becomes stabilized.
         dto2 = self.model.to_dto_v2(self.network_type)
         self.assertEqual(dto2, [
             {'id': 0, 'value': [3, 0]},

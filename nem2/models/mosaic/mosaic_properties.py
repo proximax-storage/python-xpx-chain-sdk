@@ -172,8 +172,7 @@ class MosaicProperties(util.Model):
         network_type: OptionalNetworkType = None,
     ):
         # A newer version of DTO, which is used in MosaicDefinitionTransactions.
-        # Wait for merging from:
-        #   https://nem2.slack.com/archives/CEZKUE4KB/p1556125862102400
+        # We need to keep the two versions separate.
         data = [
             {'id': FLAGS_ID, 'value': util.u64_to_dto(self.flags)},
             {'id': DIVISIBILITY_ID, 'value': util.u64_to_dto(self.divisibility)},
@@ -204,8 +203,7 @@ class MosaicProperties(util.Model):
         network_type: OptionalNetworkType = None,
     ):
         # A newer version of DTO, which is used in MosaicDefinitionTransactions.
-        # Wait for merging from:
-        #   https://nem2.slack.com/archives/CEZKUE4KB/p1556125862102400
+        # We need to keep the two versions separate.
         kwds = {}
         for item in data:
             kwds[PROPERTIES[item['id']]] = util.u64_from_dto(item['value'])

@@ -176,7 +176,6 @@ class MosaicDefinitionTransaction(Transaction):
         return {
             'mosaicNonce': self.nonce.to_dto(network_type),
             'mosaicId': self.mosaic_id.to_dto(network_type),
-            # TODO(ahuszagh) Change to use to_dto when possible.
             'properties': self.mosaic_properties.to_dto_v2(network_type),
         }
 
@@ -187,7 +186,6 @@ class MosaicDefinitionTransaction(Transaction):
     ) -> None:
         nonce = MosaicNonce.from_dto(data['mosaicNonce'], network_type)
         mosaic_id = MosaicId.from_dto(data['mosaicId'], network_type)
-        # TODO(ahuszagh) Change to use from_dto when possible.
         properties = MosaicProperties.from_dto_v2(data['properties'], network_type)
         self._set('nonce', nonce)
         self._set('mosaic_id', mosaic_id)

@@ -12,7 +12,6 @@ NEM2 SDK Python
 # Getting Started
 
 
-
 # Optimization
 
 The NEM2 SDK makes copious use of assertions to ensure functionality is correct during debugging, and during use of the client, it may be preferable to disable these assertions. This may be done by either setting the environment variable `PYTHONOPTIMIZE=TRUE`, or through the command-line flag `-O`.
@@ -38,7 +37,7 @@ $ tox
 
 # License
 
-Lexical is licensed under the Apache 2.0 license. See the LICENSE for more information. 
+Lexical is licensed under the Apache 2.0 license. See the LICENSE for more information. The nem2-sdk-python derives from both [nem2-docs](https://github.com/nemtech/nem2-docs) and the [nem2-sdk-typescript-javascript](https://github.com/nemtech/nem2-sdk-typescript-javascript).
 
 # Contributing
 
