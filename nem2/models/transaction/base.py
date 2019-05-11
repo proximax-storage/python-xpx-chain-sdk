@@ -42,7 +42,8 @@ TypeMap = typing.Mapping[TransactionType, typing.Type[TransactionBaseType]]
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionBase(util.Model):
+# TODO(ahuszagh) Make Base64Mixin
+class TransactionBase(util.Serializable):
     """
     Abstract, shared transaction base class.
 

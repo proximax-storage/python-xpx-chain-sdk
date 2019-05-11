@@ -32,8 +32,16 @@ __all__ = ['TransactionAnnounceResponse']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionAnnounceResponse(util.DTO):
-    """Response from announcing a transaction."""
+class TransactionAnnounceResponse(util.DTOSerializable):
+    """
+    Response from announcing a transaction.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            AnnounceTransactionInfoDTO:
+                message: string
+    """
 
     message: str
 

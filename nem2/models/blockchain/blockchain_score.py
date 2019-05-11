@@ -32,11 +32,18 @@ __all__ = ['BlockchainScore']
 
 @util.inherit_doc
 @util.dataclass(frozen=True, score=0)
-class BlockchainScore(util.DTO):
+class BlockchainScore(util.DTOSerializable):
     """
     Blockchain score describing the block difficulty.
 
     :param score: Blockchain score.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            BlockchainScoreDTO:
+                scoreHigh: UInt64DTO
+                scoreLow: UInt64DTO
     """
 
     score: int

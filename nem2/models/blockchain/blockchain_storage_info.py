@@ -32,7 +32,7 @@ __all__ = ['BlockchainStorageInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class BlockchainStorageInfo(util.DTO):
+class BlockchainStorageInfo(util.DTOSerializable):
     """
     Blockchain information describing stored data.
 

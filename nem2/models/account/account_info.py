@@ -36,7 +36,7 @@ __all__ = ['AccountInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AccountInfo(util.DTO):
+class AccountInfo(util.DTOSerializable):
     """
     Basic information describing an account.
 
@@ -48,6 +48,24 @@ class AccountInfo(util.DTO):
     :param mosaics: List of mosaics owned by account.
     :param importance: Importance of the account.
     :param importance_height: Importance height of the account.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            AccountDTO:
+                # Hex(Address) (50-bytes)
+                address: string
+                addressHeight: UInt64DTO
+                # Hex(PublicKey) (64-bytes)
+                publicKey: string
+                publicKeyHeight: UInt64DTO
+                mosaics: MosaicDTO[]
+                importance: UInt64DTO
+                importanceHeight: UInt64DTO
+
+            AccountInfoDTO:
+                meta: AccountMetaDTO
+                account: AccountDTO
     """
 
     meta: OptionalAccountMetadata

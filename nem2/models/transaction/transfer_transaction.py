@@ -142,7 +142,11 @@ class TransferTransaction(Transaction):
         network_type: NetworkType,
     ) -> bytes:
         """Get the serialized byte array of all mosaics."""
-        return util.Model.sequence_to_catbuffer(self.mosaics, network_type)
+
+        return util.Serializable.sequence_to_catbuffer(
+            self.mosaics,
+            network_type
+        )
 
     def to_catbuffer_specific(
         self,

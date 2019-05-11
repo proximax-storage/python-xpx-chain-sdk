@@ -35,12 +35,20 @@ __all__ = ['AccountProperties']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AccountProperties(util.DTO):
+class AccountProperties(util.DTOSerializable):
     """
     Describe properties for an account.
 
     :param address: Account address.
     :param properties: Account properties.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            AccountPropertiesDTO:
+                # Base64(Base32(Address)) (56-bytes)
+                address: string
+                properties: AccountPropertyDTO[]
     """
 
     address: Address
@@ -50,11 +58,13 @@ class AccountProperties(util.DTO):
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        return {
-            # TODO(ahuszagh) Check when stabilized
-            'address': self.address.to_dto(network_type),
-            'properties': AccountProperty.sequence_to_dto(self.properties, network_type),
-        }
+        raise NotImplementedError
+        # We're getting str from address.address, should be getting bytes.
+#        return {
+#            # TODO(ahuszagh) Check when stabilized
+#            'address': util.b64encode(self.address.address),
+#            'properties': AccountProperty.sequence_to_dto(self.properties, network_type),
+#        }
 
     @classmethod
     def from_dto(
@@ -62,9 +72,10 @@ class AccountProperties(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        properties = data.get('properties', [])
-        return cls(
-            # TODO(ahuszagh) Check when stabilized
-            address=Address.from_dto(data['address'], network_type),
-            properties=AccountProperty.sequence_from_dto(properties, network_type),
-        )
+        raise NotImplementedError
+#        properties = data.get('properties', [])
+#        return cls(
+#            # TODO(ahuszagh) Check when stabilized
+#            address=Address.create_from_encoded(util.b64decode(data['address'])),
+#            properties=AccountProperty.sequence_from_dto(properties, network_type),
+#        )

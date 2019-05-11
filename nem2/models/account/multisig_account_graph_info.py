@@ -43,12 +43,21 @@ TupleFactory = typing.Callable[..., TupleType]
 
 
 @util.inherit_doc
-class MultisigAccountGraphInfo(util.DTO, abc.Mapping):
+class MultisigAccountGraphInfo(util.DTOSerializable, abc.Mapping):
     """
     Graph info for multi-sig accounts.
 
     :param \\*args: (Optional) positional arguments to initialize mapping.
-    :param \\**kwds: (Optional) keyword arguments to initialize mapping.
+
+
+    DTO Format:
+        .. code-block:: yaml
+
+            MultisigAccountGraphInfoLevelDTO:
+                level: integer
+                multisigEntries: MultisigAccountInfoDTO[]
+
+            MultisigAccountGraphInfoDTO: MultisigAccountGraphInfoLevelDTO[]
     """
 
     _multisig_accounts: DictType

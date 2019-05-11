@@ -34,7 +34,7 @@ __all__ = ['TransactionStatus']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionStatus(util.DTO):
+class TransactionStatus(util.DTOSerializable):
     """
     Basic information describing announced transaction.
 
@@ -43,6 +43,17 @@ class TransactionStatus(util.DTO):
     :param hash: Transaction hash (hex-encoded).
     :param deadline: Transaction deadline.
     :param height: Block height at which it was confirmed or rejected.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            TransactionStatusDTO:
+                group: string
+                status: string
+                # Hex(Hash) (64-bytes)
+                hash: string
+                deadline: UInt64DTO
+                height: UInt64DTO
     """
 
     group: TransactionStatusGroup

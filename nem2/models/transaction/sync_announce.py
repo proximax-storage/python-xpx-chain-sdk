@@ -34,7 +34,7 @@ __all__ = ['SyncAnnounce']
 
 
 @util.dataclass(frozen=True)
-class SyncAnnounce(util.DTO):
+class SyncAnnounce(util.DTOSerializable):
     """
     Signed transaction to announce and sync.
 

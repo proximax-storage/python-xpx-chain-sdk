@@ -33,7 +33,7 @@ __all__ = ['TransactionInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True, hash=None, merkle_component_hash=None)
-class TransactionInfo(util.DTO):
+class TransactionInfo(util.DTOSerializable):
     """Transaction metadata."""
 
     height: int

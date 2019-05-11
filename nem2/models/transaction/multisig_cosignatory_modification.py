@@ -39,7 +39,7 @@ ModificationType = MultisigCosignatoryModificationType
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MultisigCosignatoryModification(util.Model):
+class MultisigCosignatoryModification(util.Serializable):
     """
     Multisig cosignatory modification.
 

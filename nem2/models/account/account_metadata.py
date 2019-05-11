@@ -32,7 +32,14 @@ __all__ = ['AccountMetadata']
 
 @util.dataclass(frozen=True)
 class AccountMetadata(util.Object):
-    """Metadata describing an account."""
+    """
+    Metadata describing an account.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            AccountMetaDTO: null
+    """
 
 
 OptionalAccountMetadata = typing.Optional[AccountMetadata]

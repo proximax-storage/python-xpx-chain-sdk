@@ -32,7 +32,7 @@ __all__ = ['AggregateTransactionInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AggregateTransactionInfo(util.DTO):
+class AggregateTransactionInfo(util.DTOSerializable):
     """Aggregate transaction metadata."""
 
     height: int

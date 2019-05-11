@@ -117,6 +117,7 @@ class AggregateTransaction(Transaction):
         :param network_type: Network type.
         :param max_fee: (Optional) Max fee defined by sender.
         """
+
         return cls(
             network_type,
             TransactionType.AGGREGATE_COMPLETE,
@@ -145,6 +146,7 @@ class AggregateTransaction(Transaction):
         :param network_type: Network type.
         :param max_fee: (Optional) Max fee defined by sender.
         """
+
         return cls(
             network_type,
             TransactionType.AGGREGATE_BONDED,
@@ -171,6 +173,7 @@ class AggregateTransaction(Transaction):
         :param initiator_account: Initiator account.
         :param cosignatories: Sequence of accounts cosigning transaction.
         """
+
         # TODO(ahuszagh) Need to sign.
         # TODO(ahuszagh) Implement...
         # transaction = self.to_catbuffer()
@@ -215,20 +218,29 @@ class AggregateTransaction(Transaction):
         network_type: NetworkType,
     ) -> bytes:
         """Get the serialized byte array of all sub-transactions."""
-        return util.Model.sequence_to_catbuffer(self.inner_transactions, network_type)
+
+        return util.Serializable.sequence_to_catbuffer(
+            self.inner_transactions,
+            network_type
+        )
 
     def to_cosignatures_bytes(
         self,
         network_type: NetworkType,
     ) -> bytes:
         """Get the serialized byte array of all cosignatures."""
-        return util.Model.sequence_to_catbuffer(self.cosignatures, network_type)
+
+        return util.Serializable.sequence_to_catbuffer(
+            self.cosignatures,
+            network_type
+        )
 
     def to_catbuffer_specific(
         self,
         network_type: NetworkType,
     ) -> bytes:
         """Export transfer-specific data to catbuffer."""
+
         # uint32_t payload_size
         # uint8_t[payload_size] transactions
         # uint8_t[size - payload_size] cosignatures
@@ -244,6 +256,7 @@ class AggregateTransaction(Transaction):
         network_type: NetworkType,
     ) -> bytes:
         """Load inner transactions data from catbuffer."""
+
         transactions = []
         subdata = data[:size]
         while subdata:
@@ -260,6 +273,7 @@ class AggregateTransaction(Transaction):
         network_type: NetworkType,
     ) -> bytes:
         """Load cosignatures data from catbuffer."""
+
         count = len(data) // Cosignature.CATBUFFER_SIZE
         value, data = Cosignature.sequence_from_catbuffer_pair(data, count, network_type)
         self._set('cosignatures', value)

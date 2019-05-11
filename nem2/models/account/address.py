@@ -85,7 +85,8 @@ def is_valid_address(address: bytes) -> bool:
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class Address(util.Model):
+# TODO(ahuszagh) Make Base64Mixin
+class Address(util.Serializable):
     """
     Account address for network type.
 

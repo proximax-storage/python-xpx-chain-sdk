@@ -34,13 +34,21 @@ __all__ = ['MosaicName']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicName(util.DTO):
+class MosaicName(util.DTOSerializable):
     """
     Mosaic name and identifiers.
 
     :param mosaic_id: Mosaic ID.
     :param name: Mosaic name.
     :param parent_id: Parent namespace ID.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            MosaicNameDTO:
+                parentId: UInt64DTO
+                mosaicId: UInt64DTO
+                name: string
     """
 
     mosaic_id: MosaicId

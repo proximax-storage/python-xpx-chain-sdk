@@ -35,12 +35,19 @@ __all__ = ['AccountPropertiesInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AccountPropertiesInfo(util.DTO):
+class AccountPropertiesInfo(util.DTOSerializable):
     """
     Basic information describing account properties.
 
     :param meta: Account properties metadata.
     :param account_properties: List of account properties.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            AccountPropertiesInfoDTO:
+                meta: AccountPropertiesMetaDTO
+                accountProperties: AccountPropertiesDTO
     """
 
     meta: OptionalAccountPropertiesMetadata

@@ -33,7 +33,7 @@ __all__ = ['TransactionStatusError']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionStatusError(util.DTO):
+class TransactionStatusError(util.DTOSerializable):
     """
     Model representing errors in transactions from listeners.
 

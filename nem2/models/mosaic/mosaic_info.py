@@ -36,7 +36,7 @@ __all__ = ['MosaicInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True, levy=None)
-class MosaicInfo(util.DTO):
+class MosaicInfo(util.DTOSerializable):
     """
     Information describing a mosaic.
 
@@ -50,6 +50,27 @@ class MosaicInfo(util.DTO):
     :param owner: Account that owns mosaic.
     :param properties: Mosaic properties.
     :param levy: (Optional) Levy for mosaic.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            MosaicMetaDTO:
+                # Hex(Id) (24-bytes)
+                id: string
+
+            MosaicDefinitionDTO:
+                mosaicId: UInt64DTO
+                supply: UInt64DTO
+                height: UInt64DTO
+                # Hex(PublicKey) (64-bytes)
+                owner: string
+                revision: integer
+                properties: MosaicPropertiesDTO
+                levy: MosaicLevyDTO
+
+            MosaicInfoDTO:
+                meta: MosaicMetaDTO
+                mosaic: MosaicDefinitionDTO
     """
 
     meta_id: str

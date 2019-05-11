@@ -32,7 +32,7 @@ __all__ = ['CosignatureSignedTransaction']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class CosignatureSignedTransaction(util.DTO):
+class CosignatureSignedTransaction(util.DTOSerializable):
     """
     Cosignature signed transaction.
 

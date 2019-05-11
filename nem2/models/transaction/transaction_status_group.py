@@ -33,7 +33,7 @@ __all__ = ['TransactionStatusGroup']
 
 
 @util.inherit_doc
-class TransactionStatusGroup(util.DTO, util.EnumMixin, str, enum.Enum):
+class TransactionStatusGroup(util.DTOSerializable, util.EnumMixin, str, enum.Enum):
     """Enumerated groups  for a transaction status."""
 
     FAILED = "failed"

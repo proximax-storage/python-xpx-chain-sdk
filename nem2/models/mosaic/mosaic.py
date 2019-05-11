@@ -38,12 +38,19 @@ SIZE = MosaicId.CATBUFFER_SIZE + util.U64_BYTES
 
 @util.inherit_doc
 @util.dataclass(frozen=True, amount=0)
-class Mosaic(util.Model):
+class Mosaic(util.Serializable):
     """
     Basic information describing a mosaic.
 
     :param id: Identifier for mosaic.
     :param amount: Mosaic quantity in the smallest unit possible.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            MosaicDTO:
+                id: UInt64DTO
+                amount: UInt64DTO
     """
 
     id: IdType

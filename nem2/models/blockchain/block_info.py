@@ -39,7 +39,7 @@ OptionalMerkleTreeType = typing.Optional[MerkleTreeType]
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class BlockInfo(util.DTO):
+class BlockInfo(util.DTOSerializable):
     """
     Basic information describing a block.
 
@@ -60,6 +60,48 @@ class BlockInfo(util.DTO):
     :param block_receipts_hash: Block receipt hash.
     :param state_hash: State hash.
     :param beneficiary: (Optional) Public account of beneficiary.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            HeightDTO:
+                height: UInt64DTO
+
+            BlockMetaDTO:
+                # Hex(Hash) (64-bytes)
+                hash: string
+                # Hex(Hash) (64-bytes)
+                generationHash: string
+                totalFee: UInt64DTO
+                numTransactions: integer
+                # Hex(Hash)[] (64-bytes)
+                subCacheMerkleRoots?: string[]
+
+            BlockDTO:
+                # Hex(Signature) (128-bytes)
+                signature: string
+                # Hex(PublicKey) (64-bytes)
+                signer: string
+                version: integer
+                type: integer
+                height: UInt64DTO
+                timestamp: UInt64DTO
+                difficulty: UInt64DTO
+                feeMultiplier: integer
+                # Hex(Hash) (64-bytes)
+                previousBlockHash: string
+                # Hex(Hash) (64-bytes)
+                blockTransactionsHash: string
+                # Hex(Hash) (64-bytes)
+                blockReceiptsHash: string
+                # Hex(Hash) (64-bytes)
+                stateHash: string
+                # Hex(PublicKey) (64-bytes)
+                beneficiaryPublicKey: string
+
+            BlockInfoDTO:
+                meta: BlockMetaDTO
+                block: BlockDTO
     """
 
     hash: str

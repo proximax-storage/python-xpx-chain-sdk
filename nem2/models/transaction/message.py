@@ -33,7 +33,7 @@ __all__ = ['Message']
 
 
 @util.dataclass(frozen=True)
-class Message(util.Model):
+class Message(util.Serializable):
     """
     Abstract message type.
 

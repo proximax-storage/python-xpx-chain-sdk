@@ -26,6 +26,7 @@ from __future__ import annotations
 import typing
 
 from . import abc
+from . import base64
 from . import documentation
 from . import stdint
 
@@ -37,6 +38,8 @@ __all__ = [
     'U32Mixin',
     'U64Mixin',
     'U128Mixin',
+    # TODO(ahuszagh) Restore.
+    #'Base64Mixin',
 ]
 
 IntMixinType = typing.TypeVar('IntMixinType', bound='IntMixin')
@@ -45,6 +48,7 @@ U16MixinType = typing.TypeVar('U16MixinType', bound='U16Mixin')
 U32MixinType = typing.TypeVar('U32MixinType', bound='U32Mixin')
 U64MixinType = typing.TypeVar('U64MixinType', bound='U64Mixin')
 U128MixinType = typing.TypeVar('U128MixinType', bound='U128Mixin')
+#Base64MixinType = typing.TypeVar('Base64MixinType', bound='Base64Mixin')
 
 
 class EnumMixin:
@@ -88,7 +92,7 @@ class IntMixin:
 
 
 @documentation.inherit_doc
-class U8Mixin(abc.Model):
+class U8Mixin(abc.Serializable):
     """Mixin for classes wrapping 8-bit integer types."""
 
     __slots__ = ()
@@ -129,7 +133,7 @@ class U8Mixin(abc.Model):
 
 
 @documentation.inherit_doc
-class U16Mixin(abc.Model):
+class U16Mixin(abc.Serializable):
     """Mixin for classes wrapping 16-bit integer types."""
 
     __slots__ = ()
@@ -170,7 +174,7 @@ class U16Mixin(abc.Model):
 
 
 @documentation.inherit_doc
-class U32Mixin(abc.Model):
+class U32Mixin(abc.Serializable):
     """Mixin for classes wrapping 32-bit integer types."""
 
     __slots__ = ()
@@ -211,7 +215,7 @@ class U32Mixin(abc.Model):
 
 
 @documentation.inherit_doc
-class U64Mixin(abc.Model):
+class U64Mixin(abc.Serializable):
     """Mixin for classes wrapping 64-bit integer types."""
 
     __slots__ = ()
@@ -252,7 +256,7 @@ class U64Mixin(abc.Model):
 
 
 @documentation.inherit_doc
-class U128Mixin(abc.Model):
+class U128Mixin(abc.Serializable):
     """Mixin for classes wrapping 128-bit integer types."""
 
     __slots__ = ()
@@ -290,3 +294,21 @@ class U128Mixin(abc.Model):
         size = cls.CATBUFFER_SIZE
         asint = stdint.u128_from_catbuffer(data[:size])
         return cls(asint)           # type: ignore
+
+
+#@documentation.inherit_doc
+#class Base64Mixin(abc.Serializable):
+#    """Mixin for classes wrapping data that can be encoded to and from base64."""
+#
+#    __slots__ = ()
+#
+#    def to_base64(self: Base64MixinType) -> str:
+#        """Get data encoded as base64."""
+#        return base64.b64encode(self.to_catbuffer())
+#
+#    def from_base64(
+#        cls: typing.Type[Base64MixinType],
+#        data: str
+#    ) -> Base64MixinType:
+#        """Create class from base64-encoded data."""
+#        return cls.from_catbuffer(base64.b64decode(data))

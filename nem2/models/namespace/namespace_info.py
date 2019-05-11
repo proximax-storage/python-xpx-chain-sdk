@@ -38,7 +38,7 @@ __all__ = ['NamespaceInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True, alias=Alias(AliasType.NONE, None))
-class NamespaceInfo(util.DTO):
+class NamespaceInfo(util.DTOSerializable):
     """
     Information describing a namespace.
 
@@ -53,6 +53,34 @@ class NamespaceInfo(util.DTO):
     :param start_height: Block height at which ownership begins.
     :param end_height: Block height at which ownership ends.
     :param alias: Alias linked to a namespace.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            NamespaceMetaDTO:
+                # Hex(Id) (24-bytes)
+                id: string
+                active: boolean
+                index: integer
+
+            NamespaceDTO:
+                # Hex(PublicKey) (64-bytes)
+                owner: string
+                # Hex(Address) (50-bytes)
+                ownerAddress: string
+                startHeight: UInt64DTO
+                endHeight: UInt64DTO
+                depth: integer
+                level0: UInt64DTO
+                level1?: UInt64DTO
+                level2?: UInt64DTO
+                type: integer
+                alias: AliasDTO
+                parentId: UInt64DTO
+
+            NamespaceInfoDTO:
+                meta: NamespaceMetaDTO
+                namespace: NamespaceDTO
     """
 
     active: bool

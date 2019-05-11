@@ -1,8 +1,8 @@
 """
-    client
-    ======
+    dto
+    ===
 
-    HTTP and websockets clients for communication with the NEM API.
+    Data-transfer objects for the REST API.
 
     License
     -------
@@ -22,9 +22,20 @@
     limitations under the License.
 """
 
-# type: ignore
-from .default import *
+# Do not import any of these models into the in the
+# __init__ of the subdirectories, since there is a
+# complicated web of inter-dependencies within models.
+# Just use glob imports at the models level.
+
+# Account
+from .account.account import *
+from .account.account_info import *
+from .account.account_meta import *
+from .account import *
 
 __all__ = (
-    default.__all__
+    # Account
+    account.__all__
+    + account_info.__all__
+    + account_meta.__all__
 )

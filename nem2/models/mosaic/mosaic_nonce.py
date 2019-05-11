@@ -49,9 +49,10 @@ def nonce_as_bytes(nonce: RawNonceType):
         raise TypeError(f"Invalid nonce type, got {type(nonce)}.")
 
 
+# TODO(ahuszagh) Change to an object, not an actual Model.
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicNonce(util.IntMixin, util.Model):
+class MosaicNonce(util.IntMixin, util.Serializable):
     """
     Nonce for a mosaic.
 

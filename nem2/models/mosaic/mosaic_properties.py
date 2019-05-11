@@ -76,13 +76,18 @@ def property_from_catbuffer(catbuffer: bytes) -> typing.Tuple[int, int]:
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicProperties(util.Model):
+class MosaicProperties(util.Serializable):
     """
     Properties of an asset.
 
     :param flags: Flags for the properties of the mosaic.
     :param divisibility: Decimal places mosaic can be divided into [0-6].
     :param duration: Number of blocks the mosaic will be available.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            MosaicPropertiesDTO: UInt64DTO[]
     """
 
     flags: int

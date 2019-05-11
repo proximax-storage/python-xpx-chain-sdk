@@ -36,7 +36,7 @@ SIZE = PublicAccount.CATBUFFER_SIZE + 64 * util.U8_BYTES
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AggregateTransactionCosignature(util.Model):
+class AggregateTransactionCosignature(util.Serializable):
     """
     Aggregate transaction signer and signature.
 

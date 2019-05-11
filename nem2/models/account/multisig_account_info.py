@@ -34,7 +34,7 @@ __all__ = ['MultisigAccountInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MultisigAccountInfo(util.DTO):
+class MultisigAccountInfo(util.DTOSerializable):
     """
     Information describing a multisig account.
 
@@ -46,6 +46,25 @@ class MultisigAccountInfo(util.DTO):
     :param min_removal: Min number of cosignatories required to remove a cosignatory.
     :param cosignatories: List of cosignatories.
     :param multisig_accounts: List of multisig accounts this account cosigns.
+
+
+    DTO Format:
+        .. code-block:: yaml
+
+            MultisigDTO:
+                # Hex(PublicKey) (64-bytes)
+                account: string
+                # Hex(Address) (50-bytes)
+                accountAddress: string
+                minApproval: integer
+                minRemoval: integer
+                # Hex(PublicKey)[] (64-bytes)
+                cosignatories: string[]
+                # Hex(PublicKey)[] (64-bytes)
+                multisigAccounts: string[]
+
+            MultisigAccountInfoDTO:
+                multisig: MultisigDTO
     """
 
     account: PublicAccount

@@ -25,14 +25,48 @@
 from __future__ import annotations
 import typing
 
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['AccountPropertiesMetadata']
 
 
+@util.inherit_doc
 @util.dataclass(frozen=True)
 class AccountPropertiesMetadata(util.Object):
-    """Metadata describing account properties."""
+    """
+    Metadata describing account properties.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            AccountPropertiesMetaDTO:
+                # Hex(Id) (24-bytes)
+                id: string
+    """
+
+    id: str
+
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None,
+    ) -> dict:
+        return {
+            # TODO(ahuszagh) Check when stabilized
+            'id': self.id,
+        }
+
+    @classmethod
+    def from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ):
+        assert data['meta'] == {}
+        return cls(
+            # TODO(ahuszagh) Check when stabilized
+            id=data['id'],
+        )
 
 
 OptionalAccountPropertiesMetadata = typing.Optional[AccountPropertiesMetadata]

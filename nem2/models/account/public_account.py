@@ -33,9 +33,10 @@ from ...util.signature import ed25519
 __all__ = ['PublicAccount']
 
 
+# TODO(ahuszagh) Change to an object, not an actual Model.
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class PublicAccount(util.Model):
+class PublicAccount(util.Serializable):
     """
     Describe public account information via public key and account address.
 

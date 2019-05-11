@@ -57,11 +57,20 @@ def dto_to_kwds(
 
 @util.inherit_doc
 @util.dataclass(frozen=True, type=AliasType.NONE, value=None)
-class Alias(util.DTO):
+class Alias(util.DTOSerializable):
     """
     Alias for type definitions.
 
     :param value: Address or mosaic ID for alias.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            AliasDTO:
+                type: integer
+                mosaicId?: UInt64DTO
+                # Hex(Address) (50-bytes)
+                address?: string
     """
 
     type: AliasType

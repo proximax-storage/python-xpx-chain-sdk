@@ -34,12 +34,19 @@ __all__ = ['NamespaceName']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class NamespaceName(util.Model):
+class NamespaceName(util.Serializable):
     """
     Namespace name and identifier.
 
     :param namespace_id: Namespace ID.
     :param name: Namespace name.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            NamespaceNameDTO:
+                namespaceId: UInt64DTO
+                name: string
     """
 
     namespace_id: NamespaceId

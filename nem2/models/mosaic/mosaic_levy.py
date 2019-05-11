@@ -41,7 +41,7 @@ __all__ = ['MosaicLevy']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicLevy(util.DTO):
+class MosaicLevy(util.DTOSerializable):
     """
     Information describing a mosaic levy.
 
@@ -49,6 +49,11 @@ class MosaicLevy(util.DTO):
     :param recipient: Recipient of levy.
     :param mosaic_id: Mosaic in which levy is paid.
     :param fee: Fee amount for levy.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            MosaicLevyDTO: null
     """
 
     # #type: MosaicLevyType
