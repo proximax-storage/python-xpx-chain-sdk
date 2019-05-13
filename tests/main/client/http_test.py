@@ -45,9 +45,9 @@ class TestHTTP(harness.TestCase):
         sync_data=client.HTTP,
         async_data=client.AsyncHTTP
     )
-    async def test_from_http(self, data, await_cb, with_cb):
+    async def test_create_from_http(self, data, await_cb, with_cb):
         async with with_cb(data(responses.ENDPOINT)) as http:
-            copy = data.from_http(http)
+            copy = data.create_from_http(http)
             self.assertTrue(http.raw is copy.raw)
 
     @harness.async_test(

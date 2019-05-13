@@ -44,8 +44,7 @@ def id_to_int(id: IdType) -> int:
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-# TODO(ahuszagh) Make Base64Mixin
-class NamespaceId(util.IntMixin, util.U64Mixin, util.Serializable):
+class NamespaceId(util.IntMixin, util.Object):
     """
     Identifier for a namespace.
 

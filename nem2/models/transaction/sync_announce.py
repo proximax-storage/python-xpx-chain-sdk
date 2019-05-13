@@ -34,7 +34,7 @@ __all__ = ['SyncAnnounce']
 
 
 @util.dataclass(frozen=True)
-class SyncAnnounce(util.DTOSerializable):
+class SyncAnnounce(util.DTO):
     """
     Signed transaction to announce and sync.
 
@@ -89,7 +89,7 @@ class SyncAnnounce(util.DTOSerializable):
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,

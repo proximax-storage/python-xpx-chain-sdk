@@ -1,8 +1,8 @@
 """
-    transaction_announce_response
-    =============================
+    merkle_path_item
+    ================
 
-    Response from announcing a transaction.
+    Component of a merkle path.
 
     License
     -------
@@ -27,29 +27,39 @@ from __future__ import annotations
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
-__all__ = ['TransactionAnnounceResponse']
+__all__ = ['MerklePathItem']
 
 
+# TODO(ahuszagh) Add unittests.
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionAnnounceResponse(util.DTO):
+class MerklePathItem(util.DTO):
     """
-    Response from announcing a transaction.
+    Merkle path item information.
+
+    :param position: Position of item in path.
+    :param hash: Hash of merkle path item.
 
     DTO Format:
         .. code-block:: yaml
 
-            AnnounceTransactionInfoDTO:
-                message: string
+            MerklePathItemDTO:
+                position: integer
+                # Hex(Hash) (64-bytes)
+                hash: str
     """
 
-    message: str
+    position: int
+    hash: str
 
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        return {'message': self.message}
+        return {
+            'position': self.position,
+            'hash': self.hash,
+        }
 
     @classmethod
     def create_from_dto(
@@ -57,4 +67,7 @@ class TransactionAnnounceResponse(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        return cls(data['message'])
+        return cls(
+            position=data['position'],
+            hash=data['hash'],
+        )

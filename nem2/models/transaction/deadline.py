@@ -27,7 +27,6 @@ import datetime
 import enum
 import typing
 
-from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = [
@@ -75,7 +74,7 @@ KEYWORDS = {
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class Deadline(util.U64Mixin):
+class Deadline(util.Object):
     """
     Deadline of a transaction.
 
@@ -121,7 +120,7 @@ class Deadline(util.U64Mixin):
         return int(utc.timestamp())
 
     @classmethod
-    def from_timestamp(cls, timestamp: int):
+    def create_from_timestamp(cls, timestamp: int):
         """
         Create deadline from UTC timestamp.
 
@@ -131,30 +130,7 @@ class Deadline(util.U64Mixin):
         local = utc.replace(tzinfo=None)
         return cls(local)
 
-    def to_dto(
-        self,
-        network_type: OptionalNetworkType = None,
-    ) -> util.U64DTOType:
-        return util.u64_to_dto(self.to_timestamp())
 
-    @classmethod
-    def from_dto(
-        cls,
-        data: util.U64DTOType,
-        network_type: OptionalNetworkType = None,
-    ):
-        return cls.from_timestamp(util.u64_from_dto(data))
-
-    def to_catbuffer(
-        self,
-        network_type: OptionalNetworkType = None,
-    ) -> bytes:
-        return util.u64_to_catbuffer(self.to_timestamp())
-
-    @classmethod
-    def from_catbuffer(
-        cls,
-        data: bytes,
-        network_type: OptionalNetworkType = None,
-    ):
-        return cls.from_timestamp(util.u64_from_catbuffer(data))
+# Private
+# Data-transfer object for the nemesis block timestamp.
+TIMESTAMP_NEMESIS_BLOCK_DTO = util.u64_to_dto(Deadline.TIMESTAMP_NEMESIS_BLOCK)

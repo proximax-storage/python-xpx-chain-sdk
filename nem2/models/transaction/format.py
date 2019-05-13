@@ -117,7 +117,7 @@ def save_signature_catbuffer(signature, network_type):
 def save_signer_catbuffer(signer, network_type):
     if signer is None:
         return bytes(32)
-    return signer.to_catbuffer(network_type)
+    return util.unhexlify(signer.public_key)
 
 
 SAVE_CATBUFFER = {
@@ -128,7 +128,7 @@ SAVE_CATBUFFER = {
     'network_type': lambda x, n: x.to_catbuffer(n),
     'type': lambda x, n: x.to_catbuffer(n),
     'max_fee': lambda x, n: util.u64_to_catbuffer(x),
-    'deadline': lambda x, n: x.to_catbuffer(n),
+    'deadline': lambda x, n: util.u64_to_catbuffer(x.to_timestamp()),
 }
 
 
@@ -141,18 +141,18 @@ def load_signature_catbuffer(data, network_type):
 def load_signer_catbuffer(data, network_type):
     if data == bytes(32):
         return None
-    return PublicAccount.from_catbuffer(data, network_type)
+    return PublicAccount.create_from_public_key(data, network_type)
 
 
 LOAD_CATBUFFER = {
     'size': lambda x, n: util.u32_from_catbuffer(x),
     'signature': load_signature_catbuffer,
     'signer': load_signer_catbuffer,
-    'version': TransactionVersion.from_catbuffer,
-    'network_type': NetworkType.from_catbuffer,
-    'type': TransactionType.from_catbuffer,
+    'version': TransactionVersion.create_from_catbuffer,
+    'network_type': NetworkType.create_from_catbuffer,
+    'type': TransactionType.create_from_catbuffer,
     'max_fee': lambda x, n: util.u64_from_catbuffer(x),
-    'deadline': Deadline.from_catbuffer,
+    'deadline': lambda x, n: Deadline.create_from_timestamp(util.u64_from_catbuffer(x)),
 }
 
 
@@ -181,7 +181,7 @@ SAVE_DTO = {
     'version': save_version_dto,
     'type': lambda x, n: x.to_dto(n),
     'max_fee': lambda x, n: util.u64_to_dto(x),
-    'deadline': lambda x, n: x.to_dto(n),
+    'deadline': lambda x, n: util.u64_to_dto(x.to_timestamp()),
     'transaction_info': save_transaction_info_dto,
 }
 
@@ -191,7 +191,7 @@ def load_signature_dto(data, network_type):
 
 
 def load_signer_dto(data, network_type):
-    return PublicAccount.from_dto(data, network_type)
+    return PublicAccount.create_from_public_key(data, network_type)
 
 
 def load_version_dto(data, network_type):
@@ -204,8 +204,8 @@ def load_network_type_dto(data, network_type):
 
 def load_transaction_info_dto(data, network_type):
     if 'hash' in data:
-        return TransactionInfo.from_dto(data, network_type)
-    return AggregateTransactionInfo.from_dto(data, network_type)
+        return TransactionInfo.create_from_dto(data, network_type)
+    return AggregateTransactionInfo.create_from_dto(data, network_type)
 
 
 LOAD_DTO = {
@@ -213,8 +213,8 @@ LOAD_DTO = {
     'signer': load_signer_dto,
     'version': load_version_dto,
     'network_type': load_network_type_dto,
-    'type': TransactionType.from_dto,
+    'type': TransactionType.create_from_dto,
     'max_fee': lambda x, n: util.u64_from_dto(x),
-    'deadline': Deadline.from_dto,
+    'deadline': lambda x, n: Deadline.create_from_timestamp(util.u64_from_dto(x)),
     'transaction_info': load_transaction_info_dto,
 }

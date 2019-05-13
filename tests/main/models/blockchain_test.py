@@ -68,7 +68,7 @@ class TestBlockInfo(harness.TestCase):
         dto['meta']['subCacheMerkleRoots'] = merkle_tree
 
         self.assertEqual(dto, block_info.to_dto(self.network_type))
-        self.assertEqual(block_info, self.type.from_dto(dto, self.network_type))
+        self.assertEqual(block_info, self.type.create_from_dto(dto, self.network_type))
 
 
 @harness.enum_test_case({

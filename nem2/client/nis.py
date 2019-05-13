@@ -122,7 +122,7 @@ def process_get_account_info(
     """
 
     assert status == 200
-    return models.AccountInfo.from_dto(json, network_type)
+    return models.AccountInfo.create_from_dto(json, network_type)
 
 
 get_account_info = request("get_account_info")
@@ -160,7 +160,7 @@ def process_get_accounts_info(
     """
 
     assert status == 200
-    return [models.AccountInfo.from_dto(i, network_type) for i in json]
+    return [models.AccountInfo.create_from_dto(i, network_type) for i in json]
 
 
 get_accounts_info = request("get_accounts_info")
@@ -197,7 +197,7 @@ def process_get_account_property(
     """
 
     assert status == 200
-    return models.AccountPropertiesInfo.from_dto(json, network_type)
+    return models.AccountPropertiesInfo.create_from_dto(json, network_type)
 
 
 get_account_property = request("get_account_property")
@@ -235,7 +235,7 @@ def process_get_account_properties(
     """
 
     assert status == 200
-    return models.AccountPropertiesInfo.from_dto(json, network_type)
+    return models.AccountPropertiesInfo.create_from_dto(json, network_type)
 
 
 get_account_properties = request("get_account_properties")
@@ -272,7 +272,7 @@ def process_get_multisig_account_info(
     """
 
     assert status == 200
-    return models.MultisigAccountInfo.from_dto(json, network_type)
+    return models.MultisigAccountInfo.create_from_dto(json, network_type)
 
 
 get_multisig_account_info = request("get_multisig_account_info")
@@ -309,7 +309,7 @@ def process_get_multisig_account_graph_info(
     """
 
     assert status == 200
-    return models.MultisigAccountGraphInfo.from_dto(json, network_type)
+    return models.MultisigAccountGraphInfo.create_from_dto(json, network_type)
 
 
 get_multisig_account_graph_info = request("get_multisig_account_graph_info")
@@ -346,7 +346,7 @@ def process_get_account_transactions(
     """
 
     assert status == 200
-    return [models.Transaction.from_dto(i, network_type) for i in json]
+    return [models.Transaction.create_from_dto(i, network_type) for i in json]
 
 
 get_account_transactions = request("get_account_transactions")
@@ -383,7 +383,7 @@ def process_get_account_incoming_transactions(
     """
 
     assert status == 200
-    return [models.Transaction.from_dto(i, network_type) for i in json]
+    return [models.Transaction.create_from_dto(i, network_type) for i in json]
 
 
 get_account_incoming_transactions = request("get_account_incoming_transactions")
@@ -420,7 +420,7 @@ def process_get_account_outgoing_transactions(
     """
 
     assert status == 200
-    return [models.Transaction.from_dto(i, network_type) for i in json]
+    return [models.Transaction.create_from_dto(i, network_type) for i in json]
 
 
 get_account_outgoing_transactions = request("get_account_outgoing_transactions")
@@ -457,7 +457,7 @@ def process_get_account_unconfirmed_transactions(
     """
 
     assert status == 200
-    return [models.Transaction.from_dto(i, network_type) for i in json]
+    return [models.Transaction.create_from_dto(i, network_type) for i in json]
 
 
 get_account_unconfirmed_transactions = request("get_account_unconfirmed_transactions")
@@ -494,7 +494,7 @@ def process_get_account_partial_transactions(
     """
 
     assert status == 200
-    return [models.Transaction.from_dto(i, network_type) for i in json]
+    return [models.Transaction.create_from_dto(i, network_type) for i in json]
 
 
 get_account_partial_transactions = request("get_account_partial_transactions")
@@ -534,7 +534,7 @@ def process_get_block_by_height(
     """
 
     assert status == 200
-    return models.BlockInfo.from_dto(json, network_type)
+    return models.BlockInfo.create_from_dto(json, network_type)
 
 
 get_block_by_height = request("get_block_by_height")
@@ -573,7 +573,7 @@ def process_get_blocks_by_height_with_limit(
     """
 
     assert status == 200
-    return [models.BlockInfo.from_dto(i, network_type) for i in json]
+    return [models.BlockInfo.create_from_dto(i, network_type) for i in json]
 
 
 get_blocks_by_height_with_limit = request("get_blocks_by_height_with_limit")
@@ -610,7 +610,7 @@ def process_get_block_transactions(
     """
 
     assert status == 200
-    return [models.Transaction.from_dto(i, network_type) for i in json]
+    return [models.Transaction.create_from_dto(i, network_type) for i in json]
 
 
 get_block_transactions = request("get_block_transactions")
@@ -635,6 +635,9 @@ def process_get_blockchain_height(
 ) -> int:
     """
     Process the "/chain/height" HTTP response.
+
+    Note: The data-transfer object format for the `HeightDTO` is in
+    the description for `BlockInfo`.
 
     :param status: Status code for HTTP response.
     :param json: JSON data for response message.
@@ -672,7 +675,7 @@ def process_get_blockchain_score(
     """
 
     assert status == 200
-    return models.BlockchainScore.from_dto(json, network_type)
+    return models.BlockchainScore.create_from_dto(json, network_type)
 
 
 get_blockchain_score = request("get_blockchain_score")
@@ -711,7 +714,7 @@ def process_get_diagnostic_blocks_by_height_with_limit(
     """
 
     assert status == 200
-    return [models.BlockInfo.from_dto(i, network_type) for i in json]
+    return [models.BlockInfo.create_from_dto(i, network_type) for i in json]
 
 
 get_diagnostic_blocks_by_height_with_limit = request(
@@ -744,7 +747,7 @@ def process_get_diagnostic_storage(
     """
 
     assert status == 200
-    return models.BlockchainStorageInfo.from_dto(json, network_type)
+    return models.BlockchainStorageInfo.create_from_dto(json, network_type)
 
 
 get_diagnostic_storage = request("get_diagnostic_storage")
@@ -783,7 +786,7 @@ def process_get_mosaic(
     """
 
     assert status == 200
-    return models.MosaicInfo.from_dto(json, network_type)
+    return models.MosaicInfo.create_from_dto(json, network_type)
 
 
 get_mosaic = request("get_mosaic")
@@ -820,7 +823,7 @@ def process_get_mosaics(
     """
 
     assert status == 200
-    return [models.MosaicInfo.from_dto(i, network_type) for i in json]
+    return [models.MosaicInfo.create_from_dto(i, network_type) for i in json]
 
 
 get_mosaics = request("get_mosaics")
@@ -857,7 +860,7 @@ def process_get_mosaic_names(
     """
 
     assert status == 200
-    return [models.MosaicName.from_dto(i, network_type) for i in json]
+    return [models.MosaicName.create_from_dto(i, network_type) for i in json]
 
 
 get_mosaic_names = request("get_mosaic_names")
@@ -896,7 +899,7 @@ def process_get_namespace(
     """
 
     assert status == 200
-    return models.NamespaceInfo.from_dto(json, network_type)
+    return models.NamespaceInfo.create_from_dto(json, network_type)
 
 
 get_namespace = request("get_namespace")
@@ -933,7 +936,7 @@ def process_get_namespaces_name(
     """
 
     assert status == 200
-    return [models.NamespaceName.from_dto(i, network_type) for i in json]
+    return [models.NamespaceName.create_from_dto(i, network_type) for i in json]
 
 
 get_namespaces_name = request("get_namespaces_name")
@@ -969,7 +972,7 @@ def process_get_namespaces_from_account(
     """
 
     assert status == 200
-    return [models.NamespaceInfo.from_dto(i, network_type) for i in json]
+    return [models.NamespaceInfo.create_from_dto(i, network_type) for i in json]
 
 
 get_namespaces_from_account = request("get_namespaces_from_account")
@@ -1006,7 +1009,7 @@ def process_get_namespaces_from_accounts(
     """
 
     assert status == 200
-    return [models.NamespaceInfo.from_dto(i, network_type) for i in json]
+    return [models.NamespaceInfo.create_from_dto(i, network_type) for i in json]
 
 
 get_namespaces_from_accounts = request("get_namespaces_from_accounts")
@@ -1098,6 +1101,9 @@ def request_get_network_type(client: client.Client, **kwds):
     """
     Make "/network" request.
 
+    Note: The data-transfer object format for the `NetworkTypeDTO` is in
+    the description for `NetworkType`.
+
     :param client: Wrapper for client.
     :param timeout: (Optional) timeout for request (in seconds).
     """
@@ -1154,7 +1160,7 @@ def process_get_transaction(
     """
 
     assert status == 200
-    return models.Transaction.from_dto(json, network_type)
+    return models.Transaction.create_from_dto(json, network_type)
 
 
 get_transaction = request("get_transaction")
@@ -1190,7 +1196,7 @@ def process_get_transactions(
     """
 
     assert status == 200
-    return [models.Transaction.from_dto(i, network_type) for i in json]
+    return [models.Transaction.create_from_dto(i, network_type) for i in json]
 
 
 get_transactions = request("get_transactions")
@@ -1226,7 +1232,7 @@ def process_get_transaction_status(
     """
 
     assert status == 200
-    return models.TransactionStatus.from_dto(json, network_type)
+    return models.TransactionStatus.create_from_dto(json, network_type)
 
 
 get_transaction_status = request("get_transaction_status")
@@ -1263,7 +1269,7 @@ def process_get_transaction_statuses(
     """
 
     assert status == 200
-    return [models.TransactionStatus.from_dto(i, network_type) for i in json]
+    return [models.TransactionStatus.create_from_dto(i, network_type) for i in json]
 
 
 get_transaction_statuses = request("get_transaction_statuses")
@@ -1300,7 +1306,7 @@ def process_announce(
     """
 
     assert status == 200
-    return models.TransactionAnnounceResponse.from_dto(json)
+    return models.TransactionAnnounceResponse.create_from_dto(json)
 
 
 announce = request("announce")
@@ -1341,8 +1347,8 @@ def process_announce_sync(
     if 'status' in json:
         json.setdefault('group', 'failed')
         json.setdefault('height', [0, 0])
-        return models.TransactionStatus.from_dto(json)
-    return models.Transaction.from_dto(json)
+        return models.TransactionStatus.create_from_dto(json)
+    return models.Transaction.create_from_dto(json)
 
 
 announce_sync = request("announce_sync")

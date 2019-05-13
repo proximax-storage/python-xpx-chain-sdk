@@ -34,7 +34,7 @@ __all__ = ['MosaicName']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicName(util.DTOSerializable):
+class MosaicName(util.DTO):
     """
     Mosaic name and identifiers.
 
@@ -60,18 +60,19 @@ class MosaicName(util.DTOSerializable):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            'mosaicId': self.mosaic_id.to_dto(),
+            'mosaicId': util.u64_to_dto(int(self.mosaic_id)),
             'name': self.name,
-            'parentId': self.parent_id.to_dto(),
+            'parentId': util.u64_to_dto(int(self.parent_id)),
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        mosaic_id = MosaicId.from_dto(data['mosaicId'], network_type)
-        name = data['name']
-        parent_id = NamespaceId.from_dto(data['parentId'], network_type)
-        return cls(mosaic_id, name, parent_id)
+        return cls(
+            mosaic_id=MosaicId(util.u64_from_dto(data['mosaicId'])),
+            name=data['name'],
+            parent_id=NamespaceId(util.u64_from_dto(data['parentId'])),
+        )

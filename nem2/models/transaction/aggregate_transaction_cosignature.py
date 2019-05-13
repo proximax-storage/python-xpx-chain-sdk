@@ -36,7 +36,7 @@ SIZE = PublicAccount.CATBUFFER_SIZE + 64 * util.U8_BYTES
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AggregateTransactionCosignature(util.Serializable):
+class AggregateTransactionCosignature(util.Model):
     """
     Aggregate transaction signer and signature.
 
@@ -65,17 +65,17 @@ class AggregateTransactionCosignature(util.Serializable):
     ) -> dict:
         return {
             'signature': self.signature,
-            'signer': self.signer.to_dto(network_type),
+            'signer': self.signer.public_key,
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
         signature = data['signature']
-        signer = PublicAccount.from_dto(data['signer'], network_type)
+        signer = PublicAccount.create_from_public_key(data['signer'], network_type)
         return cls(signature, signer)
 
     def to_catbuffer(
@@ -84,18 +84,18 @@ class AggregateTransactionCosignature(util.Serializable):
     ) -> bytes:
         # uint8_t[32] signer
         # uint8_t[64] signature
-        signer = self.signer.to_catbuffer(network_type)
+        signer = util.unhexlify(self.signer.public_key)
         signature = util.unhexlify(self.signature)
         return signer + signature
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls,
         data: bytes,
         network_type: OptionalNetworkType = None,
     ):
         # uint8_t[32] signer
         # uint8_t[64] signature
-        signer = PublicAccount.from_catbuffer(data[:32], network_type)
+        signer = PublicAccount.create_from_public_key(data[:32], network_type)
         signature = data[32:96]
         return cls(signature, signer)

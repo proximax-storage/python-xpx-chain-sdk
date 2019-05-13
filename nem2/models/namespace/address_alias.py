@@ -43,7 +43,7 @@ class AddressAlias(Alias):
         super().__init__(AliasType.ADDRESS, value)
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,

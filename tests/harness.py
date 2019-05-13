@@ -483,7 +483,7 @@ def model_test_dto(self):
 
     nt = self.network_type
     self.assertEqual(self.model.to_dto(nt), self.dto)
-    self.assertEqual(self.model, self.type.from_dto(self.dto, nt))
+    self.assertEqual(self.model, self.type.create_from_dto(self.dto, nt))
 
 
 def model_test_catbuffer(self):
@@ -493,7 +493,7 @@ def model_test_catbuffer(self):
     encoded = util.encode_hex(self.catbuffer)
     decoded = util.decode_hex(self.catbuffer)
     self.assertEqual(util.hexlify(self.model.to_catbuffer(nt)), encoded)
-    self.assertEqual(self.model, self.type.from_catbuffer(decoded, nt))
+    self.assertEqual(self.model, self.type.create_from_catbuffer(decoded, nt))
 
 
 def load_model(model_type, data):

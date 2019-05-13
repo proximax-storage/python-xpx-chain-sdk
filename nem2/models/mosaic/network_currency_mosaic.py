@@ -88,25 +88,25 @@ class NetworkCurrencyMosaic(Mosaic):
         return cls(amount)
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        id = NamespaceId.from_dto(data['id'], network_type)
+        id = NamespaceId(util.u64_from_dto(data['id']))
         amount = util.u64_from_dto(data['amount'])
         if int(id) != int(cls.NAMESPACE_ID):
             raise ValueError('Network currency mosaic ID does not match.')
         return cls(amount)
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls,
         data: bytes,
         network_type: OptionalNetworkType = None,
     ):
-        id, data = NamespaceId.from_catbuffer_pair(data, network_type)
-        amount = util.u64_from_catbuffer(data)
+        id = NamespaceId(util.u64_from_catbuffer(data[:8]))
+        amount = util.u64_from_catbuffer(data[8:16])
         if int(id) != int(cls.NAMESPACE_ID):
             raise ValueError('Network currency mosaic ID does not match.')
         return cls(amount)

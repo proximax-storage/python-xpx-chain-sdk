@@ -38,7 +38,7 @@ __all__ = ['NamespaceInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True, alias=Alias(AliasType.NONE, None))
-class NamespaceInfo(util.DTOSerializable):
+class NamespaceInfo(util.DTO):
     """
     Information describing a namespace.
 
@@ -75,7 +75,8 @@ class NamespaceInfo(util.DTOSerializable):
                 level1?: UInt64DTO
                 level2?: UInt64DTO
                 type: integer
-                alias: AliasDTO
+                # Required, but made optional for backward compatibility.
+                alias?: AliasDTO
                 parentId: UInt64DTO
 
             NamespaceInfoDTO:
@@ -134,17 +135,16 @@ class NamespaceInfo(util.DTOSerializable):
         namespace = {
             'type': self.type.to_dto(network_type),
             'depth': self.depth,
-            'parentId': self.parent_id.to_dto(network_type),
-            'owner': self.owner.to_dto(network_type),
-            'ownerAddress': self.owner.address.to_dto(network_type),
+            'parentId': util.u64_to_dto(int(self.parent_id)),
+            'owner': self.owner.public_key,
+            'ownerAddress': util.hexlify(self.owner.address.encoded),
             'startHeight': util.u64_to_dto(self.start_height),
             'endHeight': util.u64_to_dto(self.end_height),
         }
 
         # levels => ('level0', 'level1', ...)
         for i in range(self.depth):
-            key = f"level{i}"
-            namespace[key] = self.levels[i].to_dto(network_type)
+            namespace[f'level{i}'] = util.u64_to_dto(int(self.levels[i]))
 
         # Optional alias.
         if self.alias.type != AliasType.NONE:
@@ -156,25 +156,25 @@ class NamespaceInfo(util.DTOSerializable):
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
         meta = data['meta']
         namespace = data['namespace']
-        address = Address.from_dto(namespace['ownerAddress'], network_type)
+        address = Address.create_from_encoded(namespace['ownerAddress'])
         network_type = address.network_type
         depth = namespace['depth']
 
         # Load the levels.
         levels = []
         for i in range(depth):
-            levels.append(NamespaceId.from_dto(namespace[f'level{i}'], network_type))
+            levels.append(NamespaceId(util.u64_from_dto(namespace[f'level{i}'])))
 
         # Load the alias.
         try:
-            alias = Alias.from_dto(namespace['alias'], network_type)
+            alias = Alias.create_from_dto(namespace['alias'], network_type)
         except KeyError:
             alias = Alias(AliasType.NONE, None)
 
@@ -182,11 +182,11 @@ class NamespaceInfo(util.DTOSerializable):
             active=meta['active'],
             index=meta['index'],
             meta_id=meta['id'],
-            type=NamespaceType.from_dto(namespace['type'], network_type),
+            type=NamespaceType.create_from_dto(namespace['type'], network_type),
             depth=depth,
             levels=levels,
-            parent_id=NamespaceId.from_dto(namespace['parentId'], network_type),
-            owner=PublicAccount.from_dto(namespace['owner'], network_type),
+            parent_id=NamespaceId(util.u64_from_dto(namespace['parentId'])),
+            owner=PublicAccount(address, namespace['owner']),
             start_height=util.u64_from_dto(namespace['startHeight']),
             end_height=util.u64_from_dto(namespace['endHeight']),
             alias=alias,

@@ -39,7 +39,7 @@ ModificationType = MultisigCosignatoryModificationType
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MultisigCosignatoryModification(util.Serializable):
+class MultisigCosignatoryModification(util.Model):
     """
     Multisig cosignatory modification.
 
@@ -56,19 +56,19 @@ class MultisigCosignatoryModification(util.Serializable):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            'cosignatoryPublicKey': self.cosignatory_public_account.to_dto(network_type),
+            'cosignatoryPublicKey': self.cosignatory_public_account.public_key,
             'type': self.type.to_dto(network_type),
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
         public_key = data['cosignatoryPublicKey']
-        type = ModificationType.from_dto(data['type'], network_type)
-        public_account = PublicAccount.from_dto(public_key, network_type)
+        type = ModificationType.create_from_dto(data['type'], network_type)
+        public_account = PublicAccount.create_from_public_key(public_key, network_type)
         return cls(type, public_account)
 
     def to_catbuffer(
@@ -76,15 +76,15 @@ class MultisigCosignatoryModification(util.Serializable):
         network_type: OptionalNetworkType = None,
     ) -> bytes:
         type = self.type.to_catbuffer(network_type)
-        cosignatory = self.cosignatory_public_account.to_catbuffer(network_type)
+        cosignatory = util.unhexlify(self.cosignatory_public_account.public_key)
         return type + cosignatory
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls,
         data: bytes,
         network_type: OptionalNetworkType = None,
     ):
-        type, data = ModificationType.from_catbuffer_pair(data, network_type)
-        cosignatory = PublicAccount.from_catbuffer(data, network_type)
+        type, data = ModificationType.create_from_catbuffer_pair(data, network_type)
+        cosignatory = PublicAccount.create_from_public_key(data[:32], network_type)
         return cls(type, cosignatory)

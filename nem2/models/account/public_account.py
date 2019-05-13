@@ -26,17 +26,16 @@ from __future__ import annotations
 import typing
 
 from .address import Address
-from ..blockchain.network_type import NetworkType, OptionalNetworkType
+from ..blockchain.network_type import NetworkType
 from ... import util
 from ...util.signature import ed25519
 
 __all__ = ['PublicAccount']
 
 
-# TODO(ahuszagh) Change to an object, not an actual Model.
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class PublicAccount(util.Serializable):
+class PublicAccount(util.Object):
     """
     Describe public account information via public key and account address.
 
@@ -129,39 +128,6 @@ class PublicAccount(util.Serializable):
         data = transaction[100:]
         signature = transaction[4:68]
         return self.verify_signature(data, signature)
-
-    def to_dto(
-        self,
-        network_type: OptionalNetworkType = None,
-    ) -> str:
-        return self.public_key
-
-    @classmethod
-    def from_dto(
-        cls,
-        data: str,
-        network_type: OptionalNetworkType = None,
-    ):
-        assert network_type is not None
-        return cls.create_from_public_key(data, network_type)
-
-    def to_catbuffer(
-        self,
-        network_type: OptionalNetworkType = None,
-    ) -> bytes:
-        # uint8_t[32] public_key
-        return util.unhexlify(self.public_key)
-
-    @classmethod
-    def from_catbuffer(
-        cls,
-        data: bytes,
-        network_type: OptionalNetworkType = None,
-    ):
-        assert network_type is not None
-        # uint8_t[32] public_key
-        public_key = data[:32]
-        return cls.create_from_public_key(public_key, network_type)
 
 
 PublicAccountList = typing.Sequence[PublicAccount]

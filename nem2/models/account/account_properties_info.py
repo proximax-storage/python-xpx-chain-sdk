@@ -23,10 +23,9 @@
 """
 
 from __future__ import annotations
-import typing
 
 from .account_properties import AccountProperties
-from .account_properties_metadata import OptionalAccountPropertiesMetadata
+from .account_properties_metadata import AccountPropertiesMetadata
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
@@ -35,7 +34,7 @@ __all__ = ['AccountPropertiesInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AccountPropertiesInfo(util.DTOSerializable):
+class AccountPropertiesInfo(util.DTO):
     """
     Basic information describing account properties.
 
@@ -50,30 +49,28 @@ class AccountPropertiesInfo(util.DTOSerializable):
                 accountProperties: AccountPropertiesDTO
     """
 
-    meta: OptionalAccountPropertiesMetadata
-    account_properties: typing.Sequence[AccountProperties]
+    meta: AccountPropertiesMetadata
+    account_properties: AccountProperties
 
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        to_dto = AccountProperties.sequence_to_dto
         return {
             # TODO(ahuszagh) Check when stabilized
-            'meta': {},
-            'accountProperties': to_dto(self.account_properties, network_type),
+            'meta': self.meta.to_dto(network_type),
+            'accountProperties': self.account_properties.to_dto(network_type),
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        assert data['meta'] == {}
-        from_dto = AccountProperties.sequence_from_dto
+        from_dto = AccountProperties.create_from_dto
         return cls(
             # TODO(ahuszagh) Check when stabilized
-            meta=None,
-            account_properties=from_dto(data.get('accountProperties', []), network_type),
+            meta=AccountPropertiesMetadata.create_from_dto(data['meta'], network_type),
+            account_properties=from_dto(data['accountProperties'], network_type),
         )

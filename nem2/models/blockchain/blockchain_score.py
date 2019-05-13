@@ -32,7 +32,7 @@ __all__ = ['BlockchainScore']
 
 @util.inherit_doc
 @util.dataclass(frozen=True, score=0)
-class BlockchainScore(util.DTOSerializable):
+class BlockchainScore(util.DTO):
     """
     Blockchain score describing the block difficulty.
 
@@ -68,7 +68,7 @@ class BlockchainScore(util.DTOSerializable):
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,

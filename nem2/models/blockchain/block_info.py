@@ -39,7 +39,7 @@ OptionalMerkleTreeType = typing.Optional[MerkleTreeType]
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class BlockInfo(util.DTOSerializable):
+class BlockInfo(util.DTO):
     """
     Basic information describing a block.
 
@@ -188,7 +188,7 @@ class BlockInfo(util.DTOSerializable):
         }
         block = {
             'signature': self.signature,
-            'signer': self.signer.to_dto(network_type),
+            'signer': self.signer.public_key,
             'version': int(self.version) | (int(network_type) << 8),
             'type': self.type.to_dto(network_type),
             'height': util.u64_to_dto(self.height),
@@ -202,7 +202,7 @@ class BlockInfo(util.DTOSerializable):
         }
 
         if self.beneficiary is not None:
-            # TODO(ahuszagh) Need to base64-encoded.
+            # TODO(ahuszagh) Is base64-encoded rather than hex-encoded.
             #   Should be fixed in an upcoming version.
             public_key = util.unhexlify(self.beneficiary.public_key)
             meta['beneficiaryPublicKey'] = util.b64encode(public_key)
@@ -213,7 +213,7 @@ class BlockInfo(util.DTOSerializable):
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
@@ -224,6 +224,8 @@ class BlockInfo(util.DTOSerializable):
         network_type = NetworkType(version >> 8)
         beneficiary = None
         if 'beneficiaryPublicKey' in block:
+            # TODO(ahuszagh) Is base64-encoded rather than hex-encoded.
+            #   Should be fixed in an upcoming version.
             public_key = util.hexlify(util.b64decode(block['beneficiaryPublicKey']))
             beneficiary = PublicAccount.create_from_public_key(public_key, network_type)
         return cls(
@@ -232,10 +234,10 @@ class BlockInfo(util.DTOSerializable):
             total_fee=util.u64_from_dto(meta.get('totalFee', [0, 0])),
             num_transactions=meta.get('numTransactions', 0),
             signature=block['signature'],
-            signer=PublicAccount.from_dto(block['signer'], network_type),
+            signer=PublicAccount.create_from_public_key(block['signer'], network_type),
             network_type=network_type,
             version=TransactionVersion(version & 0xFF),
-            type=BlockType.from_dto(block['type'], network_type),
+            type=BlockType.create_from_dto(block['type'], network_type),
             height=util.u64_from_dto(block['height']),
             timestamp=util.u64_from_dto(block['timestamp']),
             difficulty=util.u64_from_dto(block['difficulty']),

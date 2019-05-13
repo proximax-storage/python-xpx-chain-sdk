@@ -33,7 +33,7 @@ __all__ = ['TransactionInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True, hash=None, merkle_component_hash=None)
-class TransactionInfo(util.DTOSerializable):
+class TransactionInfo(util.DTO):
     """Transaction metadata."""
 
     height: int
@@ -78,7 +78,7 @@ class TransactionInfo(util.DTOSerializable):
         return data
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,

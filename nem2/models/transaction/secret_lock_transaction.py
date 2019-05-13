@@ -185,13 +185,13 @@ class SecretLockTransaction(Transaction):
         # uint8_t hash_type
         # uint8_t[32] secret
         # uint8_t[25] recipient
-        mosaic, data = Mosaic.from_catbuffer_pair(data, network_type)
+        mosaic, data = Mosaic.create_from_catbuffer_pair(data, network_type)
         duration = util.u64_from_catbuffer(data[:8])
-        hash_type, data = HashType.from_catbuffer_pair(data[8:], network_type)
+        hash_type, data = HashType.create_from_catbuffer_pair(data[8:], network_type)
         hash_length = hash_type.hash_length() // 2
         secret = util.hexlify(data[:hash_length])
         data = data[32:]
-        recipient, data = Recipient.from_catbuffer_pair(data, network_type)
+        recipient, data = Recipient.create_from_catbuffer_pair(data, network_type)
 
         self._set('mosaic', mosaic)
         self._set('duration', duration)
@@ -208,7 +208,7 @@ class SecretLockTransaction(Transaction):
         network_type: NetworkType,
     ) -> dict:
         return {
-            'mosaicId': self.mosaic.id.to_dto(network_type),
+            'mosaicId': util.u64_to_dto(int(self.mosaic.id)),
             'amount': util.u64_to_dto(self.mosaic.amount),
             'duration': util.u64_to_dto(self.duration),
             'hashAlgorithm': self.hash_type.to_dto(network_type),
@@ -221,12 +221,12 @@ class SecretLockTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        mosaic_id = MosaicId.from_dto(data['mosaicId'], network_type)
+        mosaic_id = MosaicId(util.u64_from_dto(data['mosaicId']))
         amount = util.u64_from_dto(data['amount'])
         mosaic = Mosaic(mosaic_id, amount)
         duration = util.u64_from_dto(data['duration'])
-        hash_type = HashType.from_dto(data['hashAlgorithm'], network_type)
-        recipient = Recipient.from_dto(data['recipient'], network_type)
+        hash_type = HashType.create_from_dto(data['hashAlgorithm'], network_type)
+        recipient = Recipient.create_from_dto(data['recipient'], network_type)
 
         self._set('mosaic', mosaic)
         self._set('duration', duration)

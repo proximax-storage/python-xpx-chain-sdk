@@ -34,7 +34,7 @@ from ... import util
 
 __all__ = ['InnerTransaction']
 
-# We need 3 different transaction base types for `from_transaction`.
+# We need 3 different transaction base types for `create_from_transaction`.
 T1 = typing.TypeVar('T1', bound='TransactionBase')
 T2 = typing.TypeVar('T2', bound='TransactionBase')
 T3 = typing.TypeVar('T3', bound='TransactionBase')
@@ -76,7 +76,7 @@ class InnerTransaction(TransactionBase):
     # AGGREGATE
 
     @classmethod
-    def from_transaction(
+    def create_from_transaction(
         cls: typing.Type[T1],
         transaction: T2,
         signer: PublicAccount,

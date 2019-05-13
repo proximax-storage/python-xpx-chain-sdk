@@ -42,22 +42,22 @@ def dto_to_kwds(
 ) -> dict:
     """Convert data transfer object to keywords for initializer."""
 
-    kwds: dict = {'type': AliasType.from_dto(data['type'], network_type)}
+    kwds: dict = {'type': AliasType.create_from_dto(data['type'], network_type)}
     if data['type'] == AliasType.NONE:
         kwds['value'] = None
     elif data['type'] == AliasType.ADDRESS:
-        kwds['value'] = Address.from_dto(data['address'], network_type)
+        kwds['value'] = Address.create_from_encoded(data['address'])
     elif data['type'] == AliasType.MOSAIC_ID:
-        kwds['value'] = MosaicId.from_dto(data['mosaicId'], network_type)
+        kwds['value'] = MosaicId(util.u64_from_dto(data['mosaicId']))
     else:       # pragma: unreachable
-        raise ValueError("Invalid data for Alias.from_dto.")
+        raise ValueError("Invalid data for Alias.create_from_dto.")
 
     return kwds
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True, type=AliasType.NONE, value=None)
-class Alias(util.DTOSerializable):
+class Alias(util.DTO):
     """
     Alias for type definitions.
 
@@ -113,16 +113,18 @@ class Alias(util.DTOSerializable):
         if self.type == AliasType.NONE:
             pass
         elif self.type == AliasType.ADDRESS:
-            data['address'] = self.value.to_dto(network_type)
+            address = typing.cast(Address, self.value)
+            data['address'] = util.hexlify(address.encoded)
         elif self.type == AliasType.MOSAIC_ID:
-            data['mosaicId'] = self.value.to_dto(network_type)
+            mosaic_id = typing.cast(MosaicId, self.value)
+            data['mosaicId'] = util.u64_to_dto(int(mosaic_id))
         else:       # pragma: unreachable
             raise ValueError("Invalid data for Alias.to_dto.")
 
         return data
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,

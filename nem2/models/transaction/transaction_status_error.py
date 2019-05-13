@@ -33,13 +33,24 @@ __all__ = ['TransactionStatusError']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionStatusError(util.DTOSerializable):
+class TransactionStatusError(util.DTO):
     """
     Model representing errors in transactions from listeners.
 
     :param hash: Transaction hash.
     :param status: Status error message.
     :param deadline: Transaction deadline.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            # The DTO format is implied from the typescript SDK,
+            # and is only returned by listeners.
+            TransactionStatusDTO:
+                status: string
+                # Hex(Hash) (64-bytes)
+                hash: string
+                deadline: UInt64DTO
     """
 
     hash: str
@@ -53,11 +64,11 @@ class TransactionStatusError(util.DTOSerializable):
         return {
             'hash': self.hash,
             'status': self.status,
-            'deadline': self.deadline.to_dto(network_type),
+            'deadline': util.u64_to_dto(self.deadline.to_timestamp()),
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
@@ -65,5 +76,5 @@ class TransactionStatusError(util.DTOSerializable):
         return cls(
             hash=data['hash'],
             status=data['status'],
-            deadline=Deadline.from_dto(data['deadline'], network_type),
+            deadline=Deadline.create_from_timestamp(util.u64_from_dto(data['deadline'])),
         )

@@ -1,8 +1,8 @@
 """
-    transaction_announce_response
-    =============================
+    merkle_proof_info
+    =================
 
-    Response from announcing a transaction.
+    Describes a merkle proof.
 
     License
     -------
@@ -23,33 +23,49 @@
 """
 
 from __future__ import annotations
+import typing
 
-from ..blockchain.network_type import OptionalNetworkType
+from .merkle_path_item import MerklePathItem
+from .network_type import OptionalNetworkType
 from ... import util
 
-__all__ = ['TransactionAnnounceResponse']
+__all__ = ['MerkleProofInfo']
 
 
+# TODO(ahuszagh) Add unittests.
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionAnnounceResponse(util.DTO):
+class MerkleProofInfo(util.DTO):
     """
-    Response from announcing a transaction.
+    Merkle proof information.
+
+    :param payload: Proof payload.
+    :param type: Data type.
 
     DTO Format:
         .. code-block:: yaml
 
-            AnnounceTransactionInfoDTO:
-                message: string
+            MerkleProofInfoPayloadDTO:
+                merklePath: MerklePathItemDTO[]
+
+            MerkleProofInfoDTO:
+                payload: MerkleProofInfoPayloadDTO
+                type: str
     """
 
-    message: str
+    payload: typing.Sequence[MerklePathItem]
+    type: str
 
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        return {'message': self.message}
+        return {
+            'payload': {
+                'merklePath': [i.to_dto(network_type) for i in self.payload],
+            },
+            'type': self.type,
+        }
 
     @classmethod
     def create_from_dto(
@@ -57,4 +73,9 @@ class TransactionAnnounceResponse(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        return cls(data['message'])
+        payload = data['payload']
+        path = payload['merklePath']
+        return cls(
+            payload=[MerklePathItem.create_from_dto(i, network_type) for i in path],
+            type=data['type'],
+        )

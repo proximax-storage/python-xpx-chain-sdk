@@ -62,8 +62,8 @@ from tests import responses
                 lambda x: (x[0].max_fee, 0),
                 lambda x: (x[0].namespace_type, models.NamespaceType.ROOT_NAMESPACE),
                 lambda x: (x[0].duration, 0),
-                lambda x: (x[0].namespace_id, models.NamespaceId.from_hex('b1497f5fba651b4f')),
-                lambda x: (x[0].name, 'cat'),
+                lambda x: (x[0].namespace_id, models.NamespaceId.create_from_hex('b1497f5fba651b4f')),
+                lambda x: (x[0].namespace_name, 'cat'),
             ]
         },
         {

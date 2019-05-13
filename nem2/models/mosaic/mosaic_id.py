@@ -33,8 +33,7 @@ __all__ = ['MosaicId']
 
 @util.inherit_doc
 @util.dataclass(frozen=True, id=0)
-# TODO(ahuszagh) Make Base64Mixin
-class MosaicId(util.IntMixin, util.U64Mixin, util.Serializable):
+class MosaicId(util.IntMixin, util.Object):
     """
     Mosaic identifier.
 

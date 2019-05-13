@@ -26,44 +26,21 @@ from __future__ import annotations
 import enum
 import typing
 
-from .dataclasses import MISSING
-
 __all__ = [
     'AbstractMethodError',
     'Catbuffer',
-    'CatbufferSerializable',
     'DTO',
-    'DTOSerializable',
     'Object',
-    'Serializable',
-    'TypeMap',
-    'AttributeMap',
+    'Model',
 ]
 
 # TYPES
 
 NetworkType = typing.TypeVar('NetworkType', bound=enum.IntEnum)
 OptionalNetworkType = typing.Optional[NetworkType]
-DTOType = typing.TypeVar(
-    'DTOType',
-    bound='DTO'
-)
-CatbufferType = typing.TypeVar(
-    'CatbufferType',
-    bound='Catbuffer'
-)
-DTOSerializableType = typing.TypeVar(
-    'DTOSerializableType',
-    bound='DTOSerializable'
-)
-CatbufferSerializableType = typing.TypeVar(
-    'CatbufferSerializableType',
-    bound='CatbufferSerializable'
-)
-SerializableType = typing.TypeVar(
-    'SerializableType',
-    bound='Serializable'
-)
+DTOType = typing.TypeVar('DTOType', bound='DTO')
+CatbufferType = typing.TypeVar('CatbufferType', bound='Catbuffer')
+ModelType = typing.TypeVar('ModelType', bound='Model')
 DTOFormat = typing.TypeVar('DTOFormat', int, str, dict, list)
 
 # EXCEPTIONS
@@ -115,87 +92,13 @@ else:
             return cls
 
 
-TypeMap = typing.Dict[str, typing.Tuple[typing.Type, typing.Any]]
-AttributeMap = typing.Dict[str, str]
-
-
-class DTO(Object):
-    """Base data-transfer object that supports serialization to and from JSON."""
-
-    type_map: typing.ClassVar[TypeMap]
-    attribute_map: typing.ClassVar[AttributeMap]
-
-    __slots__ = ()
-
-    def serialize(
-        self: DTOType,
-    ) -> typing.Union[dict, list]:
-        """Serialize data-transfer object to JSON-serializable data."""
-
-        data = {}
-        for field, attribute in self.attribute_map.items():
-            default = self.type_mapp[field][1]
-            value = getattr(self, field, default)
-            if value is MISSING:
-                raise ValueError(f'Missing required DTO field {field}.')
-            elif value == default:
-                pass
-            elif isinstance(value, DTO):
-                data[attribute] = value.serialize()
-            else:
-                data[attribute] = value
-        return data
-
-    @classmethod
-    def deserialize(
-        cls: typing.Type[DTOType],
-        data: typing.Union[dict, list],
-    ) -> DTOType:
-        """Serialize data-transfer object to JSON-serializable data."""
-
-        kwds = {}
-        for field, attribute in cls.attribute_map.items():
-            type, default = cls.type_map[field]
-            value = data.get(attribute, default)
-            if value is MISSING:
-                raise ValueError(f'Missing required DTO field {field}.')
-            elif value == default:
-                pass
-            elif issubclass(type, DTO):
-                kwds[attribute] = type.deserialize(value)
-            else:
-                kwds[attribute] = value
-        return cls(**kwds)
-
-
-class Catbuffer(Object):
-    """Base data-transfer object that supports serialization to and from catbuffer."""
-
-    __slots__ = ()
-    # TODO(ahuszagh) Need some specialized serializers, likely....
-
-    def serialize(
-        self: CatbufferType,
-    ) -> bytes:
-        """Serialize data-transfer object to JSON-serializable data."""
-        raise AbstractMethodError
-
-    @classmethod
-    def deserialize(
-        cls: typing.Type[CatbufferType],
-        data: bytes,
-    ) -> CatbufferType:
-        """Serialize data-transfer object to JSON-serializable data."""
-        raise AbstractMethodError
-
-
-class DTOSerializable(Object[DTOFormat]):
+class DTO(Object[DTOFormat]):
     """Future format of the DTO class."""
 
     __slots__ = ()
 
     def to_dto(
-        self: DTOSerializableType,
+        self: DTOType,
         network_type: OptionalNetworkType = None,
     ) -> DTOFormat:
         """
@@ -207,11 +110,11 @@ class DTOSerializable(Object[DTOFormat]):
         raise AbstractMethodError
 
     @classmethod
-    def from_dto(
-        cls: typing.Type[DTOSerializableType],
+    def create_from_dto(
+        cls: typing.Type[DTOType],
         data: DTOFormat,
         network_type: OptionalNetworkType = None,
-    ) -> DTOSerializableType:
+    ) -> DTOType:
         """
         Load model from DTO interchange format.
 
@@ -222,8 +125,8 @@ class DTOSerializable(Object[DTOFormat]):
 
     @classmethod
     def iter_to_dto(
-        cls: typing.Type[DTOSerializableType],
-        iterable: typing.Iterable[DTOSerializableType],
+        cls: typing.Type[DTOType],
+        iterable: typing.Iterable[DTOType],
         network_type: OptionalNetworkType = None,
     ) -> typing.Generator[DTOFormat, None, None]:
         """
@@ -238,10 +141,10 @@ class DTOSerializable(Object[DTOFormat]):
 
     @classmethod
     def iter_from_dto(
-        cls: typing.Type[DTOSerializableType],
+        cls: typing.Type[DTOType],
         iterable: typing.Iterable[DTOFormat],
         network_type: OptionalNetworkType = None,
-    ) -> typing.Generator[DTOSerializableType, None, None]:
+    ) -> typing.Generator[DTOType, None, None]:
         """
         Iteratively load models from DTO interchange format.
 
@@ -250,12 +153,12 @@ class DTOSerializable(Object[DTOFormat]):
         :return: Next native model from DTO interchange format.
         """
         for dto in iterable:
-            yield cls.from_dto(dto, network_type)
+            yield cls.create_from_dto(dto, network_type)
 
     @classmethod
     def sequence_to_dto(
-        cls: typing.Type[DTOSerializableType],
-        sequence: typing.Sequence[DTOSerializableType],
+        cls: typing.Type[DTOType],
+        sequence: typing.Sequence[DTOType],
         network_type: OptionalNetworkType = None,
     ) -> typing.Sequence[DTOFormat]:
         """
@@ -269,10 +172,10 @@ class DTOSerializable(Object[DTOFormat]):
 
     @classmethod
     def sequence_from_dto(
-        cls: typing.Type[DTOSerializableType],
+        cls: typing.Type[DTOType],
         sequence: typing.Sequence[DTOFormat],
         network_type: OptionalNetworkType = None,
-    ) -> typing.Sequence[DTOSerializableType]:
+    ) -> typing.Sequence[DTOType]:
         """
         Load list of models from DTO interchange format.
 
@@ -295,23 +198,23 @@ def is_same_classmethod(
     return clsmeth1.__func__ is clsmeth2.__func__
 
 
-class CatbufferSerializable(Object):
+class Catbuffer(Object):
     """
     Future format of the catbuffer class.
 
-    Either `from_catbuffer` or `from_catbuffer_pair` needs to be specialized.
-    If `CATBUFFER_SIZE` is present, `from_catbuffer` should be specialized,
-    otherwise, `from_catbuffer_pair` should be specialized. If
-    `CATBUFFER_SIZE` is present and neither function is specialized,
-    it will lead to an `AssertionError`, or on optimized builds, a
-    `RecursionError`.
+    Either `create_from_catbuffer` or `create_from_catbuffer_pair` needs
+    to be specialized. If `CATBUFFER_SIZE` is present, `create_from_catbuffer`
+    should be specialized, otherwise, `create_from_catbuffer_pair` should
+    be specialized. If `CATBUFFER_SIZE` is present and neither function
+    is specialized, it will lead to an `AssertionError`, or on optimized
+    builds, a `RecursionError`.
     """
 
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int]
 
     def to_catbuffer(
-        self: CatbufferSerializableType,
+        self: CatbufferType,
         network_type: OptionalNetworkType = None,
     ) -> bytes:
         """
@@ -323,50 +226,50 @@ class CatbufferSerializable(Object):
         raise AbstractMethodError
 
     @classmethod
-    def from_catbuffer(
-        cls: typing.Type[CatbufferSerializableType],
+    def create_from_catbuffer(
+        cls: typing.Type[CatbufferType],
         data: bytes,
         network_type: OptionalNetworkType = None,
-    ) -> CatbufferSerializableType:
+    ) -> CatbufferType:
         """
         Load model from catbuffer interchange format.
 
         If `CATBUFFER_SIZE` is defined, you should override this
-        method, and `from_catbuffer_pair` will be automatically
-        defined. Otherwise, override `from_catbuffer_pair`.
+        method, and `create_from_catbuffer_pair` will be automatically
+        defined. Otherwise, override `create_from_catbuffer_pair`.
 
         :param network_type: (Optional) network type.
         :return: Native model from catbuffer interchange format.
         """
-        assert not is_same_classmethod(cls, CatbufferSerializable, 'from_catbuffer_pair')
-        return cls.from_catbuffer_pair(data, network_type)[0]
+        assert not is_same_classmethod(cls, Catbuffer, 'create_from_catbuffer_pair')
+        return cls.create_from_catbuffer_pair(data, network_type)[0]
 
     @classmethod
-    def from_catbuffer_pair(
-        cls: typing.Type[CatbufferSerializableType],
+    def create_from_catbuffer_pair(
+        cls: typing.Type[CatbufferType],
         data: bytes,
         network_type: OptionalNetworkType = None,
-    ) -> typing.Tuple[CatbufferSerializableType, bytes]:
+    ) -> typing.Tuple[CatbufferType, bytes]:
         """
         Load model from catbuffer interchange format.
 
         If `CATBUFFER_SIZE` is not defined, you should override this
-        method, and `from_catbuffer` will be automatically defined.
-        Otherwise, override `from_catbuffer`.
+        method, and `create_from_catbuffer` will be automatically defined.
+        Otherwise, override `create_from_catbuffer`.
 
         :param network_type: (Optional) network type.
         :return: Model and remaining bytes leftover.
         """
-        assert not is_same_classmethod(cls, CatbufferSerializable, 'from_catbuffer')
+        assert not is_same_classmethod(cls, Catbuffer, 'create_from_catbuffer')
         size = cls.CATBUFFER_SIZE
-        inst = cls.from_catbuffer(data[:size], network_type)
+        inst = cls.create_from_catbuffer(data[:size], network_type)
         remaining = data[size:]
         return inst, remaining
 
     @classmethod
     def iter_to_catbuffer(
-        cls: typing.Type[CatbufferSerializableType],
-        iterable: typing.Iterable[CatbufferSerializableType],
+        cls: typing.Type[CatbufferType],
+        iterable: typing.Iterable[CatbufferType],
         network_type,
     ) -> typing.Generator[bytes, None, None]:
         """
@@ -381,11 +284,11 @@ class CatbufferSerializable(Object):
 
     @classmethod
     def iter_from_catbuffer(
-        cls: typing.Type[CatbufferSerializableType],
+        cls: typing.Type[CatbufferType],
         data: bytes,
         count: int,
         network_type,
-    ) -> typing.Generator[CatbufferSerializableType, None, None]:
+    ) -> typing.Generator[CatbufferType, None, None]:
         """
         Iteratively load models from catbuffer interchange format.
 
@@ -399,11 +302,11 @@ class CatbufferSerializable(Object):
 
     @classmethod
     def iter_from_catbuffer_pair(
-        cls: typing.Type[CatbufferSerializableType],
+        cls: typing.Type[CatbufferType],
         data: bytes,
         count: int,
         network_type,
-    ) -> typing.Generator[typing.Tuple[CatbufferSerializableType, bytes], None, None]:
+    ) -> typing.Generator[typing.Tuple[CatbufferType, bytes], None, None]:
         """
         Iteratively load models from catbuffer interchange format.
 
@@ -413,13 +316,13 @@ class CatbufferSerializable(Object):
         :return: Next native model and input bytes leftover.
         """
         for _ in range(count):
-            value, data = cls.from_catbuffer_pair(data, network_type)
+            value, data = cls.create_from_catbuffer_pair(data, network_type)
             yield value, data
 
     @classmethod
     def sequence_to_catbuffer(
-        cls: typing.Type[CatbufferSerializableType],
-        sequence: typing.Sequence[CatbufferSerializableType],
+        cls: typing.Type[CatbufferType],
+        sequence: typing.Sequence[CatbufferType],
         network_type,
     ) -> bytes:
         """
@@ -433,11 +336,11 @@ class CatbufferSerializable(Object):
 
     @classmethod
     def sequence_from_catbuffer(
-        cls: typing.Type[CatbufferSerializableType],
+        cls: typing.Type[CatbufferType],
         data: bytes,
         count: int,
         network_type,
-    ) -> typing.Sequence[CatbufferSerializableType]:
+    ) -> typing.Sequence[CatbufferType]:
         """
         Load list of models from catbuffer interchange format.
 
@@ -450,11 +353,11 @@ class CatbufferSerializable(Object):
 
     @classmethod
     def sequence_from_catbuffer_pair(
-        cls: typing.Type[CatbufferSerializableType],
+        cls: typing.Type[CatbufferType],
         data: bytes,
         count: int,
         network_type,
-    ) -> typing.Tuple[typing.Sequence[CatbufferSerializableType], bytes]:
+    ) -> typing.Tuple[typing.Sequence[CatbufferType], bytes]:
         """
         Load list of models from catbuffer interchange format.
 
@@ -470,7 +373,7 @@ class CatbufferSerializable(Object):
         return result, data
 
 
-class Serializable(DTOSerializable, CatbufferSerializable):
+class Model(DTO, Catbuffer):
     """Base class for NEM models."""
 
     __slots__ = ()

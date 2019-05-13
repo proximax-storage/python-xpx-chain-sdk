@@ -34,7 +34,7 @@ __all__ = ['MultisigAccountInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MultisigAccountInfo(util.DTOSerializable):
+class MultisigAccountInfo(util.DTO):
     """
     Information describing a multisig account.
 
@@ -105,7 +105,7 @@ class MultisigAccountInfo(util.DTOSerializable):
         return {
             'multisig': {
                 'account': self.account.public_key,
-                'accountAddress': self.account.address.to_dto(network_type),
+                'accountAddress': util.hexlify(self.account.address.encoded),
                 'minApproval': util.u32_to_dto(self.min_approval),
                 'minRemoval': util.u32_to_dto(self.min_removal),
                 'cosignatories': cosignatories,
@@ -114,7 +114,7 @@ class MultisigAccountInfo(util.DTOSerializable):
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,

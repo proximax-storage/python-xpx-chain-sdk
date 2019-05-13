@@ -26,7 +26,6 @@ from __future__ import annotations
 import typing
 
 from . import abc
-from . import base64
 from . import documentation
 from . import stdint
 
@@ -38,8 +37,6 @@ __all__ = [
     'U32Mixin',
     'U64Mixin',
     'U128Mixin',
-    # TODO(ahuszagh) Restore.
-    #'Base64Mixin',
 ]
 
 IntMixinType = typing.TypeVar('IntMixinType', bound='IntMixin')
@@ -48,7 +45,6 @@ U16MixinType = typing.TypeVar('U16MixinType', bound='U16Mixin')
 U32MixinType = typing.TypeVar('U32MixinType', bound='U32Mixin')
 U64MixinType = typing.TypeVar('U64MixinType', bound='U64Mixin')
 U128MixinType = typing.TypeVar('U128MixinType', bound='U128Mixin')
-#Base64MixinType = typing.TypeVar('Base64MixinType', bound='Base64Mixin')
 
 
 class EnumMixin:
@@ -76,7 +72,7 @@ class IntMixin:
         return int(self).__format__(format_spec)
 
     @classmethod
-    def from_hex(
+    def create_from_hex(
         cls: typing.Type[IntMixinType],
         data: str
     ) -> IntMixinType:
@@ -92,7 +88,7 @@ class IntMixin:
 
 
 @documentation.inherit_doc
-class U8Mixin(abc.Serializable):
+class U8Mixin(abc.Model):
     """Mixin for classes wrapping 8-bit integer types."""
 
     __slots__ = ()
@@ -106,7 +102,7 @@ class U8Mixin(abc.Serializable):
         return stdint.u8_to_dto(asint)
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls: typing.Type[U8MixinType],
         data: stdint.U8DTOType,
         network_type: abc.OptionalNetworkType = None,
@@ -122,7 +118,7 @@ class U8Mixin(abc.Serializable):
         return stdint.u8_to_catbuffer(asint)
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls: typing.Type[U8MixinType],
         data: bytes,
         network_type: abc.OptionalNetworkType = None,
@@ -133,7 +129,7 @@ class U8Mixin(abc.Serializable):
 
 
 @documentation.inherit_doc
-class U16Mixin(abc.Serializable):
+class U16Mixin(abc.Model):
     """Mixin for classes wrapping 16-bit integer types."""
 
     __slots__ = ()
@@ -147,7 +143,7 @@ class U16Mixin(abc.Serializable):
         return stdint.u16_to_dto(asint)
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls: typing.Type[U16MixinType],
         data: stdint.U16DTOType,
         network_type: abc.OptionalNetworkType = None,
@@ -163,7 +159,7 @@ class U16Mixin(abc.Serializable):
         return stdint.u16_to_catbuffer(asint)
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls: typing.Type[U16MixinType],
         data: bytes,
         network_type: abc.OptionalNetworkType = None,
@@ -174,7 +170,7 @@ class U16Mixin(abc.Serializable):
 
 
 @documentation.inherit_doc
-class U32Mixin(abc.Serializable):
+class U32Mixin(abc.Model):
     """Mixin for classes wrapping 32-bit integer types."""
 
     __slots__ = ()
@@ -188,7 +184,7 @@ class U32Mixin(abc.Serializable):
         return stdint.u32_to_dto(asint)
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls: typing.Type[U32MixinType],
         data: stdint.U32DTOType,
         network_type: abc.OptionalNetworkType = None,
@@ -204,7 +200,7 @@ class U32Mixin(abc.Serializable):
         return stdint.u32_to_catbuffer(asint)
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls: typing.Type[U32MixinType],
         data: bytes,
         network_type: abc.OptionalNetworkType = None,
@@ -215,7 +211,7 @@ class U32Mixin(abc.Serializable):
 
 
 @documentation.inherit_doc
-class U64Mixin(abc.Serializable):
+class U64Mixin(abc.Model):
     """Mixin for classes wrapping 64-bit integer types."""
 
     __slots__ = ()
@@ -229,7 +225,7 @@ class U64Mixin(abc.Serializable):
         return stdint.u64_to_dto(asint)
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls: typing.Type[U64MixinType],
         data: stdint.U64DTOType,
         network_type: abc.OptionalNetworkType = None,
@@ -245,7 +241,7 @@ class U64Mixin(abc.Serializable):
         return stdint.u64_to_catbuffer(asint)
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls: typing.Type[U64MixinType],
         data: bytes,
         network_type: abc.OptionalNetworkType = None,
@@ -256,7 +252,7 @@ class U64Mixin(abc.Serializable):
 
 
 @documentation.inherit_doc
-class U128Mixin(abc.Serializable):
+class U128Mixin(abc.Model):
     """Mixin for classes wrapping 128-bit integer types."""
 
     __slots__ = ()
@@ -270,7 +266,7 @@ class U128Mixin(abc.Serializable):
         return stdint.u128_to_dto(asint)
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls: typing.Type[U128MixinType],
         data: stdint.U128DTOType,
         network_type: abc.OptionalNetworkType = None,
@@ -286,7 +282,7 @@ class U128Mixin(abc.Serializable):
         return stdint.u128_to_catbuffer(asint)
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls: typing.Type[U128MixinType],
         data: bytes,
         network_type: abc.OptionalNetworkType = None,
@@ -294,21 +290,3 @@ class U128Mixin(abc.Serializable):
         size = cls.CATBUFFER_SIZE
         asint = stdint.u128_from_catbuffer(data[:size])
         return cls(asint)           # type: ignore
-
-
-#@documentation.inherit_doc
-#class Base64Mixin(abc.Serializable):
-#    """Mixin for classes wrapping data that can be encoded to and from base64."""
-#
-#    __slots__ = ()
-#
-#    def to_base64(self: Base64MixinType) -> str:
-#        """Get data encoded as base64."""
-#        return base64.b64encode(self.to_catbuffer())
-#
-#    def from_base64(
-#        cls: typing.Type[Base64MixinType],
-#        data: str
-#    ) -> Base64MixinType:
-#        """Create class from base64-encoded data."""
-#        return cls.from_catbuffer(base64.b64decode(data))

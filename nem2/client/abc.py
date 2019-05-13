@@ -73,7 +73,7 @@ class HTTPSharedBase(util.Object):
         raise util.AbstractMethodError
 
     @classmethod
-    def from_http(cls: typing.Type[T], http) -> T:
+    def create_from_http(cls: typing.Type[T], http) -> T:
         """
         Initialize HTTPBase directly from existing HTTP client.
         For internal use, do not use directly.
@@ -181,8 +181,8 @@ class AsyncHTTPBase(HTTPSharedBase):
         return await super().__call__(cbs, *args, **kwds)
 
     @classmethod
-    def from_http(cls: typing.Type[T], http) -> T:
-        inst = super(AsyncHTTPBase, cls).from_http(http)
+    def create_from_http(cls: typing.Type[T], http) -> T:
+        inst = super(AsyncHTTPBase, cls).create_from_http(http)
         setattr(inst, '_loop', getattr(http, '_loop'))
         return inst
 
@@ -755,15 +755,15 @@ class Listener(util.Object):
         if 'transaction' in data:
             # New transaction data.
             channel_name = typing.cast(str, data['meta'].pop('channelName'))
-            transaction = models.Transaction.from_dto(data)
+            transaction = models.Transaction.create_from_dto(data)
             return ListenerMessage(channel_name, transaction)
         elif 'block' in data:
             # New block info.
-            block = models.BlockInfo.from_dto(data)
+            block = models.BlockInfo.create_from_dto(data)
             return ListenerMessage('block', block)
         elif 'status' in data:
             # New transaction status error.
-            error = models.TransactionStatusError.from_dto(data)
+            error = models.TransactionStatusError.create_from_dto(data)
             return ListenerMessage('status', error)
         elif 'meta' in data:
             # New metadata.
@@ -772,7 +772,7 @@ class Listener(util.Object):
             return ListenerMessage(channel_name, hash)
         elif 'parentHash' in data:
             # New cosignature for transaction.
-            cosignature = models.CosignatureSignedTransaction.from_dto(data)
+            cosignature = models.CosignatureSignedTransaction.create_from_dto(data)
             return ListenerMessage('cosignature', cosignature)
         else:
             # Unknown data information, don't pollute the message,

@@ -47,11 +47,11 @@ class Recipient(util.Object):
         return util.hexlify(Recipient.to_catbuffer(obj, network_type))
 
     @staticmethod
-    def from_dto(
+    def create_from_dto(
         data: str,
         network_type: NetworkType,
     ) -> RecipientType:
-        return Recipient.from_catbuffer(util.unhexlify(data), network_type)
+        return Recipient.create_from_catbuffer(util.unhexlify(data), network_type)
 
     @staticmethod
     def to_catbuffer(
@@ -67,7 +67,7 @@ class Recipient(util.Object):
         return leading + util.unhexlify(obj.encoded) + trailing
 
     @staticmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         data: bytes,
         network_type: NetworkType,
     ) -> RecipientType:
@@ -82,10 +82,10 @@ class Recipient(util.Object):
         return typing.cast(NamespaceId, NamespaceId.create_from_encoded(data[1:9]))
 
     @staticmethod
-    def from_catbuffer_pair(
+    def create_from_catbuffer_pair(
         data: bytes,
         network_type: NetworkType,
     ) -> typing.Tuple[RecipientType, bytes]:
         size = Recipient.CATBUFFER_SIZE
-        inst = Recipient.from_catbuffer(data, network_type)
+        inst = Recipient.create_from_catbuffer(data, network_type)
         return inst, data[size:]

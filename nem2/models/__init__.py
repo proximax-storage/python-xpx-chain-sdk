@@ -47,6 +47,8 @@ from .blockchain.block_info import *
 from .blockchain.block_type import *
 from .blockchain.blockchain_score import *
 from .blockchain.blockchain_storage_info import *
+from .blockchain.merkle_path_item import *
+from .blockchain.merkle_proof_info import *
 from .blockchain.network_type import *
 from .blockchain import *
 
@@ -76,6 +78,11 @@ from .namespace.namespace_info import *
 from .namespace.namespace_name import *
 from .namespace.namespace_type import *
 from .namespace import *
+
+# Node
+from .node.node_info import *
+from .node.node_time import *
+from .node import *
 
 # Transaction
 from .transaction.address_alias_transaction import *
@@ -134,6 +141,8 @@ __all__ = (
     + block_type.__all__
     + blockchain_score.__all__
     + blockchain_storage_info.__all__
+    + merkle_path_item.__all__
+    + merkle_proof_info.__all__
     + network_type.__all__
 
     # Mosaic
@@ -160,6 +169,10 @@ __all__ = (
     + namespace_info.__all__
     + namespace_name.__all__
     + namespace_type.__all__
+
+    # Node
+    + node_info.__all__
+    + node_time.__all__
 
     # Transaction
     + address_alias_transaction.__all__

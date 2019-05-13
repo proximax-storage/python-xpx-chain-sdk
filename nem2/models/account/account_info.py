@@ -24,7 +24,7 @@
 
 from __future__ import annotations
 
-from .account_metadata import OptionalAccountMetadata
+from .account_metadata import AccountMetadata
 from .address import Address
 from .public_account import PublicAccount
 from ..blockchain.network_type import OptionalNetworkType
@@ -36,7 +36,7 @@ __all__ = ['AccountInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AccountInfo(util.DTOSerializable):
+class AccountInfo(util.DTO):
     """
     Basic information describing an account.
 
@@ -68,7 +68,7 @@ class AccountInfo(util.DTOSerializable):
                 account: AccountDTO
     """
 
-    meta: OptionalAccountMetadata
+    meta: AccountMetadata
     address: Address
     address_height: int
     public_key: str
@@ -86,30 +86,32 @@ class AccountInfo(util.DTOSerializable):
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
+        meta = self.meta.to_dto(network_type)
+        account = {
+            'address': util.hexlify(self.address.encoded),
+            'addressHeight': util.u64_to_dto(self.address_height),
+            'publicKey': self.public_key,
+            'publicKeyHeight': util.u64_to_dto(self.public_key_height),
+            'mosaics': Mosaic.sequence_to_dto(self.mosaics, network_type),
+            'importance': util.u64_to_dto(self.importance),
+            'importanceHeight': util.u64_to_dto(self.importance_height),
+        }
+
         return {
-            'meta': {},
-            'account': {
-                'address': self.address.to_dto(network_type),
-                'addressHeight': util.u64_to_dto(self.address_height),
-                'publicKey': self.public_key,
-                'publicKeyHeight': util.u64_to_dto(self.public_key_height),
-                'mosaics': Mosaic.sequence_to_dto(self.mosaics, network_type),
-                'importance': util.u64_to_dto(self.importance),
-                'importanceHeight': util.u64_to_dto(self.importance_height),
-            }
+            'meta': meta,
+            'account': account,
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        assert data['meta'] == {}
         account = data['account']
         return cls(
-            meta=None,
-            address=Address.from_dto(account['address'], network_type),
+            meta=AccountMetadata.create_from_dto(data['meta'], network_type),
+            address=Address.create_from_encoded(account['address']),
             address_height=util.u64_from_dto(account.get('addressHeight', [0, 0])),
             public_key=account['publicKey'],
             public_key_height=util.u64_from_dto(account.get('publicKeyHeight', [0, 0])),

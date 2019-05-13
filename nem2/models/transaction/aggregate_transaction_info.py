@@ -32,7 +32,7 @@ __all__ = ['AggregateTransactionInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AggregateTransactionInfo(util.DTOSerializable):
+class AggregateTransactionInfo(util.DTO):
     """Aggregate transaction metadata."""
 
     height: int
@@ -73,7 +73,7 @@ class AggregateTransactionInfo(util.DTOSerializable):
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,

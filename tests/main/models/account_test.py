@@ -78,7 +78,7 @@ class TestAccount(harness.TestCase):
     'type': models.AccountInfo,
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
-        'meta': None,
+        'meta': models.AccountMetadata(),
         'address': models.Address('SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM'),
         'address_height': 1,
         'public_key': '7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808',
@@ -107,24 +107,115 @@ class TestAccountInfo(harness.TestCase):
         self.assertEqual(self.model.public_account, public_account)
 
 
+@harness.model_test_case({
+    'type': models.AccountMetadata,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {},
+    'dto': {},
+    'eq': False,
+})
 class TestAccountMetadata(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement when stabilized...
+    pass
 
 
+@harness.model_test_case({
+    'type': models.AccountProperty,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'property_type': models.PropertyType.ALLOW_ADDRESS,
+        'values': [
+            models.Address('SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG'),
+            models.Address('SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM'),
+        ],
+    },
+    'dto': {
+        'propertyType': 0x01,
+        'values': [
+            'kCiRICJxVnplFmh3pkfYpf/Tu+Ywq5JeRg==',
+            'kPbAekz5rRvwZE1Bkhi3L83x78wHpskgLA==',
+        ],
+    },
+})
 class TestAccountProperty(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement when stabilized...
+    # TODO(ahuszagh) Check when stabilized.
+    pass
+
+    # TODO(ahuszagh)
+    #   Need to test a lot of other variants.
+    #       Mosaic
+    #       Transaction
+    #       Ensure the address is correct.
 
 
+@harness.model_test_case({
+    'type': models.AccountProperties,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'address': models.Address('SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG'),
+        'properties': [
+            models.AccountProperty(models.PropertyType.ALLOW_ADDRESS, []),
+        ],
+    },
+    'dto': {
+        'address': 'U0FVSkNJQkNPRkxIVVpJV05CMzJNUjZZVVg3NUhPN0dHQ1ZaRVhTRw==',
+        'properties': [
+            {
+                'propertyType': 0x01,
+                'values': [],
+            },
+        ],
+    },
+})
 class TestAccountProperties(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement when stabilized...
+    # TODO(ahuszagh) Check when stabilized.
+    pass
 
 
+@harness.model_test_case({
+    'type': models.AccountPropertiesInfo,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'meta': models.AccountPropertiesMetadata('00000000000000000000032f'),
+        'account_properties': models.AccountProperties(
+            address=models.Address('SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG'),
+            properties=[
+                models.AccountProperty(models.PropertyType.ALLOW_ADDRESS, []),
+            ],
+        ),
+    },
+    'dto': {
+        'meta': {
+            'id': '00000000000000000000032f',
+        },
+        'accountProperties': {
+            'address': 'U0FVSkNJQkNPRkxIVVpJV05CMzJNUjZZVVg3NUhPN0dHQ1ZaRVhTRw==',
+            'properties': [
+                {
+                    'propertyType': 0x01,
+                    'values': [],
+                },
+            ],
+        },
+    },
+})
 class TestAccountPropertiesInfo(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement when stabilized...
+    # TODO(ahuszagh) Check when stabilized.
+    pass
 
 
+@harness.model_test_case({
+    'type': models.AccountPropertiesMetadata,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'id': '00000000000000000000032f',
+    },
+    'dto': {
+        'id': '00000000000000000000032f',
+    },
+})
 class TestAccountPropertiesMetadata(harness.TestCase):
-    pass    # TODO(ahuszagh) Implement when stabilized...
+    # TODO(ahuszagh) Check when stabilized.
+    pass
 
 
 @harness.model_test_case({
@@ -133,8 +224,6 @@ class TestAccountPropertiesMetadata(harness.TestCase):
     'data': {
         'address': 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54',
     },
-    'dto': '90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
-    'catbuffer': b'\x90\xfa9\xecG\xe0V\x00\xaf\xa7C\x08\xa7\xea`}\x14^7\x1b_O\x14G\xbc',
     'extras': {
         'plain': 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54',
         'pretty': 'SD5DT3-CH4BLA-BL5HIM-EKP2TA-PUKF4N-Y3L5HR-IR54',
@@ -357,8 +446,6 @@ class TestPropertyType(harness.TestCase):
         'public_key': '1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
         'address': models.Address('SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG'),
     },
-    'dto': '1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
-    'catbuffer': b'\x1b\x15?\x8bv\xef`\xa4\xbf\xe1R\xf4\xde6\x98\xbd#\x0b\xac\x9d\xc29\xd4\xe4HqZ\xa4k\xd5\x89U',
     'extras': {
         'message': b'Hello World!',
         'signature': '40af0cb5a7a7533f07a4ba6f1cb2df64f2347feb1b2eaabb9374d28603d146497ea83d3d6ee15758d39c298b48f58e578cc42f36a373e15eef7412e0bd19a801',

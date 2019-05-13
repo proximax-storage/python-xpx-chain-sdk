@@ -24,6 +24,7 @@
 
 from __future__ import annotations
 import re
+import typing
 
 from .namespace_id import NamespaceId
 from ..blockchain.network_type import OptionalNetworkType
@@ -33,8 +34,8 @@ __all__ = ['NamespaceName']
 
 
 @util.inherit_doc
-@util.dataclass(frozen=True)
-class NamespaceName(util.Serializable):
+@util.dataclass(frozen=True, parent_id=None)
+class NamespaceName(util.DTO):
     """
     Namespace name and identifier.
 
@@ -47,10 +48,12 @@ class NamespaceName(util.Serializable):
             NamespaceNameDTO:
                 namespaceId: UInt64DTO
                 name: string
+                parentId?: UInt64DTO
     """
 
     namespace_id: NamespaceId
     name: str
+    parent_id: typing.Optional[NamespaceId]
 
     @classmethod
     def create_from_name(cls, name: str):
@@ -59,8 +62,23 @@ class NamespaceName(util.Serializable):
 
         :param name: Namespace name.
         """
-        namespace_id = NamespaceId(name)
-        return cls(namespace_id, name.split('.')[-1])
+
+        ids = util.generate_namespace_id(name)
+        if len(ids) == 0:
+            namespace_id = NamespaceId(0)
+            parent_id = None
+        elif len(ids) == 1:
+            namespace_id = NamespaceId(ids[0])
+            parent_id = None
+        else:
+            namespace_id = NamespaceId(ids[-1])
+            parent_id = NamespaceId(ids[-2])
+
+        return cls(
+            namespace_id=namespace_id,
+            name=name.split('.')[-1],
+            parent_id=parent_id,
+        )
 
     def is_valid(self) -> bool:
         """Determine if the namespace name is valid."""
@@ -73,44 +91,26 @@ class NamespaceName(util.Serializable):
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        return {
-            'namespaceId': self.namespace_id.to_dto(network_type),
+        data = {
+            'namespaceId': util.u64_to_dto(int(self.namespace_id)),
             'name': self.name
         }
+        if self.parent_id is not None:
+            data['parentId'] = util.u64_to_dto(int(self.parent_id))
+
+        return data
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        namespace_id = NamespaceId.from_dto(data['namespaceId'], network_type)
-        name = data['name']
-        return cls(namespace_id, name)
-
-    def to_catbuffer(
-        self,
-        network_type: OptionalNetworkType = None,
-    ) -> bytes:
-        # uint64_t id
-        # uint8_t name_size
-        # uint8_t[name_size] name
-        id = self.namespace_id.to_catbuffer(network_type)
-        name_size = util.u8_to_catbuffer(len(self.name))
-        name = self.name.encode('ascii')
-
-        return id + name_size + name
-
-    @classmethod
-    def from_catbuffer_pair(
-        cls,
-        data: bytes,
-        network_type: OptionalNetworkType = None,
-    ):
-        id, data = NamespaceId.from_catbuffer_pair(data, network_type)
-        name_size = util.u8_from_catbuffer(data[:1])
-        data = data[1:]
-        name = data[:name_size].decode('ascii')
-        inst = cls(id, name)
-
-        return inst, data[name_size:]
+        parent_id = None
+        if 'parentId' in data:
+            parent_id = NamespaceId(util.u64_from_dto(data['parentId']))
+        return cls(
+            namespace_id=NamespaceId(util.u64_from_dto(data['namespaceId'])),
+            name=data['name'],
+            parent_id=parent_id,
+        )

@@ -131,7 +131,7 @@ class MosaicSupplyChangeTransaction(Transaction):
     # CATBUFFER
 
     def catbuffer_size_specific(self) -> int:
-        id_size = MosaicId.CATBUFFER_SIZE
+        id_size = util.U64_BYTES
         direction_size = MosaicSupplyType.CATBUFFER_SIZE
         delta_size = util.U64_BYTES
         return id_size + direction_size + delta_size
@@ -142,10 +142,10 @@ class MosaicSupplyChangeTransaction(Transaction):
     ) -> bytes:
         """Export mosaic supply change-specific data to catbuffer."""
 
-        # MosaicId mosaic_id
+        # uint64 mosaic_id
         # MosaicSupplyChange direction
         # uint64 delta
-        mosaic_id = self.mosaic_id.to_catbuffer(network_type)
+        mosaic_id = util.u64_to_catbuffer(int(self.mosaic_id))
         direction = self.direction.to_catbuffer(network_type)
         delta = util.u64_to_catbuffer(self.delta)
         return mosaic_id + direction + delta
@@ -157,13 +157,13 @@ class MosaicSupplyChangeTransaction(Transaction):
     ) -> bytes:
         """Load mosaic supply change-specific data data from catbuffer."""
 
-        # MosaicId mosaic_id
+        # uint64 mosaic_id
         # MosaicSupplyChange direction
         # uint64 delta
-        mosaic_id, data = MosaicId.from_catbuffer_pair(data, network_type)
-        direction, data = MosaicSupplyType.from_catbuffer_pair(data, network_type)
-        delta = util.u64_from_catbuffer(data[:util.U64_BYTES])
-        data = data[util.U64_BYTES:]
+        mosaic_id = MosaicId(util.u64_from_catbuffer(data[:8]))
+        direction = MosaicSupplyType.create_from_catbuffer(data[8:9], network_type)
+        delta = util.u64_from_catbuffer(data[9:17])
+        data = data[17:]
 
         self._set('mosaic_id', mosaic_id)
         self._set('direction', direction)
@@ -178,7 +178,7 @@ class MosaicSupplyChangeTransaction(Transaction):
         network_type: NetworkType,
     ) -> dict:
         return {
-            'mosaicId': self.mosaic_id.to_dto(network_type),
+            'mosaicId': util.u64_to_dto(int(self.mosaic_id)),
             'direction': self.direction.to_dto(network_type),
             'delta': util.u64_to_dto(self.delta),
         }
@@ -188,8 +188,8 @@ class MosaicSupplyChangeTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        mosaic_id = MosaicId.from_dto(data['mosaicId'], network_type)
-        direction = MosaicSupplyType.from_dto(data['direction'], network_type)
+        mosaic_id = MosaicId(util.u64_from_dto(data['mosaicId']))
+        direction = MosaicSupplyType.create_from_dto(data['direction'], network_type)
         delta = util.u64_from_dto(data['delta'])
         self._set('mosaic_id', mosaic_id)
         self._set('direction', direction)

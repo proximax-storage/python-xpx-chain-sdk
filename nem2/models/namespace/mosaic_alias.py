@@ -43,7 +43,7 @@ class MosaicAlias(Alias):
         super().__init__(AliasType.MOSAIC_ID, value)
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,

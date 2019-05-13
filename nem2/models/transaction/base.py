@@ -42,8 +42,7 @@ TypeMap = typing.Mapping[TransactionType, typing.Type[TransactionBaseType]]
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-# TODO(ahuszagh) Make Base64Mixin
-class TransactionBase(util.Serializable):
+class TransactionBase(util.Model):
     """
     Abstract, shared transaction base class.
 
@@ -176,15 +175,15 @@ class TransactionBase(util.Serializable):
         raise util.AbstractMethodError
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls: typing.Type[TransactionBaseType],
         data: typing.AnyStr,
         network_type: OptionalNetworkType = None,
     ) -> TransactionBaseType:
-        return cls.from_catbuffer_pair(data, network_type)[0]
+        return cls.create_from_catbuffer_pair(data, network_type)[0]
 
     @classmethod
-    def from_catbuffer_pair(
+    def create_from_catbuffer_pair(
         cls: typing.Type[TransactionBaseType],
         data: typing.AnyStr,
         network_type: OptionalNetworkType = None,
@@ -271,7 +270,7 @@ class TransactionBase(util.Serializable):
         raise util.AbstractMethodError
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls: typing.Type[TransactionBaseType],
         data: dict,
         network_type: OptionalNetworkType = None,

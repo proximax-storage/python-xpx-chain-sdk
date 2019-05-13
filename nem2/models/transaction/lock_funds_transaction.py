@@ -175,7 +175,7 @@ class LockFundsTransaction(Transaction):
         # Mosaic mosaic
         # uint64 duration
         # uint8[32] hash
-        mosaic, data = Mosaic.from_catbuffer_pair(data, network_type)
+        mosaic, data = Mosaic.create_from_catbuffer_pair(data, network_type)
         duration = util.u64_from_catbuffer(data[:util.U64_BYTES])
         data = data[util.U64_BYTES:]
         hash = data[:util.U8_BYTES * 32]
@@ -199,7 +199,7 @@ class LockFundsTransaction(Transaction):
         network_type: NetworkType,
     ) -> dict:
         return {
-            'mosaicId': self.mosaic_id.to_dto(network_type),
+            'mosaicId': util.u64_to_dto(int(self.mosaic_id)),
             'amount': util.u64_to_dto(self.amount),
             'duration': util.u64_to_dto(self.duration),
             'hash': self.hash,
@@ -210,7 +210,7 @@ class LockFundsTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        mosaic_id = MosaicId.from_dto(data['mosaicId'], network_type)
+        mosaic_id = MosaicId(util.u64_from_dto(data['mosaicId']))
         amount = util.u64_from_dto(data['amount'])
         duration = util.u64_from_dto(data['duration'])
         signed_transaction = SignedTransaction.create_from_announced(

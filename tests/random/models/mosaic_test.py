@@ -12,7 +12,7 @@ class TestMosaic(harness.TestCase):
         network_type = models.NetworkType.MIJIN_TEST
         model = models.Mosaic(models.MosaicId(id), amount)
         dto = model.to_dto(network_type)
-        self.assertEqual(model, models.Mosaic.from_dto(dto, network_type))
+        self.assertEqual(model, models.Mosaic.create_from_dto(dto, network_type))
 
     @harness.randomize(
         id={'min_value': -1 << 32, 'max_value': -1},
@@ -30,14 +30,14 @@ class TestMosaicId(harness.TestCase):
     @harness.randomize
     def test_valid(self, id: harness.U64):
         network_type = models.NetworkType.MIJIN_TEST
-        model = models.MosaicId(id)
+        model = models.Mosaic(models.MosaicId(id), 1)
         dto = model.to_dto(network_type)
-        self.assertEqual(model, models.MosaicId.from_dto(dto, network_type))
+        self.assertEqual(model, models.Mosaic.create_from_dto(dto, network_type))
 
     @harness.randomize(id={'min_value': -1 << 32, 'max_value': -1})
     def test_invalid(self, id: int):
         network_type = models.NetworkType.MIJIN_TEST
-        model = models.MosaicId(id)
+        model = models.Mosaic(models.MosaicId(id), 1)
         with self.assertRaises(ArithmeticError):
             model.to_dto(network_type)
 
@@ -49,27 +49,27 @@ class TestMosaicNonce(harness.TestCase):
         network_type = models.NetworkType.MIJIN_TEST
         model = models.MosaicNonce(nonce)
         dto = model.to_dto(network_type)
-        self.assertEqual(model, models.MosaicNonce.from_dto(dto, network_type))
+        self.assertEqual(model, models.MosaicNonce.create_from_dto(dto, network_type))
         catbuffer = model.to_catbuffer(network_type)
-        self.assertEqual(model, models.MosaicNonce.from_catbuffer(catbuffer, network_type))
+        self.assertEqual(model, models.MosaicNonce.create_from_catbuffer(catbuffer, network_type))
 
     @harness.randomize(nonce={'letters': string.hexdigits, 'fixed_length': 8})
     def test_valid_str(self, nonce: str):
         network_type = models.NetworkType.MIJIN_TEST
         model = models.MosaicNonce(nonce)
         dto = model.to_dto(network_type)
-        self.assertEqual(model, models.MosaicNonce.from_dto(dto, network_type))
+        self.assertEqual(model, models.MosaicNonce.create_from_dto(dto, network_type))
         catbuffer = model.to_catbuffer(network_type)
-        self.assertEqual(model, models.MosaicNonce.from_catbuffer(catbuffer, network_type))
+        self.assertEqual(model, models.MosaicNonce.create_from_catbuffer(catbuffer, network_type))
 
     @harness.randomize
     def test_valid_int(self, nonce: harness.U32):
         network_type = models.NetworkType.MIJIN_TEST
         model = models.MosaicNonce(nonce)
         dto = model.to_dto(network_type)
-        self.assertEqual(model, models.MosaicNonce.from_dto(dto, network_type))
+        self.assertEqual(model, models.MosaicNonce.create_from_dto(dto, network_type))
         catbuffer = model.to_catbuffer(network_type)
-        self.assertEqual(model, models.MosaicNonce.from_catbuffer(catbuffer, network_type))
+        self.assertEqual(model, models.MosaicNonce.create_from_catbuffer(catbuffer, network_type))
 
     @harness.randomize(nonce={'min_length': 0, 'max_length': 3})
     def test_invalid_bytes(self, nonce: bytes):
@@ -111,8 +111,7 @@ class TestMosaicProperties(harness.TestCase):
         self.assertLessEqual(properties.flags, 7)
         self.assertEqual(properties.divisibility, divisibility)
         self.assertEqual(properties.duration, duration)
-        self.assertEqual(properties, models.MosaicProperties.from_dto(properties.to_dto()))
-        self.assertEqual(properties, models.MosaicProperties.from_catbuffer(properties.to_catbuffer()))
+        self.assertEqual(properties, models.MosaicProperties.create_from_dto(properties.to_dto()))
 
     @harness.randomize(divisibility={'min_value': 7, 'max_value': 1 << 31})
     def test_invalid_divisibility(self, divisibility: int):

@@ -1,8 +1,8 @@
 """
-    transaction_announce_response
-    =============================
+    node_time
+    =========
 
-    Response from announcing a transaction.
+    Describes the time of the NEM node.
 
     License
     -------
@@ -27,29 +27,43 @@ from __future__ import annotations
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
-__all__ = ['TransactionAnnounceResponse']
+__all__ = ['NodeTime']
 
 
+# TODO(ahuszagh) Add unittests.
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionAnnounceResponse(util.DTO):
+class NodeTime(util.DTO):
     """
-    Response from announcing a transaction.
+    Node information.
+
+    :param public_key: Public key of node.
+    :param port: Port to communicate with node over.
 
     DTO Format:
         .. code-block:: yaml
 
-            AnnounceTransactionInfoDTO:
-                message: string
+            CommunicationTimestampsDTO:
+                sendTimestamp: UInt64DTO
+                receiveTimestamp: UInt64DTO
+
+            NodeTimeDTO:
+                communicationTimestamps: CommunicationTimestampsDTO
     """
 
-    message: str
+    send_timestamp: int
+    receive_timestamp: int
 
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        return {'message': self.message}
+        return {
+            'communicationTimestamps': {
+                'sendTimestamp': util.u64_to_dto(self.send_timestamp),
+                'receiveTimestamp': util.u64_to_dto(self.receive_timestamp),
+            },
+        }
 
     @classmethod
     def create_from_dto(
@@ -57,4 +71,8 @@ class TransactionAnnounceResponse(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        return cls(data['message'])
+        timestamps = data['communicationTimestamps']
+        return cls(
+            send_timestamp=util.u64_from_dto(timestamps['sendTimestamp']),
+            receive_timestamp=util.u64_from_dto(timestamps['receiveTimestamp']),
+        )

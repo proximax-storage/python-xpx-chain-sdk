@@ -11,7 +11,7 @@ from tests import responses
         {
             'name': 'test_get_namespace',
             'response': responses.NAMESPACE['nem'],
-            'params': [models.NamespaceId.from_hex('84b3552d375ffa4b')],
+            'params': [models.NamespaceId.create_from_hex('84b3552d375ffa4b')],
             'method': 'get_namespace',
             'validation': [
                 lambda x: (x.active, True),
@@ -31,7 +31,7 @@ from tests import responses
         {
             'name': 'test_get_namespaces_name',
             'response': responses.NAMESPACE_NAMES['nem'],
-            'params': [[models.NamespaceId.from_hex('84b3552d375ffa4b')]],
+            'params': [[models.NamespaceId.create_from_hex('84b3552d375ffa4b')]],
             'method': 'get_namespaces_name',
             'validation': [
                 lambda x: (len(x), 1),
@@ -62,14 +62,14 @@ from tests import responses
         {
             'name': 'test_get_linked_mosaic_id',
             'response': responses.NAMESPACE["nem"],
-            'params': [models.NamespaceId.from_hex("84b3552d375ffa4b")],
+            'params': [models.NamespaceId.create_from_hex("84b3552d375ffa4b")],
             'method': 'get_linked_mosaic_id',
             'error': ValueError,
         },
         {
             'name': 'test_get_linked_address',
             'response': responses.NAMESPACE["nem"],
-            'params': [models.NamespaceId.from_hex("84b3552d375ffa4b")],
+            'params': [models.NamespaceId.create_from_hex("84b3552d375ffa4b")],
             'method': 'get_linked_address',
             'error': ValueError,
         },

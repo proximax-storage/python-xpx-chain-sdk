@@ -8,7 +8,7 @@ from tests import harness
     'tests': [
         {
             'name': 'test_get_mosaic_names',
-            'params': [[models.MosaicId.from_hex('d525ad41d95fcf29')]],
+            'params': [[models.MosaicId.create_from_hex('d525ad41d95fcf29')]],
             'method': 'get_mosaic_names',
             'validation': [
                 lambda x: (len(x), 1),

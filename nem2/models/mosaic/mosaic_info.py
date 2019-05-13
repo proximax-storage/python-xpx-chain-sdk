@@ -25,7 +25,7 @@
 from __future__ import annotations
 
 from .mosaic_id import MosaicId
-from .mosaic_levy import MosaicLevy, OptionalMosaicLevyType
+from .mosaic_levy import MosaicLevy
 from .mosaic_properties import MosaicProperties
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import OptionalNetworkType
@@ -35,8 +35,8 @@ __all__ = ['MosaicInfo']
 
 
 @util.inherit_doc
-@util.dataclass(frozen=True, levy=None)
-class MosaicInfo(util.DTOSerializable):
+@util.dataclass(frozen=True, levy=MosaicLevy())
+class MosaicInfo(util.DTO):
     """
     Information describing a mosaic.
 
@@ -80,7 +80,7 @@ class MosaicInfo(util.DTOSerializable):
     owner: PublicAccount
     revision: int
     properties: MosaicProperties
-    levy: OptionalMosaicLevyType
+    levy: MosaicLevy
 
     @property
     def divisibility(self) -> int:
@@ -113,33 +113,32 @@ class MosaicInfo(util.DTOSerializable):
                 'id': self.meta_id,
             },
             'mosaic': {
-                'mosaicId': self.mosaic_id.to_dto(),
+                'mosaicId': util.u64_to_dto(int(self.mosaic_id)),
                 'supply': util.u64_to_dto(self.supply),
                 'height': util.u64_to_dto(self.height),
-                'owner': self.owner.to_dto(network_type),
+                'owner': self.owner.public_key,
                 'revision': util.u32_to_dto(self.revision),
-                'properties': self.properties.to_dto(),
-                'levy': {},
+                'properties': self.properties.to_dto(network_type),
+                'levy': self.levy.to_dto(network_type),
             },
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
         meta_dto = data['meta']
         mosaic_dto = data['mosaic']
-        levy_dto = mosaic_dto['levy']
-        levy = MosaicLevy.from_dto(levy_dto) if levy_dto else None
+        owner_dto = mosaic_dto['owner']
         return cls(
             meta_id=meta_dto['id'],
-            mosaic_id=MosaicId.from_dto(mosaic_dto['mosaicId']),
+            mosaic_id=MosaicId(util.u64_from_dto(mosaic_dto['mosaicId'])),
             supply=util.u64_from_dto(mosaic_dto['supply']),
             height=util.u64_from_dto(mosaic_dto['height']),
-            owner=PublicAccount.from_dto(mosaic_dto['owner'], network_type),
+            owner=PublicAccount.create_from_public_key(owner_dto, network_type),
             revision=util.u32_from_dto(mosaic_dto['revision']),
-            properties=MosaicProperties.from_dto(mosaic_dto['properties']),
-            levy=levy,
+            properties=MosaicProperties.create_from_dto(mosaic_dto['properties']),
+            levy=MosaicLevy.create_from_dto(mosaic_dto['levy']),
         )

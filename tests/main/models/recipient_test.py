@@ -20,13 +20,13 @@ class TestRecipient(harness.TestCase):
         self.assertEqual(self.namespace_dto, Recipient.to_dto(self.namespace_id, self.network_type))
 
     def test_from_dto(self):
-        self.assertEqual(self.address, Recipient.from_dto(self.address_dto, self.network_type))
-        self.assertEqual(self.namespace_id, Recipient.from_dto(self.namespace_dto, self.network_type))
+        self.assertEqual(self.address, Recipient.create_from_dto(self.address_dto, self.network_type))
+        self.assertEqual(self.namespace_id, Recipient.create_from_dto(self.namespace_dto, self.network_type))
 
     def test_to_catbuffer(self):
         self.assertEqual(self.address_catbuffer, Recipient.to_catbuffer(self.address, self.network_type))
         self.assertEqual(self.namespace_catbuffer, Recipient.to_catbuffer(self.namespace_id, self.network_type))
 
-    def test_from_catbuffer(self):
-        self.assertEqual(self.address, Recipient.from_catbuffer(self.address_catbuffer, self.network_type))
-        self.assertEqual(self.namespace_id, Recipient.from_catbuffer(self.namespace_catbuffer, self.network_type))
+    def test_create_from_catbuffer(self):
+        self.assertEqual(self.address, Recipient.create_from_catbuffer(self.address_catbuffer, self.network_type))
+        self.assertEqual(self.namespace_id, Recipient.create_from_catbuffer(self.namespace_catbuffer, self.network_type))

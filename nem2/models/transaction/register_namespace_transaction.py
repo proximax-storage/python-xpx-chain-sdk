@@ -35,7 +35,6 @@ from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ..namespace.namespace_id import NamespaceId
-from ..namespace.namespace_name import NamespaceName
 from ..namespace.namespace_type import NamespaceType
 from ... import util
 
@@ -65,7 +64,8 @@ class RegisterNamespaceTransaction(Transaction):
     :param deadline: Deadline to include transaction.
     :param max_fee: Max fee for the transaction. Higher fees increase priority.
     :param namespace_type: Root or sub namespace.
-    :param namespace_name: Name and ID of namespace to register.
+    :param namespace_name: Name of namespace to register.
+    :param namespace_id: ID of namespace to register.
     :param duration: (Optional) Duration of the namespace.
     :param parent_id: (Optional) Parent namespace ID.
     :param signature: (Optional) Transaction signature (missing if embedded transaction).
@@ -74,7 +74,8 @@ class RegisterNamespaceTransaction(Transaction):
     """
 
     namespace_type: NamespaceType
-    namespace_name: NamespaceName
+    namespace_name: str
+    namespace_id: NamespaceId
     duration: typing.Optional[int]
     parent_id: typing.Optional[NamespaceId]
 
@@ -85,7 +86,8 @@ class RegisterNamespaceTransaction(Transaction):
         deadline: Deadline,
         max_fee: int,
         namespace_type: NamespaceType,
-        namespace_name: NamespaceName,
+        namespace_name: str,
+        namespace_id: NamespaceId,
         duration: typing.Optional[int] = None,
         parent_id: typing.Optional[NamespaceId] = None,
         signature: typing.Optional[str] = None,
@@ -110,6 +112,7 @@ class RegisterNamespaceTransaction(Transaction):
         )
         self._set('namespace_type', namespace_type)
         self._set('namespace_name', namespace_name)
+        self._set('namespace_id', namespace_id)
         self._set('duration', duration)
         self._set('parent_id', parent_id)
 
@@ -135,8 +138,10 @@ class RegisterNamespaceTransaction(Transaction):
             deadline,
             0,
             NamespaceType.ROOT_NAMESPACE,
-            NamespaceName.create_from_name(namespace_name),
+            namespace_name,
+            NamespaceId(namespace_name),
             duration,
+            None,
         )
 
     @classmethod
@@ -167,20 +172,11 @@ class RegisterNamespaceTransaction(Transaction):
             deadline,
             0,
             NamespaceType.SUB_NAMESPACE,
-            NamespaceName(NamespaceId(id), namespace_name),
+            namespace_name.split('.')[-1],
+            NamespaceId(id),
             None,
             parent_id
         )
-
-    @property
-    def namespace_id(self) -> NamespaceId:
-        """Get the namespace ID from name struct."""
-        return self.namespace_name.namespace_id
-
-    @property
-    def name(self) -> str:
-        """Get the namespace name from name struct."""
-        return self.namespace_name.name
 
     # CATBUFFER
 
@@ -189,13 +185,13 @@ class RegisterNamespaceTransaction(Transaction):
         # We have 1 extra byte, as a marker for the size of the namespace name.
         extra_size = util.U8_BYTES
         namespace_type_size = util.U8_BYTES
-        duration_size = util.U64_BYTES
-        namespace_id_size = NamespaceId.CATBUFFER_SIZE
-        namespace_name_size = util.U8_BYTES * len(self.namespace_name.name)
+        duration_or_id_size = util.U64_BYTES
+        namespace_id_size = util.U64_BYTES
+        namespace_name_size = util.U8_BYTES * len(self.namespace_name)
         return (
             extra_size
             + namespace_type_size
-            + duration_size
+            + duration_or_id_size
             + namespace_id_size
             + namespace_name_size
         )
@@ -208,15 +204,20 @@ class RegisterNamespaceTransaction(Transaction):
 
         # uint8_t namespace_type
         # uint64_t duration || parent_id
-        # NamespaceName namespace_name
+        # uint64_t namespace_id
+        # uint8_t namespace_name_size
+        # uint8_t[namespace_name_size] namespace_name
         namespace_type = self.namespace_type.to_catbuffer(network_type)
         if self.duration is not None:
             duration_or_id = util.u64_to_catbuffer(self.duration)
         else:
-            duration_or_id = self.parent_id.to_catbuffer(network_type)
-        namespace_name = self.namespace_name.to_catbuffer(network_type)
+            duration_or_id = util.u64_to_catbuffer(int(self.parent_id))
+        namespace_id = util.u64_to_catbuffer(int(self.namespace_id))
+        namespace_name_size = util.u8_to_catbuffer(len(self.namespace_name))
+        namespace_name = self.namespace_name.encode('ascii')
+        namespace = namespace_id + namespace_name_size + namespace_name
 
-        return namespace_type + duration_or_id + namespace_name
+        return namespace_type + duration_or_id + namespace
 
     def load_catbuffer_specific(
         self,
@@ -227,18 +228,28 @@ class RegisterNamespaceTransaction(Transaction):
 
         # uint8_t namespace_type
         # uint64_t duration || parent_id
-        # NamespaceName namespace_name
-        namespace_type, data = NamespaceType.from_catbuffer_pair(data, network_type)
+        # uint64_t namespace_id
+        # uint8_t namespace_name_size
+        # uint8_t[namespace_name_size] namespace_name
+        namespace_type, data = NamespaceType.create_from_catbuffer_pair(
+            data,
+            network_type
+        )
         if namespace_type == NamespaceType.ROOT_NAMESPACE:
             duration = util.u64_from_catbuffer(data[:8])
             parent_id = None
         else:
             duration = None
-            parent_id = NamespaceId.from_catbuffer(data, network_type)
-        namespace_name, data = NamespaceName.from_catbuffer_pair(data[8:], network_type)
+            parent_id = NamespaceId(util.u64_from_catbuffer(data[:8]))
+        namespace_id = NamespaceId(util.u64_from_catbuffer(data[8:16]))
+        namespace_name_size = util.u8_from_catbuffer(data[16:17])
+        data = data[17:]
+        namespace_name = data[:namespace_name_size].decode('ascii')
+        data = data[namespace_name_size:]
 
         self._set('namespace_type', namespace_type)
         self._set('namespace_name', namespace_name)
+        self._set('namespace_id', namespace_id)
         self._set('duration', duration)
         self._set('parent_id', parent_id)
 
@@ -250,13 +261,16 @@ class RegisterNamespaceTransaction(Transaction):
         self,
         network_type: NetworkType,
     ) -> dict:
-        data = self.namespace_name.to_dto(network_type)
-        data.update({'namespaceType': self.namespace_type.to_dto(network_type)})
+        data = {
+            'namespaceType': self.namespace_type.to_dto(network_type),
+            'name': self.namespace_name,
+            'namespaceId': util.u64_to_dto(int(self.namespace_id)),
+        }
 
         if self.duration is not None:
             data['duration'] = util.u64_to_dto(self.duration)
         if self.parent_id is not None:
-            data['parentId'] = self.parent_id.to_dto(network_type)
+            data['parentId'] = util.u64_to_dto(int(self.parent_id))
 
         return data
 
@@ -265,17 +279,22 @@ class RegisterNamespaceTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        namespace_type = NamespaceType.from_dto(data['namespaceType'], network_type)
-        namespace_name = NamespaceName.from_dto(data, network_type)
+        namespace_type = NamespaceType.create_from_dto(
+            data['namespaceType'],
+            network_type
+        )
+        namespace_name = data['name']
+        namespace_id = NamespaceId(util.u64_from_dto(data['namespaceId']))
         if namespace_type == NamespaceType.ROOT_NAMESPACE:
             duration = util.u64_from_dto(data['duration'])
             parent_id = None
         else:
             duration = None
-            parent_id = NamespaceId.from_dto(data['parentId'], network_type)
+            parent_id = NamespaceId(util.u64_from_dto(data['parentId']))
 
         self._set('namespace_type', namespace_type)
         self._set('namespace_name', namespace_name)
+        self._set('namespace_id', namespace_id)
         self._set('duration', duration)
         self._set('parent_id', parent_id)
 

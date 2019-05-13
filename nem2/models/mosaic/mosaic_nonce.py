@@ -52,7 +52,7 @@ def nonce_as_bytes(nonce: RawNonceType):
 # TODO(ahuszagh) Change to an object, not an actual Model.
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicNonce(util.IntMixin, util.Serializable):
+class MosaicNonce(util.Model):
     """
     Nonce for a mosaic.
 
@@ -105,7 +105,7 @@ class MosaicNonce(util.IntMixin, util.Serializable):
         return int(self)
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: int,
         network_type: OptionalNetworkType = None,
@@ -119,7 +119,7 @@ class MosaicNonce(util.IntMixin, util.Serializable):
         return util.u32_to_catbuffer(int(self))
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls,
         data: bytes,
         network_type: OptionalNetworkType = None,

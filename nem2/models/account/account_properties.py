@@ -35,7 +35,7 @@ __all__ = ['AccountProperties']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AccountProperties(util.DTOSerializable):
+class AccountProperties(util.DTO):
     """
     Describe properties for an account.
 
@@ -58,24 +58,22 @@ class AccountProperties(util.DTOSerializable):
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        raise NotImplementedError
-        # We're getting str from address.address, should be getting bytes.
-#        return {
-#            # TODO(ahuszagh) Check when stabilized
-#            'address': util.b64encode(self.address.address),
-#            'properties': AccountProperty.sequence_to_dto(self.properties, network_type),
-#        }
+        return {
+            # TODO(ahuszagh) Check when stabilized
+            'address': util.b64encode(self.address.address.encode('ascii')),
+            'properties': AccountProperty.sequence_to_dto(self.properties, network_type),
+        }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        raise NotImplementedError
-#        properties = data.get('properties', [])
-#        return cls(
-#            # TODO(ahuszagh) Check when stabilized
-#            address=Address.create_from_encoded(util.b64decode(data['address'])),
-#            properties=AccountProperty.sequence_from_dto(properties, network_type),
-#        )
+        address = util.b64decode(data['address']).decode('ascii')
+        from_dto = AccountProperty.sequence_from_dto
+        return cls(
+            # TODO(ahuszagh) Check when stabilized
+            address=Address.create_from_raw_address(address),
+            properties=from_dto(data['properties'], network_type),
+        )

@@ -35,7 +35,7 @@ class TestAddressAlias(harness.TestCase):
 
     def test_from_invalid_dto(self):
         with self.assertRaises(ValueError):
-            self.type.from_dto({'type': 0})
+            self.type.create_from_dto({'type': 0})
 
 
 @harness.model_test_case({
@@ -194,7 +194,7 @@ class TestEmptyAlias(harness.TestCase):
 
     def test_from_invalid_dto(self):
         with self.assertRaises(ValueError):
-            self.type.from_dto({'type': 1, 'mosaicId': [5, 0]})
+            self.type.create_from_dto({'type': 1, 'mosaicId': [5, 0]})
 
 
 @harness.model_test_case({
@@ -228,7 +228,7 @@ class TestMosaicAlias(harness.TestCase):
 
     def test_from_invalid_dto(self):
         with self.assertRaises(ValueError):
-            self.type.from_dto({'type': 0})
+            self.type.create_from_dto({'type': 0})
 
 
 @harness.model_test_case({
@@ -237,8 +237,6 @@ class TestMosaicAlias(harness.TestCase):
     'data': {
         'id': 5,
     },
-    'dto': [5, 0],
-    'catbuffer': b'\x05\x00\x00\x00\x00\x00\x00\x00',
 })
 class TestNamespaceId(harness.TestCase):
 
@@ -369,12 +367,11 @@ class TestNamespaceInfo(harness.TestCase):
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
         'namespace_id': models.NamespaceId(0x88b64c3be2f47144),
-        'name': 'sample'
+        'name': 'sample',
     },
-    'catbuffer': b'Dq\xf4\xe2;L\xb6\x88\x06sample',
     'dto': {
         'namespaceId': [0xe2f47144, 0x88b64c3b],
-        'name': 'sample'
+        'name': 'sample',
     },
 })
 class TestNamespaceNameDepth1(harness.TestCase):
@@ -402,12 +399,13 @@ class TestNamespaceNameDepth1(harness.TestCase):
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
         'namespace_id': models.NamespaceId(0xfa9429715a71acc9),
-        'name': 'sub'
+        'name': 'sub',
+        'parent_id': models.NamespaceId(0x88b64c3be2f47144),
     },
-    'catbuffer': b'\xc9\xacqZq)\x94\xfa\x03sub',
     'dto': {
         'namespaceId': [0x5a71acc9, 0xfa942971],
-        'name': 'sub'
+        'name': 'sub',
+        'parentId': [0xe2f47144, 0x88b64c3b],
     },
 })
 class TestNamespaceNameDepth2(harness.TestCase):
@@ -422,12 +420,13 @@ class TestNamespaceNameDepth2(harness.TestCase):
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
         'namespace_id': models.NamespaceId(0x8bc7011b0b344c54),
-        'name': 'full'
+        'name': 'full',
+        'parent_id': models.NamespaceId(0xfa9429715a71acc9),
     },
-    'catbuffer': b'TL4\x0b\x1b\x01\xc7\x8b\x04full',
     'dto': {
         'namespaceId': [0x0b344c54, 0x8bc7011b],
-        'name': 'full'
+        'name': 'full',
+        'parentId': [0x5a71acc9, 0xfa942971],
     },
 })
 class TestNamespaceNameDepth3(harness.TestCase):

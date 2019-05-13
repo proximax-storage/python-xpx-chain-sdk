@@ -25,7 +25,7 @@
 from __future__ import annotations
 import typing
 
-from ..blockchain.network_type import NetworkType, OptionalNetworkType
+from ..blockchain.network_type import NetworkType
 from ... import util
 
 __all__ = ['Address']
@@ -85,8 +85,7 @@ def is_valid_address(address: bytes) -> bool:
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-# TODO(ahuszagh) Make Base64Mixin
-class Address(util.Serializable):
+class Address(util.Object):
     """
     Account address for network type.
 
@@ -98,7 +97,6 @@ class Address(util.Serializable):
 
     address: str
     network_type: NetworkType
-    CATBUFFER_SIZE: typing.ClassVar[int] = 25 * util.U8_BYTES
 
     def __init__(self, address: str) -> None:
         plain = address.strip().upper().replace('-', '')
@@ -170,31 +168,3 @@ class Address(util.Serializable):
     def is_valid(self) -> bool:
         """Check if address is valid."""
         return is_valid_address(self.encoded)
-
-    def to_dto(
-        self,
-        network_type: OptionalNetworkType = None,
-    ) -> str:
-        return util.hexlify(self.encoded)
-
-    @classmethod
-    def from_dto(
-        cls,
-        data: str,
-        network_type: OptionalNetworkType = None,
-    ):
-        return cls.create_from_encoded(data)
-
-    def to_catbuffer(
-        self,
-        network_type: OptionalNetworkType = None,
-    ) -> bytes:
-        return self.encoded
-
-    @classmethod
-    def from_catbuffer(
-        cls,
-        data: bytes,
-        network_type: OptionalNetworkType = None,
-    ):
-        return cls.create_from_encoded(data)

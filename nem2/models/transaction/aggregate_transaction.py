@@ -219,7 +219,7 @@ class AggregateTransaction(Transaction):
     ) -> bytes:
         """Get the serialized byte array of all sub-transactions."""
 
-        return util.Serializable.sequence_to_catbuffer(
+        return util.Model.sequence_to_catbuffer(
             self.inner_transactions,
             network_type
         )
@@ -230,7 +230,7 @@ class AggregateTransaction(Transaction):
     ) -> bytes:
         """Get the serialized byte array of all cosignatures."""
 
-        return util.Serializable.sequence_to_catbuffer(
+        return util.Model.sequence_to_catbuffer(
             self.cosignatures,
             network_type
         )
@@ -263,7 +263,10 @@ class AggregateTransaction(Transaction):
             # This will hard-error if the transaction is invalid,
             # or cut-off, since every deserializer checks the input
             # is valid.
-            value, subdata = InnerTransaction.from_catbuffer_pair(subdata, network_type)
+            value, subdata = InnerTransaction.create_from_catbuffer_pair(
+                subdata,
+                network_type
+            )
             transactions.append(value)
         return data[size:]
 

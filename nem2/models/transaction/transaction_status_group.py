@@ -24,18 +24,17 @@
 
 from __future__ import annotations
 import enum
-import typing
 
-from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['TransactionStatusGroup']
 
 
 @util.inherit_doc
-class TransactionStatusGroup(util.DTOSerializable, util.EnumMixin, str, enum.Enum):
+class TransactionStatusGroup(util.EnumMixin, str, enum.Enum):
     """Enumerated groups  for a transaction status."""
 
+    UNKNOWN = "unknown"
     FAILED = "failed"
     UNCONFIRMED = "unconfirmed"
     CONFIRMED = "confirmed"
@@ -43,22 +42,9 @@ class TransactionStatusGroup(util.DTOSerializable, util.EnumMixin, str, enum.Enu
     def description(self) -> str:
         return DESCRIPTION[self]
 
-    def to_dto(
-        self,
-        network_type: OptionalNetworkType = None,
-    ) -> str:
-        return typing.cast(str, self.value)
-
-    @classmethod
-    def from_dto(
-        cls,
-        data: str,
-        network_type: OptionalNetworkType = None,
-    ):
-        return cls(data)
-
 
 DESCRIPTION = {
+    TransactionStatusGroup.UNKNOWN: "Unknown status.",
     TransactionStatusGroup.FAILED: "Transaction failed.",
     TransactionStatusGroup.UNCONFIRMED: "Transaction not yet confirmed.",
     TransactionStatusGroup.CONFIRMED: "Transaction confirmed.",

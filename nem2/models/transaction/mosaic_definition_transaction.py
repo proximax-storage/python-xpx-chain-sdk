@@ -36,7 +36,7 @@ from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic_id import MosaicId
 from ..mosaic.mosaic_nonce import MosaicNonce
-from ..mosaic.mosaic_properties import MosaicProperties
+from ..mosaic.mosaic_properties import MosaicProperties, MosaicDefinitionProperties
 from ... import util
 
 __all__ = [
@@ -128,9 +128,12 @@ class MosaicDefinitionTransaction(Transaction):
     # CATBUFFER
 
     def catbuffer_size_specific(self) -> int:
+        # TODO(ahuszagh) Likely have to remove the Nonce, because
+        # it likely does not have an actual format.
         nonce_size = MosaicNonce.CATBUFFER_SIZE
-        id_size = MosaicId.CATBUFFER_SIZE
-        properties_size = self.mosaic_properties.catbuffer_size()
+        id_size = util.U64_BYTES
+        definition_properties = MosaicDefinitionProperties(self.mosaic_properties)
+        properties_size = definition_properties.catbuffer_size()
         return nonce_size + id_size + properties_size
 
     def to_catbuffer_specific(
@@ -140,11 +143,12 @@ class MosaicDefinitionTransaction(Transaction):
         """Export mosaic definition-specific data to catbuffer."""
 
         # MosaicNonce nonce
-        # MosaicId mosaic_id
+        # uint64_t mosaic_id
         # MosaicProperties properties
         nonce = self.nonce.to_catbuffer(network_type)
-        mosaic_id = self.mosaic_id.to_catbuffer(network_type)
-        properties = self.mosaic_properties.to_catbuffer(network_type)
+        mosaic_id = util.u64_to_catbuffer(int(self.mosaic_id))
+        definition_properties = MosaicDefinitionProperties(self.mosaic_properties)
+        properties = definition_properties.to_catbuffer(network_type)
         return nonce + mosaic_id + properties
 
     def load_catbuffer_specific(
@@ -157,13 +161,16 @@ class MosaicDefinitionTransaction(Transaction):
         # MosaicNonce nonce
         # MosaicId mosaic_id
         # MosaicProperties properties
-        nonce, data = MosaicNonce.from_catbuffer_pair(data, network_type)
-        mosaic_id, data = MosaicId.from_catbuffer_pair(data, network_type)
-        properties, data = MosaicProperties.from_catbuffer_pair(data, network_type)
+        nonce, data = MosaicNonce.create_from_catbuffer_pair(data, network_type)
+        mosaic_id = MosaicId(util.u64_from_catbuffer(data[:8]))
+        properties, data = MosaicDefinitionProperties.create_from_catbuffer_pair(
+            data[8:],
+            network_type
+        )
 
         self._set('nonce', nonce)
         self._set('mosaic_id', mosaic_id)
-        self._set('mosaic_properties', properties)
+        self._set('mosaic_properties', properties.model)
 
         return typing.cast(bytes, data)
 
@@ -173,10 +180,11 @@ class MosaicDefinitionTransaction(Transaction):
         self,
         network_type: NetworkType,
     ) -> dict:
+        definition_properties = MosaicDefinitionProperties(self.mosaic_properties)
         return {
             'mosaicNonce': self.nonce.to_dto(network_type),
-            'mosaicId': self.mosaic_id.to_dto(network_type),
-            'properties': self.mosaic_properties.to_dto_v2(network_type),
+            'mosaicId': util.u64_to_dto(int(self.mosaic_id)),
+            'properties': definition_properties.to_dto(network_type),
         }
 
     def load_dto_specific(
@@ -184,12 +192,15 @@ class MosaicDefinitionTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        nonce = MosaicNonce.from_dto(data['mosaicNonce'], network_type)
-        mosaic_id = MosaicId.from_dto(data['mosaicId'], network_type)
-        properties = MosaicProperties.from_dto_v2(data['properties'], network_type)
+        nonce = MosaicNonce.create_from_dto(data['mosaicNonce'], network_type)
+        mosaic_id = MosaicId(util.u64_from_dto(data['mosaicId']))
+        properties = MosaicDefinitionProperties.create_from_dto(
+            data['properties'],
+            network_type
+        )
         self._set('nonce', nonce)
         self._set('mosaic_id', mosaic_id)
-        self._set('mosaic_properties', properties)
+        self._set('mosaic_properties', properties.model)
 
 
 @register_transaction('MOSAIC_DEFINITION')

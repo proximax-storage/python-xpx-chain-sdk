@@ -129,8 +129,8 @@ class AddressAliasTransaction(Transaction):
 
     def catbuffer_size_specific(self) -> int:
         action_type_size = AliasActionType.CATBUFFER_SIZE
-        namespace_id_size = NamespaceId.CATBUFFER_SIZE
-        address_size = Address.CATBUFFER_SIZE
+        namespace_id_size = util.U64_BYTES
+        address_size = 25 * util.U8_BYTES
         return action_type_size + namespace_id_size + address_size
 
     def to_catbuffer_specific(
@@ -140,11 +140,11 @@ class AddressAliasTransaction(Transaction):
         """Export address alias-specific data to catbuffer."""
 
         # uint8_t action_type
-        # NamespaceId namespace_id
+        # uint64_t namespace_id
         # Address address
         action_type = self.action_type.to_catbuffer(network_type)
-        namespace_id = self.namespace_id.to_catbuffer(network_type)
-        address = self.address.to_catbuffer(network_type)
+        namespace_id = util.u64_to_catbuffer(int(self.namespace_id))
+        address = self.address.encoded
 
         return action_type + namespace_id + address
 
@@ -156,11 +156,12 @@ class AddressAliasTransaction(Transaction):
         """Load address alias-specific data data from catbuffer."""
 
         # uint8_t action_type
-        # NamespaceId namespace_id
+        # uint64_t namespace_id
         # Address address
-        action_type, data = AliasActionType.from_catbuffer_pair(data, network_type)
-        namespace_id, data = NamespaceId.from_catbuffer_pair(data, network_type)
-        address, data = Address.from_catbuffer_pair(data, network_type)
+        action_type = AliasActionType.create_from_catbuffer(data, network_type)
+        namespace_id = NamespaceId(util.u64_from_catbuffer(data[1:9]))
+        address = Address.create_from_encoded(data[9:34])
+        data = data[34:]
 
         self._set('action_type', action_type)
         self._set('namespace_id', namespace_id)
@@ -176,8 +177,8 @@ class AddressAliasTransaction(Transaction):
     ) -> dict:
         return {
             'actionType': self.action_type.to_dto(network_type),
-            'namespaceId': self.namespace_id.to_dto(network_type),
-            'address': self.address.to_dto(network_type),
+            'namespaceId': util.u64_to_dto(int(self.namespace_id)),
+            'address': util.hexlify(self.address.encoded),
         }
 
     def load_dto_specific(
@@ -185,9 +186,9 @@ class AddressAliasTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        action_type = AliasActionType.from_dto(data['actionType'], network_type)
-        namespace_id = NamespaceId.from_dto(data['namespaceId'], network_type)
-        address = Address.from_dto(data['address'], network_type)
+        action_type = AliasActionType.create_from_dto(data['actionType'], network_type)
+        namespace_id = NamespaceId(util.u64_from_dto(data['namespaceId']))
+        address = Address.create_from_encoded(data['address'])
 
         self._set('action_type', action_type)
         self._set('namespace_id', namespace_id)

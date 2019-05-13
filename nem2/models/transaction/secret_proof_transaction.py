@@ -166,7 +166,7 @@ class SecretProofTransaction(Transaction):
         # uint8_t[32] secret
         # uint16_t proof_size
         # uint8_t[proof_size] proof
-        hash_type, data = HashType.from_catbuffer_pair(data, network_type)
+        hash_type, data = HashType.create_from_catbuffer_pair(data, network_type)
         hash_length = hash_type.hash_length() // 2
         secret = util.hexlify(data[:hash_length])
         data = data[32:]
@@ -196,7 +196,7 @@ class SecretProofTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        hash_type = HashType.from_dto(data['hashAlgorithm'], network_type)
+        hash_type = HashType.create_from_dto(data['hashAlgorithm'], network_type)
         self._set('hash_type', hash_type)
         self._set('secret', data['secret'])
         self._set('proof', data['proof'])

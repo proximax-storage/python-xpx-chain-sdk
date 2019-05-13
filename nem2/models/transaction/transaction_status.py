@@ -23,8 +23,9 @@
 """
 
 from __future__ import annotations
+import typing
 
-from .deadline import Deadline
+from .deadline import Deadline, TIMESTAMP_NEMESIS_BLOCK_DTO
 from .transaction_status_group import TransactionStatusGroup
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
@@ -34,7 +35,7 @@ __all__ = ['TransactionStatus']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class TransactionStatus(util.DTOSerializable):
+class TransactionStatus(util.DTO):
     """
     Basic information describing announced transaction.
 
@@ -48,12 +49,12 @@ class TransactionStatus(util.DTOSerializable):
         .. code-block:: yaml
 
             TransactionStatusDTO:
-                group: string
+                group?: string
                 status: string
                 # Hex(Hash) (64-bytes)
-                hash: string
-                deadline: UInt64DTO
-                height: UInt64DTO
+                hash?: string
+                deadline?: UInt64DTO
+                height?: UInt64DTO
     """
 
     group: TransactionStatusGroup
@@ -66,24 +67,33 @@ class TransactionStatus(util.DTOSerializable):
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        return {
-            'group': self.group.to_dto(network_type),
-            'status': self.status,
-            'hash': self.hash,
-            'deadline': self.deadline.to_dto(network_type),
-            'height': util.u64_to_dto(self.height),
-        }
+        data: dict = {'status': self.status}
+        timestamp = self.deadline.to_timestamp()
+        if self.group != TransactionStatusGroup.UNKNOWN:
+            data['group'] = typing.cast(str, self.group.value)
+        if self.hash:
+            data['hash'] = self.hash
+        if timestamp != Deadline.TIMESTAMP_NEMESIS_BLOCK:
+            data['deadline'] = util.u64_to_dto(timestamp)
+        if self.height:
+            data['height'] = util.u64_to_dto(self.height)
+
+        return data
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        group = data.get('group', 'unknown')
+        hash = data.get('hash', '')
+        timestamp = data.get('deadline', TIMESTAMP_NEMESIS_BLOCK_DTO)
+        height = data.get('height', [0, 0])
         return cls(
-            group=TransactionStatusGroup.from_dto(data['group'], network_type),
+            group=TransactionStatusGroup(group),
             status=data['status'],
-            hash=data['hash'],
-            deadline=Deadline.from_dto(data['deadline'], network_type),
-            height=util.u64_from_dto(data['height']),
+            hash=hash,
+            deadline=Deadline.create_from_timestamp(util.u64_from_dto(timestamp)),
+            height=util.u64_from_dto(height),
         )

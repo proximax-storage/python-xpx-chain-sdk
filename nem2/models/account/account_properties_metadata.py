@@ -23,7 +23,6 @@
 """
 
 from __future__ import annotations
-import typing
 
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
@@ -57,16 +56,12 @@ class AccountPropertiesMetadata(util.Object):
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        assert data['meta'] == {}
         return cls(
             # TODO(ahuszagh) Check when stabilized
             id=data['id'],
         )
-
-
-OptionalAccountPropertiesMetadata = typing.Optional[AccountPropertiesMetadata]

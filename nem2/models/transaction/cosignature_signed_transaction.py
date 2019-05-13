@@ -32,7 +32,7 @@ __all__ = ['CosignatureSignedTransaction']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class CosignatureSignedTransaction(util.DTOSerializable):
+class CosignatureSignedTransaction(util.DTO):
     """
     Cosignature signed transaction.
 
@@ -56,7 +56,7 @@ class CosignatureSignedTransaction(util.DTOSerializable):
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,

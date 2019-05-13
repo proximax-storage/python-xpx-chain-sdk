@@ -34,17 +34,58 @@ from ... import util
 
 __all__ = ['AccountProperty']
 
-PropertyValue= typing.Union[
+PropertyValue = typing.Union[
     Address,
     MosaicId,
     Transaction,
     # TODO(ahuszagh) Add sentinel
+    #   I'm assuming it's empty or an address?
 ]
+PropertyValueList = typing.Sequence[PropertyValue]
+
+
+def to_base64(
+    property_type: int,
+    values: typing.Sequence[PropertyValue],
+) -> typing.List[str]:
+    """Export properties to base64."""
+
+    if property_type & 0x01:
+        # We have an address.
+        cast = lambda x: typing.cast(Address, x)
+        return [util.b64encode(cast(i).encoded) for i in values]
+    elif property_type & 0x02:
+        # We have a mosaic.
+        raise NotImplementedError
+    elif property_type & 0x04:
+        # We have a transaction.
+        raise NotImplementedError
+    else:
+        raise ValueError('Unknown property type.')
+
+
+def from_base64(
+    property_type: int,
+    values: typing.List[str],
+) -> typing.Sequence[PropertyValue]:
+    """Load properties from base64."""
+
+    if property_type & 0x01:
+        # We have an address.
+        return [Address.create_from_encoded(util.b64decode(i)) for i in values]
+    elif property_type & 0x02:
+        # We have a mosaic.
+        raise NotImplementedError
+    elif property_type & 0x04:
+        # We have a transaction.
+        raise NotImplementedError
+    else:
+        raise ValueError('Unknown property type.')
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AccountProperty(util.DTOSerializable):
+class AccountProperty(util.DTO):
     """
     Describe account property via type and values.
 
@@ -57,7 +98,7 @@ class AccountProperty(util.DTOSerializable):
             AccountPropertyDTO:
                 propertyType: integer
                 # Base64(Address), Base64(MosaicID), Base64(Transaction)
-                values: string
+                values: string[]
     """
 
     property_type: PropertyType
@@ -67,22 +108,22 @@ class AccountProperty(util.DTOSerializable):
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        raise NotImplementedError
-#        return {
-#            # TODO(ahuszagh) Check when stabilized
-#            'propertyType': self.property_type.to_dto(network_type),
-#            'values': [i.to_base64() for i in self.values],
-#        }
+        return {
+            # TODO(ahuszagh) Check when stabilized
+            'propertyType': self.property_type.to_dto(network_type),
+            'values': to_base64(int(self.property_type), self.values),
+        }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        raise NotImplementedError
-#        return cls(
-#            # TODO(ahuszagh) Check when stabilized
-#            property_type=PropertyType.from_dto(data['propertyType'], network_type),
-#            values=[AccountProperty.from_base64(i) for i in data['values']],
-#        )
+        property_type = data['propertyType']
+        values = data['values']
+        return cls(
+            # TODO(ahuszagh) Check when stabilized
+            property_type=PropertyType.create_from_dto(property_type, network_type),
+            values=from_base64(property_type, values),
+        )

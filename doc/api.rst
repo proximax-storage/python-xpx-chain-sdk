@@ -5,7 +5,7 @@ Client
 ------
 
 .. automodule:: nem2.client
-   :exclude-members: from_http
+   :exclude-members: create_from_http
 
 Models
 ------

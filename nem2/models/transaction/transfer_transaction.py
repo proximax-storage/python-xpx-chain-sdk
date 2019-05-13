@@ -143,7 +143,7 @@ class TransferTransaction(Transaction):
     ) -> bytes:
         """Get the serialized byte array of all mosaics."""
 
-        return util.Serializable.sequence_to_catbuffer(
+        return util.Model.sequence_to_catbuffer(
             self.mosaics,
             network_type
         )
@@ -191,7 +191,7 @@ class TransferTransaction(Transaction):
         # uint8_t mosaics_count
         # uint8_t[message_size] message
         # Mosaic[mosaics_count] mosaics
-        recipient, data = Recipient.from_catbuffer_pair(data, network_type)
+        recipient, data = Recipient.create_from_catbuffer_pair(data, network_type)
         message_size = util.u16_from_catbuffer(data[:util.U16_BYTES])
         data = data[util.U16_BYTES:]
         mosaics_count = util.u8_from_catbuffer(data[:util.U8_BYTES])
@@ -222,11 +222,11 @@ class TransferTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        recipient = Recipient.from_dto(data['recipient'], network_type)
+        recipient = Recipient.create_from_dto(data['recipient'], network_type)
         mosaics = Mosaic.sequence_from_dto(data.get('mosaics', []), network_type)
         message = EMPTY_MESSAGE
         if 'message' in data:
-            message = PlainMessage.from_dto(data['message'], network_type)
+            message = PlainMessage.create_from_dto(data['message'], network_type)
 
         self._set('recipient', recipient)
         self._set('mosaics', mosaics)

@@ -23,15 +23,16 @@
 """
 
 from __future__ import annotations
-import typing
 
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['AccountMetadata']
 
 
+@util.inherit_doc
 @util.dataclass(frozen=True)
-class AccountMetadata(util.Object):
+class AccountMetadata(util.DTO):
     """
     Metadata describing an account.
 
@@ -41,5 +42,17 @@ class AccountMetadata(util.Object):
             AccountMetaDTO: null
     """
 
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None,
+    ) -> dict:
+        return {}
 
-OptionalAccountMetadata = typing.Optional[AccountMetadata]
+    @classmethod
+    def create_from_dto(
+        cls,
+        data: dict,
+        network_type: OptionalNetworkType = None,
+    ):
+        assert data == {}
+        return cls()

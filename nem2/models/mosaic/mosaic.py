@@ -33,12 +33,11 @@ from ... import util
 __all__ = ['Mosaic']
 
 IdType = typing.Union[MosaicId, NamespaceId]
-SIZE = MosaicId.CATBUFFER_SIZE + util.U64_BYTES
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True, amount=0)
-class Mosaic(util.Serializable):
+class Mosaic(util.Model):
     """
     Basic information describing a mosaic.
 
@@ -55,7 +54,7 @@ class Mosaic(util.Serializable):
 
     id: IdType
     amount: int
-    CATBUFFER_SIZE: typing.ClassVar[int] = SIZE
+    CATBUFFER_SIZE: typing.ClassVar[int] = 2 * util.U64_BYTES
 
     def to_dto(
         self,
@@ -63,16 +62,16 @@ class Mosaic(util.Serializable):
     ) -> dict:
         return {
             'amount': util.u64_to_dto(self.amount),
-            'id': self.id.to_dto(network_type),
+            'id': util.u64_to_dto(int(self.id)),
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        mosaic_id = MosaicId.from_dto(data['id'], network_type)
+        mosaic_id = MosaicId(util.u64_from_dto(data['id']))
         amount = util.u64_from_dto(data['amount'])
         return cls(mosaic_id, amount)
 
@@ -80,18 +79,18 @@ class Mosaic(util.Serializable):
         self,
         network_type: OptionalNetworkType = None,
     ) -> bytes:
-        mosaic_id = self.id.to_catbuffer(network_type)
+        mosaic_id = util.u64_to_catbuffer(int(self.id))
         amount = util.u64_to_catbuffer(self.amount)
         return mosaic_id + amount
 
     @classmethod
-    def from_catbuffer(
+    def create_from_catbuffer(
         cls,
         data: bytes,
         network_type: OptionalNetworkType = None,
     ):
-        mosaic_id, data = MosaicId.from_catbuffer_pair(data, network_type)
-        amount = util.u64_from_catbuffer(data)
+        mosaic_id = MosaicId(util.u64_from_catbuffer(data[:8]))
+        amount = util.u64_from_catbuffer(data[8:16])
         return cls(mosaic_id, amount)
 
 

@@ -47,7 +47,7 @@ class TestAddressAliasTransaction(harness.TestCase):
     def test_catbuffer(self):
         catbuffer = self.transaction.to_catbuffer()
         self.assertEqual(self.catbuffer, util.hexlify(catbuffer))
-        self.assertEqual(self.transaction, models.Transaction.from_catbuffer(catbuffer))
+        self.assertEqual(self.transaction, models.Transaction.create_from_catbuffer(catbuffer))
 
     def test_dto(self):
         pass
@@ -58,7 +58,7 @@ class TestAddressAliasTransaction(harness.TestCase):
         #   Restore when I get a message on slack.
         #   https://nem2.slack.com/archives/CEZKUE4KB/p1553097806138700?thread_ts=1553095634.133900&cid=CEZKUE4KB
         # self.assertEqual(self.dto, dto)
-        # self.assertEqual(self.transaction, models.Transaction.from_dto(dto))
+        # self.assertEqual(self.transaction, models.Transaction.create_from_dto(dto))
 
     def test_sign_with(self):
         signed_transaction = self.transaction.sign_with(self.signer)
@@ -192,8 +192,6 @@ class TestChronoUnit(harness.TestCase):
     'data': {
         'deadline': datetime.datetime(2019, 3, 8, 0, 18, 57),
     },
-    'dto': [1552004337, 0],
-    'catbuffer': b'\xf1\xb4\x81\\\x00\x00\x00\x00',
 })
 class TestDeadline(harness.TestCase):
 
@@ -268,7 +266,7 @@ class TestInnnerTransaction(harness.TestCase):
     def test_catbuffer_size_shared(self):
         self.assertEqual(models.InnerTransaction.catbuffer_size_shared(), 40)
 
-    def test_from_catbuffer(self):
+    def test_create_from_catbuffer(self):
         transactions = [
             (models.TransactionType.ADDRESS_ALIAS, '4a0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e42004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'),
             (models.TransactionType.MOSAIC_ALIAS, '390000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e43004471f4e23b4cb688a6c03b484fd6f72f'),
@@ -277,7 +275,7 @@ class TestInnnerTransaction(harness.TestCase):
         ]
 
         for type, payload in transactions:
-            transaction = models.InnerTransaction.from_catbuffer(payload)
+            transaction = models.InnerTransaction.create_from_catbuffer(payload)
             self.assertEqual(transaction.type, type)
 
 
@@ -295,7 +293,7 @@ class TestMessage(harness.TestCase):
     def test_dto(self):
         dto = {'payload': util.hexlify(b'Hello world!'), 'type': 0}
         with self.assertRaises(NotImplementedError):
-            models.Message.from_dto(dto, models.NetworkType.MIJIN_TEST)
+            models.Message.create_from_dto(dto, models.NetworkType.MIJIN_TEST)
 
 
 @harness.enum_test_case({
@@ -375,7 +373,7 @@ class TestMosaicAliasTransaction(harness.TestCase):
         'signer': None,
         'transaction_info': None,
         'nonce': models.MosaicNonce(1),
-        'mosaic_id': models.MosaicId.from_hex('6c699a1517bea955'),
+        'mosaic_id': models.MosaicId.create_from_hex('6c699a1517bea955'),
         'mosaic_properties': models.MosaicProperties(0x3, 3),
     },
     'dto': {
@@ -425,7 +423,7 @@ class TestMosaicDefinitionTransaction(harness.TestCase):
         'signature': None,
         'signer': None,
         'transaction_info': None,
-        'mosaic_id': models.MosaicId.from_hex('941299b2b7e1291c'),
+        'mosaic_id': models.MosaicId.create_from_hex('941299b2b7e1291c'),
         'direction': models.MosaicSupplyType.INCREASE,
         'delta': 15000000,
     },
@@ -522,6 +520,7 @@ class TestPlainMessage(harness.TestCase):
     pass
 
 
+# TODO(ahuszagh) Restore...
 @harness.transaction_test_case({
     'type': models.RegisterNamespaceTransaction,
     'network_type': models.NetworkType.MIJIN_TEST,
@@ -536,7 +535,8 @@ class TestPlainMessage(harness.TestCase):
         'namespace_type': models.NamespaceType.ROOT_NAMESPACE,
         'duration': 100,
         'parent_id': None,
-        'namespace_name': models.NamespaceName.create_from_name('sample'),
+        'namespace_name': 'sample',
+        'namespace_id': models.NamespaceId('sample'),
     },
     'dto': {
         'transaction': {
@@ -577,14 +577,10 @@ class TestRegisterNamespaceTransactionRoot(harness.TestCase):
         with self.assertRaises(ValueError):
             self.type(**kwds)
 
-    def test_properties(self):
-        self.assertEqual(self.model.namespace_name.namespace_id, self.model.namespace_id)
-        self.assertEqual(self.model.namespace_name.name, self.model.name)
-
     def test_create_root_namespace(self):
         self.assertEqual(self.model, self.type.create_root_namespace(
             deadline=self.data['deadline'],
-            namespace_name=self.data['namespace_name'].name,
+            namespace_name=self.data['namespace_name'],
             duration=self.data['duration'],
             network_type=self.data['network_type'],
         ))
@@ -603,7 +599,8 @@ class TestRegisterNamespaceTransactionRoot(harness.TestCase):
         'transaction_info': None,
         'namespace_type': models.NamespaceType.SUB_NAMESPACE,
         'parent_id': models.NamespaceId(0x88b64c3be2f47144),
-        'namespace_name': models.NamespaceName.create_from_name('sample.sub'),
+        'namespace_name': 'sub',
+        'namespace_id': models.NamespaceId('sample.sub'),
     },
     'dto': {
         'transaction': {
@@ -648,7 +645,7 @@ class TestRegisterNamespaceTransactionSub(harness.TestCase):
     def test_create_sub_namespace(self):
         self.assertEqual(self.model, self.type.create_sub_namespace(
             deadline=self.data['deadline'],
-            namespace_name=self.data['namespace_name'].name,
+            namespace_name=self.data['namespace_name'],
             parent_namespace=self.data['parent_id'],
             network_type=self.data['network_type'],
         ))
@@ -656,7 +653,7 @@ class TestRegisterNamespaceTransactionSub(harness.TestCase):
     def test_create_sub_namespace_from_name(self):
         self.assertEqual(self.model, self.type.create_sub_namespace(
             deadline=self.data['deadline'],
-            namespace_name=self.data['namespace_name'].name,
+            namespace_name=self.data['namespace_name'],
             parent_namespace=self.extras['parent_namespace'],
             network_type=self.data['network_type'],
         ))
@@ -850,7 +847,7 @@ class TestTransaction(harness.TestCase):
     def test_catbuffer_size_shared(self):
         self.assertEqual(models.Transaction.catbuffer_size_shared(), 120)
 
-    def test_from_catbuffer(self):
+    def test_create_from_catbuffer(self):
         transactions = [
             (models.TransactionType.ADDRESS_ALIAS, '9a000000102e9c68fe9cbaa5d1d27ad35f9e386b42c265749be0e27182b8a9ebf18a0357332ef4ee350b648ea00437790c70471959b9334aea2e2e89356d52613fd385021b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'),
             (models.TransactionType.MOSAIC_ALIAS, '890000004643c4a57eccb783217473cf11bd6642e754d8362a552266fc6e332f523550b3e4431f468c942a1c43748b12f16112b63c282fa48a674a3cb66df33ec8ad100f1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e430000000000000000f1b4815c00000000004471f4e23b4cb688a6c03b484fd6f72f'),
@@ -860,10 +857,10 @@ class TestTransaction(harness.TestCase):
         ]
 
         for type, payload in transactions:
-            transaction = models.Transaction.from_catbuffer(payload)
+            transaction = models.Transaction.create_from_catbuffer(payload)
             self.assertEqual(transaction.type, type)
 
-    def test_from_dto(self):
+    def test_create_from_dto(self):
         transactions = [
             # TODO(ahuszagh) Add more transactions here...
             (models.TransactionType.SECRET_LOCK, {
@@ -905,7 +902,7 @@ class TestTransaction(harness.TestCase):
         ]
 
         for type, dto in transactions:
-            transaction = models.Transaction.from_dto(dto)
+            transaction = models.Transaction.create_from_dto(dto)
             self.assertEqual(transaction.type, type)
 
     # TODO(ahuszagh) Need to test the hooks.
@@ -975,7 +972,7 @@ class TestTransactionInfo(harness.TestCase):
         'group': models.TransactionStatusGroup.CONFIRMED,
         'status': 'Success',
         'hash': 'b2635223db45cfbb4e21cdfc359fe7f222a6e5f6000c99ca9e729db02e6661f5',
-        'deadline': models.Deadline.from_timestamp(1),
+        'deadline': models.Deadline.create_from_timestamp(1),
         'height': 1,
     },
     'dto': {
@@ -996,7 +993,7 @@ class TestTransactionStatus(harness.TestCase):
     'data': {
         'hash': 'b2635223db45cfbb4e21cdfc359fe7f222a6e5f6000c99ca9e729db02e6661f5',
         'status': 'Success',
-        'deadline': models.Deadline.from_timestamp(1),
+        'deadline': models.Deadline.create_from_timestamp(1),
     },
     'dto': {
         'hash': 'b2635223db45cfbb4e21cdfc359fe7f222a6e5f6000c99ca9e729db02e6661f5',
@@ -1024,11 +1021,6 @@ class TestTransactionStatusError(harness.TestCase):
         'Transaction failed.',
         'Transaction not yet confirmed.',
         'Transaction confirmed.',
-    ],
-    'dto': [
-        'failed',
-        'unconfirmed',
-        'confirmed',
     ],
 })
 class TestTransactionStatusGroup(harness.TestCase):
@@ -1145,17 +1137,17 @@ class TestTransferTransaction(harness.TestCase):
         with self.assertRaises(ValueError):
             self.model.to_catbuffer(models.NetworkType.MIJIN)
         with self.assertRaises(ValueError):
-            self.type.from_catbuffer(self.catbuffer, models.NetworkType.MIJIN)
+            self.type.create_from_catbuffer(self.catbuffer, models.NetworkType.MIJIN)
         with self.assertRaises(ValueError):
             self.model.to_dto(models.NetworkType.MIJIN)
         with self.assertRaises(ValueError):
-            self.type.from_dto(self.dto, models.NetworkType.MIJIN)
+            self.type.create_from_dto(self.dto, models.NetworkType.MIJIN)
         with self.assertRaises(ValueError):
-            self.type.from_catbuffer(b'', self.network_type)
+            self.type.create_from_catbuffer(b'', self.network_type)
         with self.assertRaises(ValueError):
             size = util.hexlify(util.u32_to_catbuffer(1 << 31))
             catbuffer = size + self.catbuffer[8:]
-            self.type.from_catbuffer(catbuffer, self.network_type)
+            self.type.create_from_catbuffer(catbuffer, self.network_type)
 
 
 @harness.transaction_test_case({

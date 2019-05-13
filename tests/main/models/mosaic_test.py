@@ -25,8 +25,6 @@ class TestMosaic(harness.TestCase):
     'data': {
         'id': 5,
     },
-    'dto': [5, 0],
-    'catbuffer': b'\x05\x00\x00\x00\x00\x00\x00\x00',
     'extras': {
         'nonce': models.MosaicNonce(b'\x00\x00\x00\x00'),
         'public_key': '7D08373CFFE4154E129E04F0827E5F3D6907587E348757B0F87D2F839BF88246',
@@ -56,13 +54,13 @@ class TestMosaicId(harness.TestCase):
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
         'meta_id': '5cc07cbc3a48065f47d6df80',
-        'mosaic_id': models.MosaicId.from_hex('6c699a1517bea955'),
+        'mosaic_id': models.MosaicId.create_from_hex('6c699a1517bea955'),
         'supply': 8999999998000000,
         'height': 1,
         'owner': models.PublicAccount.create_from_public_key('a04335f99d9ee3787528a16c7a302f80d511e9cf71d97d95c2182e0ea75a1ef9', models.NetworkType.MIJIN_TEST),
         'revision': 1,
         'properties': models.MosaicProperties(0x2, 6, 0),
-        'levy': None,
+        'levy': models.MosaicLevy(),
     },
     'dto': {
         'meta': {
@@ -83,6 +81,13 @@ class TestMosaicInfo(harness.TestCase):
     pass
 
 
+@harness.model_test_case({
+    'type': models.MosaicLevy,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {},
+    'dto': {},
+    'eq': False,
+})
 class TestMosaicLevy(harness.TestCase):
     pass
 
@@ -159,18 +164,6 @@ class TestMosaicNonce(harness.TestCase):
     def test_int(self):
         self.assertEqual(int(self.model), 0x78563412)
 
-    def test_index(self):
-        self.assertEqual(hex(self.model), "0x78563412")
-
-    def test_format(self):
-        value = self.type(5)
-        self.assertEqual(f'{value:x}', '5')
-        self.assertEqual(f'{value:X}', '5')
-
-        value = self.type(13)
-        self.assertEqual(f'{value:x}', 'd')
-        self.assertEqual(f'{value:X}', 'D')
-
     def test_create_random(self):
         def fake_entropy(size: int):
             return b'4' * size
@@ -195,7 +188,6 @@ class TestMosaicNonce(harness.TestCase):
         'duration': 100,
     },
     'dto': [[3, 0], [1, 0], [100, 0]],
-    'catbuffer': b'\x01\x03\x01\x02d\x00\x00\x00\x00\x00\x00\x00',
 })
 class TestMosaicProperties(harness.TestCase):
 
@@ -210,15 +202,6 @@ class TestMosaicProperties(harness.TestCase):
         self.assertEqual(self.type.create(transferable=True).flags, 0x2)
         self.assertEqual(self.type.create(transferable=False).flags, 0x0)
         self.assertEqual(self.type.create(levy_mutable=True).flags, 0x6)
-
-    def test_dto_v2(self):
-        dto2 = self.model.to_dto_v2(self.network_type)
-        self.assertEqual(dto2, [
-            {'id': 0, 'value': [3, 0]},
-            {'id': 1, 'value': [1, 0]},
-            {'id': 2, 'value': [100, 0]}
-        ])
-        self.assertEqual(self.model, self.type.from_dto_v2(dto2, self.network_type))
 
 
 @harness.enum_test_case({
@@ -278,12 +261,12 @@ class TestNetworkCurrencyMosaic(harness.TestCase):
 
     def test_from_invalid_dto(self):
         with self.assertRaises(ValueError):
-            self.type.from_dto({'amount': [1, 0], 'id': [0, 0]})
+            self.type.create_from_dto({'amount': [1, 0], 'id': [0, 0]})
 
     def test_from_invalid_catbuffer(self):
         with self.assertRaises(ValueError):
             catbuffer = bytes(8) + self.catbuffer[8:]
-            self.type.from_catbuffer(catbuffer)
+            self.type.create_from_catbuffer(catbuffer)
 
 
 @harness.model_test_case({
@@ -316,9 +299,9 @@ class TestNetworkHarvestMosaic(harness.TestCase):
 
     def test_from_invalid_dto(self):
         with self.assertRaises(ValueError):
-            self.type.from_dto({'amount': [1, 0], 'id': [0, 0]})
+            self.type.create_from_dto({'amount': [1, 0], 'id': [0, 0]})
 
     def test_from_invalid_catbuffer(self):
         with self.assertRaises(ValueError):
             catbuffer = bytes(8) + self.catbuffer[8:]
-            self.type.from_catbuffer(catbuffer)
+            self.type.create_from_catbuffer(catbuffer)

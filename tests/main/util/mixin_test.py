@@ -12,9 +12,9 @@ class TestUMixin(harness.TestCase):
         dto = 0x7F
         catbuffer = b'\x7f'
         self.assertEqual(value.to_dto(None), dto)
-        self.assertEqual(Mixin.from_dto(dto, None), value)
+        self.assertEqual(Mixin.create_from_dto(dto, None), value)
         self.assertEqual(value.to_catbuffer(None), catbuffer)
-        self.assertEqual(Mixin.from_catbuffer(catbuffer, None), value)
+        self.assertEqual(Mixin.create_from_catbuffer(catbuffer, None), value)
 
     def test_u16mixin(self):
         class Mixin(util.U16Mixin, int):
@@ -24,9 +24,9 @@ class TestUMixin(harness.TestCase):
         dto = 0x7FFF
         catbuffer = b'\xff\x7f'
         self.assertEqual(value.to_dto(None), dto)
-        self.assertEqual(Mixin.from_dto(dto, None), value)
+        self.assertEqual(Mixin.create_from_dto(dto, None), value)
         self.assertEqual(value.to_catbuffer(None), catbuffer)
-        self.assertEqual(Mixin.from_catbuffer(catbuffer, None), value)
+        self.assertEqual(Mixin.create_from_catbuffer(catbuffer, None), value)
 
     def test_u32mixin(self):
         class Mixin(util.U32Mixin, int):
@@ -36,9 +36,9 @@ class TestUMixin(harness.TestCase):
         dto = 0x7FFFFFFF
         catbuffer = b'\xff\xff\xff\x7f'
         self.assertEqual(value.to_dto(None), dto)
-        self.assertEqual(Mixin.from_dto(dto, None), value)
+        self.assertEqual(Mixin.create_from_dto(dto, None), value)
         self.assertEqual(value.to_catbuffer(None), catbuffer)
-        self.assertEqual(Mixin.from_catbuffer(catbuffer, None), value)
+        self.assertEqual(Mixin.create_from_catbuffer(catbuffer, None), value)
 
     def test_u64mixin(self):
         class Mixin(util.U64Mixin, int):
@@ -48,9 +48,9 @@ class TestUMixin(harness.TestCase):
         dto = [0xFFFFFFFF, 0x7FFFFFFF]
         catbuffer = b'\xff\xff\xff\xff\xff\xff\xff\x7f'
         self.assertEqual(value.to_dto(None), dto)
-        self.assertEqual(Mixin.from_dto(dto, None), value)
+        self.assertEqual(Mixin.create_from_dto(dto, None), value)
         self.assertEqual(value.to_catbuffer(None), catbuffer)
-        self.assertEqual(Mixin.from_catbuffer(catbuffer, None), value)
+        self.assertEqual(Mixin.create_from_catbuffer(catbuffer, None), value)
 
     def test_u128mixin(self):
         class Mixin(util.U128Mixin, int):
@@ -60,6 +60,6 @@ class TestUMixin(harness.TestCase):
         dto = [[0xFFFFFFFF, 0xFFFFFFFF], [0xFFFFFFFF, 0x7FFFFFFF]]
         catbuffer = b'\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x7f'
         self.assertEqual(value.to_dto(None), dto)
-        self.assertEqual(Mixin.from_dto(dto, None), value)
+        self.assertEqual(Mixin.create_from_dto(dto, None), value)
         self.assertEqual(value.to_catbuffer(None), catbuffer)
-        self.assertEqual(Mixin.from_catbuffer(catbuffer, None), value)
+        self.assertEqual(Mixin.create_from_catbuffer(catbuffer, None), value)

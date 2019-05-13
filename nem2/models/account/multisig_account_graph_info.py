@@ -43,7 +43,7 @@ TupleFactory = typing.Callable[..., TupleType]
 
 
 @util.inherit_doc
-class MultisigAccountGraphInfo(util.DTOSerializable, abc.Mapping):
+class MultisigAccountGraphInfo(util.DTO, abc.Mapping):
     """
     Graph info for multi-sig accounts.
 
@@ -110,22 +110,22 @@ class MultisigAccountGraphInfo(util.DTOSerializable, abc.Mapping):
 
     # MAPPING
 
-    def __contains__(self, key: Key) -> bool:   # type: ignore
+    def __contains__(self, key: Key) -> bool:       # type: ignore
         return key in self._multisig_accounts
 
-    def __getitem__(self, key: Key) -> Value:   # type: ignore
+    def __getitem__(self, key: Key) -> Value:       # type: ignore
         return self._multisig_accounts[key]
 
-    def __iter__(self) -> typing.Iterator[Key]: # type: ignore
+    def __iter__(self) -> typing.Iterator[Key]:     # type: ignore
         return iter(self._multisig_accounts)
 
-    def __len__(self) -> int:                   # type: ignore
+    def __len__(self) -> int:                       # type: ignore
         return len(self._multisig_accounts)
 
     def copy(self) -> MultisigAccountGraphInfo:
         return MultisigAccountGraphInfo(self._multisig_accounts)
 
-    def get(                                    # type: ignore
+    def get(                                        # type: ignore
         self,
         key: Key,
         default: OptionalValue = None
@@ -152,7 +152,7 @@ class MultisigAccountGraphInfo(util.DTOSerializable, abc.Mapping):
         return data
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: list,
         network_type: OptionalNetworkType = None,

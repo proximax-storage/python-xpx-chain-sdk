@@ -33,7 +33,7 @@ __all__ = ['Message']
 
 
 @util.dataclass(frozen=True)
-class Message(util.Serializable):
+class Message(util.Model):
     """
     Abstract message type.
 
@@ -59,7 +59,7 @@ class Message(util.Serializable):
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
@@ -74,7 +74,7 @@ class Message(util.Serializable):
         return self.payload
 
     @classmethod
-    def from_catbuffer_pair(
+    def create_from_catbuffer_pair(
         cls,
         data: bytes,
         network_type: OptionalNetworkType = None,

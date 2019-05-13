@@ -41,7 +41,7 @@ __all__ = ['MosaicLevy']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicLevy(util.DTOSerializable):
+class MosaicLevy(util.DTO):
     """
     Information describing a mosaic levy.
 
@@ -65,7 +65,7 @@ class MosaicLevy(util.DTOSerializable):
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        raise NotImplementedError
+        return {}
         # #return {
         # #    'type': self.type.to_dto(),
         # #    'recipient': self.recipient.to_dto(),
@@ -74,18 +74,16 @@ class MosaicLevy(util.DTOSerializable):
         # #}
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        raise NotImplementedError
+        assert data == {}
+        return cls()
         # #return cls(
-        # #    type=MosaicLevyType.from_dto(data['type']),
-        # #    recipient=Address.from_dto(data['recipient']),
-        # #    mosaic_id=MosaicId.from_dto(data['mosaicId']),
+        # #    type=MosaicLevyType.create_from_dto(data['type']),
+        # #    recipient=Address.create_from_dto(data['recipient']),
+        # #    mosaic_id=MosaicId.create_from_dto(data['mosaicId']),
         # #    fee=data['fee'],
         # #)
-
-
-OptionalMosaicLevyType = typing.Optional[MosaicLevy]

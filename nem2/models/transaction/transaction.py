@@ -143,7 +143,7 @@ class Transaction(TransactionBase):
 
     def to_aggregate(self, signer: PublicAccount) -> InnerTransaction:
         """Convert transaction to inner transaction."""
-        return InnerTransaction.from_transaction(self, signer)
+        return InnerTransaction.create_from_transaction(self, signer)
 
     # CATBUFFER
 

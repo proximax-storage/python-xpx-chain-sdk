@@ -76,9 +76,12 @@ def property_from_catbuffer(catbuffer: bytes) -> typing.Tuple[int, int]:
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class MosaicProperties(util.Serializable):
+class MosaicProperties(util.DTO):
     """
     Properties of an asset.
+
+    Note: The `MosaicDefinitionTransaction` uses a different DTO
+    format for `MosaicProperties` than specified here.
 
     :param flags: Flags for the properties of the mosaic.
     :param divisibility: Decimal places mosaic can be divided into [0-6].
@@ -142,12 +145,56 @@ class MosaicProperties(util.Serializable):
         flags = to_flags(supply_mutable, transferable, levy_mutable)
         return cls(flags, divisibility, duration)
 
+    def to_dto(
+        self,
+        network_type: OptionalNetworkType = None,
+    ) -> DTOType:
+        # For indefinite mosaics, the duration is optional (default 0).
+        return [
+            util.u64_to_dto(self.flags),
+            util.u64_to_dto(self.divisibility),
+            util.u64_to_dto(self.duration),
+        ]
+
+    @classmethod
+    def create_from_dto(
+        cls,
+        data: DTOType,
+        network_type: OptionalNetworkType = None,
+    ):
+        # For indefinite mosaics, the duration is optional (default 0).
+        flags = util.u64_from_dto(data[0])
+        divisibility = util.u64_from_dto(data[1])
+        duration = 0
+        if len(data) == 3:
+            duration = util.u64_from_dto(data[2])
+        return cls(flags, divisibility, duration)
+
+    # TESTING
+    # Private, internal helper for testing only.
+
+    def _permute_(self, cb) -> MosaicProperties:
+        """Permute data inside self."""
+
+        flags = 0x7 - self.flags
+        divisibility = 6 - self.divisibility
+        duration = cb(self.duration)
+        return MosaicProperties(flags, divisibility, duration)
+
+
+@util.inherit_doc
+@util.dataclass(frozen=True)
+class MosaicDefinitionProperties(util.Model):
+    """Internal class to provide transaction support for mosaic properties."""
+
+    model: MosaicProperties
+
     def catbuffer_size(self) -> int:
         """Get the mosaic properties size as catbuffer."""
 
         # Get the number of optional properties.
         count = 0
-        if self.duration != 0:
+        if self.model.duration != 0:
             count += 1
 
         # uint8 count
@@ -164,45 +211,23 @@ class MosaicProperties(util.Serializable):
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
-    ) -> DTOType:
-        # For indefinite mosaics, the duration is optional (default 0).
-        return [
-            util.u64_to_dto(self.flags),
-            util.u64_to_dto(self.divisibility),
-            util.u64_to_dto(self.duration),
-        ]
-
-    def to_dto_v2(
-        self,
-        network_type: OptionalNetworkType = None,
     ):
         # A newer version of DTO, which is used in MosaicDefinitionTransactions.
         # We need to keep the two versions separate.
         data = [
-            {'id': FLAGS_ID, 'value': util.u64_to_dto(self.flags)},
-            {'id': DIVISIBILITY_ID, 'value': util.u64_to_dto(self.divisibility)},
+            {'id': FLAGS_ID, 'value': util.u64_to_dto(self.model.flags)},
+            {'id': DIVISIBILITY_ID, 'value': util.u64_to_dto(self.model.divisibility)},
         ]
-        if self.duration != 0:
-            data.append({'id': DURATION_ID, 'value': util.u64_to_dto(self.duration)})
+        if self.model.duration != 0:
+            data.append({
+                'id': DURATION_ID,
+                'value': util.u64_to_dto(self.model.duration)
+            })
 
         return data
 
     @classmethod
-    def from_dto(
-        cls,
-        data: DTOType,
-        network_type: OptionalNetworkType = None,
-    ):
-        # For indefinite mosaics, the duration is optional (default 0).
-        flags = util.u64_from_dto(data[0])
-        divisibility = util.u64_from_dto(data[1])
-        duration = 0
-        if len(data) == 3:
-            duration = util.u64_from_dto(data[2])
-        return cls(flags, divisibility, duration)
-
-    @classmethod
-    def from_dto_v2(
+    def create_from_dto(
         cls,
         data: DTO2Type,
         network_type: OptionalNetworkType = None,
@@ -212,28 +237,28 @@ class MosaicProperties(util.Serializable):
         kwds = {}
         for item in data:
             kwds[PROPERTIES[item['id']]] = util.u64_from_dto(item['value'])
-        return cls(**kwds)
+        return cls(MosaicProperties(**kwds))
 
     def to_catbuffer(
         self,
         network_type: OptionalNetworkType = None,
     ) -> bytes:
         # Serialize the required properties.
-        flags = util.u8_to_catbuffer(self.flags)
-        divisibility = util.u8_to_catbuffer(self.divisibility)
+        flags = util.u8_to_catbuffer(self.model.flags)
+        divisibility = util.u8_to_catbuffer(self.model.divisibility)
 
         # Serialize the optional properties.
-        properties_count = 0
-        optional_properties = b''
-        if self.duration != 0:
-            properties_count += 1
-            optional_properties += property_to_catbuffer(DURATION_ID, self.duration)
+        counter = 0
+        optional = b''
+        if self.model.duration != 0:
+            counter += 1
+            optional += property_to_catbuffer(DURATION_ID, self.model.duration)
 
-        count = util.u8_to_catbuffer(properties_count)
-        return count + flags + divisibility + optional_properties
+        count = util.u8_to_catbuffer(counter)
+        return count + flags + divisibility + optional
 
     @classmethod
-    def from_catbuffer_pair(
+    def create_from_catbuffer_pair(
         cls,
         data: bytes,
         network_type: OptionalNetworkType = None,
@@ -256,17 +281,6 @@ class MosaicProperties(util.Serializable):
             kwds[PROPERTIES[id]] = value
 
         # Instantiate our class and return pair.
-        inst = cls(flags, divisibility, **kwds)
+        inst = cls(MosaicProperties(flags, divisibility, **kwds))
         remaining = data[size:]
         return inst, remaining
-
-    # TESTING
-    # Private, internal helper for testing only.
-
-    def _permute_(self, cb) -> MosaicProperties:
-        """Permute data inside self."""
-
-        flags = 0x7 - self.flags
-        divisibility = 6 - self.divisibility
-        duration = cb(self.duration)
-        return MosaicProperties(flags, divisibility, duration)

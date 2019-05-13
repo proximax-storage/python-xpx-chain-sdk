@@ -122,10 +122,12 @@ class MosaicAliasTransaction(Transaction):
             mosaic_id
         )
 
+    # CATBUFFER
+
     def catbuffer_size_specific(self) -> int:
         action_type_size = AliasActionType.CATBUFFER_SIZE
-        namespace_id_size = NamespaceId.CATBUFFER_SIZE
-        mosaic_id_size = MosaicId.CATBUFFER_SIZE
+        namespace_id_size = util.U64_BYTES
+        mosaic_id_size = util.U64_BYTES
         return action_type_size + namespace_id_size + mosaic_id_size
 
     def to_catbuffer_specific(
@@ -135,11 +137,11 @@ class MosaicAliasTransaction(Transaction):
         """Export mosaic alias-specific data to catbuffer."""
 
         # uint8_t action_type
-        # NamespaceId namespace_id
-        # MosaicId mosaic_id
+        # uint64_t namespace_id
+        # uint64_t mosaic_id
         action_type = self.action_type.to_catbuffer(network_type)
-        namespace_id = self.namespace_id.to_catbuffer(network_type)
-        mosaic_id = self.mosaic_id.to_catbuffer(network_type)
+        namespace_id = util.u64_to_catbuffer(int(self.namespace_id))
+        mosaic_id = util.u64_to_catbuffer(int(self.mosaic_id))
 
         return action_type + namespace_id + mosaic_id
 
@@ -151,11 +153,12 @@ class MosaicAliasTransaction(Transaction):
         """Load mosaic alias-specific data data from catbuffer."""
 
         # uint8_t action_type
-        # NamespaceId namespace_id
-        # MosaicId mosaic_id
-        action_type, data = AliasActionType.from_catbuffer_pair(data, network_type)
-        namespace_id, data = NamespaceId.from_catbuffer_pair(data, network_type)
-        mosaic_id, data = MosaicId.from_catbuffer_pair(data, network_type)
+        # uint64_t namespace_id
+        # uint64_t mosaic_id
+        action_type = AliasActionType.create_from_catbuffer(data, network_type)
+        namespace_id = NamespaceId(util.u64_from_catbuffer(data[1:9]))
+        mosaic_id = MosaicId(util.u64_from_catbuffer(data[9:17]))
+        data = data[17:]
 
         self._set('action_type', action_type)
         self._set('namespace_id', namespace_id)
@@ -163,9 +166,34 @@ class MosaicAliasTransaction(Transaction):
 
         return data
 
+    # DTO
+
+    def to_dto_specific(
+        self,
+        network_type: NetworkType,
+    ) -> dict:
+        return {
+            'actionType': self.action_type.to_dto(network_type),
+            'namespaceId': util.u64_to_dto(int(self.namespace_id)),
+            'mosaicId': util.u64_to_dto(int(self.mosaic_id)),
+        }
+
+    def load_dto_specific(
+        self,
+        data: dict,
+        network_type: NetworkType,
+    ) -> None:
+        action_type = AliasActionType.create_from_dto(data['actionType'], network_type)
+        namespace_id = NamespaceId(util.u64_from_dto(data['namespaceId']))
+        mosaic_id = MosaicId(util.u64_from_dto(data['mosaicId']))
+
+        self._set('action_type', action_type)
+        self._set('namespace_id', namespace_id)
+        self._set('mosaic_id', mosaic_id)
+
 
 @register_transaction('MOSAIC_ALIAS')
 class MosaicAliasInnerTransaction(InnerTransaction, MosaicAliasTransaction):
-    """Embedded address alias transaction."""
+    """Embedded mosaic alias transaction."""
 
     __slots__ = ()

@@ -32,13 +32,21 @@ __all__ = ['BlockchainStorageInfo']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class BlockchainStorageInfo(util.DTOSerializable):
+class BlockchainStorageInfo(util.DTO):
     """
     Blockchain information describing stored data.
 
     :param num_blocks: Number of confirmed blocks.
     :param num_transactions: Number of confirmed transactions.
     :param num_accounts: Number accounts published in the blockchain.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            BlockchainStorageInfoDTO:
+                numBlocks: integer
+                numTransactions: integer
+                numAccounts: integer
     """
 
     num_blocks: int
@@ -56,12 +64,13 @@ class BlockchainStorageInfo(util.DTOSerializable):
         }
 
     @classmethod
-    def from_dto(
+    def create_from_dto(
         cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        num_blocks = data['numBlocks']
-        num_transactions = data['numTransactions']
-        num_accounts = data['numAccounts']
-        return cls(num_blocks, num_transactions, num_accounts)
+        return cls(
+            num_blocks=data['numBlocks'],
+            num_transactions=data['numTransactions'],
+            num_accounts=data['numAccounts'],
+        )

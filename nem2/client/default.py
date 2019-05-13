@@ -86,7 +86,7 @@ class HTTPBase(abc.HTTPBase):
 
     @property
     def root(self) -> HTTP:
-        return HTTP.from_http(self)
+        return HTTP.create_from_http(self)
 
 
 @util.inherit_doc
@@ -95,27 +95,27 @@ class HTTP(HTTPBase, abc.HTTP):
 
     @property
     def account(self) -> AccountHTTP:
-        return AccountHTTP.from_http(self)
+        return AccountHTTP.create_from_http(self)
 
     @property
     def blockchain(self) -> BlockchainHTTP:
-        return BlockchainHTTP.from_http(self)
+        return BlockchainHTTP.create_from_http(self)
 
     @property
     def mosaic(self) -> MosaicHTTP:
-        return MosaicHTTP.from_http(self)
+        return MosaicHTTP.create_from_http(self)
 
     @property
     def namespace(self) -> NamespaceHTTP:
-        return NamespaceHTTP.from_http(self)
+        return NamespaceHTTP.create_from_http(self)
 
     @property
     def network(self) -> NetworkHTTP:
-        return NetworkHTTP.from_http(self)
+        return NetworkHTTP.create_from_http(self)
 
     @property
     def transaction(self) -> TransactionHTTP:
-        return TransactionHTTP.from_http(self)
+        return TransactionHTTP.create_from_http(self)
 
 
 @util.inherit_doc
@@ -174,7 +174,7 @@ class AsyncHTTPBase(abc.AsyncHTTPBase):
 
     @property
     def root(self) -> AsyncHTTP:
-        return AsyncHTTP.from_http(self)
+        return AsyncHTTP.create_from_http(self)
 
 
 @util.inherit_doc
@@ -183,27 +183,27 @@ class AsyncHTTP(AsyncHTTPBase, abc.HTTP):
 
     @property
     def account(self) -> AsyncAccountHTTP:
-        return AsyncAccountHTTP.from_http(self)
+        return AsyncAccountHTTP.create_from_http(self)
 
     @property
     def blockchain(self) -> AsyncBlockchainHTTP:
-        return AsyncBlockchainHTTP.from_http(self)
+        return AsyncBlockchainHTTP.create_from_http(self)
 
     @property
     def mosaic(self) -> AsyncMosaicHTTP:
-        return AsyncMosaicHTTP.from_http(self)
+        return AsyncMosaicHTTP.create_from_http(self)
 
     @property
     def namespace(self) -> AsyncNamespaceHTTP:
-        return AsyncNamespaceHTTP.from_http(self)
+        return AsyncNamespaceHTTP.create_from_http(self)
 
     @property
     def network(self) -> AsyncNetworkHTTP:
-        return AsyncNetworkHTTP.from_http(self)
+        return AsyncNetworkHTTP.create_from_http(self)
 
     @property
     def transaction(self) -> AsyncTransactionHTTP:
-        return AsyncTransactionHTTP.from_http(self)
+        return AsyncTransactionHTTP.create_from_http(self)
 
 
 @util.inherit_doc

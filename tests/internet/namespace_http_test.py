@@ -26,7 +26,7 @@ from tests import harness
         },
         {
             'name': 'test_get_namespaces_name',
-            'params': [[models.NamespaceId.from_hex('84b3552d375ffa4b')]],
+            'params': [[models.NamespaceId.create_from_hex('84b3552d375ffa4b')]],
             'method': 'get_namespaces_name',
             'validation': [
                 lambda x: (len(x), 1),
@@ -35,7 +35,7 @@ from tests import harness
         },
         {
             'name': 'test_get_namespace',
-            'params': [models.NamespaceId.from_hex('84b3552d375ffa4b')],
+            'params': [models.NamespaceId.create_from_hex('84b3552d375ffa4b')],
             'method': 'get_namespace',
             'validation': [
                 lambda x: (x.meta_id, '5C7C07005CC1FE000176FA2B'),

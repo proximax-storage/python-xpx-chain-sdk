@@ -11,7 +11,7 @@ from tests import responses
         {
             'name': 'test_get_mosaic',
             'response': responses.MOSAIC_INFO["Ok"],
-            'params': [models.MosaicId.from_hex('6c699a1517bea955')],
+            'params': [models.MosaicId.create_from_hex('6c699a1517bea955')],
             'method': 'get_mosaic',
             'validation': [
                 lambda x: (x.meta_id, '5CC07CBC3A48065F47D6DF80'),
@@ -28,7 +28,7 @@ from tests import responses
         {
             'name': 'test_get_mosaics',
             'response': responses.MOSAICS_INFO["Ok"],
-            'params': [[models.MosaicId.from_hex('6c699a1517bea955')]],
+            'params': [[models.MosaicId.create_from_hex('6c699a1517bea955')]],
             'method': 'get_mosaics',
             'validation': [
                 lambda x: (len(x), 1),

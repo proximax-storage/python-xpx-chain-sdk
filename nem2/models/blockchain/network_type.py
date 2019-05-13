@@ -33,7 +33,16 @@ __all__ = ['NetworkType']
 
 @util.inherit_doc
 class NetworkType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
-    """Identifier for the network type."""
+    """
+    Identifier for the network type.
+
+    DTO Format:
+        .. code-block:: yaml
+
+            NetworkTypeDTO:
+                name: string
+                description: string
+    """
 
     MAIN_NET   = 0x68       # noqa: E221
     TEST_NET   = 0x98       # noqa: E221
