@@ -388,6 +388,33 @@ class TestMultisigAccountInfo(harness.TestCase):
 
 
 @harness.enum_test_case({
+    'type': models.PropertyModificationType,
+    'enums': [
+        models.PropertyModificationType.ADD,
+        models.PropertyModificationType.REMOVE,
+    ],
+    'values': [
+        0x00,
+        0x01,
+    ],
+    'descriptions': [
+        "Add property to account",
+        "Remove property from account",
+    ],
+    'dto': [
+        0x00,
+        0x01,
+    ],
+    'catbuffer': [
+        b'\x00',
+        b'\x01',
+    ],
+})
+class TestPropertyModificationType(harness.TestCase):
+    pass
+
+
+@harness.enum_test_case({
     'type': models.PropertyType,
     'enums': [
         models.PropertyType.ALLOW_ADDRESS,

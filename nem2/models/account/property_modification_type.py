@@ -1,8 +1,8 @@
 """
-    transaction_version
-    ===================
+    property_modification_type
+    ==========================
 
-    Enumerations for transaction versions.
+    Types of property modifications for an account.
 
     License
     -------
@@ -27,36 +27,21 @@ import enum
 
 from ... import util
 
-__all__ = ['TransactionVersion']
+__all__ = ['PropertyModificationType']
 
 
 @util.inherit_doc
-class TransactionVersion(util.U8Mixin, enum.IntEnum):
-    """Transaction version."""
+class PropertyModificationType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
+    """Identifier for an account property modification type."""
 
-    TRANSFER = 3
-    REGISTER_NAMESPACE = 2
-    MOSAIC_DEFINITION = 3
-    MOSAIC_SUPPLY_CHANGE = 2
-    MODIFY_MULTISIG_ACCOUNT = 3
-    AGGREGATE_COMPLETE = 2
-    AGGREGATE_BONDED = 2
-    LOCK = 1
-    SECRET_LOCK = 1
-    SECRET_PROOF = 1
-    ADDRESS_ALIAS = 1
-    MOSAIC_ALIAS = 1
-    MODIFY_ACCOUNT_PROPERTY_ADDRESS = 1
-    MODIFY_ACCOUNT_PROPERTY_MOSAIC = 1
-    MODIFY_ACCOUNT_PROPERTY_ENTITY_TYPE = 1
-    LINK_ACCOUNT = 2
+    ADD     = 0x00  # noqa: E221
+    REMOVE  = 0x01  # noqa: E221
 
     def description(self) -> str:
         return DESCRIPTION[self]
 
 
 DESCRIPTION = {
-    TransactionVersion(1): "Transaction version 1.",
-    TransactionVersion(2): "Transaction version 2.",
-    TransactionVersion(3): "Transaction version 3.",
+    PropertyModificationType.ADD: "Add property to account.",
+    PropertyModificationType.REMOVE: "Remove property from account.",
 }

@@ -38,6 +38,7 @@ from .account.account_properties_metadata import *
 from .account.address import *
 from .account.multisig_account_graph_info import *
 from .account.multisig_account_info import *
+from .account.property_modification_type import *
 from .account.property_type import *
 from .account.public_account import *
 from .account import *
@@ -85,6 +86,8 @@ from .node.node_time import *
 from .node import *
 
 # Transaction
+from .transaction.account_link_transaction import *
+from .transaction.account_property_modification import *
 from .transaction.address_alias_transaction import *
 from .transaction.aggregate_transaction_cosignature import *
 from .transaction.aggregate_transaction_info import *
@@ -95,6 +98,7 @@ from .transaction.deadline import *
 from .transaction.hash_lock_transaction import *
 from .transaction.hash_type import *
 from .transaction.inner_transaction import *
+from .transaction.link_action import *
 from .transaction.lock_funds_transaction import *
 from .transaction.message import *
 from .transaction.message_type import *
@@ -133,6 +137,7 @@ __all__ = (
     + address.__all__
     + multisig_account_graph_info.__all__
     + multisig_account_info.__all__
+    + property_modification_type.__all__
     + property_type.__all__
     + public_account.__all__
 
@@ -175,6 +180,8 @@ __all__ = (
     + node_time.__all__
 
     # Transaction
+    + account_link_transaction.__all__
+    + account_property_modification.__all__
     + address_alias_transaction.__all__
     + aggregate_transaction_cosignature.__all__
     + aggregate_transaction_info.__all__
@@ -185,6 +192,7 @@ __all__ = (
     + hash_lock_transaction.__all__
     + hash_type.__all__
     + inner_transaction.__all__
+    + link_action.__all__
     + lock_funds_transaction.__all__
     + message.__all__
     + message_type.__all__

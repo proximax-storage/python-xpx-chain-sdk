@@ -109,7 +109,7 @@ class LockFundsTransaction(Transaction):
         max_fee: int = 0,
     ):
         """
-        Create new mosaic supply change transaction.
+        Create new lock funds transaction.
 
         :param deadline: Deadline to include transaction.
         :param mosaic: Locked mosaic.
@@ -218,7 +218,7 @@ class LockFundsTransaction(Transaction):
             TransactionType.AGGREGATE_BONDED,
             network_type
         )
-        self._set('mosaic_id', Mosaic(mosaic_id, amount))
+        self._set('mosaic', Mosaic(mosaic_id, amount))
         self._set('duration', duration)
         self._set('signed_transaction', signed_transaction)
 

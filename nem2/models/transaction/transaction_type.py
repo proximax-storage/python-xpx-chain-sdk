@@ -36,8 +36,6 @@ class TransactionType(util.U16Mixin, util.EnumMixin, enum.IntEnum):
 
     TRANSFER = 0x4154
     REGISTER_NAMESPACE = 0x414E
-    ADDRESS_ALIAS = 0x424E
-    MOSAIC_ALIAS = 0x434E
     MOSAIC_DEFINITION = 0x414D
     MOSAIC_SUPPLY_CHANGE = 0x424D
     MODIFY_MULTISIG_ACCOUNT = 0x4155
@@ -46,22 +44,32 @@ class TransactionType(util.U16Mixin, util.EnumMixin, enum.IntEnum):
     LOCK = 0x4148
     SECRET_LOCK = 0x4152
     SECRET_PROOF = 0x4252
+    ADDRESS_ALIAS = 0x424E
+    MOSAIC_ALIAS = 0x434E
+    MODIFY_ACCOUNT_PROPERTY_ADDRESS = 0x4150
+    MODIFY_ACCOUNT_PROPERTY_MOSAIC = 0x4250
+    MODIFY_ACCOUNT_PROPERTY_ENTITY_TYPE = 0x4350
+    LINK_ACCOUNT = 0x414C
 
     def description(self) -> str:
         return DESCRIPTION[self]
 
 
 DESCRIPTION = {
-    TransactionType.TRANSFER: "Transfer Transaction transaction type.",
+    TransactionType.TRANSFER: "Transfer transaction type.",
     TransactionType.REGISTER_NAMESPACE: "Register namespace transaction type.",
-    TransactionType.ADDRESS_ALIAS: "Address alias transaction type.",
-    TransactionType.MOSAIC_ALIAS: "Mosaic alias transaction type.",
     TransactionType.MOSAIC_DEFINITION: "Mosaic definition transaction type.",
     TransactionType.MOSAIC_SUPPLY_CHANGE: "Mosaic supply change transaction.",
     TransactionType.MODIFY_MULTISIG_ACCOUNT: "Modify multisig account transaction type.",
     TransactionType.AGGREGATE_COMPLETE: "Aggregate complete transaction type.",
     TransactionType.AGGREGATE_BONDED: "Aggregate bonded transaction type.",
     TransactionType.LOCK: "Lock transaction type.",
-    TransactionType.SECRET_LOCK: "Secret Lock Transaction type.",
-    TransactionType.SECRET_PROOF: "Secret Proof transaction type.",
+    TransactionType.SECRET_LOCK: "Secret lock transaction type.",
+    TransactionType.SECRET_PROOF: "Secret proof transaction type.",
+    TransactionType.ADDRESS_ALIAS: "Address alias transaction type.",
+    TransactionType.MOSAIC_ALIAS: "Mosaic alias transaction type.",
+    TransactionType.MODIFY_ACCOUNT_PROPERTY_ADDRESS: "Modify account property address transaction type.",  # noqa: E501
+    TransactionType.MODIFY_ACCOUNT_PROPERTY_MOSAIC: "Modify account property mosaic transaction type.",    # noqa: E501
+    TransactionType.MODIFY_ACCOUNT_PROPERTY_ENTITY_TYPE: "Modify account property entity type transaction type.",  # noqa: E501
+    TransactionType.LINK_ACCOUNT: "Link account transaction type.",
 }

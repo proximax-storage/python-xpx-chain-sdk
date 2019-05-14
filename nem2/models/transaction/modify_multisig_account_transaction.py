@@ -207,8 +207,8 @@ class ModifyMultisigAccountTransaction(Transaction):
             network_type
         )
 
-        self._set('approval', approval)
-        self._set('removal', removal)
+        self._set('min_approval_delta', approval)
+        self._set('min_removal_delta', removal)
         self._set('modifications', modifications)
 
 

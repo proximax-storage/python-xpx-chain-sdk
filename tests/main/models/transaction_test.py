@@ -10,77 +10,43 @@ def psuedo_entropy(size: int) -> bytes:
     return bytes([random.randint(0, 255) for _ in range(size)])
 
 
-# TODO(ahuszagh) Switch to a data-driven test.
+@harness.transaction_test_case({
+    'type': models.AddressAliasTransaction,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'network_type': models.NetworkType.MIJIN_TEST,
+        'version': models.TransactionVersion.ADDRESS_ALIAS,
+        'deadline': models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+        'max_fee': 0,
+        'signature': None,
+        'signer': None,
+        'transaction_info': None,
+        'action_type': models.AliasActionType.LINK,
+        'namespace_id': models.NamespaceId(0x88B64C3BE2F47144),
+        'address': models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54'),
+    },
+    # TODO(ahuszagh) Add DTO...
+    #   https://nem2.slack.com/archives/CEZKUE4KB/p1553097806138700?thread_ts=1553095634.133900&cid=CEZKUE4KB
+    'catbuffer': '9a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
+    'extras': {
+        'private_key': '97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca',
+        'signed': {
+            'payload': '9a000000102e9c68fe9cbaa5d1d27ad35f9e386b42c265749be0e27182b8a9ebf18a0357332ef4ee350b648ea00437790c70471959b9334aea2e2e89356d52613fd385021b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
+            'hash': 'a45d14bae72e64ce94e3cb88927cce8d4048cf08a11ed13936af58efb614c0d4',
+        },
+        'embedded': '4a0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e42004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
+    },
+})
 class TestAddressAliasTransaction(harness.TestCase):
 
-    def setUp(self):
-        self.deadline = models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57))
-        self.action_type = models.AliasActionType.LINK
-        self.namespace_id = models.NamespaceId(0x88B64C3BE2F47144)
-        self.address = models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54')
-        self.network_type = models.NetworkType.MIJIN_TEST
-        self.transaction = models.AddressAliasTransaction.create(
-            deadline=self.deadline,
-            action_type=self.action_type,
-            namespace_id=self.namespace_id,
-            address=self.address,
-            network_type=self.network_type,
-        )
-        private_key = "97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca"
-        self.signer = models.Account.create_from_private_key(private_key, self.network_type)
-        self.catbuffer = '9a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'
-        self.payload = '9a000000102e9c68fe9cbaa5d1d27ad35f9e386b42c265749be0e27182b8a9ebf18a0357332ef4ee350b648ea00437790c70471959b9334aea2e2e89356d52613fd385021b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'
-        self.hash = 'a45d14bae72e64ce94e3cb88927cce8d4048cf08a11ed13936af58efb614c0d4'
-        self.embedded = '4a0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e42004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'
-
-    def test_init(self):
-        self.assertEqual(self.transaction.deadline, self.deadline)
-        self.assertEqual(self.transaction.action_type, self.action_type)
-        self.assertEqual(self.transaction.namespace_id, self.namespace_id)
-        self.assertEqual(self.transaction.address, self.address)
-        self.assertEqual(self.transaction.network_type, self.network_type)
-
-    def test_slots(self):
-        with self.assertRaises(TypeError):
-            self.transaction.__dict__
-
-    def test_catbuffer(self):
-        catbuffer = self.transaction.to_catbuffer()
-        self.assertEqual(self.catbuffer, util.hexlify(catbuffer))
-        self.assertEqual(self.transaction, models.Transaction.create_from_catbuffer(catbuffer))
-
-    def test_dto(self):
-        pass
-        # TODO(ahuszagh) Confirm...
-        # dto = self.transaction.to_dto()
-        # TODO(ahuszagh)
-        #   Is this right?
-        #   Restore when I get a message on slack.
-        #   https://nem2.slack.com/archives/CEZKUE4KB/p1553097806138700?thread_ts=1553095634.133900&cid=CEZKUE4KB
-        # self.assertEqual(self.dto, dto)
-        # self.assertEqual(self.transaction, models.Transaction.create_from_dto(dto))
-
-    def test_sign_with(self):
-        signed_transaction = self.transaction.sign_with(self.signer)
-        self.assertEqual(signed_transaction.payload, self.payload)
-        self.assertEqual(signed_transaction.hash, self.hash)
-        self.assertEqual(signed_transaction.signer, self.signer.public_key)
-        self.assertEqual(signed_transaction.type, models.TransactionType.ADDRESS_ALIAS)
-        self.assertEqual(signed_transaction.network_type, self.signer.network_type)
-
-    def test_to_aggregate(self):
-        inner = self.transaction.to_aggregate(self.signer.public_account)
-        catbuffer = inner.to_catbuffer()
-        self.assertEqual(self.embedded, util.hexlify(catbuffer))
-
-        with self.assertRaises(TypeError):
-            inner.__dict__
-
-    def test_dataclasses(self):
-        self.assertEqual(self.transaction, self.transaction.replace())
-        self.assertIsInstance(self.transaction.asdict(), dict)
-        self.assertIsInstance(self.transaction.astuple(), tuple)
-        self.assertIsInstance(self.transaction.fields(), tuple)
+    def test_create(self):
+        self.assertEqual(self.model, self.type.create(
+            deadline=self.data['deadline'],
+            action_type=self.data['action_type'],
+            namespace_id=self.data['namespace_id'],
+            address=self.data['address'],
+            network_type=self.data['network_type'],
+        ))
 
 
 @harness.model_test_case({
@@ -126,7 +92,32 @@ class TestAggregateTransactionInfo(harness.TestCase):
 
 
 class TestAliasTransaction(harness.TestCase):
-    pass        # TODO(ahuszagh) Implement
+
+    def test_create_for_address(self):
+        network_type = models.NetworkType.MIJIN_TEST
+        type = models.AliasTransaction
+        model = type.create_for_address(
+            deadline=models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+            action_type=models.AliasActionType.LINK,
+            namespace_id=models.NamespaceId(0x88B64C3BE2F47144),
+            address=models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54'),
+            network_type=network_type,
+        )
+        catbuffer = '9a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e420000000000000000f1b4815c00000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'
+        self.assertEqual(catbuffer, util.hexlify(model.to_catbuffer(network_type)))
+
+    def test_create_for_mosaic(self):
+        network_type = models.NetworkType.MIJIN_TEST
+        type = models.AliasTransaction
+        model = type.create_for_mosaic(
+            deadline=models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+            action_type=models.AliasActionType.LINK,
+            namespace_id=models.NamespaceId(0x88B64C3BE2F47144),
+            mosaic_id=models.MosaicId(0x2FF7D64F483BC0A6),
+            network_type=network_type,
+        )
+        catbuffer = '8900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e430000000000000000f1b4815c00000000004471f4e23b4cb688a6c03b484fd6f72f'
+        self.assertEqual(catbuffer, util.hexlify(model.to_catbuffer(network_type)))
 
 
 @harness.model_test_case({
@@ -148,7 +139,7 @@ class TestCosignatureSignedTransaction(harness.TestCase):
 
 
 # TODO(ahuszagh)
-#   Add cosignature_transaction
+#   Add CosignatureTransaction when AggregateTransaction is stabilized.
 
 
 @harness.enum_test_case({
@@ -202,6 +193,25 @@ class TestDeadline(harness.TestCase):
             self.type.create(25, models.ChronoUnit.HOURS)
 
         self.type.create(23, models.ChronoUnit.HOURS)
+
+
+class TestHashLockTransaction(harness.TestCase):
+
+    def test_create(self):
+        def create(cls):
+            return cls.create(
+                deadline=models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+                mosaic=models.Mosaic(models.MosaicId.create_from_hex('941299b2b7e1291c'), 1000),
+                duration=1000,
+                signed_transaction=models.SignedTransaction.create_from_announced(
+                    '8ed5521912d32097e4f9b172fab4200966a99c72910b839bff934e0c3ac219e0',
+                    models.TransactionType.AGGREGATE_BONDED,
+                    models.NetworkType.MIJIN_TEST,
+                ),
+                network_type=models.NetworkType.MIJIN_TEST,
+            )
+
+        self.assertEqual(create(models.HashLockTransaction), create(models.LockFundsTransaction))
 
 
 @harness.enum_test_case({
@@ -279,9 +289,84 @@ class TestInnnerTransaction(harness.TestCase):
             self.assertEqual(transaction.type, type)
 
 
-# TODO(ahuszagh) Implement...
-class TestLockFundsTransaction(harness.TestCase):
+@harness.enum_test_case({
+    'type': models.LinkAction,
+    'enums': [
+        models.LinkAction.LINK,
+        models.LinkAction.UNLINK,
+    ],
+    'values': [
+        0,
+        1,
+    ],
+    'descriptions': [
+        'Link an account.',
+        'Unlink an account.',
+    ],
+    'dto': [
+        0,
+        1,
+    ],
+    'catbuffer': [
+        b'\x00',
+        b'\x01',
+    ],
+})
+class TestLinkAction(harness.TestCase):
     pass
+
+
+@harness.transaction_test_case({
+    'type': models.LockFundsTransaction,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'network_type': models.NetworkType.MIJIN_TEST,
+        'version': models.TransactionVersion.LOCK,
+        'deadline': models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+        'max_fee': 0,
+        'signature': None,
+        'signer': None,
+        'transaction_info': None,
+        'mosaic': models.Mosaic(models.MosaicId.create_from_hex('941299b2b7e1291c'), 1000),
+        'duration': 1000,
+        'signed_transaction': models.SignedTransaction.create_from_announced(
+            '8ed5521912d32097e4f9b172fab4200966a99c72910b839bff934e0c3ac219e0',
+            models.TransactionType.AGGREGATE_BONDED,
+            models.NetworkType.MIJIN_TEST,
+        ),
+    },
+    'dto': {
+        'transaction': {
+            'version': 36865,
+            'type': 16712,
+            'maxFee': [0, 0],
+            'deadline': [1552004337, 0],
+            'hash': '8ed5521912d32097e4f9b172fab4200966a99c72910b839bff934e0c3ac219e0',
+            'mosaicId': [3084986652, 2484246962],
+            'amount': [1000, 0],
+            'duration': [1000, 0],
+        },
+    },
+    'catbuffer': 'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019048410000000000000000f1b4815c000000001c29e1b7b2991294e803000000000000e8030000000000008ed5521912d32097e4f9b172fab4200966a99c72910b839bff934e0c3ac219e0',
+    'extras': {
+        'private_key': '97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca',
+        'signed': {
+            'payload': 'b000000098a52c00c957a44a776e0dfeba91f8f82ad14531fe744e97bf9a0f3c9ffc34c06009b999a73333ec1fdaf1c7e4b2deb0c2fad6649225500758a3bd2296d64a031b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019048410000000000000000f1b4815c000000001c29e1b7b2991294e803000000000000e8030000000000008ed5521912d32097e4f9b172fab4200966a99c72910b839bff934e0c3ac219e0',
+            'hash': '85752623019ef2583858c041b583f88aac1140d502aafb206f82e83727234190',
+        },
+        'embedded': '600000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019048411c29e1b7b2991294e803000000000000e8030000000000008ed5521912d32097e4f9b172fab4200966a99c72910b839bff934e0c3ac219e0',
+    },
+})
+class TestLockFundsTransaction(harness.TestCase):
+
+    def test_create(self):
+        self.assertEqual(self.model, self.type.create(
+            deadline=self.data['deadline'],
+            mosaic=self.data['mosaic'],
+            duration=self.data['duration'],
+            signed_transaction=self.data['signed_transaction'],
+            network_type=self.data['network_type'],
+        ))
 
 
 class TestMessage(harness.TestCase):
@@ -318,9 +403,62 @@ class TestMessageType(harness.TestCase):
     pass
 
 
-# TODO(ahuszagh) Implement...
+@harness.transaction_test_case({
+    'type': models.ModifyMultisigAccountTransaction,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'network_type': models.NetworkType.MIJIN_TEST,
+        'version': models.TransactionVersion.MODIFY_MULTISIG_ACCOUNT,
+        'deadline': models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+        'max_fee': 0,
+        'signature': None,
+        'signer': None,
+        'transaction_info': None,
+        'min_approval_delta': 0,
+        'min_removal_delta': 1,
+        'modifications': [
+            models.MultisigCosignatoryModification(
+                type=models.MultisigCosignatoryModificationType.ADD,
+                cosignatory_public_account=models.PublicAccount.create_from_public_key('1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955', models.NetworkType.MIJIN_TEST),
+            ),
+        ],
+    },
+    'dto': {
+        'transaction': {
+            'version': 36867,
+            'type': 16725,
+            'maxFee': [0, 0],
+            'deadline': [1552004337, 0],
+            'minApprovalDelta': 0,
+            'minRemovalDelta': 1,
+            'modifications': [
+                {
+                    'cosignatoryPublicKey': '1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
+                    'type': 0
+                }
+            ],
+        },
+    },
+    'catbuffer': '9c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000039055410000000000000000f1b4815c00000000010001001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
+    'extras': {
+        'private_key': '97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca',
+        'signed': {
+            'payload': '9c000000f88d8b90d729d90858e5e421dab9a84ced620bbc67d3e59684cb69f4a715eed889b4367cf3ab8e0c906e8ee3d8161dad057cf438e38054c4deb018dfc405df0b1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955039055410000000000000000f1b4815c00000000010001001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
+            'hash': '15a4d6c39b7b9ed20ea2bbe21e7df7a375c8d956051ed6bf70cd40898136db7c',
+        },
+        'embedded': '4c0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895503905541010001001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
+    },
+})
 class TestModifyMultisigAccountTransaction(harness.TestCase):
-    pass
+
+    def test_create(self):
+        self.assertEqual(self.model, self.type.create(
+            deadline=self.data['deadline'],
+            min_approval_delta=self.data['min_approval_delta'],
+            min_removal_delta=self.data['min_removal_delta'],
+            modifications=self.data['modifications'],
+            network_type=self.data['network_type'],
+        ))
 
 
 @harness.transaction_test_case({
@@ -520,7 +658,6 @@ class TestPlainMessage(harness.TestCase):
     pass
 
 
-# TODO(ahuszagh) Restore...
 @harness.transaction_test_case({
     'type': models.RegisterNamespaceTransaction,
     'network_type': models.NetworkType.MIJIN_TEST,
@@ -862,7 +999,73 @@ class TestTransaction(harness.TestCase):
 
     def test_create_from_dto(self):
         transactions = [
-            # TODO(ahuszagh) Add more transactions here...
+            # TODO(ahuszagh) Add ADDRESS_ALIAS
+            (models.TransactionType.LOCK, {
+                'transaction': {
+                    'version': 36865,
+                    'type': 16712,
+                    'maxFee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'hash': '8ed5521912d32097e4f9b172fab4200966a99c72910b839bff934e0c3ac219e0',
+                    'mosaicId': [3084986652, 2484246962],
+                    'amount': [1000, 0],
+                    'duration': [1000, 0],
+                },
+            }),
+            (models.TransactionType.MODIFY_MULTISIG_ACCOUNT, {
+                'transaction': {
+                    'version': 36867,
+                    'type': 16725,
+                    'maxFee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'minApprovalDelta': 0,
+                    'minRemovalDelta': 1,
+                    'modifications': [
+                        {
+                            'cosignatoryPublicKey': '1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955',
+                            'type': 0
+                        }
+                    ],
+                },
+            }),
+            # TODO(ahuszagh) Add MOSAIC_ALIAS
+            (models.TransactionType.MOSAIC_DEFINITION, {
+                'transaction': {
+                    'version': 36867,
+                    'type': 16717,
+                    'maxFee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'mosaicNonce': 1,
+                    'mosaicId': [398371157, 1818860053],
+                    'properties': [
+                        {'id': 0, 'value': [3, 0]},
+                        {'id': 1, 'value': [3, 0]},
+                    ],
+                },
+            }),
+            (models.TransactionType.MOSAIC_SUPPLY_CHANGE, {
+                'transaction': {
+                    'version': 36866,
+                    'type': 16973,
+                    'maxFee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'mosaicId': [3084986652, 2484246962],
+                    'direction': 1,
+                    'delta': [15000000, 0],
+                },
+            }),
+            (models.TransactionType.REGISTER_NAMESPACE, {
+                'transaction': {
+                    'version': 36866,
+                    'type': 16718,
+                    'maxFee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'namespaceType': 0,
+                    'duration': [100, 0],
+                    'namespaceId': [0xe2f47144, 0x88b64c3b],
+                    'name': 'sample',
+                },
+            }),
             (models.TransactionType.SECRET_LOCK, {
                 'transaction': {
                     'version': 36865,
@@ -1038,8 +1241,8 @@ class TestTransactionStatusGroup(harness.TestCase):
         0x4252,
     ],
     'descriptions': [
-        'Transfer Transaction transaction type.',
-        'Secret Proof transaction type.',
+        'Transfer transaction type.',
+        'Secret proof transaction type.',
     ],
     'dto': [
         0x4154,

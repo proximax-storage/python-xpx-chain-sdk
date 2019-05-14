@@ -29,7 +29,7 @@ from .property_type import PropertyType
 from .address import Address
 from ..blockchain.network_type import OptionalNetworkType
 from ..mosaic.mosaic_id import MosaicId
-from ..transaction.transaction import Transaction
+from ..transaction.transaction_type import TransactionType
 from ... import util
 
 __all__ = ['AccountProperty']
@@ -37,7 +37,7 @@ __all__ = ['AccountProperty']
 PropertyValue = typing.Union[
     Address,
     MosaicId,
-    Transaction,
+    TransactionType,
     # TODO(ahuszagh) Add sentinel
     #   I'm assuming it's empty or an address?
 ]
