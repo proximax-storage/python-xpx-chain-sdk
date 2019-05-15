@@ -197,10 +197,10 @@ class MosaicDefinitionProperties(util.Model):
         if self.model.duration != 0:
             count += 1
 
-        # uint8 count
-        # uint8 flags
-        # uint8 divisibility
-        # typedef MosaicProperty { id: uint8, value: uint64 }
+        # uint8_t count
+        # uint8_t flags
+        # uint8_t divisibility
+        # typedef MosaicProperty { id: uint8_t, value: uint64_t }
         # MosaicProperty[count] properties
         count_size = util.U8_BYTES
         flags_size = util.U8_BYTES

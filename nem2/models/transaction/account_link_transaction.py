@@ -35,7 +35,6 @@ from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
-from ..namespace.namespace_id import NamespaceId
 from ... import util
 
 __all__ = [
@@ -133,8 +132,7 @@ class AccountLinkTransaction(Transaction):
         self,
         network_type: NetworkType,
     ) -> bytes:
-        """Export lock funds-specific data to catbuffer."""
-        raise NotImplementedError
+        """Export account link-specific data to catbuffer."""
 
         # uint8_t[32] remote_account_key
         # uint8_t link_action
@@ -147,7 +145,7 @@ class AccountLinkTransaction(Transaction):
         data: bytes,
         network_type: NetworkType,
     ) -> bytes:
-        """Load lock funds-specific data data from catbuffer."""
+        """Load account link-specific data data from catbuffer."""
 
         # uint8_t[32] remote_account_key
         # uint8_t link_action

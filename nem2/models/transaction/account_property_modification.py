@@ -35,20 +35,27 @@ from ... import util
 
 __all__ = ['AccountPropertyModification']
 
-def to_dto(value: PropertyValue) -> typing.Union[str, list, int]:
+DTOType = typing.Union[
+    str,
+    typing.Sequence[int],
+    int
+]
+
+
+def to_dto(value: PropertyValue) -> DTOType:
     """Serialize property modification value to DTO."""
 
     if isinstance(value, Address):
         return value.address
     elif isinstance(value, MosaicId):
         return util.u64_to_dto(int(value.id))
-    elif isinstance(value, Transaction):
+    elif isinstance(value, TransactionType):
         return value.to_dto()
     else:
         raise NotImplementedError
 
 
-def from_dto(data: typing.Union[str, list, int]) -> PropertyValue:
+def from_dto(data: DTOType) -> PropertyValue:
     """Load property modification value from DTO."""
 
     if isinstance(data, str):
@@ -61,7 +68,6 @@ def from_dto(data: typing.Union[str, list, int]) -> PropertyValue:
         raise NotImplementedError
 
 
-# TODO(ahuszagh) Add unittests...
 @util.inherit_doc
 @util.dataclass(frozen=True)
 class AccountPropertyModification(util.DTO):
@@ -74,6 +80,18 @@ class AccountPropertyModification(util.DTO):
 
     modification_type: PropertyModificationType
     value: PropertyValue
+
+    def is_address(self) -> bool:
+        """Determine if the modification value type is an address."""
+        return isinstance(self.value, Address)
+
+    def is_mosaic(self) -> bool:
+        """Determine if the modification value type is a mosaic ID."""
+        return isinstance(self.value, MosaicId)
+
+    def is_entity_type(self) -> bool:
+        """Determine if the modification value type is an entity type."""
+        return isinstance(self.value, TransactionType)
 
     def to_dto(
         self,
@@ -97,25 +115,3 @@ class AccountPropertyModification(util.DTO):
             modification_type=PropertyModificationType.create_from_dto(type),
             value=from_dto(data['value']),
         )
-
-#    def to_catbuffer(
-#        self,
-#        network_type: OptionalNetworkType = None,
-#    ) -> bytes:
-#        # uint8_t[32] signer
-#        # uint8_t[64] signature
-#        signer = util.unhexlify(self.signer.public_key)
-#        signature = util.unhexlify(self.signature)
-#        return signer + signature
-#
-#    @classmethod
-#    def create_from_catbuffer(
-#        cls,
-#        data: bytes,
-#        network_type: OptionalNetworkType = None,
-#    ):
-#        # uint8_t[32] signer
-#        # uint8_t[64] signature
-#        signer = PublicAccount.create_from_public_key(data[:32], network_type)
-#        signature = data[32:96]
-#        return cls(signature, signer)

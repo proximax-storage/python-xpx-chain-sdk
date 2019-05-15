@@ -11,6 +11,172 @@ def psuedo_entropy(size: int) -> bytes:
 
 
 @harness.transaction_test_case({
+    'type': models.AccountLinkTransaction,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'network_type': models.NetworkType.MIJIN_TEST,
+        'version': models.TransactionVersion.LINK_ACCOUNT,
+        'deadline': models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+        'max_fee': 0,
+        'signature': None,
+        'signer': None,
+        'transaction_info': None,
+        'remote_account_key': 'a5f82ec8ebb341427b6785c8111906cd0df18838fb11b51ce0e18b5e79dff630',
+        'link_action': models.LinkAction.LINK,
+    },
+    'dto': {
+        'transaction': {
+            'version': 36866,
+            'type': 16716,
+            'maxFee': [0, 0],
+            'deadline': [1552004337, 0],
+            'remoteAccountKey': 'a5f82ec8ebb341427b6785c8111906cd0df18838fb11b51ce0e18b5e79dff630',
+            'linkAction': 0,
+        },
+    },
+    'catbuffer': '9900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002904c410000000000000000f1b4815c00000000a5f82ec8ebb341427b6785c8111906cd0df18838fb11b51ce0e18b5e79dff63000',
+    'extras': {
+        'private_key': '97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca',
+        'signed': {
+            'payload': '99000000916d9517663b000752ab21fde1d7f9850b793c61c689d44a100becc7244fc014ae7115cc5d507fdc00fb988cb01e9b1c832c5cb53650d907f5eeca9599e0030a1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895502904c410000000000000000f1b4815c00000000a5f82ec8ebb341427b6785c8111906cd0df18838fb11b51ce0e18b5e79dff63000',
+            'hash': '5aeaaddfcecd32eeb65fa4ee9b94b092616fe2ee41ff88e6734230f8126c45cc',
+        },
+        'embedded': '490000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895502904c41a5f82ec8ebb341427b6785c8111906cd0df18838fb11b51ce0e18b5e79dff63000',
+    },
+})
+class TestAccountLinkTransaction(harness.TestCase):
+
+    def test_create(self):
+        self.assertEqual(self.model, self.type.create(
+            deadline=self.data['deadline'],
+            remote_account_key=self.data['remote_account_key'],
+            link_action=self.data['link_action'],
+            network_type=self.data['network_type'],
+        ))
+
+
+@harness.model_test_case({
+    'type': models.AccountPropertyModification,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'modification_type': models.PropertyModificationType.ADD,
+        'value': models.Address('SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG'),
+    },
+    'dto': {
+        'modificationType': 0,
+        'value': 'SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG',
+    },
+})
+class TestAccountPropertyModificationAddress(harness.TestCase):
+    pass
+
+
+@harness.model_test_case({
+    'type': models.AccountPropertyModification,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'modification_type': models.PropertyModificationType.ADD,
+        'value': models.MosaicId.create_from_hex('941299b2b7e1291c'),
+    },
+    'dto': {
+        'modificationType': 0,
+        'value': [3084986652, 2484246962],
+    },
+})
+class TestAccountPropertyModificationMosaic(harness.TestCase):
+    pass
+
+
+@harness.model_test_case({
+    'type': models.AccountPropertyModification,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'modification_type': models.PropertyModificationType.ADD,
+        'value': models.TransactionType.LOCK,
+    },
+    'dto': {
+        'modificationType': 0,
+        'value': 0x4148,
+    },
+    'eq': False,
+})
+class TestAccountPropertyModificationTransaction(harness.TestCase):
+    pass
+
+
+class TestAccountPropertyTransaction(harness.TestCase):
+
+    def setUp(self):
+        self.type = models.AccountPropertyTransaction
+        self.network_type = models.NetworkType.MIJIN_TEST
+        self.deadline = models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57))
+        self.modification_type = models.PropertyModificationType.ADD
+        self.address = models.Address('SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG')
+        self.mosaic = models.MosaicId.create_from_hex('6c699a1517bea955')
+        self.entity_type = models.TransactionType.LOCK
+
+    def test_create_address_property_modification_transaction(self):
+        modifications = [
+            models.AccountPropertyModification(self.modification_type, self.address)
+        ]
+        model = self.type.create_address_property_modification_transaction(
+            deadline=self.deadline,
+            property_type=models.PropertyType.ALLOW_ADDRESS,
+            modifications=modifications,
+            network_type=self.network_type,
+        )
+        catbuffer = util.hexlify(model.to_catbuffer(self.network_type))
+        self.assertEqual(catbuffer, '94000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019050410000000000000000f1b4815c00000000010100902891202271567a65166877a647d8a5ffd3bbe630ab925e46')
+
+    def test_create_mosaic_property_modification_transaction(self):
+        modifications = [
+            models.AccountPropertyModification(self.modification_type, self.mosaic)
+        ]
+        model = self.type.create_mosaic_property_modification_transaction(
+            deadline=self.deadline,
+            property_type=models.PropertyType.ALLOW_MOSAIC,
+            modifications=modifications,
+            network_type=self.network_type,
+        )
+        catbuffer = util.hexlify(model.to_catbuffer(self.network_type))
+        self.assertEqual(catbuffer, '83000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019050420000000000000000f1b4815c0000000002010055a9be17159a696c')
+
+    def test_create_entity_type_property_modification_transaction(self):
+        modifications = [
+            models.AccountPropertyModification(self.modification_type, self.entity_type)
+        ]
+        model = self.type.create_entity_type_property_modification_transaction(
+            deadline=self.deadline,
+            property_type=models.PropertyType.ALLOW_TRANSACTION,
+            modifications=modifications,
+            network_type=self.network_type,
+        )
+        catbuffer = util.hexlify(model.to_catbuffer(self.network_type))
+        self.assertEqual(catbuffer, '7d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019050430000000000000000f1b4815c000000000401004841')
+
+    def test_create_address_filter(self):
+        model = models.AccountPropertyModification(self.modification_type, self.address)
+        self.assertEqual(model, self.type.create_address_filter(
+            self.modification_type,
+            self.address
+        ))
+
+    def test_create_mosaic_filter(self):
+        model = models.AccountPropertyModification(self.modification_type, self.mosaic)
+        self.assertEqual(model, self.type.create_mosaic_filter(
+            self.modification_type,
+            self.mosaic
+        ))
+
+    def test_create_entity_type_filter(self):
+        model = models.AccountPropertyModification(self.modification_type, self.entity_type)
+        self.assertEqual(model, self.type.create_entity_type_filter(
+            self.modification_type,
+            self.entity_type
+        ))
+
+
+@harness.transaction_test_case({
     'type': models.AddressAliasTransaction,
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
@@ -401,6 +567,171 @@ class TestMessage(harness.TestCase):
 })
 class TestMessageType(harness.TestCase):
     pass
+
+
+@harness.transaction_test_case({
+    'type': models.ModifyAccountPropertyAddressTransaction,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'network_type': models.NetworkType.MIJIN_TEST,
+        'version': models.TransactionVersion.MODIFY_ACCOUNT_PROPERTY_ADDRESS,
+        'deadline': models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+        'max_fee': 0,
+        'signature': None,
+        'signer': None,
+        'transaction_info': None,
+        'property_type': models.PropertyType.ALLOW_ADDRESS,
+        'modifications': [
+            models.AccountPropertyModification(
+                modification_type=models.PropertyModificationType.ADD,
+                value=models.Address('SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG'),
+            ),
+        ],
+    },
+    'dto': {
+        'transaction': {
+            'version': 36865,
+            'type': 16720,
+            'maxFee': [0, 0],
+            'deadline': [1552004337, 0],
+            'propertyType': 1,
+            'modifications': [
+                {
+                    'modificationType': 0,
+                    'value': 'SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG',
+                },
+            ],
+        },
+    },
+    'catbuffer': '94000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019050410000000000000000f1b4815c00000000010100902891202271567a65166877a647d8a5ffd3bbe630ab925e46',
+    'extras': {
+        'private_key': '97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca',
+        'signed': {
+            'payload': '9400000077c79e31faa4afa232b9123c282bc8f4eb72cf1ad094447a79bdc99abae7f0e3581a9cc21ed8fe05fa83562d4502aeb2931534cce3be5c1d7e6daf930b32ab0c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019050410000000000000000f1b4815c00000000010100902891202271567a65166877a647d8a5ffd3bbe630ab925e46',
+            'hash': '7dc7ebe49aa806cf0e3554973727b5cb45c2eb80a62ca028356d332ee3360f38',
+        },
+        'embedded': '440000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501905041010100902891202271567a65166877a647d8a5ffd3bbe630ab925e46',
+    },
+})
+class TestModifyAccountPropertyAddressTransaction(harness.TestCase):
+
+    def test_create(self):
+        self.assertEqual(self.model, self.type.create(
+            deadline=self.data['deadline'],
+            property_type=self.data['property_type'],
+            modifications=self.data['modifications'],
+            network_type=self.data['network_type'],
+        ))
+
+
+@harness.transaction_test_case({
+    'type': models.ModifyAccountPropertyEntityTypeTransaction,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'network_type': models.NetworkType.MIJIN_TEST,
+        'version': models.TransactionVersion.MODIFY_ACCOUNT_PROPERTY_ENTITY_TYPE,
+        'deadline': models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+        'max_fee': 0,
+        'signature': None,
+        'signer': None,
+        'transaction_info': None,
+        'property_type': models.PropertyType.ALLOW_TRANSACTION,
+        'modifications': [
+            models.AccountPropertyModification(
+                modification_type=models.PropertyModificationType.ADD,
+                value=models.TransactionType.LOCK,
+            ),
+        ],
+    },
+    'dto': {
+        'transaction': {
+            'version': 36865,
+            'type': 17232,
+            'maxFee': [0, 0],
+            'deadline': [1552004337, 0],
+            'propertyType': 4,
+            'modifications': [
+                {
+                    'modificationType': 0,
+                    'value': 16712,
+                },
+            ],
+        },
+    },
+    'catbuffer': '7d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019050430000000000000000f1b4815c000000000401004841',
+    'extras': {
+        'private_key': '97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca',
+        'signed': {
+            'payload': '7d000000caf1f511ee89418a48371281195e5eedeeaa0c3f798cf8f52a2ad5dd9d0b783f7699aac462cf01f51ccaab5dbff36d65977e4a84cb11d331af8ff16abece53031b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019050430000000000000000f1b4815c000000000401004841',
+            'hash': '6657a5f4371d852a96127838ef15182c46ca6461d6c00c3ea240173ff72bb4e1',
+        },
+        'embedded': '2d0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019050430401004841',
+    },
+})
+class TestModifyAccountPropertyEntityTypeTransaction(harness.TestCase):
+
+    def test_create(self):
+        self.assertEqual(self.model, self.type.create(
+            deadline=self.data['deadline'],
+            property_type=self.data['property_type'],
+            modifications=self.data['modifications'],
+            network_type=self.data['network_type'],
+        ))
+
+
+@harness.transaction_test_case({
+    'type': models.ModifyAccountPropertyMosaicTransaction,
+    'network_type': models.NetworkType.MIJIN_TEST,
+    'data': {
+        'network_type': models.NetworkType.MIJIN_TEST,
+        'version': models.TransactionVersion.MODIFY_ACCOUNT_PROPERTY_MOSAIC,
+        'deadline': models.Deadline(datetime.datetime(2019, 3, 8, 0, 18, 57)),
+        'max_fee': 0,
+        'signature': None,
+        'signer': None,
+        'transaction_info': None,
+        'property_type': models.PropertyType.ALLOW_MOSAIC,
+        'modifications': [
+            models.AccountPropertyModification(
+                modification_type=models.PropertyModificationType.ADD,
+                value=models.MosaicId.create_from_hex('6c699a1517bea955'),
+            ),
+        ],
+    },
+    'dto': {
+        'transaction': {
+            'version': 36865,
+            'type': 16976,
+            'maxFee': [0, 0],
+            'deadline': [1552004337, 0],
+            'propertyType': 2,
+            'modifications': [
+                {
+                    'modificationType': 0,
+                    'value': [398371157, 1818860053],
+                },
+            ],
+        },
+    },
+    'catbuffer': '83000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019050420000000000000000f1b4815c0000000002010055a9be17159a696c',
+    'extras': {
+        'private_key': '97131746d864f4c9001b1b86044d765ba08d7fddc7a0fb3abbc8d111aa26cdca',
+        'signed': {
+            'payload': '830000000346bfce8054c9106443e36efadfdab804aa687373338c32593cc39323d7f881079b3c341d5d9bf3b323fd607fe7b7f6c902f5ad9b081aa9ff0f8294326c0d0c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019050420000000000000000f1b4815c0000000002010055a9be17159a696c',
+            'hash': '0ef5201686574ff6876df7d7d566f09ad8d8846f2128e3784c78e4af81cb396e',
+        },
+        'embedded': '330000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd589550190504202010055a9be17159a696c',
+    },
+})
+class TestModifyAccountPropertyMosaicTransaction(harness.TestCase):
+
+    def test_create(self):
+        self.assertEqual(self.model, self.type.create(
+            deadline=self.data['deadline'],
+            property_type=self.data['property_type'],
+            modifications=self.data['modifications'],
+            network_type=self.data['network_type'],
+        ))
 
 
 @harness.transaction_test_case({
@@ -1000,6 +1331,16 @@ class TestTransaction(harness.TestCase):
     def test_create_from_dto(self):
         transactions = [
             # TODO(ahuszagh) Add ADDRESS_ALIAS
+            (models.TransactionType.LINK_ACCOUNT, {
+                'transaction': {
+                    'version': 36866,
+                    'type': 16716,
+                    'maxFee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'remoteAccountKey': 'a5f82ec8ebb341427b6785c8111906cd0df18838fb11b51ce0e18b5e79dff630',
+                    'linkAction': 0,
+                },
+            }),
             (models.TransactionType.LOCK, {
                 'transaction': {
                     'version': 36865,
@@ -1010,6 +1351,51 @@ class TestTransaction(harness.TestCase):
                     'mosaicId': [3084986652, 2484246962],
                     'amount': [1000, 0],
                     'duration': [1000, 0],
+                },
+            }),
+            (models.TransactionType.MODIFY_ACCOUNT_PROPERTY_ADDRESS, {
+                'transaction': {
+                    'version': 36865,
+                    'type': 16720,
+                    'maxFee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'propertyType': 1,
+                    'modifications': [
+                        {
+                            'modificationType': 0,
+                            'value': 'SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG',
+                        },
+                    ],
+                },
+            }),
+            (models.TransactionType.MODIFY_ACCOUNT_PROPERTY_ENTITY_TYPE, {
+                'transaction': {
+                    'version': 36865,
+                    'type': 17232,
+                    'maxFee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'propertyType': 4,
+                    'modifications': [
+                        {
+                            'modificationType': 0,
+                            'value': 16712,
+                        },
+                    ],
+                },
+            }),
+            (models.TransactionType.MODIFY_ACCOUNT_PROPERTY_MOSAIC, {
+                'transaction': {
+                    'version': 36865,
+                    'type': 16976,
+                    'maxFee': [0, 0],
+                    'deadline': [1552004337, 0],
+                    'propertyType': 2,
+                    'modifications': [
+                        {
+                            'modificationType': 0,
+                            'value': [398371157, 1818860053],
+                        },
+                    ],
                 },
             }),
             (models.TransactionType.MODIFY_MULTISIG_ACCOUNT, {

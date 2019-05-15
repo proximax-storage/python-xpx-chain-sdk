@@ -102,6 +102,10 @@ from .transaction.link_action import *
 from .transaction.lock_funds_transaction import *
 from .transaction.message import *
 from .transaction.message_type import *
+from .transaction.modify_account_property_address_transaction import *
+from .transaction.modify_account_property_entity_type_transaction import *
+from .transaction.modify_account_property_mosaic_transaction import *
+from .transaction.modify_account_property_transaction import *
 from .transaction.modify_multisig_account_transaction import *
 from .transaction.mosaic_alias_transaction import *
 from .transaction.mosaic_definition_transaction import *
@@ -196,6 +200,10 @@ __all__ = (
     + lock_funds_transaction.__all__
     + message.__all__
     + message_type.__all__
+    + modify_account_property_address_transaction.__all__
+    + modify_account_property_entity_type_transaction.__all__
+    + modify_account_property_mosaic_transaction.__all__
+    + modify_account_property_transaction.__all__
     + modify_multisig_account_transaction.__all__
     + mosaic_alias_transaction.__all__
     + mosaic_definition_transaction.__all__
