@@ -200,6 +200,11 @@ class ModifyAccountPropertyAddressTransaction(Transaction):
 
     # DTO
 
+    @classmethod
+    def validate_dto_specific(cls, data: dict) -> bool:
+        required_keys = {'propertyType', 'modifications'}
+        return cls.validate_dto_required(data, required_keys)
+
     def to_dto_specific(
         self,
         network_type: NetworkType,

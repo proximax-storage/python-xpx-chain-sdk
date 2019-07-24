@@ -56,6 +56,21 @@ class MerkleProofInfo(util.DTO):
     payload: typing.Sequence[MerklePathItem]
     type: str
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_l1 = {'payload', 'type'}
+        required_l2 = {'merklePath'}
+        return (
+            # Level 1
+            cls.validate_dto_required(data, required_l1)
+            and cls.validate_dto_all(data, required_l1)
+            # Level 2
+            and cls.validate_dto_required(data['payload'], required_l2)
+            and cls.validate_dto_all(data['payload'], required_l2)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -73,6 +88,9 @@ class MerkleProofInfo(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         payload = data['payload']
         path = payload['merklePath']
         return cls(

@@ -56,6 +56,16 @@ class Mosaic(util.Model):
     amount: int
     CATBUFFER_SIZE: typing.ClassVar[int] = 2 * util.U64_BYTES
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'id', 'amount'}
+        return (
+            cls.validate_dto_required(data, required_keys)
+            and cls.validate_dto_all(data, required_keys)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -71,6 +81,9 @@ class Mosaic(util.Model):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         mosaic_id = MosaicId(util.u64_from_dto(data['id']))
         amount = util.u64_from_dto(data['amount'])
         return cls(mosaic_id, amount)

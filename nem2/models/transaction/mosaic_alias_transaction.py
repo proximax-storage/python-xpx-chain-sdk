@@ -168,6 +168,14 @@ class MosaicAliasTransaction(Transaction):
 
     # DTO
 
+    @classmethod
+    def validate_dto_specific(cls, data: dict) -> bool:
+        required_keys = {'actionType', 'namespaceId', 'mosaicId'}
+        return (
+            cls.validate_dto_required(data, required_keys)
+            and cls.validate_dto_all(data, required_keys)
+        )
+
     def to_dto_specific(
         self,
         network_type: NetworkType,

@@ -145,6 +145,15 @@ class MosaicProperties(util.DTO):
         flags = to_flags(supply_mutable, transferable, levy_mutable)
         return cls(flags, divisibility, duration)
 
+    @classmethod
+    def validate_dto(cls, data: DTOType) -> bool:
+        """Validate the data-transfer object."""
+
+        return (
+            len(data) in {2, 3}
+            and all(len(i) == 2 for i in data)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -162,6 +171,9 @@ class MosaicProperties(util.DTO):
         data: DTOType,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         # For indefinite mosaics, the duration is optional (default 0).
         flags = util.u64_from_dto(data[0])
         divisibility = util.u64_from_dto(data[1])
@@ -208,6 +220,19 @@ class MosaicDefinitionProperties(util.Model):
         property_size = util.U64_BYTES + util.U8_BYTES
         return count_size + flags_size + divisibility_size + count * property_size
 
+    @classmethod
+    def validate_dto(cls, data: DTO2Type) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'id', 'value'}
+        return (
+            len(data) >= 2
+            and all((
+                cls.validate_dto_required(entry, required_keys)
+                and cls.validate_dto_all(entry, required_keys)
+            ) for entry in data)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -232,6 +257,9 @@ class MosaicDefinitionProperties(util.Model):
         data: DTO2Type,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         # A newer version of DTO, which is used in MosaicDefinitionTransactions.
         # We need to keep the two versions separate.
         kwds = {}

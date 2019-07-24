@@ -82,6 +82,29 @@ class AccountInfo(util.DTO):
         """Get public account."""
         return PublicAccount(self.address, self.public_key)
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_l1 = {'meta', 'account'}
+        required_l2 = {
+            'address',
+            'publicKey',
+            'addressHeight',
+            'publicKeyHeight',
+            'mosaics',
+            'importance',
+            'importanceHeight'
+        }
+        return (
+            # Level 1
+            cls.validate_dto_required(data, required_l1)
+            and cls.validate_dto_all(data, required_l1)
+            # Level 2
+            and cls.validate_dto_required(data['account'], required_l2)
+            and cls.validate_dto_all(data['account'], required_l2)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -108,9 +131,13 @@ class AccountInfo(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
+        meta = data['meta']
         account = data['account']
         return cls(
-            meta=AccountMetadata.create_from_dto(data['meta'], network_type),
+            meta=AccountMetadata.create_from_dto(meta, network_type),
             address=Address.create_from_encoded(account['address']),
             address_height=util.u64_from_dto(account.get('addressHeight', [0, 0])),
             public_key=account['publicKey'],

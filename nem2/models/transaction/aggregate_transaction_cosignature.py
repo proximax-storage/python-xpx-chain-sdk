@@ -59,6 +59,17 @@ class AggregateTransactionCosignature(util.Model):
         self._set('signature', signature)
         self._set('signer', signer)
 
+
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'signature', 'signer'}
+        return (
+            cls.validate_dto_required(data, required_keys)
+            and cls.validate_dto_all(data, required_keys)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -74,6 +85,9 @@ class AggregateTransactionCosignature(util.Model):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         signature = data['signature']
         signer = PublicAccount.create_from_public_key(data['signer'], network_type)
         return cls(signature, signer)

@@ -61,6 +61,11 @@ class MosaicLevy(util.DTO):
     # #mosaic_id: MosaicId
     # #fee: int
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+        return data == {}
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -79,7 +84,9 @@ class MosaicLevy(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        assert data == {}
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         return cls()
         # #return cls(
         # #    type=MosaicLevyType.create_from_dto(data['type']),

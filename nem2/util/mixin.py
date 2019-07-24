@@ -94,6 +94,14 @@ class U8Mixin(abc.Model):
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U8_BYTES
 
+    @classmethod
+    def validate_dto(
+        cls: typing.Type[U8MixinType],
+        data: stdint.U8DTOType
+    ) -> bool:
+        """Validate the data-transfer object."""
+        return isinstance(data, int) and 0 <= data < (1<<8)
+
     def to_dto(
         self: U8MixinType,
         network_type: abc.OptionalNetworkType = None,
@@ -107,6 +115,9 @@ class U8Mixin(abc.Model):
         data: stdint.U8DTOType,
         network_type: abc.OptionalNetworkType = None,
     ) -> U8MixinType:
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         asint = stdint.u8_from_dto(data)
         return cls(asint)           # type: ignore
 
@@ -135,6 +146,14 @@ class U16Mixin(abc.Model):
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U16_BYTES
 
+    @classmethod
+    def validate_dto(
+        cls: typing.Type[U16MixinType],
+        data: stdint.U16DTOType
+    ) -> bool:
+        """Validate the data-transfer object."""
+        return isinstance(data, int) and 0 <= data < (1<<16)
+
     def to_dto(
         self: U16MixinType,
         network_type: abc.OptionalNetworkType = None,
@@ -148,6 +167,9 @@ class U16Mixin(abc.Model):
         data: stdint.U16DTOType,
         network_type: abc.OptionalNetworkType = None,
     ) -> U16MixinType:
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         asint = stdint.u16_from_dto(data)
         return cls(asint)           # type: ignore
 
@@ -176,6 +198,14 @@ class U32Mixin(abc.Model):
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U32_BYTES
 
+    @classmethod
+    def validate_dto(
+        cls: typing.Type[U32MixinType],
+        data: stdint.U32DTOType
+    ) -> bool:
+        """Validate the data-transfer object."""
+        return isinstance(data, int) and 0 <= data < (1<<32)
+
     def to_dto(
         self,
         network_type: abc.OptionalNetworkType = None,
@@ -189,6 +219,9 @@ class U32Mixin(abc.Model):
         data: stdint.U32DTOType,
         network_type: abc.OptionalNetworkType = None,
     ) -> U32MixinType:
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         asint = stdint.u32_from_dto(data)
         return cls(asint)           # type: ignore
 
@@ -217,6 +250,14 @@ class U64Mixin(abc.Model):
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U64_BYTES
 
+    @classmethod
+    def validate_dto(
+        cls: typing.Type[U64MixinType],
+        data: stdint.U64DTOType
+    ) -> bool:
+        """Validate the data-transfer object."""
+        return len(data) == 2 and all(U32Mixin.validate_dto(i) for i in data)
+
     def to_dto(
         self: U64Mixin,
         network_type: abc.OptionalNetworkType = None,
@@ -230,6 +271,9 @@ class U64Mixin(abc.Model):
         data: stdint.U64DTOType,
         network_type: abc.OptionalNetworkType = None,
     ) -> U64MixinType:
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         asint = stdint.u64_from_dto(data)
         return cls(asint)           # type: ignore
 
@@ -258,6 +302,14 @@ class U128Mixin(abc.Model):
     __slots__ = ()
     CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U128_BYTES
 
+    @classmethod
+    def validate_dto(
+        cls: typing.Type[U128MixinType],
+        data: stdint.U128DTOType
+    ) -> bool:
+        """Validate the data-transfer object."""
+        return len(data) == 2 and all(U64Mixin.validate_dto(i) for i in data)
+
     def to_dto(
         self: U128MixinType,
         network_type: abc.OptionalNetworkType = None,
@@ -271,6 +323,9 @@ class U128Mixin(abc.Model):
         data: stdint.U128DTOType,
         network_type: abc.OptionalNetworkType = None,
     ) -> U128MixinType:
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         asint = stdint.u128_from_dto(data)
         return cls(asint)           # type: ignore
 

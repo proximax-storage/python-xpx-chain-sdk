@@ -98,6 +98,11 @@ class MosaicNonce(util.Model):
         """
         return cls(nonce)
 
+    @classmethod
+    def validate_dto(cls, data: int) -> bool:
+        """Validate the data-transfer object."""
+        return isinstance(data, int) and 0 <= data < (1<<32)
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -110,6 +115,9 @@ class MosaicNonce(util.Model):
         data: int,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         return cls(data)
 
     def to_catbuffer(

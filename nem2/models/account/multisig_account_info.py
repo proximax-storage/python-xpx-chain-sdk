@@ -96,6 +96,28 @@ class MultisigAccountInfo(util.DTO):
 
         return account in self.multisig_accounts
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_l1 = {'multisig'}
+        required_l2 = {
+            'account',
+            'accountAddress',
+            'minApproval',
+            'minRemoval',
+            'cosignatories',
+            'multisigAccounts',
+        }
+        return (
+            # Level 1
+            cls.validate_dto_required(data, required_l1)
+            and cls.validate_dto_all(data, required_l1)
+            # Level 2
+            and cls.validate_dto_required(data['multisig'], required_l2)
+            and cls.validate_dto_all(data['multisig'], required_l2)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -119,6 +141,9 @@ class MultisigAccountInfo(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         # Normalize the network type if it's not provided.
         if network_type is None and 'accountAddress' in data:
             network_type = Address(data['accountAddress']).network_type

@@ -1,6 +1,6 @@
 # SWAGGER
 
-This folder should only be used by developers of the NEM2 SDK, and allows us to auto-generate the data-transfer object models and REST API methods using `swagger-codegen-cli`.
+This folder should only be used by developers of the NEM2 SDK, and allows us to auto-generate the data-transfer object models and REST API methods using `swagger-codegen-cli`. Please note that Swagger is currently **not** in use by the NEM2-SDK, and is merely a potential feature if Swagger's automated codegen improves in quality (by using native async/await).
 
 ## Dependencies
 

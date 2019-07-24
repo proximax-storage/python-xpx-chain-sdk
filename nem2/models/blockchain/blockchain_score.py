@@ -58,6 +58,16 @@ class BlockchainScore(util.DTO):
         """Get the high 64-bits of the blockchain score."""
         return util.u128_high(self.score)
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'scoreHigh', 'scoreLow'}
+        return (
+            cls.validate_dto_required(data, required_keys)
+            and cls.validate_dto_all(data, required_keys)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -73,6 +83,9 @@ class BlockchainScore(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         score_low = data['scoreLow']
         score_high = data['scoreHigh']
         return cls(util.u128_from_dto([score_low, score_high]))

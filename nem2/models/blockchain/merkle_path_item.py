@@ -52,6 +52,16 @@ class MerklePathItem(util.DTO):
     position: int
     hash: str
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'position', 'hash'}
+        return (
+            cls.validate_dto_required(data, required_keys)
+            and cls.validate_dto_all(data, required_keys)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -67,6 +77,9 @@ class MerklePathItem(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         return cls(
             position=data['position'],
             hash=data['hash'],

@@ -62,6 +62,18 @@ class TransactionInfo(util.DTO):
             and self.hash != self.merkle_component_hash
         )
 
+
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'height', 'index', 'id'}
+        all_keys = required_keys | {'hash', 'merkleComponentHash'}
+        return (
+            cls.validate_dto_required(data, required_keys)
+            and cls.validate_dto_all(data, all_keys)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -83,6 +95,9 @@ class TransactionInfo(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         return cls(
             height=util.u64_from_dto(data['height']),
             index=data['index'],

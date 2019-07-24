@@ -203,6 +203,18 @@ class SecretLockTransaction(Transaction):
 
     # DTO
 
+    @classmethod
+    def validate_dto_specific(cls, data: dict) -> bool:
+        required_keys = {
+            'mosaicId',
+            'amount',
+            'duration',
+            'hashAlgorithm',
+            'secret',
+            'recipient',
+        }
+        return cls.validate_dto_required(data, required_keys)
+
     def to_dto_specific(
         self,
         network_type: NetworkType,

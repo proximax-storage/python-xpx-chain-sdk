@@ -226,6 +226,29 @@ class TransactionBase(util.Model):
 
     # DTO
 
+    @classmethod
+    def validate_dto_specific(cls, data: dict) -> bool:
+        """Validate transaction-specific fields in data-transfer object."""
+        raise util.AbstractMethodError
+
+    @classmethod
+    def validate_dto_shared(cls, data: dict) -> bool:
+        """Validate shared fields in data-transfer object."""
+        raise util.AbstractMethodError
+
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'transaction'}
+        all_keys = required_keys | {'meta'}
+        return (
+            cls.validate_dto_required(data, required_keys)
+            and cls.validate_dto_all(data, all_keys)
+            and cls.validate_dto_shared(data['transaction'])
+            and cls.validate_dto_specific(data['transaction'])
+        )
+
     def to_dto_shared(
         self,
         network_type: NetworkType,
@@ -292,6 +315,10 @@ class TransactionBase(util.Model):
         if cls in TransactionBase.__subclasses__():
             cls = cls.DTO.find_transaction(cls.TYPE_MAP, data)
         inst = typing.cast(TransactionBaseType, cls.__new__(cls))
+
+        # Validate after we find the correct subclass.
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
 
         # Load and check the network type.
         nt = cls.DTO.load_network_type(data)

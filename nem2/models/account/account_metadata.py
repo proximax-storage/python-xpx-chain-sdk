@@ -42,6 +42,11 @@ class AccountMetadata(util.DTO):
             AccountMetaDTO: null
     """
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+        return data == {}
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -54,5 +59,7 @@ class AccountMetadata(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
-        assert data == {}
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         return cls()

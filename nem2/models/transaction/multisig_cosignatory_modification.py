@@ -51,6 +51,16 @@ class MultisigCosignatoryModification(util.Model):
     cosignatory_public_account: PublicAccount
     CATBUFFER_SIZE: typing.ClassVar[int] = 33 * util.U8_BYTES
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'cosignatoryPublicKey', 'type'}
+        return (
+            cls.validate_dto_required(data, required_keys)
+            and cls.validate_dto_all(data, required_keys)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -66,6 +76,9 @@ class MultisigCosignatoryModification(util.Model):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         public_key = data['cosignatoryPublicKey']
         type = ModificationType.create_from_dto(data['type'], network_type)
         public_account = PublicAccount.create_from_public_key(public_key, network_type)

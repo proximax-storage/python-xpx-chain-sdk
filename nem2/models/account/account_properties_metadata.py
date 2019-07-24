@@ -32,7 +32,7 @@ __all__ = ['AccountPropertiesMetadata']
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class AccountPropertiesMetadata(util.Object):
+class AccountPropertiesMetadata(util.DTO):
     """
     Metadata describing account properties.
 
@@ -45,6 +45,16 @@ class AccountPropertiesMetadata(util.Object):
     """
 
     id: str
+
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'id'}
+        return (
+            cls.validate_dto_required(data, required_keys)
+            and cls.validate_dto_all(data, required_keys)
+        )
 
     def to_dto(
         self,
@@ -61,6 +71,9 @@ class AccountPropertiesMetadata(util.Object):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         return cls(
             # TODO(ahuszagh) Check when stabilized
             id=data['id'],

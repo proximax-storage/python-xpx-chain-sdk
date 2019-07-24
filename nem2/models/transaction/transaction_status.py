@@ -63,6 +63,17 @@ class TransactionStatus(util.DTO):
     deadline: Deadline
     height: int
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'status'}
+        all_keys = required_keys | {'group', 'hash', 'deadline', 'height'}
+        return (
+            cls.validate_dto_required(data, required_keys)
+            and cls.validate_dto_all(data, all_keys)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -86,6 +97,9 @@ class TransactionStatus(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         group = data.get('group', 'unknown')
         hash = data.get('hash', '')
         timestamp = data.get('deadline', TIMESTAMP_NEMESIS_BLOCK_DTO)

@@ -194,6 +194,16 @@ class Transaction(TransactionBase):
 
     # DTO
 
+    @classmethod
+    def validate_dto_shared(cls, data: dict) -> bool:
+        required_keys = {
+            'version',
+            'type',
+            'maxFee',
+            'deadline',
+        }
+        return cls.validate_dto_required(data, required_keys)
+
     def to_dto_shared(
         self,
         network_type: NetworkType,

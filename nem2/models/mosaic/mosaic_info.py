@@ -104,6 +104,33 @@ class MosaicInfo(util.DTO):
         """Get if levy is mutable. Default false."""
         return self.properties.levy_mutable
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_l1 = {'meta', 'mosaic'}
+        required_l21 = {'id'}
+        required_l22 = {
+            'mosaicId',
+            'supply',
+            'height',
+            'owner',
+            'revision',
+            'properties',
+            'levy',
+        }
+        return (
+            # Level 1
+            cls.validate_dto_required(data, required_l1)
+            and cls.validate_dto_all(data, required_l1)
+            # Level 2_1
+            and cls.validate_dto_required(data['meta'], required_l21)
+            and cls.validate_dto_all(data['meta'], required_l21)
+            # Level 2_2
+            and cls.validate_dto_required(data['mosaic'], required_l22)
+            and cls.validate_dto_all(data['mosaic'], required_l22)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -129,6 +156,9 @@ class MosaicInfo(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         meta_dto = data['meta']
         mosaic_dto = data['mosaic']
         owner_dto = mosaic_dto['owner']

@@ -141,6 +141,16 @@ class MultisigAccountGraphInfo(util.DTO, abc.Mapping):
     def values(self) -> typing.ValuesView[Value]:
         return self._multisig_accounts.values()
 
+    @classmethod
+    def validate_dto(cls, data: list) -> bool:
+        """Validate the data-transfer object."""
+
+        required_keys = {'level', 'multisigEntries'}
+        return all((
+            cls.validate_dto_required(entry, required_keys)
+            and cls.validate_dto_all(entry, required_keys)
+        ) for entry in data)
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -157,6 +167,9 @@ class MultisigAccountGraphInfo(util.DTO, abc.Mapping):
         data: list,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         graph = {}
         for item in data:
             key = item['level']

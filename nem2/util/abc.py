@@ -97,6 +97,41 @@ class DTO(Object[DTOFormat]):
 
     __slots__ = ()
 
+    @classmethod
+    def validate_dto_required(
+        cls: typing.Type[DTOType],
+        data: dict,
+        required_keys: set
+    ) -> bool:
+        """Validate the required keys of the DTO."""
+        return set(data) & required_keys == required_keys
+
+    @classmethod
+    def validate_dto_all(
+        cls: typing.Type[DTOType],
+        data: dict,
+        all_keys: set
+    ) -> bool:
+        """Validate all keys are known of the DTO."""
+        if __debug__:
+            # Only do in debug builds, since it might pose backwards-
+            # compatibility issues in production.
+            return not(set(data) - all_keys)
+        return True
+
+    @classmethod
+    def validate_dto(
+        cls: typing.Type[DTOType],
+        data: DTOFormat
+    ) -> bool:
+        """
+        Validate the DTO interchange format matches the object type.
+
+        :param data: Data-transfer object.
+        :return: If DTO was validated for type.
+        """
+        raise AbstractMethodError
+
     def to_dto(
         self: DTOType,
         network_type: OptionalNetworkType = None,
@@ -118,6 +153,7 @@ class DTO(Object[DTOFormat]):
         """
         Load model from DTO interchange format.
 
+        :param data: Data-transfer object.
         :param network_type: (Optional) network type.
         :return: Native model from DTO interchange format.
         """

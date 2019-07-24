@@ -175,6 +175,45 @@ class BlockInfo(util.DTO):
         self._set('beneficiary', beneficiary)
         self._set('merkle_tree', merkle_tree or [])
 
+    @classmethod
+    def validate_dto(cls, data: dict) -> bool:
+        """Validate the data-transfer object."""
+
+        required_l1 = {'meta', 'block'}
+        required_l21 = {
+            'hash',
+            'generationHash',
+            'totalFee',
+            'numTransactions',
+        }
+        all_l21 = required_l21 | {'subCacheMerkleRoots', 'numStatements'}
+        required_l22 = {
+            'signature',
+            'signer',
+            'version',
+            'type',
+            'height',
+            'timestamp',
+            'difficulty',
+            'feeMultiplier',
+            'previousBlockHash',
+            'blockTransactionsHash',
+            'blockReceiptsHash',
+            'stateHash',
+        }
+        all_l22 = required_l22 | {'beneficiaryPublicKey'}
+        return (
+            # Level 1
+            cls.validate_dto_required(data, required_l1)
+            and cls.validate_dto_all(data, required_l1)
+            # Level 2_1
+            and cls.validate_dto_required(data['meta'], required_l21)
+            and cls.validate_dto_all(data['meta'], all_l21)
+            # Level 2_2
+            and cls.validate_dto_required(data['block'], required_l22)
+            and cls.validate_dto_all(data['block'], all_l22)
+        )
+
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
@@ -218,6 +257,9 @@ class BlockInfo(util.DTO):
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
         meta = data['meta']
         block = data['block']
         version = block['version']
