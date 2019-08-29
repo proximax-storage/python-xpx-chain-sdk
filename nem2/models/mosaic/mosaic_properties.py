@@ -175,11 +175,20 @@ class MosaicProperties(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         # For indefinite mosaics, the duration is optional (default 0).
-        flags = util.u64_from_dto(data[0])
-        divisibility = util.u64_from_dto(data[1])
         duration = 0
-        if len(data) == 3:
-            duration = util.u64_from_dto(data[2])
+        
+        for prop in data[0 : 3]:
+            prop_id = util.u8_from_dto(prop["id"])
+
+            if (prop_id == 0):
+                flags = util.u64_from_dto(prop["value"])
+            elif (prop_id == 1):
+                divisibility = util.u64_from_dto(prop["value"])
+            elif (prop_id == 2):
+                duration = util.u64_from_dto(prop["value"])
+            else:
+                raise ValueError('Invalid data-transfer object.')
+
         return cls(flags, divisibility, duration)
 
     # TESTING

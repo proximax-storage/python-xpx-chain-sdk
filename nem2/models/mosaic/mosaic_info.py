@@ -117,7 +117,6 @@ class MosaicInfo(util.DTO):
             'owner',
             'revision',
             'properties',
-            'levy',
         }
         return (
             # Level 1
@@ -128,7 +127,7 @@ class MosaicInfo(util.DTO):
             and cls.validate_dto_all(data['meta'], required_l21)
             # Level 2_2
             and cls.validate_dto_required(data['mosaic'], required_l22)
-            and cls.validate_dto_all(data['mosaic'], required_l22)
+#            and cls.validate_dto_all(data['mosaic'], required_l22)
         )
 
     def to_dto(
@@ -146,7 +145,6 @@ class MosaicInfo(util.DTO):
                 'owner': self.owner.public_key,
                 'revision': util.u32_to_dto(self.revision),
                 'properties': self.properties.to_dto(network_type),
-                'levy': self.levy.to_dto(network_type),
             },
         }
 
@@ -170,5 +168,4 @@ class MosaicInfo(util.DTO):
             owner=PublicAccount.create_from_public_key(owner_dto, network_type),
             revision=util.u32_from_dto(mosaic_dto['revision']),
             properties=MosaicProperties.create_from_dto(mosaic_dto['properties']),
-            levy=MosaicLevy.create_from_dto(mosaic_dto['levy']),
         )

@@ -24,6 +24,7 @@
 
 from __future__ import annotations
 
+import typing
 from .mosaic_id import MosaicId
 from ..blockchain.network_type import OptionalNetworkType
 from ..namespace.namespace_id import NamespaceId
@@ -39,27 +40,24 @@ class MosaicName(util.DTO):
     Mosaic name and identifiers.
 
     :param mosaic_id: Mosaic ID.
-    :param name: Mosaic name.
-    :param parent_id: Parent namespace ID.
+    :param names: Mosaic name.
 
     DTO Format:
         .. code-block:: yaml
 
             MosaicNameDTO:
-                parentId: UInt64DTO
                 mosaicId: UInt64DTO
-                name: string
+                names: string
     """
 
     mosaic_id: MosaicId
-    name: str
-    parent_id: NamespaceId
+    names: typing.Sequence[str]
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-        required_keys = {'mosaicId', 'name', 'parentId'}
+        required_keys = {'mosaicId', 'names'}
         return (
             cls.validate_dto_required(data, required_keys)
             and cls.validate_dto_all(data, required_keys)
@@ -71,8 +69,7 @@ class MosaicName(util.DTO):
     ) -> dict:
         return {
             'mosaicId': util.u64_to_dto(int(self.mosaic_id)),
-            'name': self.name,
-            'parentId': util.u64_to_dto(int(self.parent_id)),
+            'names': self.name,
         }
 
     @classmethod
@@ -86,6 +83,5 @@ class MosaicName(util.DTO):
 
         return cls(
             mosaic_id=MosaicId(util.u64_from_dto(data['mosaicId'])),
-            name=data['name'],
-            parent_id=NamespaceId(util.u64_from_dto(data['parentId'])),
+            names=data['names'],
         )
