@@ -769,7 +769,7 @@ def request_get_mosaic(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/mosaic/{id:x}"
+    url = f"/mosaic/{id:016x}"
     return client.get(url, **kwds)
 
 
@@ -806,7 +806,7 @@ def request_get_mosaics(
     """
 
     url = "/mosaic"
-    json = {"mosaicIds": [f"{i:x}" for i in ids]}
+    json = {"mosaicIds": [f"{i:016x}" for i in ids]}
     return client.post(url, json=json, **kwds)
 
 
@@ -843,7 +843,7 @@ def request_get_mosaic_names(
     """
 
     url = "/mosaic/names"
-    json = {"mosaicIds": [f"{i:x}" for i in ids]}
+    json = {"mosaicIds": [f"{i:016x}" for i in ids]}
     return client.post(url, json=json, **kwds)
 
 
@@ -882,7 +882,7 @@ def request_get_namespace(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/namespace/{namespace_id:x}"
+    url = f"/namespace/{namespace_id:016x}"
     return client.get(url, **kwds)
 
 
@@ -919,7 +919,7 @@ def request_get_namespaces_name(
     """
 
     url = "/namespace/names"
-    json = {"namespaceIds": [f"{i:x}" for i in ids]}
+    json = {"namespaceIds": [f"{i:016x}" for i in ids]}
     return client.post(url, json=json, **kwds)
 
 
