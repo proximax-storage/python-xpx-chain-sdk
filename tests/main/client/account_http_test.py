@@ -11,7 +11,7 @@ from tests import responses
         {
             'name': 'test_get_account_info',
             'response': responses.ACCOUNT_INFO["Ok"],
-            'params': [models.Address('SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM')],
+            'params': [models.Address('SCBO3CAFOVAOGYBAHQKPUOGLAYWFLNJUFFCH3RYY')],
             'method': 'get_account_info',
             'validation': [
                 lambda x: (x.public_key, '7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808'),
@@ -21,7 +21,7 @@ from tests import responses
         {
             'name': 'test_get_accounts_info',
             'response': responses.ACCOUNTS_INFO["Ok"],
-            'params': [[models.Address('SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM')]],
+            'params': [[models.Address('SCBO3CAFOVAOGYBAHQKPUOGLAYWFLNJUFFCH3RYY')]],
             'method': 'get_accounts_info',
             'validation': [
                 lambda x: (len(x), 1),

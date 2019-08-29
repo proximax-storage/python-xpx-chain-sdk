@@ -79,7 +79,7 @@ class TestAccount(harness.TestCase):
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
         'meta': models.AccountMetadata(),
-        'address': models.Address('SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM'),
+        'address': models.Address('SCBO3CAFOVAOGYBAHQKPUOGLAYWFLNJUFFCH3RYY'),
         'address_height': 1,
         'public_key': '7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808',
         'public_key_height': 1,
@@ -125,7 +125,7 @@ class TestAccountMetadata(harness.TestCase):
         'property_type': models.PropertyType.ALLOW_ADDRESS,
         'values': [
             models.Address('SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG'),
-            models.Address('SD3MA6SM7GWRX4DEJVAZEGFXF7G7D36MA6TMSIBM'),
+            models.Address('SCBO3CAFOVAOGYBAHQKPUOGLAYWFLNJUFFCH3RYY'),
         ],
     },
     'dto': {
