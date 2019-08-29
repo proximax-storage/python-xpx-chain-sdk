@@ -122,6 +122,8 @@ class BlockInfo(util.DTO):
     block_receipts_hash: str
     state_hash: str
     beneficiary: typing.Optional[PublicAccount]
+    fee_interest: int
+    fee_interest_denominator: int
     merkle_tree: OptionalMerkleTreeType
 
     def __init__(
@@ -143,6 +145,8 @@ class BlockInfo(util.DTO):
         block_transactions_hash: typing.AnyStr,
         block_receipts_hash: typing.AnyStr,
         state_hash: typing.AnyStr,
+        fee_interest: int,
+        fee_interest_denominator: int,
         beneficiary: typing.Optional[PublicAccount] = None,
         merkle_tree: OptionalMerkleTreeType = None,
     ) -> None:
@@ -172,6 +176,8 @@ class BlockInfo(util.DTO):
         self._set('block_transactions_hash', block_transactions_hash)
         self._set('block_receipts_hash', block_receipts_hash)
         self._set('state_hash', state_hash)
+        self._set('fee_interest', fee_interest)
+        self._set('fee_interest_denominator', fee_interest_denominator)
         self._set('beneficiary', beneficiary)
         self._set('merkle_tree', merkle_tree or [])
 
@@ -184,7 +190,7 @@ class BlockInfo(util.DTO):
             'hash',
             'generationHash',
             'totalFee',
-            'numTransactions',
+            'numTransactions'
         }
         all_l21 = required_l21 | {'subCacheMerkleRoots', 'numStatements'}
         required_l22 = {
@@ -200,6 +206,8 @@ class BlockInfo(util.DTO):
             'blockTransactionsHash',
             'blockReceiptsHash',
             'stateHash',
+            'feeInterest',
+            'feeInterestDenominator'
         }
         all_l22 = required_l22 | {'beneficiaryPublicKey'}
         return (
@@ -238,6 +246,8 @@ class BlockInfo(util.DTO):
             'blockTransactionsHash': self.block_transactions_hash,
             'blockReceiptsHash': self.block_receipts_hash,
             'stateHash': self.state_hash,
+            'feeInterest': self.fee_interest,
+            'feeInterestDenominator': self.fee_interest_denominator
         }
 
         if self.beneficiary is not None:
@@ -289,5 +299,7 @@ class BlockInfo(util.DTO):
             block_receipts_hash=block['blockReceiptsHash'],
             state_hash=block['stateHash'],
             beneficiary=beneficiary,
-            merkle_tree=meta.get('subCacheMerkleRoots', []),
+            fee_interest=block['feeInterest'],
+            fee_interest_denominator=block['feeInterestDenominator'],
+            merkle_tree=meta.get('subCacheMerkleRoots', [])
         )

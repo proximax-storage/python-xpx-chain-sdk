@@ -1,6 +1,7 @@
 from nem2 import client
 from nem2 import models
 from tests import harness
+from tests import config
 
 
 @harness.http_test_case({
@@ -11,7 +12,7 @@ from tests import harness
             'params': [],
             'method': 'get_blockchain_height',
             'validation': [
-                lambda x: (x >= 11402, True),
+                lambda x: (x >= config.blockchain_height, True),
             ]
         },
         {
@@ -20,7 +21,7 @@ from tests import harness
             'method': 'get_blockchain_height',
             'validation': [
                 lambda x: (isinstance(x, int), True),
-                lambda x: (x >= 11402, True),
+                lambda x: (x >= config.blockchain_height, True),
             ]
         },
         {
