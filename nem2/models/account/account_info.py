@@ -46,8 +46,6 @@ class AccountInfo(util.DTO):
     :param public_key: Account public key.
     :param public_key_height: Chain height when public key was published.
     :param mosaics: List of mosaics owned by account.
-    :param importance: Importance of the account.
-    :param importance_height: Importance height of the account.
 
     DTO Format:
         .. code-block:: yaml
@@ -59,9 +57,9 @@ class AccountInfo(util.DTO):
                 # Hex(PublicKey) (64-bytes)
                 publicKey: string
                 publicKeyHeight: UInt64DTO
+                accountType: UInt64DTO
+                linkedAccountType: string
                 mosaics: MosaicDTO[]
-                importance: UInt64DTO
-                importanceHeight: UInt64DTO
 
             AccountInfoDTO:
                 meta: AccountMetaDTO
@@ -73,9 +71,10 @@ class AccountInfo(util.DTO):
     address_height: int
     public_key: str
     public_key_height: int
+    account_type: int
+    linked_account_key: str
     mosaics: MosaicList
-    importance: int
-    importance_height: int
+    snapshots: dict
 
     @property
     def public_account(self) -> PublicAccount:
@@ -89,12 +88,13 @@ class AccountInfo(util.DTO):
         required_l1 = {'meta', 'account'}
         required_l2 = {
             'address',
-            'publicKey',
             'addressHeight',
+            'publicKey',
             'publicKeyHeight',
+            'accountType',
+            'linkedAccountKey',
             'mosaics',
-            'importance',
-            'importanceHeight'
+            'snapshots'
         }
         return (
             # Level 1
@@ -115,9 +115,10 @@ class AccountInfo(util.DTO):
             'addressHeight': util.u64_to_dto(self.address_height),
             'publicKey': self.public_key,
             'publicKeyHeight': util.u64_to_dto(self.public_key_height),
+            'accountType': self.account_type,
+            'linkedAccountKey': self.linked_account_key,
             'mosaics': Mosaic.sequence_to_dto(self.mosaics, network_type),
-            'importance': util.u64_to_dto(self.importance),
-            'importanceHeight': util.u64_to_dto(self.importance_height),
+            'snapshots': self.snapshots
         }
 
         return {
@@ -142,7 +143,8 @@ class AccountInfo(util.DTO):
             address_height=util.u64_from_dto(account.get('addressHeight', [0, 0])),
             public_key=account['publicKey'],
             public_key_height=util.u64_from_dto(account.get('publicKeyHeight', [0, 0])),
+            account_type=account['accountType'],
+            linked_account_key=account['linkedAccountKey'],
             mosaics=Mosaic.sequence_from_dto(account.get('mosaics', []), network_type),
-            importance=util.u64_from_dto(account.get('importance', [0, 0])),
-            importance_height=util.u64_from_dto(account.get('importanceHeight', [0, 0])),
+            snapshots=account.get('snapshots', [])
         )
