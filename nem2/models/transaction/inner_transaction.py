@@ -67,7 +67,7 @@ class InnerTransaction(TransactionBase):
         names={
             'signer': 'signer',
             'version': 'version',
-            'network_type': 'version',
+            'network_type': 'network_type',
             'type': 'type',
             'transaction_info': 'meta',
         },

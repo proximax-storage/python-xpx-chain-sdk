@@ -76,7 +76,7 @@ class Transaction(TransactionBase):
             'signature': 'signature',
             'signer': 'signer',
             'version': 'version',
-            'network_type': 'version',
+            'network_type': 'network_type',
             'type': 'type',
             'max_fee': 'maxFee',
             'deadline': 'deadline',
