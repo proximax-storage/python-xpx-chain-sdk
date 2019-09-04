@@ -34,6 +34,9 @@ from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ... import util
 
+import logging
+logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class FormatBase(util.Object):
     """Utilities to simplify loading and saving to interchange formats."""
@@ -199,7 +202,7 @@ def load_version_dto(data, network_type):
 
 
 def load_network_type_dto(data, network_type):
-    return NetworkType(data >> 8)
+    return NetworkType((data >> 24) & 0x000000ff)
 
 
 def load_transaction_info_dto(data, network_type):

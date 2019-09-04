@@ -209,7 +209,7 @@ class TransferTransaction(Transaction):
 
     @classmethod
     def validate_dto_specific(cls, data: dict) -> bool:
-        required_keys = {'recipient', 'mosaics', 'message'}
+        required_keys = {'recipient', 'mosaics'}
         return cls.validate_dto_required(data, required_keys)
 
     def to_dto_specific(
