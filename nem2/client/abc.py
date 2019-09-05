@@ -31,6 +31,10 @@ from . import nis
 from .. import models
 from .. import util
 
+import logging
+logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 T = typing.TypeVar('T')
 MessageType = typing.Union[
     models.BlockInfo,
@@ -100,6 +104,8 @@ class HTTPSharedBase(util.Object):
             network_type = kwds.pop('network_type')
         except KeyError:
             network_type = self.network_type
+        logger.debug("NET %s" % (network_type))
+
         return typing.cast(T, cb(self.raw, network_type, *args, **kwds))
 
     @property

@@ -35,6 +35,12 @@ from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType, OptionalNetworkType
 from ... import util
 
+
+import logging
+logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 TransactionInfoType = typing.Union[TransactionInfo, AggregateTransactionInfo]
 TransactionBaseType = typing.TypeVar('TransactionBaseType', bound='TransactionBase')
 TypeMap = typing.Mapping[TransactionType, typing.Type[TransactionBaseType]]
@@ -321,6 +327,7 @@ class TransactionBase(util.Model):
             raise ValueError('Invalid data-transfer object.')
 
         # Load and check the network type.
+        logger.debug(data)
         nt = cls.DTO.load_network_type(data)
         if network_type is not None and network_type != nt:
             raise ValueError('Network type does not match transaction.')

@@ -50,6 +50,7 @@ class TransactionType(util.U16Mixin, util.EnumMixin, enum.IntEnum):
     MODIFY_ACCOUNT_PROPERTY_MOSAIC = 0x4250
     MODIFY_ACCOUNT_PROPERTY_ENTITY_TYPE = 0x4350
     LINK_ACCOUNT = 0x414C
+    NETWORK_CONFIG_ENTITY = 0x4159
 
     def description(self) -> str:
         return DESCRIPTION[self]
@@ -72,4 +73,5 @@ DESCRIPTION = {
     TransactionType.MODIFY_ACCOUNT_PROPERTY_MOSAIC: "Modify account property mosaic transaction type.",    # noqa: E501
     TransactionType.MODIFY_ACCOUNT_PROPERTY_ENTITY_TYPE: "Modify account property entity type transaction type.",  # noqa: E501
     TransactionType.LINK_ACCOUNT: "Link account transaction type.",
+    TransactionType.NETWORK_CONFIG_ENTITY: ""
 }
