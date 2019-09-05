@@ -12,7 +12,7 @@ from tests import config
             'params': [],
             'method': 'get_blockchain_height',
             'validation': [
-                lambda x: (x >= config.blockchain_height, True),
+                lambda x: (x >= config.Blockchain.height, True),
             ]
         },
         {
@@ -21,7 +21,7 @@ from tests import config
             'method': 'get_blockchain_height',
             'validation': [
                 lambda x: (isinstance(x, int), True),
-                lambda x: (x >= config.blockchain_height, True),
+                lambda x: (x >= config.Blockchain.height, True),
             ]
         },
         {
@@ -38,6 +38,14 @@ from tests import config
             'method': 'get_diagnostic_storage',
             'validation': [
                 lambda x: (isinstance(x, models.BlockchainStorageInfo), True),
+            ]
+        },
+        {
+            'name': 'test_get_diagnostic_server',
+            'params': [],
+            'method': 'get_diagnostic_server',
+            'validation': [
+                lambda x: (isinstance(x, models.BlockchainServerInfo), True),
             ]
         },
     ],

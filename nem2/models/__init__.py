@@ -48,6 +48,7 @@ from .blockchain.block_info import *
 from .blockchain.block_type import *
 from .blockchain.blockchain_score import *
 from .blockchain.blockchain_storage_info import *
+from .blockchain.blockchain_server_info import *
 from .blockchain.merkle_path_item import *
 from .blockchain.merkle_proof_info import *
 from .blockchain.network_type import *

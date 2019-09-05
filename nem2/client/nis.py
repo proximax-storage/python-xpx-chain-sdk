@@ -756,6 +756,37 @@ def process_get_diagnostic_storage(
 
 get_diagnostic_storage = request("get_diagnostic_storage")
 
+
+def request_get_diagnostic_server(client: client.Client, **kwds):
+    """
+    Make "/diagnostic/server" request.
+
+    :param client: Wrapper for client.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    url = "/diagnostic/server"
+    return client.get(url, **kwds)
+
+
+def process_get_diagnostic_server(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.BlockchainServerInfo:
+    """
+    Process the "/diagnostic/server" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return models.BlockchainServerInfo.create_from_dto(json, network_type)
+
+
+get_diagnostic_server = request("get_diagnostic_server")
+
 # MOSAIC HTTP
 # -----------
 
@@ -1435,6 +1466,10 @@ CLIENT_CB = {
     'get_diagnostic_storage': (
         request_get_diagnostic_storage,
         process_get_diagnostic_storage,
+    ),
+    'get_diagnostic_server': (
+        request_get_diagnostic_server,
+        process_get_diagnostic_server,
     ),
 
     # MOSAIC

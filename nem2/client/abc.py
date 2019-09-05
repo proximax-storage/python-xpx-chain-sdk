@@ -476,6 +476,13 @@ class BlockchainHTTP(HTTPSharedBase):
         """
         return self(nis.get_diagnostic_storage, **kwds)
 
+    def get_diagnostic_server(self, **kwds):
+        """
+        Get diagnostic storage information for rest server.
+
+        :return: Blockchain diagnostic rest server information.
+        """
+        return self(nis.get_diagnostic_server, **kwds)
 
 class MosaicHTTP(HTTPSharedBase):
     """Abstract base class for the mosaic HTTP client."""
