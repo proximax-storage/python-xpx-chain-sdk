@@ -421,6 +421,16 @@ class BlockchainHTTP(HTTPSharedBase):
         """
         return self(nis.get_block_transactions, height, **kwds)
 
+    def get_merkle_by_hash_in_block(self, height: int, hash: str, **kwds):
+        """
+        Get information for all transactions included in a block by height.
+
+        :param height: Block height.
+        :param hash: Transaction hash.
+        :return: Sequence of information models describing transactions.
+        """
+        return self(nis.get_merkle_by_hash_in_block, height, hash, **kwds)
+
     # TODO(ahuszagh) Bugs.
     #   getBlockByTransactionMerkle produces a 500 internal server error.
     #       Response 500.

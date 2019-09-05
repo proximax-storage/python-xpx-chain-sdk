@@ -29,6 +29,10 @@ from .merkle_path_item import MerklePathItem
 from .network_type import OptionalNetworkType
 from ... import util
 
+import logging
+logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 __all__ = ['MerkleProofInfo']
 
 
@@ -53,22 +57,18 @@ class MerkleProofInfo(util.DTO):
                 type: str
     """
 
-    payload: typing.Sequence[MerklePathItem]
-    type: str
+    merkle_path: typing.Sequence[MerklePathItem]
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-        required_l1 = {'payload', 'type'}
-        required_l2 = {'merklePath'}
+
+        required_l1 = {'merklePath'}
         return (
             # Level 1
             cls.validate_dto_required(data, required_l1)
-            and cls.validate_dto_all(data, required_l1)
-            # Level 2
-            and cls.validate_dto_required(data['payload'], required_l2)
-            and cls.validate_dto_all(data['payload'], required_l2)
+#            and cls.validate_dto_all(data, required_l1)
         )
 
     def to_dto(
@@ -76,10 +76,7 @@ class MerkleProofInfo(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            'payload': {
-                'merklePath': [i.to_dto(network_type) for i in self.payload],
-            },
-            'type': self.type,
+            'merklePath': [i.to_dto(network_type) for i in self.payload],
         }
 
     @classmethod
@@ -91,9 +88,7 @@ class MerkleProofInfo(util.DTO):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        payload = data['payload']
-        path = payload['merklePath']
+        path = data['merklePath']
         return cls(
-            payload=[MerklePathItem.create_from_dto(i, network_type) for i in path],
-            type=data['type'],
+            merkle_path=[MerklePathItem.create_from_dto(i, network_type) for i in path]
         )

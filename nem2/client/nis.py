@@ -589,14 +589,14 @@ def request_get_block_transactions(
     **kwds
 ):
     """
-    Make "/blocks/{height}/transactions" request.
+    Make "/block/{height}/transactions" request.
 
     :param client: Wrapper for client.
     :param height: Height of block.
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/blocks/{height}/transactions"
+    url = f"/block/{height}/transactions"
     return client.get(url, **kwds)
 
 
@@ -606,7 +606,7 @@ def process_get_block_transactions(
     network_type: models.NetworkType,
 ) -> typing.Sequence[models.Transaction]:
     """
-    Process the "/blocks/{height}/transactions" HTTP response.
+    Process the "/block/{height}/transactions" HTTP response.
 
     :param status: Status code for HTTP response.
     :param json: JSON data for response message.
@@ -618,6 +618,45 @@ def process_get_block_transactions(
 
 
 get_block_transactions = request("get_block_transactions")
+
+
+def request_get_merkle_by_hash_in_block(
+    client: client.Client,
+    height: int,
+    hash: str,
+    **kwds
+):
+    """
+    Make "/block/{height}/transaction/{hash}/merkle" request.
+
+    :param client: Wrapper for client.
+    :param height: Height of block.
+    :param hash: Transaction hash included in block.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    url = f"/block/{height}/transaction/{hash}/merkle"
+    return client.get(url, **kwds)
+
+
+def process_get_merkle_by_hash_in_block(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.Transaction]:
+    """
+    Process the "/block/{height}/transaction/{hash}/merkle" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return models.MerkleProofInfo.create_from_dto(json, network_type)
+
+
+get_merkle_by_hash_in_block = request("get_merkle_by_hash_in_block")
 
 
 def request_get_blockchain_height(client: client.Client, **kwds):
@@ -1450,6 +1489,10 @@ CLIENT_CB = {
     'get_block_transactions': (
         request_get_block_transactions,
         process_get_block_transactions,
+    ),
+    'get_merkle_by_hash_in_block': (
+        request_get_merkle_by_hash_in_block,
+        process_get_merkle_by_hash_in_block,
     ),
     'get_blockchain_height': (
         request_get_blockchain_height,

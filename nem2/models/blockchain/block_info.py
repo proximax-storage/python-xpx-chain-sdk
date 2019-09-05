@@ -47,6 +47,7 @@ class BlockInfo(util.DTO):
     :param generation_hash: Generation hash.
     :param total_fee: Sum of all transaction fees included in block.
     :param num_transactions: The number of transactions included in block.
+    :param num_statements: The number of statements included in block.
     :param signature: Block signature.
     :param signer: Public account of the block harvester.
     :param network_type: Network type.
@@ -108,6 +109,7 @@ class BlockInfo(util.DTO):
     generation_hash: str
     total_fee: int
     num_transactions: int
+    num_statements: int
     signature: str
     signer: PublicAccount
     network_type: NetworkType
@@ -132,6 +134,7 @@ class BlockInfo(util.DTO):
         generation_hash: typing.AnyStr,
         total_fee: int,
         num_transactions: int,
+        num_statements: int,
         signature: typing.AnyStr,
         signer: PublicAccount,
         network_type: NetworkType,
@@ -163,6 +166,7 @@ class BlockInfo(util.DTO):
         self._set('generation_hash', generation_hash)
         self._set('total_fee', total_fee)
         self._set('num_transactions', num_transactions)
+        self._set('num_statements', num_statements)
         self._set('signature', signature)
         self._set('signer', signer)
         self._set('network_type', network_type)
@@ -178,7 +182,6 @@ class BlockInfo(util.DTO):
         self._set('state_hash', state_hash)
         self._set('fee_interest', fee_interest)
         self._set('fee_interest_denominator', fee_interest_denominator)
-        self._set('beneficiary', beneficiary)
         self._set('merkle_tree', merkle_tree or [])
 
     @classmethod
@@ -189,10 +192,11 @@ class BlockInfo(util.DTO):
         required_l21 = {
             'hash',
             'generationHash',
+            'subCacheMerkleRoots',
             'totalFee',
-            'numTransactions'
+            'numTransactions',
+            'numStatements'
         }
-        all_l21 = required_l21 | {'subCacheMerkleRoots', 'numStatements'}
         required_l22 = {
             'signature',
             'signer',
@@ -206,20 +210,21 @@ class BlockInfo(util.DTO):
             'blockTransactionsHash',
             'blockReceiptsHash',
             'stateHash',
+            'beneficiary',
             'feeInterest',
             'feeInterestDenominator'
         }
-        all_l22 = required_l22 | {'beneficiaryPublicKey'}
+        
         return (
             # Level 1
             cls.validate_dto_required(data, required_l1)
             and cls.validate_dto_all(data, required_l1)
             # Level 2_1
             and cls.validate_dto_required(data['meta'], required_l21)
-            and cls.validate_dto_all(data['meta'], all_l21)
+            and cls.validate_dto_all(data['meta'], required_l21)
             # Level 2_2
             and cls.validate_dto_required(data['block'], required_l22)
-            and cls.validate_dto_all(data['block'], all_l22)
+            and cls.validate_dto_all(data['block'], required_l22)
         )
 
     def to_dto(
@@ -229,9 +234,10 @@ class BlockInfo(util.DTO):
         meta = {
             'hash': self.hash,
             'generationHash': self.generation_hash,
-            'totalFee': util.u64_to_dto(self.total_fee),
             'subCacheMerkleRoots': self.merkle_tree,
+            'totalFee': util.u64_to_dto(self.total_fee),
             'numTransactions': self.num_transactions,
+            'numStatements': self.num_statements,
         }
         block = {
             'signature': self.signature,
@@ -254,7 +260,7 @@ class BlockInfo(util.DTO):
             # TODO(ahuszagh) Is base64-encoded rather than hex-encoded.
             #   Should be fixed in an upcoming version.
             public_key = util.unhexlify(self.beneficiary.public_key)
-            meta['beneficiaryPublicKey'] = util.b64encode(public_key)
+            meta['beneficiary'] = util.b64encode(public_key)
 
         return {
             'meta': meta,
@@ -273,18 +279,19 @@ class BlockInfo(util.DTO):
         meta = data['meta']
         block = data['block']
         version = block['version']
-        network_type = NetworkType(version >> 8)
+        network_type = NetworkType((version >> 24) & 0x000000ff)
         beneficiary = None
-        if 'beneficiaryPublicKey' in block:
+        if 'beneficiary' in block:
             # TODO(ahuszagh) Is base64-encoded rather than hex-encoded.
             #   Should be fixed in an upcoming version.
-            public_key = util.hexlify(util.b64decode(block['beneficiaryPublicKey']))
-            beneficiary = PublicAccount.create_from_public_key(public_key, network_type)
+            beneficiary = PublicAccount.create_from_public_key(block['beneficiary'], network_type)
         return cls(
             hash=meta['hash'],
             generation_hash=meta['generationHash'],
+            merkle_tree=meta.get('subCacheMerkleRoots', []),
             total_fee=util.u64_from_dto(meta.get('totalFee', [0, 0])),
             num_transactions=meta.get('numTransactions', 0),
+            num_statements=meta.get('numStatements', 1),
             signature=block['signature'],
             signer=PublicAccount.create_from_public_key(block['signer'], network_type),
             network_type=network_type,
@@ -300,6 +307,5 @@ class BlockInfo(util.DTO):
             state_hash=block['stateHash'],
             beneficiary=beneficiary,
             fee_interest=block['feeInterest'],
-            fee_interest_denominator=block['feeInterestDenominator'],
-            merkle_tree=meta.get('subCacheMerkleRoots', [])
+            fee_interest_denominator=block['feeInterestDenominator']
         )
