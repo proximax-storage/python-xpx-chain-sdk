@@ -221,6 +221,11 @@ class HTTP(HTTPSharedBase):
     def blockchain(self) -> BlockchainHTTP:
         """Get BlockchainHTTP to the same endpoint."""
         raise util.AbstractMethodError
+    
+    @property
+    def mosaic(self) -> ConfigHTTP:
+        """Get ConfigHTTP to the same endpoint."""
+        raise util.AbstractMethodError
 
     @property
     def mosaic(self) -> MosaicHTTP:
@@ -493,6 +498,22 @@ class BlockchainHTTP(HTTPSharedBase):
         :return: Blockchain diagnostic rest server information.
         """
         return self(nis.get_diagnostic_server, **kwds)
+
+class ConfigHTTP(HTTPSharedBase):
+    """Abstract base class for the Config HTTP client."""
+
+    def get_config(
+        self,
+        height: int,
+        **kwds
+    ):
+        """
+        Gets config of network at height.
+
+        :param height: The height of the blockchain to get config.
+        :return: CatapultConfig.
+        """
+        return self(nis.get_config, height, **kwds)
 
 class MosaicHTTP(HTTPSharedBase):
     """Abstract base class for the mosaic HTTP client."""

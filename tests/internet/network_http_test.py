@@ -7,6 +7,7 @@ from tests import harness
     'clients': (client.NetworkHTTP, client.AsyncNetworkHTTP),
     'tests': [
         {
+            #/network
             'name': 'test_get_network_type',
             'params': [],
             'method': 'get_network_type',

@@ -43,18 +43,13 @@ class MerkleProofInfo(util.DTO):
     """
     Merkle proof information.
 
-    :param payload: Proof payload.
-    :param type: Data type.
+    :param merkle_path: The complementary data needed to calculate the merkle root.
 
     DTO Format:
         .. code-block:: yaml
 
-            MerkleProofInfoPayloadDTO:
-                merklePath: MerklePathItemDTO[]
-
             MerkleProofInfoDTO:
-                payload: MerkleProofInfoPayloadDTO
-                type: str
+                merklePath: MerklePathItemDTO[]
     """
 
     merkle_path: typing.Sequence[MerklePathItem]
@@ -68,7 +63,7 @@ class MerkleProofInfo(util.DTO):
         return (
             # Level 1
             cls.validate_dto_required(data, required_l1)
-#            and cls.validate_dto_all(data, required_l1)
+            and cls.validate_dto_all(data, required_l1)
         )
 
     def to_dto(

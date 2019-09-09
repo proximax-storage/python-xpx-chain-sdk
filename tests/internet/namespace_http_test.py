@@ -7,6 +7,16 @@ from tests import harness
     'clients': (client.NamespaceHTTP, client.AsyncNamespaceHTTP),
     'tests': [
         {
+            #/namespace/{namespaceId}
+            'name': 'test_get_namespace',
+            'params': [models.NamespaceId.create_from_hex('b16d77fd8b6fb3be')],
+            'method': 'get_namespace',
+            'validation': [
+                lambda x: (x.meta_id, '5D62745F8E825C00011B7CB5'),
+            ]
+        },
+        {
+            #/account/{accountId}/namespaces
             'name': 'test_get_namespaces_from_account',
             'params': [models.Address('SARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJETM3ZSP')],
             'method': 'get_namespaces_from_account',
@@ -16,6 +26,7 @@ from tests import harness
             ]
         },
         {
+            #/account/namespaces
             'name': 'test_get_namespaces_from_accounts',
             'params': [[models.Address('SARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJETM3ZSP')]],
             'method': 'get_namespaces_from_accounts',
@@ -25,20 +36,13 @@ from tests import harness
             ]
         },
         {
+            #/namespace/names
             'name': 'test_get_namespaces_name',
             'params': [[models.NamespaceId.create_from_hex('b16d77fd8b6fb3be')]],
             'method': 'get_namespaces_name',
             'validation': [
                 lambda x: (len(x), 1),
                 lambda x: (x[0].name, 'prx'),
-            ]
-        },
-        {
-            'name': 'test_get_namespace',
-            'params': [models.NamespaceId.create_from_hex('b16d77fd8b6fb3be')],
-            'method': 'get_namespace',
-            'validation': [
-                lambda x: (x.meta_id, '5D62745F8E825C00011B7CB5'),
             ]
         },
     ],

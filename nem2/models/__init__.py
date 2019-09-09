@@ -54,6 +54,9 @@ from .blockchain.merkle_proof_info import *
 from .blockchain.network_type import *
 from .blockchain import *
 
+# Config
+from .config.catapult_config import *
+
 # Mosaic
 from .mosaic.mosaic import *
 from .mosaic.mosaic_id import *

@@ -826,6 +826,46 @@ def process_get_diagnostic_server(
 
 get_diagnostic_server = request("get_diagnostic_server")
 
+
+# CONFIG HTTP
+# -----------
+
+
+def request_get_config(
+    client: client.Client,
+    height: int,
+    **kwds
+):
+    """
+    Make "/config/{height}" request.
+
+    :param height: The height of the blockchain to get config.
+    """
+
+    url = f"/config/{height}"
+    return client.get(url, **kwds)
+
+
+def process_get_config(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.CatapultConfig:
+    """
+    Process the "/config/{height}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return models.CatapultConfig.create_from_dto(json, network_type)
+
+
+get_config = request("get_config")
+
+
 # MOSAIC HTTP
 # -----------
 
@@ -1513,6 +1553,12 @@ CLIENT_CB = {
     'get_diagnostic_server': (
         request_get_diagnostic_server,
         process_get_diagnostic_server,
+    ),
+
+    # CONFIG
+    'get_config': (
+        request_get_config,
+        process_get_config,
     ),
 
     # MOSAIC

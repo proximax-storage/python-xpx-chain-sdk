@@ -7,6 +7,7 @@ from tests import config
     'clients': (client.AccountHTTP, client.AsyncAccountHTTP),
     'tests': [
         {
+            #/account/{accountId}
             'name': 'test_get_account_info',
             'params': [models.Address(config.Recipient.address)],
             'method': 'get_account_info',
@@ -15,6 +16,7 @@ from tests import config
             ]
         },
         {
+            #/account
             'name': 'test_get_accounts_info',
             'params': [[models.Address(config.Recipient.address)]],
             'method': 'get_accounts_info',
@@ -24,6 +26,7 @@ from tests import config
             ]
         },
         {
+            #/account/{publicKey}/transaction
             'name': 'test_account_transactions',
             'params': [models.PublicAccount(config.Recipient.address, config.Recipient.public_key)],
             'method': 'transactions',
@@ -34,6 +37,7 @@ from tests import config
             ]
         },
         {
+            #/account/{publicKey}/transaction/incoming
             'name': 'test_incoming_transactions',
             'params': [models.PublicAccount(config.Recipient.address, config.Recipient.public_key)],
             'method': 'incoming_transactions',
@@ -44,6 +48,7 @@ from tests import config
             ],
         },
         {
+            #/account/{publicKey}/transaction/outgoing
             'name': 'test_outgoing_transactions',
             'params': [models.PublicAccount(config.Sender.address, config.Sender.public_key)],
             'method': 'outgoing_transactions',
@@ -52,6 +57,7 @@ from tests import config
             ],
         },
         {
+            #/account/{publicKey}/transaction/unconfirmed
             'name': 'test_unconfirmed_transactions',
             'params': [models.PublicAccount(config.Recipient.address, config.Recipient.public_key)],
             'method': 'unconfirmed_transactions',
@@ -60,6 +66,7 @@ from tests import config
             ],
         },
         {
+            #/account/{publicKey}/transaction/partial
             'name': 'test_aggregate_bonded_transactions',
             'params': [models.PublicAccount(config.Recipient.address, config.Recipient.public_key)],
             'method': 'aggregate_bonded_transactions',
@@ -67,6 +74,14 @@ from tests import config
                 lambda x: (len(x), 0),
             ],
         },
+        #TODO
+        #/account/properties
+        #TODO
+        #/account/{accountId}/multisig
+        #TODO
+        #/account/{accountId}/multisig/graph
+        #TODO
+        #/account/names
     ],
 })
 class TestAccountHttp(harness.TestCase):

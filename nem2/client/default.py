@@ -39,6 +39,7 @@ __all__ = [
     'HTTP',
     'AccountHTTP',
     'BlockchainHTTP',
+    'ConfigHTTP',
     'MosaicHTTP',
     'NamespaceHTTP',
     'NetworkHTTP',
@@ -48,6 +49,7 @@ __all__ = [
     'AsyncHTTP',
     'AsyncAccountHTTP',
     'AsyncBlockchainHTTP',
+    'AsyncConfigHTTP',
     'AsyncMosaicHTTP',
     'AsyncNamespaceHTTP',
     'AsyncNetworkHTTP',
@@ -102,6 +104,10 @@ class HTTP(HTTPBase, abc.HTTP):
         return BlockchainHTTP.create_from_http(self)
 
     @property
+    def mosaic(self) -> ConfigHTTP:
+        return ConfigHTTP.create_from_http(self)
+
+    @property
     def mosaic(self) -> MosaicHTTP:
         return MosaicHTTP.create_from_http(self)
 
@@ -126,6 +132,11 @@ class AccountHTTP(HTTPBase, abc.AccountHTTP):
 @util.inherit_doc
 class BlockchainHTTP(HTTPBase, abc.BlockchainHTTP):
     """Blockchain client for the synchronous NIS API."""
+
+
+@util.inherit_doc
+class ConfigHTTP(HTTPBase, abc.ConfigHTTP):
+    """Config client for the synchronous NIS API."""
 
 
 @util.inherit_doc
@@ -190,6 +201,10 @@ class AsyncHTTP(AsyncHTTPBase, abc.HTTP):
         return AsyncBlockchainHTTP.create_from_http(self)
 
     @property
+    def mosaic(self) -> AsyncConfigHTTP:
+        return AsyncConfigHTTP.create_from_http(self)
+
+    @property
     def mosaic(self) -> AsyncMosaicHTTP:
         return AsyncMosaicHTTP.create_from_http(self)
 
@@ -214,6 +229,11 @@ class AsyncAccountHTTP(AsyncHTTPBase, abc.AccountHTTP):
 @util.inherit_doc
 class AsyncBlockchainHTTP(AsyncHTTPBase, abc.BlockchainHTTP):
     """Blockchain client for the asynchronous NIS API."""
+
+
+@util.inherit_doc
+class AsyncConfigHTTP(AsyncHTTPBase, abc.ConfigHTTP):
+    """Config client for the asynchronous NIS API."""
 
 
 @util.inherit_doc
