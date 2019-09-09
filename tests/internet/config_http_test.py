@@ -8,8 +8,6 @@ from tests import config
     'clients': (client.ConfigHTTP, client.AsyncConfigHTTP),
     'tests': [
         {
-            #TODO
-            #/config/{height}
             'name': 'test_get_config',
             'params': [100,],
             'method': 'get_config',

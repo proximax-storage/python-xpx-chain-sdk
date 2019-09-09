@@ -866,6 +866,76 @@ def process_get_config(
 get_config = request("get_config")
 
 
+# NODE HTTP
+# -----------
+
+
+def request_get_node_info(
+    client: client.Client,
+    **kwds
+):
+    """
+    Make "/node/info" request.
+
+    """
+
+    url = f"/node/info"
+    return client.get(url, **kwds)
+
+
+def process_get_node_info(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.NodeInfo:
+    """
+    Process the "/node/info" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return models.NodeInfo.create_from_dto(json, network_type)
+
+
+get_node_info = request("get_node_info")
+
+
+def request_get_node_time(
+    client: client.Client,
+    **kwds
+):
+    """
+    Make "/node/time" request.
+
+    """
+
+    url = f"/node/time"
+    return client.get(url, **kwds)
+
+
+def process_get_node_time(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.NodeTime:
+    """
+    Process the "/node/time" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return models.NodeTime.create_from_dto(json, network_type)
+
+
+get_node_time = request("get_node_time")
+
+
 # MOSAIC HTTP
 # -----------
 
@@ -1559,6 +1629,16 @@ CLIENT_CB = {
     'get_config': (
         request_get_config,
         process_get_config,
+    ),
+    
+    # NODE
+    'get_node_info': (
+        request_get_node_info,
+        process_get_node_info,
+    ),
+    'get_node_time': (
+        request_get_node_time,
+        process_get_node_time,
     ),
 
     # MOSAIC

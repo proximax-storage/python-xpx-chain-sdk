@@ -228,6 +228,11 @@ class HTTP(HTTPSharedBase):
         raise util.AbstractMethodError
 
     @property
+    def mosaic(self) -> NodeHTTP:
+        """Get NodeHTTP to the same endpoint."""
+        raise util.AbstractMethodError
+
+    @property
     def mosaic(self) -> MosaicHTTP:
         """Get MosaicHTTP to the same endpoint."""
         raise util.AbstractMethodError
@@ -514,6 +519,31 @@ class ConfigHTTP(HTTPSharedBase):
         :return: CatapultConfig.
         """
         return self(nis.get_config, height, **kwds)
+
+class NodeHTTP(HTTPSharedBase):
+    """Abstract base class for the Node HTTP client."""
+
+    def get_node_info(
+        self,
+        **kwds
+    ):
+        """
+        Supplies additional information about the application running on a node.
+
+        :return: NodeInfo.
+        """
+        return self(nis.get_node_info, **kwds)
+    
+    def get_node_time(
+        self,
+        **kwds
+    ):
+        """
+        Gets the node time at the moment the reply was sent and received.
+
+        :return: NodeTime.
+        """
+        return self(nis.get_node_time, **kwds)
 
 class MosaicHTTP(HTTPSharedBase):
     """Abstract base class for the mosaic HTTP client."""
