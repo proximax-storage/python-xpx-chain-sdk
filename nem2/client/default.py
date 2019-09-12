@@ -39,6 +39,8 @@ __all__ = [
     'HTTP',
     'AccountHTTP',
     'BlockchainHTTP',
+    'ContractHTTP',
+    'MetadataHTTP',
     'ConfigHTTP',
     'NodeHTTP',
     'MosaicHTTP',
@@ -50,6 +52,8 @@ __all__ = [
     'AsyncHTTP',
     'AsyncAccountHTTP',
     'AsyncBlockchainHTTP',
+    'AsyncContractHTTP',
+    'AsyncMetadataHTTP',
     'AsyncConfigHTTP',
     'AsyncNodeHTTP',
     'AsyncMosaicHTTP',
@@ -106,6 +110,14 @@ class HTTP(HTTPBase, abc.HTTP):
         return BlockchainHTTP.create_from_http(self)
 
     @property
+    def config(self) -> ContractHTTP:
+        return ContractHTTP.create_from_http(self)
+
+    @property
+    def metadata(self) -> MetadataHTTP:
+        return MetadataHTTP.create_from_http(self)
+
+    @property
     def config(self) -> ConfigHTTP:
         return ConfigHTTP.create_from_http(self)
 
@@ -138,6 +150,16 @@ class AccountHTTP(HTTPBase, abc.AccountHTTP):
 @util.inherit_doc
 class BlockchainHTTP(HTTPBase, abc.BlockchainHTTP):
     """Blockchain client for the synchronous NIS API."""
+
+
+@util.inherit_doc
+class ContractHTTP(HTTPBase, abc.ContractHTTP):
+    """Contract client for the synchronous NIS API."""
+
+
+@util.inherit_doc
+class MetadataHTTP(HTTPBase, abc.MetadataHTTP):
+    """Metadata client for the synchronous NIS API."""
 
 
 @util.inherit_doc
@@ -212,6 +234,14 @@ class AsyncHTTP(AsyncHTTPBase, abc.HTTP):
         return AsyncBlockchainHTTP.create_from_http(self)
 
     @property
+    def config(self) -> AsyncContractHTTP:
+        return AsyncContractHTTP.create_from_http(self)
+
+    @property
+    def metadata(self) -> AsyncMetadataHTTP:
+        return AsyncMetadataHTTP.create_from_http(self)
+
+    @property
     def config(self) -> AsyncConfigHTTP:
         return AsyncConfigHTTP.create_from_http(self)
 
@@ -244,6 +274,16 @@ class AsyncAccountHTTP(AsyncHTTPBase, abc.AccountHTTP):
 @util.inherit_doc
 class AsyncBlockchainHTTP(AsyncHTTPBase, abc.BlockchainHTTP):
     """Blockchain client for the asynchronous NIS API."""
+
+
+@util.inherit_doc
+class AsyncContractHTTP(AsyncHTTPBase, abc.ContractHTTP):
+    """Contract client for the asynchronous NIS API."""
+
+
+@util.inherit_doc
+class AsyncMetadataHTTP(AsyncHTTPBase, abc.MetadataHTTP):
+    """Metadata client for the asynchronous NIS API."""
 
 
 @util.inherit_doc

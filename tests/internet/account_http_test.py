@@ -82,6 +82,15 @@ from tests import config
         #/account/{accountId}/multisig/graph
         #TODO
         #/account/names
+        {
+            #/account/{publicKey}/contracts
+            'name': 'test_contracts',
+            'params': [models.PublicAccount(config.Recipient.address, config.Recipient.public_key)],
+            'method': 'contracts',
+            'validation': [
+                lambda x: (len(x), 0),
+            ],
+        },
     ],
 })
 class TestAccountHttp(harness.TestCase):

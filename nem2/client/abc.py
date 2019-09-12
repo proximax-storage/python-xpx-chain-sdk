@@ -223,12 +223,27 @@ class HTTP(HTTPSharedBase):
         raise util.AbstractMethodError
     
     @property
-    def mosaic(self) -> ConfigHTTP:
+    def contract(self) -> ContractHTTP:
+        """Get ContractHTTP to the same endpoint."""
+        raise util.AbstractMethodError
+    
+    @property
+    def contract(self) -> MetadataHTTP:
+        """Get MetadataHTTP to the same endpoint."""
+        raise util.AbstractMethodError
+    
+    @property
+    def contract(self) -> MetadataHTTP:
+        """Get MetadataHTTP to the same endpoint."""
+        raise util.AbstractMethodError
+    
+    @property
+    def config(self) -> ConfigHTTP:
         """Get ConfigHTTP to the same endpoint."""
         raise util.AbstractMethodError
 
     @property
-    def mosaic(self) -> NodeHTTP:
+    def node(self) -> NodeHTTP:
         """Get NodeHTTP to the same endpoint."""
         raise util.AbstractMethodError
 
@@ -399,6 +414,19 @@ class AccountHTTP(HTTPSharedBase):
         """
         return self(nis.get_account_partial_transactions, public_account, **kwds)
 
+    def contracts(
+        self,
+        public_account: models.PublicAccount,
+        **kwds
+    ):
+        """
+        Get account contracts.
+
+        :param address: Account address.
+        :return: List of ContractInfo object.
+        """
+        return self(nis.get_account_contracts, public_account, **kwds)
+
 
 class BlockchainHTTP(HTTPSharedBase):
     """Abstract base class for the blockchain HTTP client."""
@@ -503,6 +531,64 @@ class BlockchainHTTP(HTTPSharedBase):
         :return: Blockchain diagnostic rest server information.
         """
         return self(nis.get_diagnostic_server, **kwds)
+
+class ContractHTTP(HTTPSharedBase):
+    """Abstract base class for the Contract HTTP client."""
+
+    def get_contract(
+        self,
+        contract_id: str,
+        **kwds
+    ):
+        """
+        Gets the contract for a given contractId.
+
+        :param contractId: The account identifier.
+        :return: ContractInfo.
+        """
+        return self(nis.get_contract, contract_id, **kwds)
+
+    def get_contracts(
+        self,
+        addresses: typing.Sequence[models.Address],
+        **kwds
+    ):
+        """
+        Get contracts for an array of addresses
+
+        :param height: The height of the blockchain to get config.
+        :return: Sequence of ContractInfo.
+        """
+        return self(nis.get_contracts, addresses, **kwds)
+
+class MetadataHTTP(HTTPSharedBase):
+    """Abstract base class for the Metadata HTTP client."""
+
+    def get_metadata(
+        self,
+        metadata_id: str,
+        **kwds
+    ):
+        """
+        Gets the metadata for a given metadataId.
+
+        :param metadataId: The metadata identifiers.
+        :return: MetadataInfo.
+        """
+        return self(nis.get_metadata, metadata_id, **kwds)
+
+    def get_metadatas(
+        self,
+        metadata_ids: typing.Sequence[str],
+        **kwds
+    ):
+        """
+        Gets the metadatas for a given metadataIds.
+
+        :param metadataIds: The metadata identifiers.
+        :return: Sequence of MetadataInfo.
+        """
+        return self(nis.get_metadatas, metadata_ids, **kwds)
 
 class ConfigHTTP(HTTPSharedBase):
     """Abstract base class for the Config HTTP client."""

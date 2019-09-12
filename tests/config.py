@@ -1,4 +1,7 @@
 
+class Contract:
+    hash = "EB8923957301F796C884977234D20B0388A3AD6F865F1ACC7D3A94AFF597D59D"
+
 class Blockchain:
     height = 100
 
