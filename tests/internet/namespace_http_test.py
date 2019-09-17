@@ -45,6 +45,15 @@ from tests import harness
                 lambda x: (x[0].name, 'prx'),
             ]
         },
+        {
+            #/namespace/{namespaceId}/metadata
+            'name': 'test_namespace_metadata',
+            'params': [models.NamespaceId.create_from_hex('b16d77fd8b6fb3be')],
+            'method': 'metadata',
+            'validation': [
+                lambda x: (isinstance(x, models.NamespaceMetadataInfo, True)),
+            ]
+        },
     ],
 })
 class TestNamespaceHttp(harness.TestCase):

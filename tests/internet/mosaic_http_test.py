@@ -27,6 +27,15 @@ from tests import harness
                 lambda x: (x[0].names[0], 'prx.xpx'),
             ]
         },
+        {
+            #/mosaic/{mosaicId}/metadata
+            'name': 'test_mosaic_metadata',
+            'params': [models.MosaicId.create_from_hex('0dc67fbe1cad29e3')],
+            'method': 'metadata',
+            'validation': [
+                lambda x: (isinstance(x, models.MosaicMetadataInfo), True),
+            ]
+        },
     ],
 })
 class TestMosaicHttp(harness.TestCase):

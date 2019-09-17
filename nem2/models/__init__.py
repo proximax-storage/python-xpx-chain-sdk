@@ -62,6 +62,8 @@ from .contract.contract_info import *
 
 # Metadata
 from .metadata.address_metadata_info import *
+from .metadata.mosaic_metadata_info import *
+from .metadata.namespace_metadata_info import *
 from .metadata.metadata import *
 from .metadata.field import *
 

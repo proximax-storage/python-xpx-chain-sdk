@@ -91,6 +91,15 @@ from tests import config
                 lambda x: (len(x), 0),
             ],
         },
+        {
+            #/account/{publicKey}/metadata
+            'name': 'test_metadata',
+            'params': [models.PublicAccount(config.Recipient.address, config.Recipient.public_key)],
+            'method': 'metadata',
+            'validation': [
+                lambda x: (isinstance(x, models.AccountMetadataInfo), True),
+            ],
+        },
     ],
 })
 class TestAccountHttp(harness.TestCase):

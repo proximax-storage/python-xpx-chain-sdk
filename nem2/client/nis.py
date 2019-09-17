@@ -541,6 +541,43 @@ def process_get_account_contracts(
 get_account_contracts = request("get_account_contracts")
 
 
+def request_get_account_metadata(
+    client: client.Client,
+    public_account: models.PublicAccount,
+    **kwds
+):
+    """
+    Make "/account/{public_key}/metadata" request.
+
+    :param client: Wrapper for client.
+    :param public_account: Public account.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    url = f"/account/{public_account.public_key}/metadata"
+    return client.get(url, **kwds)
+
+
+def process_get_account_metadata(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> models.AddressMetadataInfo:
+    """
+    Process the "/account/{public_key}/metadata" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return models.AddressMetadataInfo.create_from_dto(json)
+
+
+get_account_metadata = request("get_account_metadata")
+
+
 # BLOCKCHAIN HTTP
 # ---------------
 
@@ -1234,6 +1271,44 @@ def process_get_mosaic_names(
 
 get_mosaic_names = request("get_mosaic_names")
 
+
+def request_get_mosaic_metadata(
+    client: client.Client,
+    mosaic_id: models.MosaicId,
+    **kwds
+):
+    """
+    Make "/mosaic/{mosaic_id}/metadata" request.
+
+    :param client: Wrapper for client.
+    :param mosaic_id: Mosaic ID.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    url = f"/mosaic/{mosaic_id:016x}/metadata"
+    return client.get(url, **kwds)
+
+
+def process_get_mosaic_metadata(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> models.AddressMetadataInfo:
+    """
+    Process the "/mosaic/{mosaic_id}/metadata" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return models.MosaicMetadataInfo.create_from_dto(json)
+
+
+get_mosaic_metadata = request("get_mosaic_metadata")
+
+
 # NAMESPACE HTTP
 # --------------
 
@@ -1452,6 +1527,42 @@ def process_get_linked_address(
 
 
 get_linked_address = request("get_linked_address")
+
+def request_get_namespace_metadata(
+    client: client.Client,
+    namespace_id: models.NamespaceId,
+    **kwds
+):
+    """
+    Make "/namespace/{namespace_id}/metadata" request.
+
+    :param client: Wrapper for client.
+    :param id: Namespace ID.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    url = f"/namespace/{namespace_id:016x}/metadata"
+    return client.get(url, **kwds)
+
+
+def process_get_namespace_metadata(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.NamespaceMetadataInfo:
+    """
+    Process the "/namespace/{namespace_id}/metadata" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return models.NamespaceMetadataInfo.create_from_dto(json, network_type)
+
+
+get_namespace_metadata = request("get_namespace_metadata")
+
 
 # NETWORK HTTP
 # ------------
@@ -1775,6 +1886,10 @@ CLIENT_CB = {
         request_get_account_contracts,
         process_get_account_contracts,
     ),
+    'get_account_metadata': (
+        request_get_account_metadata,
+        process_get_account_metadata,
+    ),
 
     # BLOCKCHAIN
     'get_block_by_height': (
@@ -1863,6 +1978,10 @@ CLIENT_CB = {
         request_get_mosaic_names,
         process_get_mosaic_names,
     ),
+    'get_mosaic_metadata': (
+        request_get_mosaic_metadata,
+        process_get_mosaic_metadata,
+    ),
 
     # NAMESPACE
     'get_namespace': (
@@ -1888,6 +2007,10 @@ CLIENT_CB = {
     'get_linked_address': (
         request_get_linked_address,
         process_get_linked_address,
+    ),
+    'get_namespace_metadata': (
+        request_get_namespace_metadata,
+        process_get_namespace_metadata,
     ),
 
     # NETWORK
