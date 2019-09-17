@@ -1652,15 +1652,16 @@ def request_get_transactions(
     **kwds
 ):
     """
-    Make "/transaction/{hash}" request.
+    Make "/transaction" request.
 
     :param client: Wrapper for client.
     :param hashes: Sequence of transaction hashes.
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/transaction/{hash}"
-    return client.get(url, **kwds)
+    url = f"/transaction"
+    json = {'transactionIds': list(hashes)}
+    return client.post(url, json=json, **kwds)
 
 
 def process_get_transactions(
@@ -1669,7 +1670,7 @@ def process_get_transactions(
     network_type: models.NetworkType,
 ):
     """
-    Process the "/transaction/{hash}" HTTP response.
+    Process the "/transaction" HTTP response.
 
     :param status: Status code for HTTP response.
     :param json: JSON data for response message.
