@@ -37,6 +37,10 @@ from ... import util
 
 __all__ = ['Transaction']
 
+import logging
+logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 @util.inherit_doc
 class Transaction(TransactionBase):
@@ -50,7 +54,7 @@ class Transaction(TransactionBase):
         #   uint32_t size
         #   uint8_t[64] signature
         #   uint8_t[32] signer
-        #   uint8_t version
+        #   uint8_t[3] version
         #   uint8_t network_type
         #   uint16_t type
         #   uint64_t max_fee
@@ -60,16 +64,16 @@ class Transaction(TransactionBase):
             'size': slice(0, 4),
             'signature': slice(4, 68),
             'signer': slice(68, 100),
-            'version': slice(100, 101),
-            'network_type': slice(101, 102),
-            'type': slice(102, 104),
-            'max_fee': slice(104, 112),
-            'deadline': slice(112, 120),
+            'version': slice(100, 103),
+            'network_type': slice(103, 104),
+            'type': slice(104, 106),
+            'max_fee': slice(106, 114),
+            'deadline': slice(114, 122),
             # Helpers.
             'signature_half': slice(4, 36),
             'signing_bytes': slice(100, None),
         },
-        size_shared=120,
+        size_shared=122,
     )
     DTO: typing.ClassVar[DTOFormat] = DTOFormat(
         names={
@@ -86,18 +90,18 @@ class Transaction(TransactionBase):
 
     # SIGNING
 
-    def sign_with(self, account: Account) -> SignedTransaction:
+    def sign_with(self, account: Account, gen_hash: typing.AnyStr) -> SignedTransaction:
         """
         Serialize and sign transaction.
 
         :param account: Account to sign transaction.
-        :param embedded: Convert transaction to embedded transaction.
+        :param gen_hash: Nemesis generation hash.
         :return: Signed transaction data,
         """
 
         # Serialize transaction data, sign, and generate a hash.
         transaction = self.to_catbuffer()
-        payload = account.sign(transaction)
+        payload = account.sign(transaction, gen_hash)
         hash = self.transaction_hash(payload)
         return SignedTransaction(
             payload,

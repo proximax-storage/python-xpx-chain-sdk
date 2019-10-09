@@ -33,6 +33,9 @@ from ...util.signature import ed25519
 
 __all__ = ['Account']
 
+import logging
+logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -121,11 +124,12 @@ class Account(util.Object):
 
         return cls(address, public_key, private_key)
 
-    def sign(self, transaction: typing.AnyStr) -> bytes:
+    def sign(self, transaction: typing.AnyStr, gen_hash: typing.AnyStr) -> bytes:
         """
         Sign transaction using private key.
 
         :param private_key: Hex-encoded or raw bytes for transaction data.
+        :param gen_hash: Nemesis generation hash.
         :return: Signed transaction data.
         """
 
@@ -135,12 +139,14 @@ class Account(util.Object):
         # uint32_t size
         # uint8_t[64] signature
         # uint8_t[32] signer
-        signing_bytes = transaction[100:]
+
+        signing_bytes = util.unhexlify(gen_hash) + transaction[100:]
+
         signature = self.sign_data(signing_bytes)
         public_key = util.unhexlify(self.public_key)
         size = transaction[:4]
 
-        return size + signature + public_key + signing_bytes
+        return size + signature + public_key + transaction[100:]
 
     def sign_data(self, data: typing.AnyStr) -> bytes:
         """

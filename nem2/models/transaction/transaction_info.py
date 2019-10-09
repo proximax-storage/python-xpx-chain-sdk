@@ -67,11 +67,12 @@ class TransactionInfo(util.DTO):
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-        required_keys = {'height', 'index', 'id'}
+        #required_keys = {'height', 'index', 'id'}
+        required_keys = {'height'}
         all_keys = required_keys | {'hash', 'merkleComponentHash'}
         return (
             cls.validate_dto_required(data, required_keys)
-            and cls.validate_dto_all(data, all_keys)
+#            and cls.validate_dto_all(data, all_keys)
         )
 
     def to_dto(
@@ -100,8 +101,8 @@ class TransactionInfo(util.DTO):
 
         return cls(
             height=util.u64_from_dto(data['height']),
-            index=data['index'],
-            id=data['id'],
+            index=data.get('index', 0),
+            id=data.get('id', ''),
             hash=data.get('hash'),
             merkle_component_hash=data.get('merkleComponentHash'),
         )

@@ -1762,7 +1762,7 @@ def request_announce(
     **kwds
 ):
     """
-    Make "/transaction/sync" request.
+    Make "/transaction" request.
 
     :param client: Wrapper for client.
     :param transaction: Signed transaction data.
@@ -1780,59 +1780,18 @@ def process_announce(
     network_type: models.NetworkType,
 ) -> models.TransactionAnnounceResponse:
     """
-    Process the "/transaction/sync" HTTP response.
+    Process the "/transaction" HTTP response.
 
     :param status: Status code for HTTP response.
     :param json: JSON data for response message.
     """
 
-    assert status == 200
+    assert (status == 200 | status == 202)
     return models.TransactionAnnounceResponse.create_from_dto(json)
 
 
 announce = request("announce")
 
-
-def request_announce_sync(
-    client: client.Client,
-    transaction: models.SignedTransaction,
-    **kwds
-):
-    """
-    Make "/transaction/sync" request.
-
-    :param client: Wrapper for client.
-    :param transaction: Signed transaction data.
-    :param timeout: (Optional) timeout for request (in seconds).
-    """
-
-    url = f"/transaction/sync"
-    sync = models.SyncAnnounce.create(transaction)
-    json = sync.to_dto()
-    return client.post(url, json=json, **kwds)
-
-
-def process_announce_sync(
-    status: int,
-    json: dict,
-    network_type: models.NetworkType,
-) -> typing.Union[models.Transaction, models.TransactionStatus]:
-    """
-    Process the "/transaction/sync" HTTP response.
-
-    :param status: Status code for HTTP response.
-    :param json: JSON data for response message.
-    """
-
-    assert status == 200
-    if 'status' in json:
-        json.setdefault('group', 'failed')
-        json.setdefault('height', [0, 0])
-        return models.TransactionStatus.create_from_dto(json)
-    return models.Transaction.create_from_dto(json)
-
-
-announce_sync = request("announce_sync")
 
 # FORWARDERS
 # ----------
@@ -2040,9 +1999,5 @@ CLIENT_CB = {
     'announce': (
         request_announce,
         process_announce,
-    ),
-    'announce_sync': (
-        request_announce_sync,
-        process_announce_sync,
     ),
 }

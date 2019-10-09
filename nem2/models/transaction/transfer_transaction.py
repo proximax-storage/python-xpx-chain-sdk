@@ -102,8 +102,8 @@ class TransferTransaction(Transaction):
         deadline: Deadline,
         recipient: RecipientType,
         mosaics: typing.Optional[MosaicList],
-        message: Message,
         network_type: NetworkType,
+        message: Message = EMPTY_MESSAGE,
         max_fee: int = 0,
     ):
         """

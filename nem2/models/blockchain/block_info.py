@@ -191,11 +191,11 @@ class BlockInfo(util.DTO):
         required_l1 = {'meta', 'block'}
         required_l21 = {
             'hash',
-            'generationHash',
-            'subCacheMerkleRoots',
-            'totalFee',
-            'numTransactions',
-            'numStatements'
+            'generationHash'
+#            'subCacheMerkleRoots',
+#            'totalFee',
+#            'numTransactions',
+#            'numStatements'
         }
         required_l22 = {
             'signature',
@@ -205,14 +205,14 @@ class BlockInfo(util.DTO):
             'height',
             'timestamp',
             'difficulty',
-            'feeMultiplier',
             'previousBlockHash',
-            'blockTransactionsHash',
-            'blockReceiptsHash',
-            'stateHash',
-            'beneficiary',
-            'feeInterest',
-            'feeInterestDenominator'
+            'blockTransactionsHash'
+#            'feeMultiplier',
+#            'blockReceiptsHash',
+#            'stateHash',
+#            'beneficiary',
+#            'feeInterest',
+#            'feeInterestDenominator'
         }
         
         return (
@@ -221,10 +221,10 @@ class BlockInfo(util.DTO):
             and cls.validate_dto_all(data, required_l1)
             # Level 2_1
             and cls.validate_dto_required(data['meta'], required_l21)
-            and cls.validate_dto_all(data['meta'], required_l21)
+#            and cls.validate_dto_all(data['meta'], required_l21)
             # Level 2_2
             and cls.validate_dto_required(data['block'], required_l22)
-            and cls.validate_dto_all(data['block'], required_l22)
+#            and cls.validate_dto_all(data['block'], required_l22)
         )
 
     def to_dto(
@@ -294,18 +294,18 @@ class BlockInfo(util.DTO):
             num_statements=meta.get('numStatements', 1),
             signature=block['signature'],
             signer=PublicAccount.create_from_public_key(block['signer'], network_type),
-            network_type=network_type,
             version=TransactionVersion(version & 0xFF),
             type=BlockType.create_from_dto(block['type'], network_type),
             height=util.u64_from_dto(block['height']),
             timestamp=util.u64_from_dto(block['timestamp']),
             difficulty=util.u64_from_dto(block['difficulty']),
-            fee_multiplier=util.u32_from_dto(block.get('feeMultiplier', 0)),
             previous_block_hash=block['previousBlockHash'],
             block_transactions_hash=block['blockTransactionsHash'],
-            block_receipts_hash=block['blockReceiptsHash'],
-            state_hash=block['stateHash'],
+            network_type=network_type,
+            fee_multiplier=util.u32_from_dto(block.get('feeMultiplier', 0)),
+            block_receipts_hash=block.get('blockReceiptsHash', ''),
+            state_hash=block.get('stateHash', ''),
             beneficiary=beneficiary,
-            fee_interest=block['feeInterest'],
-            fee_interest_denominator=block['feeInterestDenominator']
+            fee_interest=block.get('feeInterest', 0),
+            fee_interest_denominator=block.get('feeInterestDenominator', 0)
         )

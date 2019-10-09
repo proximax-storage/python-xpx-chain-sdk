@@ -865,20 +865,6 @@ class TransactionHTTP(HTTPSharedBase):
         """
         return self(nis.announce, transaction, **kwds)
 
-    def announce_sync(
-        self,
-        transaction: models.SignedTransaction,
-        **kwds
-    ):
-        """
-        Announce and get synchronization message for transaction.
-
-        :param transaction: Signed transaction data.
-        :return: Transaction status or object.
-        """
-        return self(nis.announce_sync, transaction, **kwds)
-
-
 # WEBSOCKET
 # ---------
 
@@ -949,7 +935,7 @@ class Listener(util.Object):
 
     async def __anext__(self) -> typing.Optional[ListenerMessage]:
         """Iterate over subscribed messages."""
-
+        
         message: bytes = await self._iter.__anext__()
         data = json.loads(message)
         if 'transaction' in data:
@@ -998,7 +984,7 @@ class Listener(util.Object):
     @util.observable
     async def unconfirmed_added(self, address: models.Address) -> None:
         """Emit message for unconfirmed transactions are announced."""
-        await self.subscribe(f'confirmedAdded/{address.address}')
+        await self.subscribe(f'unconfirmedAdded/{address.address}')
 
     @util.observable
     async def unconfirmed_removed(self, address: models.Address) -> None:

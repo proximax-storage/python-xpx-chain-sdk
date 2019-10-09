@@ -29,6 +29,10 @@ import typing
 
 from ... import util
 
+import logging
+logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 __all__ = [
     'ChronoUnit',
     'Deadline',
@@ -87,7 +91,7 @@ class Deadline(util.Object):
     """
 
     deadline: datetime.datetime
-    TIMESTAMP_NEMESIS_BLOCK: typing.ClassVar[int] = 1459468800
+    TIMESTAMP_NEMESIS_BLOCK: typing.ClassVar[int] = 1459468800000
 
     @classmethod
     def create(
@@ -117,7 +121,7 @@ class Deadline(util.Object):
         """Export deadline to UTC timestamp."""
 
         utc = self.deadline.replace(tzinfo=datetime.timezone.utc)
-        return int(utc.timestamp())
+        return int(utc.timestamp() * 1000) - self.TIMESTAMP_NEMESIS_BLOCK
 
     @classmethod
     def create_from_timestamp(cls, timestamp: int):
