@@ -101,8 +101,8 @@ class TransferTransaction(Transaction):
         cls,
         deadline: Deadline,
         recipient: RecipientType,
-        mosaics: typing.Optional[MosaicList],
         network_type: NetworkType,
+        mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
         max_fee: int = 0,
     ):
@@ -133,7 +133,7 @@ class TransferTransaction(Transaction):
         # 2 for message_size, and 1 for mosaics_count.
         extra_size = util.U8_BYTES + util.U16_BYTES
         recipient_size = Recipient.CATBUFFER_SIZE
-        message_size = len(self.message.payload)
+        message_size = self.message.catbuffer_size_specific()
         mosaics_size = Mosaic.CATBUFFER_SIZE * len(self.mosaics)
         return extra_size + recipient_size + message_size + mosaics_size
 
@@ -157,12 +157,13 @@ class TransferTransaction(Transaction):
         # uint8_t[25] recipient
         # uint16_t message_size
         # uint8_t mosaics_count
+        # uint8_t message type
         # uint8_t[message_size] message
         # Mosaic[mosaics_count] mosaics
         recipient = Recipient.to_catbuffer(self.recipient, network_type)
-        message_size = util.u16_to_catbuffer(len(self.message.payload))
+        message_size = util.u16_to_catbuffer(self.message.catbuffer_size_specific())
         mosaics_count = util.u8_to_catbuffer(len(self.mosaics))
-        message = self.message.payload
+        message = self.message.to_catbuffer(network_type)
         mosaics = self.to_mosaics_bytes(network_type)
 
         return recipient + message_size + mosaics_count + message + mosaics
@@ -209,7 +210,7 @@ class TransferTransaction(Transaction):
 
     @classmethod
     def validate_dto_specific(cls, data: dict) -> bool:
-        required_keys = {'recipient', 'mosaics'}
+        required_keys = {'recipient'}
         return cls.validate_dto_required(data, required_keys)
 
     def to_dto_specific(

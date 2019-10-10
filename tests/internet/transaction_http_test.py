@@ -52,7 +52,7 @@ from tests import aitertools
     ],
 })
 class TestTransactionHttp(harness.TestCase):
-    async def test_transaction(self):
+    async def test_transfer_transaction(self):
         gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
 
         nemesis = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
@@ -92,3 +92,41 @@ class TestTransactionHttp(harness.TestCase):
 
         await asyncio.gather(listen(), announce())
 
+    
+    async def test_message_transaction(self):
+        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
+
+        nemesis = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+        self.assertEqual(nemesis.address.address, 'SBGS2IGUED476REYI5ZZGISVSEHAF6YIQZV6YJFQ')
+
+        recipient = models.Address('SAFSPPRI4MBM3R7USYLJHUODAD5ZEK65YUP35NV6')
+        message = models.PlainMessage(b'Hello world')
+        print(len(message.payload))
+
+        tx = models.TransferTransaction.create(
+            deadline=models.Deadline.create(),
+            recipient=recipient,
+            network_type=models.NetworkType.MIJIN_TEST,
+            max_fee=1,
+            message=message
+        )
+
+        async def announce():
+            signed_tx = tx.sign_with(nemesis, gen_hash)
+            with client.TransactionHTTP(responses.ENDPOINT) as http:
+                http.announce(signed_tx)
+
+        async def listen():
+            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+                await listener.confirmed(nemesis.address)
+
+                async for m in listener:
+                    #TODO: Check for more transactions. It could not always be the first one.
+                    #TODO: Implement timeout.
+                    tx = m.message
+                    self.assertEqual(isinstance(tx, models.TransferTransaction), True)
+                    self.assertEqual(tx.recipient, recipient)
+                    self.assertEqual(tx.message, message)
+                    break
+
+        await asyncio.gather(listen(), announce())
