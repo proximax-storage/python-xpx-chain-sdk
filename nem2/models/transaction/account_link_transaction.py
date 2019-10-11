@@ -162,7 +162,7 @@ class AccountLinkTransaction(Transaction):
 
     @classmethod
     def validate_dto_specific(cls, data: dict) -> bool:
-        required_keys = {'remoteAccountKey', 'linkAction'}
+        required_keys = {'remoteAccountKey', 'action'}
         return cls.validate_dto_required(data, required_keys)
 
     def to_dto_specific(
@@ -171,7 +171,7 @@ class AccountLinkTransaction(Transaction):
     ) -> dict:
         return {
             'remoteAccountKey': self.remote_account_key,
-            'linkAction': self.link_action.to_dto(network_type),
+            'action': self.link_action.to_dto(network_type),
         }
 
     def load_dto_specific(
@@ -180,7 +180,7 @@ class AccountLinkTransaction(Transaction):
         network_type: NetworkType,
     ) -> None:
         remote_account_key = data['remoteAccountKey']
-        link_action = LinkAction.create_from_dto(data['linkAction'])
+        link_action = LinkAction.create_from_dto(data['action'])
         self._set('remote_account_key', remote_account_key)
         self._set('link_action', link_action)
 
