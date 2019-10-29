@@ -89,6 +89,7 @@ class TestTransactionHttp(harness.TestCase):
 #                    self.assertEqual(len(tx.mosaics), 1)
 #                    self.assertEqual(tx.mosaics[0].id, mosaic_id)
 #                    self.assertEqual(tx.mosaics[0].amount, amount)
+#                    self.assertEqual(tx.address, account.address)
 #                    break
 #
 #        await asyncio.gather(listen(), announce())
@@ -128,6 +129,7 @@ class TestTransactionHttp(harness.TestCase):
 #                    self.assertEqual(isinstance(tx, models.TransferTransaction), True)
 #                    self.assertEqual(tx.recipient, recipient)
 #                    self.assertEqual(tx.message, message)
+#                    self.assertEqual(tx.address, account.address)
 #                    break
 #
 #        await asyncio.gather(listen(), announce())
@@ -167,6 +169,7 @@ class TestTransactionHttp(harness.TestCase):
 #                    self.assertEqual(isinstance(tx, models.AccountLinkTransaction), True)
 #                    self.assertEqual(tx.remote_account_key, linked_account.public_key.upper())
 #                    self.assertEqual(tx.link_action, action)
+#                    self.assertEqual(tx.address, account.address)
 #                    break
 #
 #        await asyncio.gather(listen(models.LinkAction.LINK), announce())
@@ -217,6 +220,7 @@ class TestTransactionHttp(harness.TestCase):
 #                    self.assertEqual(len(tx.modifications), 1)
 #                    self.assertEqual(tx.property_type, property_type)
 #                    self.assertEqual(tx.modifications[0].modification_type, modification_type)
+#                    self.assertEqual(tx.address, account.address)
 #                    break
 #
 #        for property_type in [models.PropertyType.ALLOW_ADDRESS, models.PropertyType.BLOCK_ADDRESS]:
@@ -256,34 +260,74 @@ class TestTransactionHttp(harness.TestCase):
 #                    self.assertEqual(tx.property_type, property_type)
 #                    self.assertEqual(tx.modifications[0].modification_type, modification_type)
 #                    self.assertEqual(tx.modifications[0].value, value)
+#                    self.assertEqual(tx.address, account.address)
 #                    break
 #
 #        for property_type in [models.PropertyType.ALLOW_MOSAIC, models.PropertyType.BLOCK_MOSAIC]:
 #            for modification_type in [models.PropertyModificationType.ADD, models.PropertyModificationType.REMOVE]:
 #                await asyncio.gather(listen(property_type, modification_type, mosaic_id), announce(nemesis, mosaic_id, property_type, modification_type))
         
-    async def test_modify_account_property_entity_type_transaction(self):
+#    async def test_modify_account_property_entity_type_transaction(self):
+#        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
+#
+#        tx_type = models.TransactionType.LINK_ACCOUNT
+#        #account = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+#        account = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+#
+#        async def announce(account, value, property_type, modification_type):
+#            tx = models.ModifyAccountPropertyEntityTypeTransaction.create(
+#                deadline=models.Deadline.create(),
+#                network_type=models.NetworkType.MIJIN_TEST,
+#                max_fee=1,
+#                property_type=property_type,
+#                modifications=[models.AccountPropertyModification(modification_type, value)]
+#            )
+#            
+#            signed_tx = tx.sign_with(account, gen_hash)
+#
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(signed_tx)
+#
+#        async def listen(account, value, property_type, modification_type):
+#            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+#                await listener.confirmed(account.address)
+#
+#                async for m in listener:
+#                    #TODO: Check for more transactions. It could not always be the first one.
+#                    #TODO: Implement timeout.
+#                    tx = m.message
+#                    self.assertEqual(isinstance(tx, models.ModifyAccountPropertyEntityTypeTransaction), True)
+#                    self.assertEqual(len(tx.modifications), 1)
+#                    self.assertEqual(tx.property_type, property_type)
+#                    self.assertEqual(tx.modifications[0].modification_type, modification_type)
+#                    self.assertEqual(tx.modifications[0].value, value)
+#                    self.assertEqual(tx.address, account.address)
+#                    break
+#
+#        for property_type in [models.PropertyType.BLOCK_TRANSACTION]:
+#            for modification_type in [models.PropertyModificationType.ADD, models.PropertyModificationType.REMOVE]:
+#                await asyncio.gather(listen(account, tx_type, property_type, modification_type), announce(account, tx_type, property_type, modification_type))
+    
+    async def test_register_namespace_transaction(self):
         gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
 
-        tx_type = models.TransactionType.LINK_ACCOUNT
         #account = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         account = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
 
-        async def announce(account, value, property_type, modification_type):
-            tx = models.ModifyAccountPropertyEntityTypeTransaction.create(
-                deadline=models.Deadline.create(),
-                network_type=models.NetworkType.MIJIN_TEST,
-                max_fee=1,
-                property_type=property_type,
-                modifications=[models.AccountPropertyModification(modification_type, value)]
-            )
-            
-            signed_tx = tx.sign_with(account, gen_hash)
+        tx = models.RegisterNamespaceTransaction.create_root_namespace(
+            deadline=models.Deadline.create(),
+            network_type=models.NetworkType.MIJIN_TEST,
+            namespace_name='foobar',
+            duration=3600
+        )
+        
+        signed_tx = tx.sign_with(account, gen_hash)
 
+        async def announce():
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
 
-        async def listen(account, value, property_type, modification_type):
+        async def listen():
             async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
                 await listener.confirmed(account.address)
 
@@ -291,13 +335,46 @@ class TestTransactionHttp(harness.TestCase):
                     #TODO: Check for more transactions. It could not always be the first one.
                     #TODO: Implement timeout.
                     tx = m.message
-                    self.assertEqual(isinstance(tx, models.ModifyAccountPropertyEntityTypeTransaction), True)
-                    self.assertEqual(len(tx.modifications), 1)
-                    self.assertEqual(tx.property_type, property_type)
-                    self.assertEqual(tx.modifications[0].modification_type, modification_type)
-                    self.assertEqual(tx.modifications[0].value, value)
+                    self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
+                    self.assertEqual(tx.namespace_name, 'foobar')
+                    self.assertEqual(tx.address, account.address)
                     break
 
-        for property_type in [models.PropertyType.BLOCK_TRANSACTION]:
-            for modification_type in [models.PropertyModificationType.ADD, models.PropertyModificationType.REMOVE]:
-                await asyncio.gather(listen(account, tx_type, property_type, modification_type), announce(account, tx_type, property_type, modification_type))
+        await asyncio.gather(listen(), announce())
+
+    async def test_address_alias_transaction(self):
+        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
+
+        #account = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+        account = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+
+        async def announce(action_type):
+            tx = models.AddressAliasTransaction.create(
+                deadline=models.Deadline.create(),
+                network_type=models.NetworkType.MIJIN_TEST,
+                max_fee=1,
+                action_type=action_type,
+                namespace_id=models.NamespaceId(0xb8ffeb12bcf3840f),
+                address=account.address
+            )
+            
+            signed_tx = tx.sign_with(account, gen_hash)
+
+            with client.TransactionHTTP(responses.ENDPOINT) as http:
+                http.announce(signed_tx)
+
+        async def listen(action_type):
+            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+                await listener.confirmed(account.address)
+
+                async for m in listener:
+                    #TODO: Check for more transactions. It could not always be the first one.
+                    #TODO: Implement timeout.
+                    tx = m.message
+                    self.assertEqual(isinstance(tx, models.AddressAliasTransaction), True)
+                    self.assertEqual(tx.action_type, action_type)
+                    self.assertEqual(tx.address, account.address)
+                    break
+
+        for action in [models.AliasActionType.LINK, models.AliasActionType.UNLINK]:
+            await asyncio.gather(listen(action), announce(action))

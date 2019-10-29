@@ -173,7 +173,7 @@ class AddressAliasTransaction(Transaction):
 
     @classmethod
     def validate_dto_specific(cls, data: dict) -> bool:
-        required_keys = {'actionType', 'namespaceId', 'address'}
+        required_keys = {'aliasAction', 'namespaceId', 'address'}
         return cls.validate_dto_required(data, required_keys)
 
     def to_dto_specific(
@@ -181,7 +181,7 @@ class AddressAliasTransaction(Transaction):
         network_type: NetworkType,
     ) -> dict:
         return {
-            'actionType': self.action_type.to_dto(network_type),
+            'aliasAction': self.action_type.to_dto(network_type),
             'namespaceId': util.u64_to_dto(int(self.namespace_id)),
             'address': util.hexlify(self.address.encoded),
         }
@@ -191,7 +191,7 @@ class AddressAliasTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        action_type = AliasActionType.create_from_dto(data['actionType'], network_type)
+        action_type = AliasActionType.create_from_dto(data['aliasAction'], network_type)
         namespace_id = NamespaceId(util.u64_from_dto(data['namespaceId']))
         address = Address.create_from_encoded(data['address'])
 
