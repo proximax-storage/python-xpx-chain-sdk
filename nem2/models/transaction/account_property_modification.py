@@ -97,7 +97,7 @@ class AccountPropertyModification(util.DTO):
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-        required_keys = {'modificationType', 'value'}
+        required_keys = {'type', 'value'}
         return (
             cls.validate_dto_required(data, required_keys)
             and cls.validate_dto_all(data, required_keys)
@@ -109,7 +109,7 @@ class AccountPropertyModification(util.DTO):
     ) -> dict:
         return {
             # TODO(ahuszagh) Check when stabilized
-            'modificationType': self.modification_type.to_dto(network_type),
+            'type': self.modification_type.to_dto(network_type),
             'value': to_dto(self.value),
         }
 
@@ -122,7 +122,7 @@ class AccountPropertyModification(util.DTO):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        type = data['modificationType']
+        type = data['type']
         return cls(
             # TODO(ahuszagh) Check when stabilized
             modification_type=PropertyModificationType.create_from_dto(type),
