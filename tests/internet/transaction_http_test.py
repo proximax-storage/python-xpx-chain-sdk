@@ -3,10 +3,12 @@ from nem2 import models
 from tests import harness
 from tests import config
 from tests import responses
-import datetime
-from binascii import unhexlify
-import asyncio
 from tests import aitertools
+import datetime
+import binascii
+import asyncio
+import hashlib
+import os
 
 @harness.http_test_case({
     'clients': (client.TransactionHTTP, client.AsyncTransactionHTTP),
@@ -308,62 +310,138 @@ class TestTransactionHttp(harness.TestCase):
 #            for modification_type in [models.PropertyModificationType.ADD, models.PropertyModificationType.REMOVE]:
 #                await asyncio.gather(listen(account, tx_type, property_type, modification_type), announce(account, tx_type, property_type, modification_type))
     
-    async def test_register_namespace_transaction(self):
+#    async def test_register_namespace_transaction(self):
+#        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
+#
+#        #account = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+#        account = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+#
+#        tx = models.RegisterNamespaceTransaction.create_root_namespace(
+#            deadline=models.Deadline.create(),
+#            network_type=models.NetworkType.MIJIN_TEST,
+#            namespace_name='foobar',
+#            duration=60
+#        )
+#        
+#        signed_tx = tx.sign_with(account, gen_hash)
+#
+#        async def announce():
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(signed_tx)
+#
+#        async def listen():
+#            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+#                await listener.confirmed(account.address)
+#
+#                async for m in listener:
+#                    #TODO: Check for more transactions. It could not always be the first one.
+#                    #TODO: Implement timeout.
+#                    tx = m.message
+#                    self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
+#                    self.assertEqual(tx.namespace_name, 'foobar')
+#                    break
+#
+#        await asyncio.gather(listen(), announce())
+
+#    async def test_address_alias_transaction(self):
+#        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
+#
+#        #account = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+#        account = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+#
+#        async def announce(action_type):
+#            tx = models.AddressAliasTransaction.create(
+#                deadline=models.Deadline.create(),
+#                network_type=models.NetworkType.MIJIN_TEST,
+#                max_fee=1,
+#                action_type=action_type,
+#                namespace_id=models.NamespaceId(0xb8ffeb12bcf3840f),
+#                address=account.address
+#            )
+#            
+#            signed_tx = tx.sign_with(account, gen_hash)
+#
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(signed_tx)
+#
+#        async def listen(action_type):
+#            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+#                await listener.confirmed(account.address)
+#
+#                async for m in listener:
+#                    #TODO: Check for more transactions. It could not always be the first one.
+#                    #TODO: Implement timeout.
+#                    tx = m.message
+#                    self.assertEqual(isinstance(tx, models.AddressAliasTransaction), True)
+#                    self.assertEqual(tx.action_type, action_type)
+#                    self.assertEqual(tx.address, account.address)
+#                    break
+#
+#        for action in [models.AliasActionType.LINK, models.AliasActionType.UNLINK]:
+#            await asyncio.gather(listen(action), announce(action))
+
+#    async def test_register_sub_namespace_transaction(self):
+#        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
+#
+#        #account = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+#        account = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+#
+#        tx = models.RegisterNamespaceTransaction.create_sub_namespace(
+#            deadline=models.Deadline.create(),
+#            network_type=models.NetworkType.MIJIN_TEST,
+#            namespace_name='subfoobar',
+#            parent_namespace='foobar'
+#        )
+#        
+#        signed_tx = tx.sign_with(account, gen_hash)
+#
+#        async def announce():
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(signed_tx)
+#
+#        async def listen():
+#            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+#                await listener.confirmed(account.address)
+#
+#                async for m in listener:
+#                    #TODO: Check for more transactions. It could not always be the first one.
+#                    #TODO: Implement timeout.
+#                    tx = m.message
+#                    self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
+#                    self.assertEqual(tx.namespace_name, 'subfoobar')
+#                    break
+#
+#        await asyncio.gather(listen(), announce())
+    
+    async def test_secret_lock_transaction(self):
         gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
 
-        #account = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         account = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+        account2 = models.Account.create_from_private_key('2C8178EF9ED7A6D30ABDC1E4D30D68B05861112A98B1629FBE2C8D16FDE97A1C', models.NetworkType.MIJIN_TEST)
+        mosaic_id = models.MosaicId.create_from_hex('0dc67fbe1cad29e3')
 
-        tx = models.RegisterNamespaceTransaction.create_root_namespace(
-            deadline=models.Deadline.create(),
-            network_type=models.NetworkType.MIJIN_TEST,
-            namespace_name='foobar',
-            duration=3600
-        )
-        
-        signed_tx = tx.sign_with(account, gen_hash)
+        random_bytes = os.urandom(20)
+        h = hashlib.sha3_256(random_bytes)
+        secret = binascii.hexlify(h.digest()).decode('utf-8').upper()
+        proof = binascii.hexlify(random_bytes).decode('utf-8').upper()
 
-        async def announce():
-            with client.TransactionHTTP(responses.ENDPOINT) as http:
-                http.announce(signed_tx)
-
-        async def listen():
-            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
-                await listener.confirmed(account.address)
-
-                async for m in listener:
-                    #TODO: Check for more transactions. It could not always be the first one.
-                    #TODO: Implement timeout.
-                    tx = m.message
-                    self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
-                    self.assertEqual(tx.namespace_name, 'foobar')
-                    self.assertEqual(tx.address, account.address)
-                    break
-
-        await asyncio.gather(listen(), announce())
-
-    async def test_address_alias_transaction(self):
-        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
-
-        #account = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-        account = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
-
-        async def announce(action_type):
-            tx = models.AddressAliasTransaction.create(
+        async def announce_lock():
+            lock_tx = models.SecretLockTransaction.create(
                 deadline=models.Deadline.create(),
                 network_type=models.NetworkType.MIJIN_TEST,
-                max_fee=1,
-                action_type=action_type,
-                namespace_id=models.NamespaceId(0xb8ffeb12bcf3840f),
-                address=account.address
+                mosaic=models.Mosaic(mosaic_id, 1000),
+                duration=60,
+                hash_type=models.HashType.SHA3_256,
+                secret=secret,
+                recipient=account2.address,
             )
             
-            signed_tx = tx.sign_with(account, gen_hash)
-
+            signed_lock_tx = lock_tx.sign_with(account, gen_hash)
+            
             with client.TransactionHTTP(responses.ENDPOINT) as http:
-                http.announce(signed_tx)
+                http.announce(signed_lock_tx)
 
-        async def listen(action_type):
+        async def listen_lock():
             async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
                 await listener.confirmed(account.address)
 
@@ -371,10 +449,38 @@ class TestTransactionHttp(harness.TestCase):
                     #TODO: Check for more transactions. It could not always be the first one.
                     #TODO: Implement timeout.
                     tx = m.message
-                    self.assertEqual(isinstance(tx, models.AddressAliasTransaction), True)
-                    self.assertEqual(tx.action_type, action_type)
-                    self.assertEqual(tx.address, account.address)
+                    self.assertEqual(isinstance(tx, models.SecretLockTransaction), True)
+                    self.assertEqual(tx.recipient, account2.address)
+                    self.assertEqual(tx.secret, secret)
+                    break
+       
+        async def announce_proof():
+            proof_tx = models.SecretProofTransaction.create(
+                deadline=models.Deadline.create(),
+                network_type=models.NetworkType.MIJIN_TEST,
+                hash_type=models.HashType.SHA3_256,
+                secret=secret,
+                proof=proof,
+                recipient=account2.address,
+            )
+            
+            signed_proof_tx = proof_tx.sign_with(account, gen_hash)
+            
+            with client.TransactionHTTP(responses.ENDPOINT) as http:
+                http.announce(signed_proof_tx)
+
+        async def listen_proof():
+            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+                await listener.confirmed(account.address)
+
+                async for m in listener:
+                    #TODO: Check for more transactions. It could not always be the first one.
+                    #TODO: Implement timeout.
+                    tx = m.message
+                    self.assertEqual(isinstance(tx, models.SecretProofTransaction), True)
+                    self.assertEqual(tx.recipient, account2.address)
+                    self.assertEqual(tx.secret, secret)
                     break
 
-        for action in [models.AliasActionType.LINK, models.AliasActionType.UNLINK]:
-            await asyncio.gather(listen(action), announce(action))
+        await asyncio.gather(listen_lock(), announce_lock())
+        await asyncio.gather(listen_proof(), announce_proof())

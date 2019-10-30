@@ -29,6 +29,7 @@ from .deadline import Deadline
 from .hash_type import HashType
 from .inner_transaction import InnerTransaction
 from .registry import register_transaction
+from .recipient import Recipient, RecipientType
 from .transaction import Transaction
 from .transaction_info import TransactionInfo
 from .transaction_type import TransactionType
@@ -64,6 +65,7 @@ class SecretProofTransaction(Transaction):
 
     hash_type: HashType
     secret: str
+    recipient: RecipientType
     proof: str
 
     def __init__(
@@ -74,6 +76,7 @@ class SecretProofTransaction(Transaction):
         max_fee: int,
         hash_type: HashType,
         secret: typing.AnyStr,
+        recipient: RecipientType,
         proof: typing.AnyStr,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
@@ -95,6 +98,7 @@ class SecretProofTransaction(Transaction):
         )
         self._set('hash_type', hash_type)
         self._set('secret', secret)
+        self._set('recipient', recipient)
         self._set('proof', proof)
 
     @classmethod
@@ -103,6 +107,7 @@ class SecretProofTransaction(Transaction):
         deadline: Deadline,
         hash_type: HashType,
         secret: typing.AnyStr,
+        recipient: RecipientType,
         proof: typing.AnyStr,
         network_type: NetworkType,
         max_fee: int = 0,
@@ -124,6 +129,7 @@ class SecretProofTransaction(Transaction):
             max_fee,
             hash_type,
             secret,
+            recipient,
             proof
         )
 
@@ -135,8 +141,9 @@ class SecretProofTransaction(Transaction):
         # The hash is just 0-padded to 32 bytes.
         extra_size = util.U8_BYTES + util.U16_BYTES
         secret_size = 32
+        recipient_size = 25
         proof_size = len(self.proof) // 2
-        return extra_size + secret_size + proof_size
+        return extra_size + secret_size + recipient_size + proof_size
 
     def to_catbuffer_specific(
         self,
@@ -152,8 +159,9 @@ class SecretProofTransaction(Transaction):
         hash_type = self.hash_type.to_catbuffer(network_type)
         secret = util.unhexlify(self.secret)
         secret = secret + b'\x00' * (32 - len(secret))
+        recipient = Recipient.to_catbuffer(self.recipient, network_type)
         proof = util.u16_to_catbuffer(proof_size) + util.unhexlify(self.proof)
-        return hash_type + secret + proof
+        return hash_type + secret + recipient + proof
 
     def load_catbuffer_specific(
         self,
@@ -170,11 +178,13 @@ class SecretProofTransaction(Transaction):
         hash_length = hash_type.hash_length() // 2
         secret = util.hexlify(data[:hash_length])
         data = data[32:]
+        recipient, data = Recipient.create_from_catbuffer_pair(data, network_type)
         proof_size = util.u16_from_catbuffer(data[:2])
         proof = util.hexlify(data[2: proof_size + 2])
 
         self._set('hash_type', hash_type)
         self._set('secret', secret)
+        self._set('recipient', recipient)
         self._set('proof', proof)
 
         return data[proof_size + 2:]
@@ -183,7 +193,7 @@ class SecretProofTransaction(Transaction):
 
     @classmethod
     def validate_dto_specific(cls, data: dict) -> bool:
-        required_keys = {'hashAlgorithm', 'secret', 'proof'}
+        required_keys = {'hashAlgorithm', 'secret', 'recipient', 'proof'}
         return cls.validate_dto_required(data, required_keys)
 
     def to_dto_specific(
@@ -193,6 +203,7 @@ class SecretProofTransaction(Transaction):
         return {
             'hashAlgorithm': self.hash_type.to_dto(network_type),
             'secret': self.secret,
+            'recipient': Recipient.to_dto(self.recipient, network_type),
             'proof': self.proof,
         }
 
@@ -202,10 +213,12 @@ class SecretProofTransaction(Transaction):
         network_type: NetworkType,
     ) -> None:
         hash_type = HashType.create_from_dto(data['hashAlgorithm'], network_type)
+        recipient = Recipient.create_from_dto(data['recipient'], network_type)
+
         self._set('hash_type', hash_type)
         self._set('secret', data['secret'])
         self._set('proof', data['proof'])
-
+        self._set('recipient', recipient)
 
 @register_transaction('SECRET_PROOF')
 class SecretProofInnerTransaction(InnerTransaction, SecretProofTransaction):
