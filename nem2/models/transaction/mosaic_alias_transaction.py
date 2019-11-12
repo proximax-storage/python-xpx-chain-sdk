@@ -170,10 +170,9 @@ class MosaicAliasTransaction(Transaction):
 
     @classmethod
     def validate_dto_specific(cls, data: dict) -> bool:
-        required_keys = {'actionType', 'namespaceId', 'mosaicId'}
+        required_keys = {'aliasAction', 'namespaceId', 'mosaicId'}
         return (
             cls.validate_dto_required(data, required_keys)
-            and cls.validate_dto_all(data, required_keys)
         )
 
     def to_dto_specific(
@@ -181,7 +180,7 @@ class MosaicAliasTransaction(Transaction):
         network_type: NetworkType,
     ) -> dict:
         return {
-            'actionType': self.action_type.to_dto(network_type),
+            'aliasAction': self.action_type.to_dto(network_type),
             'namespaceId': util.u64_to_dto(int(self.namespace_id)),
             'mosaicId': util.u64_to_dto(int(self.mosaic_id)),
         }
@@ -191,7 +190,7 @@ class MosaicAliasTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        action_type = AliasActionType.create_from_dto(data['actionType'], network_type)
+        action_type = AliasActionType.create_from_dto(data['aliasAction'], network_type)
         namespace_id = NamespaceId(util.u64_from_dto(data['namespaceId']))
         mosaic_id = MosaicId(util.u64_from_dto(data['mosaicId']))
 
