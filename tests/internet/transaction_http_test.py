@@ -413,35 +413,159 @@ class TestTransactionHttp(harness.TestCase):
 #
 #        await asyncio.gather(listen(), announce())
     
-    async def test_secret_lock_transaction(self):
+#    async def test_secret_lock_transaction(self):
+#        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
+#
+#        account = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+#        account2 = models.Account.create_from_private_key('2C8178EF9ED7A6D30ABDC1E4D30D68B05861112A98B1629FBE2C8D16FDE97A1C', models.NetworkType.MIJIN_TEST)
+#        mosaic_id = models.MosaicId.create_from_hex('0dc67fbe1cad29e3')
+#
+#        random_bytes = os.urandom(20)
+#        h = hashlib.sha3_256(random_bytes)
+#        secret = binascii.hexlify(h.digest()).decode('utf-8').upper()
+#        proof = binascii.hexlify(random_bytes).decode('utf-8').upper()
+#
+#        async def announce_lock():
+#            lock_tx = models.SecretLockTransaction.create(
+#                deadline=models.Deadline.create(),
+#                network_type=models.NetworkType.MIJIN_TEST,
+#                mosaic=models.Mosaic(mosaic_id, 1000),
+#                duration=60,
+#                hash_type=models.HashType.SHA3_256,
+#                secret=secret,
+#                recipient=account2.address,
+#            )
+#            
+#            signed_lock_tx = lock_tx.sign_with(account, gen_hash)
+#            
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(signed_lock_tx)
+#
+#        async def listen_lock():
+#            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+#                await listener.confirmed(account.address)
+#
+#                async for m in listener:
+#                    #TODO: Check for more transactions. It could not always be the first one.
+#                    #TODO: Implement timeout.
+#                    tx = m.message
+#                    self.assertEqual(isinstance(tx, models.SecretLockTransaction), True)
+#                    self.assertEqual(tx.recipient, account2.address)
+#                    self.assertEqual(tx.secret, secret)
+#                    break
+#       
+#        async def announce_proof():
+#            proof_tx = models.SecretProofTransaction.create(
+#                deadline=models.Deadline.create(),
+#                network_type=models.NetworkType.MIJIN_TEST,
+#                hash_type=models.HashType.SHA3_256,
+#                secret=secret,
+#                proof=proof,
+#                recipient=account2.address,
+#            )
+#            
+#            signed_proof_tx = proof_tx.sign_with(account, gen_hash)
+#            
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(signed_proof_tx)
+#
+#        async def listen_proof():
+#            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+#                await listener.confirmed(account.address)
+#
+#                async for m in listener:
+#                    #TODO: Check for more transactions. It could not always be the first one.
+#                    #TODO: Implement timeout.
+#                    tx = m.message
+#                    self.assertEqual(isinstance(tx, models.SecretProofTransaction), True)
+#                    self.assertEqual(tx.recipient, account2.address)
+#                    self.assertEqual(tx.secret, secret)
+#                    break
+#
+#        await asyncio.gather(listen_lock(), announce_lock())
+#        await asyncio.gather(listen_proof(), announce_proof())
+    
+#    async def test_hash_lock_transaction(self):
+#        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
+#
+#        alice = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+#        bob = models.Account.create_from_private_key('2C8178EF9ED7A6D30ABDC1E4D30D68B05861112A98B1629FBE2C8D16FDE97A1C', models.NetworkType.MIJIN_TEST)
+#        mike = models.Account.create_from_private_key('A97B139EB641BCC841A610231870925EB301BA680D07BBCF9AEE83FAA5E9FB43', models.NetworkType.MIJIN_TEST)
+#        mosaic_id = models.MosaicId.create_from_hex('0dc67fbe1cad29e3')
+#        amount = 1000
+#
+#        alice_to_bob = models.TransferTransaction.create(
+#            deadline=models.Deadline.create(),
+#            recipient=bob.address,
+#            mosaics=[models.Mosaic(mosaic_id, amount)],
+#            network_type=models.NetworkType.MIJIN_TEST,
+#            max_fee=1
+#        )
+#
+#        signature = alice.sign(alice_to_bob.to_catbuffer(), gen_hash)[4:68]
+#
+#        bob_to_alice = models.TransferTransaction.create(
+#            deadline=models.Deadline.create(),
+#            recipient=alice.address,
+#            mosaics=[models.Mosaic(mosaic_id, amount)],
+#            network_type=models.NetworkType.MIJIN_TEST,
+#            max_fee=1
+#        )
+#    
+#        escrow = models.AggregateTransaction.create_complete(
+#            deadline=models.Deadline.create(),
+#            inner_transactions=[alice_to_bob.to_aggregate(alice), bob_to_alice.to_aggregate(alice)],
+#            cosignatures=[
+#                models.AggregateTransactionCosignature(alice.sign(alice_to_bob.to_catbuffer(), gen_hash)[4:68], alice),
+#                models.AggregateTransactionCosignature(bob.sign(bob_to_alice.to_catbuffer(), gen_hash)[4:68], bob)
+#            ],
+#            network_type=models.NetworkType.MIJIN_TEST,
+#        )
+#
+#        #TODO: Signing not implemented
+#        escrow_signed = escrow.sign_with(alice, gen_hash)
+#
+#        async def announce_lock():
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(escrow_signed)
+#
+#        async def listen_lock():
+#            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+#                await listener.confirmed(account.address)
+#
+#                async for m in listener:
+#                    #TODO: Check for more transactions. It could not always be the first one.
+#                    #TODO: Implement timeout.
+#                    tx = m.message
+#                    self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
+#                    break
+#       
+#        await asyncio.gather(listen_lock(), announce_lock())
+
+    async def test_mosaic_definition_transaction(self):
         gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
 
         account = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
-        account2 = models.Account.create_from_private_key('2C8178EF9ED7A6D30ABDC1E4D30D68B05861112A98B1629FBE2C8D16FDE97A1C', models.NetworkType.MIJIN_TEST)
-        mosaic_id = models.MosaicId.create_from_hex('0dc67fbe1cad29e3')
+        self.assertEqual(account.address.address, 'SBGS2IGUED476REYI5ZZGISVSEHAF6YIQZV6YJFQ')
 
-        random_bytes = os.urandom(20)
-        h = hashlib.sha3_256(random_bytes)
-        secret = binascii.hexlify(h.digest()).decode('utf-8').upper()
-        proof = binascii.hexlify(random_bytes).decode('utf-8').upper()
+        nonce = models.MosaicNonce(5)
 
-        async def announce_lock():
-            lock_tx = models.SecretLockTransaction.create(
-                deadline=models.Deadline.create(),
-                network_type=models.NetworkType.MIJIN_TEST,
-                mosaic=models.Mosaic(mosaic_id, 1000),
-                duration=60,
-                hash_type=models.HashType.SHA3_256,
-                secret=secret,
-                recipient=account2.address,
-            )
-            
-            signed_lock_tx = lock_tx.sign_with(account, gen_hash)
-            
+        tx = models.MosaicDefinitionTransaction.create(
+            deadline=models.Deadline.create(),
+            network_type=models.NetworkType.MIJIN_TEST,
+            max_fee=1,
+            nonce=nonce,
+            mosaic_id=models.MosaicId.create_from_nonce(nonce, account),
+            mosaic_properties=models.MosaicProperties(0x3, 3),
+        )
+
+        signed_tx = tx.sign_with(account, gen_hash)
+
+        async def announce():
             with client.TransactionHTTP(responses.ENDPOINT) as http:
-                http.announce(signed_lock_tx)
+                http.announce(signed_tx)
 
-        async def listen_lock():
+        async def listen():
             async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
                 await listener.confirmed(account.address)
 
@@ -449,38 +573,46 @@ class TestTransactionHttp(harness.TestCase):
                     #TODO: Check for more transactions. It could not always be the first one.
                     #TODO: Implement timeout.
                     tx = m.message
-                    self.assertEqual(isinstance(tx, models.SecretLockTransaction), True)
-                    self.assertEqual(tx.recipient, account2.address)
-                    self.assertEqual(tx.secret, secret)
-                    break
-       
-        async def announce_proof():
-            proof_tx = models.SecretProofTransaction.create(
-                deadline=models.Deadline.create(),
-                network_type=models.NetworkType.MIJIN_TEST,
-                hash_type=models.HashType.SHA3_256,
-                secret=secret,
-                proof=proof,
-                recipient=account2.address,
-            )
-            
-            signed_proof_tx = proof_tx.sign_with(account, gen_hash)
-            
-            with client.TransactionHTTP(responses.ENDPOINT) as http:
-                http.announce(signed_proof_tx)
-
-        async def listen_proof():
-            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
-                await listener.confirmed(account.address)
-
-                async for m in listener:
-                    #TODO: Check for more transactions. It could not always be the first one.
-                    #TODO: Implement timeout.
-                    tx = m.message
-                    self.assertEqual(isinstance(tx, models.SecretProofTransaction), True)
-                    self.assertEqual(tx.recipient, account2.address)
-                    self.assertEqual(tx.secret, secret)
+                    self.assertEqual(isinstance(tx, models.MosaicDefinitionTransaction), True)
                     break
 
-        await asyncio.gather(listen_lock(), announce_lock())
-        await asyncio.gather(listen_proof(), announce_proof())
+        await asyncio.gather(listen(), announce())
+
+#    async def test_mosaic_alias_transaction(self):
+#        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
+#
+#        nemesis = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+#        self.assertEqual(nemesis.address.address, 'SBGS2IGUED476REYI5ZZGISVSEHAF6YIQZV6YJFQ')
+#
+#        tx = models.MosaicAliasTransaction.create(
+#            deadline=models.Deadline.create(),
+#            network_type=models.NetworkType.MIJIN_TEST,
+#            max_fee=1,
+#            action_type: models.AliasActionType.LINK,
+#            namespace_id: models.NamespaceId(0xb8ffeb12bcf3840f),
+#            mosaic_id: MosaicId,
+#        )
+#
+#        signed_tx = tx.sign_with(nemesis, gen_hash)
+#
+#        async def announce():
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(signed_tx)
+#
+#        async def listen():
+#            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+#                await listener.confirmed(nemesis.address)
+#
+#                async for m in listener:
+#                    #TODO: Check for more transactions. It could not always be the first one.
+#                    #TODO: Implement timeout.
+#                    tx = m.message
+#                    self.assertEqual(isinstance(tx, models.TransferTransaction), True)
+#                    self.assertEqual(tx.recipient, recipient)
+#                    self.assertEqual(len(tx.mosaics), 1)
+#                    self.assertEqual(tx.mosaics[0].id, mosaic_id)
+#                    self.assertEqual(tx.mosaics[0].amount, amount)
+#                    self.assertEqual(tx.address, account.address)
+#                    break
+#
+#        await asyncio.gather(listen(), announce())

@@ -105,6 +105,7 @@ from .transaction.account_property_modification import *
 from .transaction.address_alias_transaction import *
 from .transaction.aggregate_transaction_cosignature import *
 from .transaction.aggregate_transaction_info import *
+from .transaction.aggregate_transaction import *
 from .transaction.alias_transaction import *
 from .transaction.cosignature_signed_transaction import *
 from .transaction.cosignature_transaction import *

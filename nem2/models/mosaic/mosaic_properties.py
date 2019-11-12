@@ -178,7 +178,7 @@ class MosaicProperties(util.DTO):
         duration = 0
         
         for prop in data[0 : 3]:
-            prop_id = util.u8_from_dto(prop["id"])
+            prop_id = util.u8_from_dto(prop["key"])
 
             if (prop_id == 0):
                 flags = util.u64_from_dto(prop["value"])
@@ -233,7 +233,7 @@ class MosaicDefinitionProperties(util.Model):
     def validate_dto(cls, data: DTO2Type) -> bool:
         """Validate the data-transfer object."""
 
-        required_keys = {'id', 'value'}
+        required_keys = {'key', 'value'}
         return (
             len(data) >= 2
             and all((
@@ -249,12 +249,12 @@ class MosaicDefinitionProperties(util.Model):
         # A newer version of DTO, which is used in MosaicDefinitionTransactions.
         # We need to keep the two versions separate.
         data = [
-            {'id': FLAGS_ID, 'value': util.u64_to_dto(self.model.flags)},
-            {'id': DIVISIBILITY_ID, 'value': util.u64_to_dto(self.model.divisibility)},
+            {'key': FLAGS_ID, 'value': util.u64_to_dto(self.model.flags)},
+            {'key': DIVISIBILITY_ID, 'value': util.u64_to_dto(self.model.divisibility)},
         ]
         if self.model.duration != 0:
             data.append({
-                'id': DURATION_ID,
+                'key': DURATION_ID,
                 'value': util.u64_to_dto(self.model.duration)
             })
 
@@ -273,7 +273,7 @@ class MosaicDefinitionProperties(util.Model):
         # We need to keep the two versions separate.
         kwds = {}
         for item in data:
-            kwds[PROPERTIES[item['id']]] = util.u64_from_dto(item['value'])
+            kwds[PROPERTIES[item['key']]] = util.u64_from_dto(item['value'])
         return cls(MosaicProperties(**kwds))
 
     def to_catbuffer(
