@@ -734,6 +734,43 @@ def process_get_merkle_by_hash_in_block(
 get_merkle_by_hash_in_block = request("get_merkle_by_hash_in_block")
 
 
+def request_get_block_receipts(
+    client: client.Client,
+    height: int,
+    **kwds
+):
+    """
+    Make "/block/{height}/receipts" request.
+
+    :param client: Wrapper for client.
+    :param height: Height of block.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    url = f"/block/{height}/receipts"
+    return client.get(url, **kwds)
+
+
+def process_get_block_receipts(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.Transaction]:
+    """
+    Process the "/block/{height}/receipts" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type..
+    """
+
+    assert status == 200
+    return models.Statements.create_from_dto(json, network_type)
+
+
+get_block_receipts = request("get_block_receipts")
+
+
 def request_get_blockchain_height(client: client.Client, **kwds):
     """
     Make "/chain/height" request.
@@ -1867,6 +1904,10 @@ CLIENT_CB = {
     'get_merkle_by_hash_in_block': (
         request_get_merkle_by_hash_in_block,
         process_get_merkle_by_hash_in_block,
+    ),
+    'get_block_receipts': (
+        request_get_block_receipts,
+        process_get_block_receipts,
     ),
     'get_blockchain_height': (
         request_get_blockchain_height,

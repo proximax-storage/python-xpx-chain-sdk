@@ -54,6 +54,17 @@ from .blockchain.merkle_proof_info import *
 from .blockchain.network_type import *
 from .blockchain import *
 
+# Receipt
+from .receipt.balance_change_receipt import *
+from .receipt.receipt_base import *
+from .receipt.receipt import *
+from .receipt.receipt_type import *
+from .receipt.receipt_version import *
+from .receipt.source import *
+from .receipt.statements import *
+from .receipt.transaction_statement import *
+from .receipt import *
+
 # Config
 from .config.catapult_config import *
 
@@ -168,6 +179,15 @@ __all__ = (
     + merkle_path_item.__all__
     + merkle_proof_info.__all__
     + network_type.__all__
+
+    # Receipt
+    + balance_change_receipt.__all__
+    + receipt.__all__
+    + receipt_type.__all__
+    + receipt_version.__all__
+    + source.__all__
+    + statements.__all__
+    + transaction_statement.__all__
 
     # Mosaic
     + mosaic.__all__

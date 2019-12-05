@@ -492,17 +492,18 @@ class BlockchainHTTP(HTTPSharedBase):
     #           "message": "Cannot read property 'queryDocument' of undefined"
     #       }
     #
-    #   getBlockReceipts produces a 500 internal server error.
-    #       Response 500.
-    #       > GET {{url}}/block/{{height}}/receipts
-    #       {
-    #           "code": "Internal",
-    #           "message": "db.chainInfo is not a function"
-    #       }
-    #
     #   getBlockReceiptsByTransactionMerkle produces a 500 internal server error.
     #       Response 500.
     #       > GET {url}}/block/{{height}}/receipt/{{transactionId}}/merkle
+
+    def get_block_receipts(self, height: int, **kwds):
+        """
+        Get receipts for a block by height.
+
+        :param height: Block height.
+        :return: Sequence of information models describing transactions.
+        """
+        return self(nis.get_block_receipts, height, **kwds)
 
     def get_blockchain_height(self, **kwds):
         """
