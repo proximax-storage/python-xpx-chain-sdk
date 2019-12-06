@@ -52,8 +52,13 @@ from tests import config
             'params': [42545],
             'method': 'get_block_receipts',
             'validation': [
-                lambda x: (len(x), 1),
                 lambda x: (isinstance(x, models.Statements), True),
+                lambda x: (len(x.transaction_statements), 1),
+                lambda x: (isinstance(x.transaction_statements[0], models.TransactionStatement), True),
+                lambda x: (x.transaction_statements[0].height, 42545),
+                lambda x: (len(x.transaction_statements[0].receipts), 1),
+                lambda x: (isinstance(x.transaction_statements[0].receipts[0], models.BalanceChangeReceipt), True),
+                lambda x: (x.transaction_statements[0].receipts[0].account, "346E56F77F07B19D48B3AEF969EDB01F68A5AC9FAF8E5E007577D71BA66385FB")
             ]
         },
     ],

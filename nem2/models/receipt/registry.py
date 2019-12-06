@@ -1,8 +1,10 @@
 """
-    receipt_version
-    ===================
+    registry
+    ========
 
-    Enumerations for transaction versions.
+    Class decorators to simplify defining and registering transactions.
+    These allow us to register classes via `TYPE_MAP` with a class
+    decorator, simplifying the generation of new transactions.
 
     License
     -------
@@ -22,28 +24,17 @@
     limitations under the License.
 """
 
-from __future__ import annotations
-import enum
-
-from ... import util
-
-__all__ = ['ReceiptVersion']
+from .receipt_type import ReceiptType
+from .receipt_version import ReceiptVersion
 
 
-@util.inherit_doc
-class ReceiptVersion(util.U8Mixin, enum.IntEnum):
-    """Receipt version."""
+def register_receipt(name: str):
+    """Register receipt by type."""
 
-    #TODO: Set the right values
-    BALANCE_CHANGE = 1
-    BALANCE_TRANSFER = 0
-    ARTIFACT_EXPIRY = 0
-    INFLATION = 0
+    type = getattr(ReceiptVersion, name)
 
-    def description(self) -> str:
-        return DESCRIPTION[self]
+    def decorator(cls):
+        cls.TYPE_MAP[type] = cls
+        return cls
 
-
-DESCRIPTION = {
-    ReceiptVersion(1): "Receipt version 1.",
-}
+    return decorator

@@ -1,8 +1,8 @@
 """
-    source
+    resolution_entry
     ================
 
-    Component of a merkle path.
+    Resolution entry
 
     License
     -------
@@ -25,36 +25,37 @@
 from __future__ import annotations
 
 from ..blockchain.network_type import OptionalNetworkType
+from .source import Source
 from ... import util
 
-__all__ = ['Source']
+__all__ = ['ResolutionEntry']
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class Source(util.DTO):
+class ResolutionEntry(util.DTO):
     """
     Merkle path item information.
 
-    :param primary_id: The transaction index within the block.
-    :param secondary_id: The transaction index inside within the aggregate transaction.
+    :param source:
+    :param resolved:.
 
     DTO Format:
         .. code-block:: yaml
 
             MerklePathItemDTO:
-                primaryId: integer
-                secondaryId: integer
+                source: SourceDTO
+                resolved: Uint64DTO
     """
 
-    primary_id: int
-    secondary_id: int
+    source: int
+    resolved: int
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-        required_keys = {'primaryId', 'secondaryId'}
+        required_keys = {'source', 'resolved'}
         return (
             cls.validate_dto_required(data, required_keys)
             and cls.validate_dto_all(data, required_keys)
@@ -65,8 +66,8 @@ class Source(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            'primaryId': self.position,
-            'secondaryId': self.hash,
+            'source': self.source.to_dto(),
+            'resolved': util.u64_to_dto(self.resolved),
         }
 
     @classmethod
@@ -79,6 +80,6 @@ class Source(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls(
-            primary_id=data['primaryId'],
-            secondary_id=data['secondaryId'],
+            source=Source.create_from_dto(data['source']),
+            resolved=util.u64_from_dto(data['resolved']),
         )

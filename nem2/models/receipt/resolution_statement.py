@@ -1,8 +1,8 @@
 """
-    source
-    ================
+    resolution_statement
+    ====================
 
-    Component of a merkle path.
+    Resolution statement.
 
     License
     -------
@@ -23,38 +23,37 @@
 """
 
 from __future__ import annotations
+import typing
 
-from ..blockchain.network_type import OptionalNetworkType
+from ..blockchain.network_type import OptionalNetworkType, NetworkType
+from .resolution_entry import ResolutionEntry
 from ... import util
 
-__all__ = ['Source']
+__all__ = [
+    'ResolutionStatement',
+]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class Source(util.DTO):
+class ResolutionStatement(util.DTO):
     """
-    Merkle path item information.
+    A resolution statement keeps the relation between a namespace alias used in a transaction and the real address or mosaicId.
 
-    :param primary_id: The transaction index within the block.
-    :param secondary_id: The transaction index inside within the aggregate transaction.
-
-    DTO Format:
-        .. code-block:: yaml
-
-            MerklePathItemDTO:
-                primaryId: integer
-                secondaryId: integer
+    :param height: 
+    :param unresolved: 
+    :param resolutionEntries: The array of resolution entries linked to the unresolved namespaceId.
     """
 
-    primary_id: int
-    secondary_id: int
+    height: int
+    unresolved: int
+    resolution_entries: typing.Sequence[ResolutionEntry]
+
+    # DTO
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
-        """Validate the data-transfer object."""
-
-        required_keys = {'primaryId', 'secondaryId'}
+        required_keys = {'height', 'unresolved', 'resolutionEntries'}
         return (
             cls.validate_dto_required(data, required_keys)
             and cls.validate_dto_all(data, required_keys)
@@ -65,13 +64,14 @@ class Source(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            'primaryId': self.position,
-            'secondaryId': self.hash,
+            'height': util.u64_to_dto(self.height),
+            'unresolved': util.u64_to_dto(self.unresolved),
+            'resolutionEntries': [ResolutionEntry.to_dto(i) for i in self.resolution_entries]
         }
 
     @classmethod
     def create_from_dto(
-        cls,
+        self,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):
@@ -79,6 +79,8 @@ class Source(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls(
-            primary_id=data['primaryId'],
-            secondary_id=data['secondaryId'],
+            height = util.u64_from_dto(data['mosaicId']),
+            unresolved = util.u64_from_dto(data['unresolved']),
+            resolution_entries = [ResolutionEntry.create_from_dto(i) for i in data['resolutionEntries']]
         )
+            

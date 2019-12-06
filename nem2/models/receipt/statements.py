@@ -27,6 +27,7 @@ import typing
 
 from ..blockchain.network_type import OptionalNetworkType
 from .transaction_statement import TransactionStatement
+from .resolution_statement import ResolutionStatement
 from ... import util
 
 import logging
@@ -53,8 +54,8 @@ class Statements(util.DTO):
     """
 
     transaction_statements: typing.Sequence[TransactionStatement]
-    #address_resolution_statements: typing.Sequence[ResolutionStatement]
-    #mosaic_resolution_statements: typing.Sequence[ResolutionStatement]
+    address_resolution_statements: typing.Sequence[ResolutionStatement]
+    mosaic_resolution_statements: typing.Sequence[ResolutionStatement]
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
@@ -74,8 +75,8 @@ class Statements(util.DTO):
     ) -> dict:
         return {
             'transactionStatements': [i.to_dto(network_type) for i in self.transaction_statements],
-            #'addressResolutionStatements': [i.to_dto(network_type) for i in self.address_resultion_statements],
-            #'mosaicResolutionStatements': [i.to_dto(network_type) for i in self.mosaic_resolution_statements],
+            'addressResolutionStatements': [i.to_dto(network_type) for i in self.address_resultion_statements],
+            'mosaicResolutionStatements': [i.to_dto(network_type) for i in self.mosaic_resolution_statements],
         }
 
     @classmethod
@@ -88,7 +89,7 @@ class Statements(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls(
-            transaction_statements=[TransactionStatement.create_from_dto(i, network_type) for i in data['transactionStatements']]
-            #address_resolution_statements=[ResolutionStatement.create_from_dto(i, network_type) for i in data['addressResolutionStatements']]
-            #mosaic_resolution_statements=[ResolutionStatement.create_from_dto(i, network_type) for i in data['mosaicResolutionStatements']]
+            transaction_statements=[TransactionStatement.create_from_dto(i, network_type) for i in data['transactionStatements']],
+            address_resolution_statements=[ResolutionStatement.create_from_dto(i, network_type) for i in data['addressResolutionStatements']],
+            mosaic_resolution_statements=[ResolutionStatement.create_from_dto(i, network_type) for i in data['mosaicResolutionStatements']]
         )

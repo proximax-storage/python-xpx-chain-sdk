@@ -1,5 +1,5 @@
 """
-    balance_change_receipt
+    inflation_receipt
     ====================
 
     Transfer transaction.
@@ -33,26 +33,23 @@ from .registry import register_receipt
 from ... import util
 
 __all__ = [
-    'BalanceChangeReceipt',
+    'InflationReceipt',
 ]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-@register_receipt('BALANCE_CHANGE')
-class BalanceChangeReceipt(Receipt):
+@register_receipt('INFLATION')
+class InflationReceipt(Receipt):
     """
-    Balance Change Receipt.
+    Native currency mosaics were created due to inflation..
 
     :param network_type: Network type.
     :param version: The version of the receipt.    
-    :param account: The target account public key.
     :param mosaicId: Mosaic.
     :param amount: Amount to change.
     """
 
-    #account: PublicAccount
-    account: str
     mosaic_id: int
     amount: int
 
@@ -60,7 +57,6 @@ class BalanceChangeReceipt(Receipt):
         self,
         #network_type: NetworkType,
         version: ReceiptVersion,
-        account: str,
         mosaic_id: int,
         amount: int
     ) -> None:
@@ -68,11 +64,9 @@ class BalanceChangeReceipt(Receipt):
             ReceiptVersion.BALANCE_CHANGE,
             #network_type,
             version,
-            account,
             mosaic_id,
             amount
         )
-        self._set('account', account)
         self._set('mosaic_id', mosaic_id)
         self._set('amount', amount)
 
@@ -80,7 +74,7 @@ class BalanceChangeReceipt(Receipt):
 
     @classmethod
     def validate_dto_specific(cls, data: dict) -> bool:
-        required_keys = {'account', 'mosaicId', 'amount'}
+        required_keys = {'mosaicId', 'amount'}
         return cls.validate_dto_required(data, required_keys)
 
     def to_dto_specific(
@@ -88,8 +82,6 @@ class BalanceChangeReceipt(Receipt):
         #network_type: NetworkType,
     ) -> dict:
         return {
-            #'account': self.account.public_key,
-            'account': self.account,
             'mosaic': util.u64_to_dto(self.mosaic_id),
             'amount': util.u64_to_dto(self.amount),
         }
@@ -99,12 +91,9 @@ class BalanceChangeReceipt(Receipt):
         data: dict,
         #network_type: NetworkType,
     ) -> None:
-        #account = PublicAccount.create_from_public_key(data['account'], network_type)
-        account = data['account']
         mosaic_id = util.u64_from_dto(data['mosaicId'])
         amount = util.u64_from_dto(data['amount'])
 
-        self._set('account', account)
         self._set('mosaic_id', mosaic_id)
         self._set('amount', amount)
 

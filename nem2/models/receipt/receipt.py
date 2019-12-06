@@ -48,7 +48,7 @@ class Receipt(ReceiptBase):
     DTO: typing.ClassVar[DTOFormat] = DTOFormat(
         names={
             'version': 'version',
-            'network_type': 'version',
+            #'network_type': 'version',
             'type': 'type',
         },
     )
@@ -65,11 +65,12 @@ class Receipt(ReceiptBase):
 
     def to_dto_shared(
         self,
-        network_type: NetworkType,
+        #network_type: NetworkType
     ) -> dict:
         # Shared data and callbacks.
         data: dict = {}
-        cb = lambda k, v: self.DTO.save(k, data, v, network_type)
+        cb = lambda k, v: self.DTO.save(k, data, v)
+        #cb = lambda k, v: self.DTO.save(k, data, v, network_type)
         cb_get = lambda k: cb(k, getattr(self, k))
 
         # Save shared data.
@@ -83,13 +84,14 @@ class Receipt(ReceiptBase):
     def load_dto_shared(
         self,
         data: dict,
-        network_type: NetworkType,
+        #network_type: NetworkType,
     ) -> None:
         # Shared data and callbacks.
-        cb = lambda k: self.DTO.load(k, data, network_type)
+        cb = lambda k: self.DTO.load(k, data)
+        #cb = lambda k: self.DTO.load(k, data, network_type)
         cb_set = lambda k: self._set(k, cb(k))
 
         # Load shared data.
         cb_set('version')
-        self._set('network_type', network_type)
+        #self._set('network_type', network_type)
         cb_set('type')

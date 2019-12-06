@@ -56,6 +56,9 @@ from .blockchain import *
 
 # Receipt
 from .receipt.balance_change_receipt import *
+from .receipt.balance_transfer_receipt import *
+from .receipt.artifact_expiry_receipt import *
+from .receipt.inflation_receipt import *
 from .receipt.receipt_base import *
 from .receipt.receipt import *
 from .receipt.receipt_type import *
@@ -63,6 +66,8 @@ from .receipt.receipt_version import *
 from .receipt.source import *
 from .receipt.statements import *
 from .receipt.transaction_statement import *
+from .receipt.resolution_statement import *
+from .receipt.resolution_entry import *
 from .receipt import *
 
 # Config
@@ -182,12 +187,17 @@ __all__ = (
 
     # Receipt
     + balance_change_receipt.__all__
+    + balance_transfer_receipt.__all__
+    + artifact_expiry_receipt.__all__
+    + inflation_receipt.__all__
     + receipt.__all__
     + receipt_type.__all__
     + receipt_version.__all__
     + source.__all__
     + statements.__all__
     + transaction_statement.__all__
+    + resolution_statement.__all__
+    + resolution_entry.__all__
 
     # Mosaic
     + mosaic.__all__

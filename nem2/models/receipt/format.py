@@ -37,25 +37,29 @@ logger = logging.getLogger(__name__)
 class FormatBase(util.Object):
     """Utilities to simplify loading and saving to interchange formats."""
 
-    def save(self, key, data, value, network_type) -> None:
+    def save(self, key, data, value) -> None:
+    #def save(self, key, data, value, network_type) -> None:
         """Save value to interchange format by key."""
         raise util.AbstractMethodError
 
-    def load(self, key, data, network_type):
+    def load(self, key, data):
+    #def load(self, key, data, network_type):
         """Load value from interchange format by key."""
         raise util.AbstractMethodError
 
     def load_size(self, data):
         """Load transaction size."""
-        return self.load('size', data, None)
+        return self.load('size', data)
+        #return self.load('size', data, None)
 
     def load_type(self, data):
         """Load transaction type."""
-        return self.load('type', data, None)
+        #return self.load('version', data, None)
+        return self.load('version', data)
 
-    def load_network_type(self, data):
-        """Load network type."""
-        return self.load('network_type', data, None)
+    #def load_network_type(self, data):
+    #    """Load network type."""
+    #    return self.load('network_type', data, None)
 
     def find_receipt(self, type_map, data):
         """Find derived receipt class via the receipt type."""
@@ -70,22 +74,28 @@ class DTOFormat(FormatBase):
 
     names: typing.Dict[str, str]
 
-    def save(self, key, data, value, network_type) -> None:
+    def save(self, key, data, value) -> None:
+    #def save(self, key, data, value, network_type) -> None:
         name = self.names[key]
         cb = SAVE_DTO[key]
         if value is not None:
-            data[name] = cb(value, network_type)
+            data[name] = cb(value)
+            #data[name] = cb(value, network_type)
 
-    def load(self, key, data, network_type):
+    def load(self, key, data):
+    #def load(self, key, data, network_type):
         name = self.names[key]
         cb = LOAD_DTO[key]
         value = data.get(name)
         if value is not None:
-            return cb(value, network_type)
+            return cb(value)
+            #return cb(value, network_type)
 
 
-def save_version_dto(version, network_type):
-    return version | (int(network_type) << 8)
+#def save_version_dto(version, network_type):
+#    return version | (int(network_type) << 8)
+def save_version_dto(version):
+    return version
 
 
 SAVE_DTO = {
@@ -94,16 +104,18 @@ SAVE_DTO = {
 }
 
 
-def load_version_dto(data, network_type):
-    return data & 0xFF
+#def load_version_dto(data, network_type):
+#    return data & 0xFF
+def load_version_dto(data):
+    return data
 
 
-def load_network_type_dto(data, network_type):
-    return NetworkType((data >> 24) & 0x000000ff)
+#def load_network_type_dto(data, network_type):
+#    return NetworkType((data >> 24) & 0x000000ff)
 
 
 LOAD_DTO = {
     'version': load_version_dto,
-    'network_type': load_network_type_dto,
+    #'network_type': load_network_type_dto,
     'type': ReceiptType.create_from_dto,
 }
