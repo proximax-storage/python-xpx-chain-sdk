@@ -484,62 +484,6 @@ class TestTransactionHttp(harness.TestCase):
 #
 #        await asyncio.gather(listen_lock(), announce_lock())
 #        await asyncio.gather(listen_proof(), announce_proof())
-    
-    async def test_hash_lock_transaction(self):
-        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
-
-        alice = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
-        bob = models.Account.create_from_private_key('2C8178EF9ED7A6D30ABDC1E4D30D68B05861112A98B1629FBE2C8D16FDE97A1C', models.NetworkType.MIJIN_TEST)
-        mike = models.Account.create_from_private_key('A97B139EB641BCC841A610231870925EB301BA680D07BBCF9AEE83FAA5E9FB43', models.NetworkType.MIJIN_TEST)
-        mosaic_id = models.MosaicId.create_from_hex('0dc67fbe1cad29e3')
-        amount = 1000
-
-        alice_to_bob = models.TransferTransaction.create(
-            deadline=models.Deadline.create(),
-            recipient=bob.address,
-            mosaics=[models.Mosaic(mosaic_id, amount)],
-            network_type=models.NetworkType.MIJIN_TEST,
-            max_fee=1
-        )
-
-        bob_to_alice = models.TransferTransaction.create(
-            deadline=models.Deadline.create(),
-            recipient=alice.address,
-            mosaics=[models.Mosaic(mosaic_id, amount)],
-            network_type=models.NetworkType.MIJIN_TEST,
-            max_fee=1
-        )
-        
-        cosignatories = [
-            #models.AggregateTransactionCosignature(alice.sign(alice_to_bob.to_catbuffer(), gen_hash)[4:68], alice),
-            models.AggregateTransactionCosignature(bob.sign(bob_to_alice.to_catbuffer(), gen_hash)[4:68], bob)
-        ]
-
-        escrow = models.AggregateTransaction.create_complete(
-            deadline=models.Deadline.create(),
-            inner_transactions=[alice_to_bob.to_aggregate(alice), bob_to_alice.to_aggregate(alice)],
-            network_type=models.NetworkType.MIJIN_TEST,
-        )
-
-        escrow_signed = escrow.sign_transaction_with_cosignatories(alice, bob, gen_hash)
-    
-        async def announce_lock():
-            with client.TransactionHTTP(responses.ENDPOINT) as http:
-                http.announce(escrow_signed)
-
-        async def listen_lock():
-            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
-                await listener.confirmed(mike.address)
-
-                async for m in listener:
-                    #TODO: Check for more transactions. It could not always be the first one.
-                    #TODO: Implement timeout.
-                    tx = m.message
-                    self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
-                    break
-       
-        await asyncio.gather(listen_lock(), announce_lock())
-
 #    async def test_mosaic_definition_transaction(self):
 #        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
 #
@@ -617,3 +561,47 @@ class TestTransactionHttp(harness.TestCase):
 #
 #        await asyncio.gather(listen(models.AliasActionType.LINK), announce(models.AliasActionType.LINK))
 #        await asyncio.gather(listen(models.AliasActionType.UNLINK), announce(models.AliasActionType.UNLINK))
+    
+    async def test_aggregate_single_transaction(self):
+        gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
+
+        alice = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
+        bob = models.Account.create_from_private_key('2C8178EF9ED7A6D30ABDC1E4D30D68B05861112A98B1629FBE2C8D16FDE97A1C', models.NetworkType.MIJIN_TEST)
+        mosaic_id = models.MosaicId.create_from_hex('0dc67fbe1cad29e3')
+        amount = 1000
+
+        alice_to_bob = models.TransferTransaction.create(
+            deadline=models.Deadline.create(),
+            recipient=bob.address,
+            mosaics=[models.Mosaic(mosaic_id, amount)],
+            network_type=models.NetworkType.MIJIN_TEST,
+            max_fee=1
+        )
+
+        aggregate = models.AggregateTransaction.create_complete(
+            deadline=models.Deadline.create(),
+            inner_transactions=[alice_to_bob.to_aggregate(alice)],
+            network_type=models.NetworkType.MIJIN_TEST,
+        )
+
+        agregate_signed = aggregate.sign_transaction_with_cosignatories(alice, gen_hash, None)
+    
+        async def announce_lock():
+            with client.TransactionHTTP(responses.ENDPOINT) as http:
+                http.announce(agregate_signed)
+
+        async def listen_lock():
+            async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+                await listener.confirmed(alice.address)
+
+                async for m in listener:
+                    #TODO: Check for more transactions. It could not always be the first one.
+                    #TODO: Implement timeout.
+                    tx = m.message
+                    self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
+                    self.assertEqual(len(tx.inner_transactions), 1)
+                    self.assertEqual(tx.inner_transactions[0].recipient, bob.address)
+                    break
+       
+        await asyncio.gather(listen_lock(), announce_lock())
+

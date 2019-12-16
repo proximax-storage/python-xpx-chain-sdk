@@ -57,11 +57,11 @@ class InnerTransaction(TransactionBase):
         slices={
             'size': slice(0, 4),
             'signer': slice(4, 36),
-            'version': slice(36, 37),
-            'network_type': slice(37, 38),
-            'type': slice(38, 40),
+            'version': slice(36, 39),
+            'network_type': slice(39, 40),
+            'type': slice(40, 42),
         },
-        size_shared=40,
+        size_shared=42,
     )
     DTO: typing.ClassVar[DTOFormat] = DTOFormat(
         names={
@@ -70,6 +70,7 @@ class InnerTransaction(TransactionBase):
             'network_type': 'version',
             'type': 'type',
             'transaction_info': 'meta',
+            'recipient': 'recipient'
         },
     )
 
@@ -159,6 +160,7 @@ class InnerTransaction(TransactionBase):
         cb_get('network_type')
         cb_get('type')
         cb_get('transaction_info')
+        cb_get('recipient')
 
         return data
 
@@ -179,7 +181,8 @@ class InnerTransaction(TransactionBase):
         cb_set('type')
         self._set('max_fee', None)
         self._set('deadline', None)
-        cb_set('transaction_info')
+        self._set('transaction_info', None)
+        self._set('recipient', None)
 
 
 InnerTransactionList = typing.Sequence[InnerTransaction]

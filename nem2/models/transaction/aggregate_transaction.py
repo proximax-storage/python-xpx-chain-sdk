@@ -46,7 +46,6 @@ import logging
 logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 Cosignature = AggregateTransactionCosignature
 Cosignatures = typing.Sequence[Cosignature]
 TYPES = (
@@ -170,8 +169,8 @@ class AggregateTransaction(Transaction):
     def sign_transaction_with_cosignatories(
         self,
         initiator: Account,
-        cosignor: Account,
-        gen_hash: typing.AnyStr
+        gen_hash: typing.AnyStr,
+        cosignatures: typing.Optional[Cosignatures] = None
     ) -> SignedTransaction:
         """
         Sign transaction with cosignatories.
@@ -180,17 +179,16 @@ class AggregateTransaction(Transaction):
         :param cosignatories: Sequence of accounts cosigning transaction.
         """
 
+        # TODO Implement cosigners
         transaction = self.to_catbuffer()
         payload = initiator.sign(transaction, gen_hash)
         hash = self.transaction_hash(payload)
 
-        logger.info(len(payload))
-        logger.info(int.from_bytes(payload[0:4], "little"))
-
-        pkey = util.unhexlify(cosignor.public_key)
-        cos = cosignor.sign_data(hash)
-
-        payload = payload + pkey + cos
+#        payload_size = len(payload)
+#        payload_writen = int.from_bytes(payload[0:4], 'little')
+#        data_writen = int.from_bytes(payload[122:126], 'little')
+#        cosig_writen = int.from_bytes(payload[122 + data_writen : 126 + data_writen], 'little')
+#        logger.info("%d %d %d %d %d" % (payload_size, payload_writen, data_writen, 122 + data_writen, cosig_writen))
 
         return SignedTransaction(
             payload,
@@ -265,11 +263,10 @@ class AggregateTransaction(Transaction):
         # uint32_t payload_size
         # uint8_t[payload_size] transactions
         # uint8_t[size - payload_size] cosignatures
-        payload_size = util.u32_to_catbuffer(self.inner_transactions_size() + self.cosignatures_size())
-        #logger.info(int.from_bytes(payload_size, "little"))
+        payload_size = util.u32_to_catbuffer(self.inner_transactions_size())
         transactions = self.to_inner_transactions_bytes(network_type)
         cosignatures = self.to_cosignatures_bytes(network_type)
-        #logger.info(len(transactions) + len(cosignatures))
+        #logger.info("Specific %d %d %d = %d" % (len(payload_size), len(transactions), len(cosignatures), len(payload_size + transactions + cosignatures)))
         return payload_size + transactions + cosignatures
 
     def load_inner_transactions_bytes(
@@ -322,7 +319,31 @@ class AggregateTransaction(Transaction):
 
     # DTO
 
-    # TODO(ahuszagh) Implement...
+    @classmethod
+    def validate_dto_specific(cls, data: dict) -> bool:
+        required_keys = {'transactions'}
+        return cls.validate_dto_required(data, required_keys)
+
+	
+    def to_dto_specific(
+        self,
+        network_type: NetworkType,
+    ) -> dict:
+        return {
+            'recipient': Recipient.to_dto(self.recipient, network_type),
+            'mosaics': Mosaic.sequence_to_dto(self.mosaics, network_type),
+            'message': self.message.to_dto(network_type),
+        }
+
+    
+    def load_dto_specific(
+        self,
+        data: dict,
+        network_type: NetworkType,
+    ) -> None:
+        inner_transactions = [InnerTransaction.create_from_dto(x, network_type) for x in data['transactions']]
+
+        self._set('inner_transactions', inner_transactions)
 
 
 @util.inherit_doc
