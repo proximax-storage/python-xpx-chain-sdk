@@ -234,6 +234,7 @@ __all__ = (
     + address_alias_transaction.__all__
     + aggregate_transaction_cosignature.__all__
     + aggregate_transaction_info.__all__
+    + aggregate_transaction.__all__
     + alias_transaction.__all__
     + cosignature_signed_transaction.__all__
     + cosignature_transaction.__all__

@@ -135,6 +135,18 @@ class Deadline(util.Object):
         return cls(local)
 
 
+    @classmethod
+    def create_fake(cls, timestamp: int):
+        """
+        Create deadline from UTC timestamp.
+
+        :param timestamp: Timestamp in UTC timezone.
+        """
+        ts = timestamp + cls.TIMESTAMP_NEMESIS_BLOCK / 1000
+        utc = datetime.datetime.fromtimestamp(ts, datetime.timezone.utc)
+        local = utc.replace(tzinfo=None)
+        return cls(local)
+
 # Private
 # Data-transfer object for the nemesis block timestamp.
 TIMESTAMP_NEMESIS_BLOCK_DTO = util.u64_to_dto(Deadline.TIMESTAMP_NEMESIS_BLOCK)

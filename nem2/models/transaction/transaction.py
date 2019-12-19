@@ -102,7 +102,7 @@ class Transaction(TransactionBase):
         # Serialize transaction data, sign, and generate a hash.
         transaction = self.to_catbuffer()
         payload = account.sign(transaction, gen_hash)
-        hash = self.transaction_hash(payload)
+        hash = self.transaction_hash(payload, gen_hash)
         return SignedTransaction(
             payload,
             hash,
@@ -112,7 +112,7 @@ class Transaction(TransactionBase):
         )
 
     @staticmethod
-    def transaction_hash(transaction: typing.AnyStr) -> str:
+    def transaction_hash(transaction: typing.AnyStr, gen_hash: typing.AnyStr) -> str:
         """Generate transaction hash from signed transaction payload."""
 
         # Decode the data.
@@ -121,10 +121,12 @@ class Transaction(TransactionBase):
         # Extract the first half of the signature, the signer, and the
         # remaining signing bytes, sign them, and get the hash.
         slices = Transaction.CATBUFFER.slices
+
         signature_half = transaction[slices['signature_half']]
         signer = transaction[slices['signer']]
         rest = transaction[slices['signing_bytes']]
-        data = signature_half + signer + rest
+
+        data = signature_half + signer + util.decode_hex(gen_hash, with_prefix=True) + rest
         hash = util.hashlib.sha3_256(data).hexdigest()
 
         return typing.cast(str, hash)

@@ -170,7 +170,7 @@ class AggregateTransaction(Transaction):
         self,
         initiator: Account,
         gen_hash: typing.AnyStr,
-        cosignatures: typing.Optional[Cosignatures] = None
+        cosignatories: typing.Optional[Account] = None
     ) -> SignedTransaction:
         """
         Sign transaction with cosignatories.
@@ -179,16 +179,17 @@ class AggregateTransaction(Transaction):
         :param cosignatories: Sequence of accounts cosigning transaction.
         """
 
-        # TODO Implement cosigners
         transaction = self.to_catbuffer()
         payload = initiator.sign(transaction, gen_hash)
-        hash = self.transaction_hash(payload)
+        hash = self.transaction_hash(payload, gen_hash)
 
-#        payload_size = len(payload)
-#        payload_writen = int.from_bytes(payload[0:4], 'little')
-#        data_writen = int.from_bytes(payload[122:126], 'little')
-#        cosig_writen = int.from_bytes(payload[122 + data_writen : 126 + data_writen], 'little')
-#        logger.info("%d %d %d %d %d" % (payload_size, payload_writen, data_writen, 122 + data_writen, cosig_writen))
+        if (cosignatories):
+            for cosignatory in cosignatories:
+                payload += util.decode_hex(cosignatory.public_key)
+                payload += cosignatory.sign_data(hash)
+
+            new_size = len(payload)
+            payload = new_size.to_bytes(4, 'little') + payload[4:]
 
         return SignedTransaction(
             payload,
@@ -229,8 +230,9 @@ class AggregateTransaction(Transaction):
         # The payload size is the size from all inner transactions.
         extra_size = util.U32_BYTES
         payload_size = self.inner_transactions_size()
-        cosignatures_size = self.cosignatures_size()
-        return extra_size + payload_size + cosignatures_size
+        #cosignatures_size = self.cosignatures_size()
+        #return extra_size + payload_size + cosignatures_size
+        return extra_size + payload_size
 
     def to_inner_transactions_bytes(
         self,
@@ -267,7 +269,8 @@ class AggregateTransaction(Transaction):
         transactions = self.to_inner_transactions_bytes(network_type)
         cosignatures = self.to_cosignatures_bytes(network_type)
         #logger.info("Specific %d %d %d = %d" % (len(payload_size), len(transactions), len(cosignatures), len(payload_size + transactions + cosignatures)))
-        return payload_size + transactions + cosignatures
+        #return payload_size + transactions + cosignatures
+        return payload_size + transactions
 
     def load_inner_transactions_bytes(
         self,
