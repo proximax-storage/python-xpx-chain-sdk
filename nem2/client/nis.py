@@ -1830,6 +1830,80 @@ def process_announce(
 announce = request("announce")
 
 
+def request_announce_partial(
+    client: client.Client,
+    transaction: models.SignedTransaction,
+    **kwds
+):
+    """
+    Make "/transaction/partial" request.
+
+    :param client: Wrapper for client.
+    :param transaction: Signed transaction data.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    url = f"/transaction/partial"
+    json = {'payload': transaction.payload}
+    return client.put(url, json=json, **kwds)
+
+
+def process_announce_partial(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.TransactionAnnounceResponse:
+    """
+    Process the "/transaction/partial" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert (status == 200 | status == 202)
+    return models.TransactionAnnounceResponse.create_from_dto(json)
+
+
+announce_partial = request("announce_partial")
+
+
+def request_announce_cosignature(
+    client: client.Client,
+    transaction: models.CosignatureSignedTransaction,
+    **kwds
+):
+    """
+    Make "/transaction/cosignature" request.
+
+    :param client: Wrapper for client.
+    :param transaction: Signed transaction data.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    url = f"/transaction/cosignature"
+    json = transaction.to_dto()
+    return client.put(url, json=json, **kwds)
+
+
+def process_announce_cosignature(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.TransactionAnnounceResponse:
+    """
+    Process the "/transaction/cosignature" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert (status == 200 | status == 202)
+    return models.TransactionAnnounceResponse.create_from_dto(json)
+
+
+announce_cosignature = request("announce_cosignature")
+
+
 # FORWARDERS
 # ----------
 
@@ -2040,5 +2114,13 @@ CLIENT_CB = {
     'announce': (
         request_announce,
         process_announce,
+    ),
+    'announce_partial': (
+        request_announce_partial,
+        process_announce_partial,
+    ),
+    'announce_cosignature': (
+        request_announce_cosignature,
+        process_announce_cosignature,
     ),
 }

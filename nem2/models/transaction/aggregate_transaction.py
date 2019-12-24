@@ -40,7 +40,7 @@ from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ... import util
 
-__all__ = ['AggregateTransaction']
+__all__ = ['AggregateTransaction', 'AggregateBondedTransaction', 'AggregateCompleteTransaction']
 
 import logging
 logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
@@ -83,7 +83,7 @@ class AggregateTransaction(Transaction):
         deadline: Deadline,
         max_fee: int,
         inner_transactions: typing.Optional[InnerTransactionList] = None,
-        cosignatures: typing.Optional[Cosignatures] = None,
+        #cosignatures: typing.Optional[Cosignatures] = None,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -101,7 +101,7 @@ class AggregateTransaction(Transaction):
             transaction_info,
         )
         self._set('inner_transactions', inner_transactions or [])
-        self._set('cosignatures', cosignatures or [])
+        #self._set('cosignatures', cosignatures or [])
 
     @classmethod
     def create_complete(
@@ -137,8 +137,8 @@ class AggregateTransaction(Transaction):
         cls,
         deadline: Deadline,
         inner_transactions: typing.Optional[InnerTransactionList],
-        cosignatures: Cosignatures,
         network_type: NetworkType,
+        cosignatures: typing.Optional[Cosignatures] = None,
         max_fee: int = 0,
     ):
         """
@@ -163,8 +163,29 @@ class AggregateTransaction(Transaction):
 
     # SIGNING
 
-    def sign_with(self, account: Account) -> SignedTransaction:
-        raise TypeError('Use `sign_transaction_with_cosignatories` instead.')
+    def sign_with(
+        self, 
+        account: Account,
+        gen_hash: typing.AnyStr
+    ) -> SignedTransaction:
+        """
+        Sign transaction.
+
+        :param account: Escrow account.
+        :param gen_hash: Generation hash
+        """
+
+        transaction = self.to_catbuffer()
+        payload = account.sign(transaction, gen_hash)
+        hash = self.transaction_hash(payload, gen_hash)
+
+        return SignedTransaction(
+            payload,
+            hash,
+            account.public_key,
+            self.type,
+            self.network_type
+        )
 
     def sign_transaction_with_cosignatories(
         self,
@@ -176,6 +197,7 @@ class AggregateTransaction(Transaction):
         Sign transaction with cosignatories.
 
         :param initiator_account: Initiator account.
+        :param gen_hash: Generation hash
         :param cosignatories: Sequence of accounts cosigning transaction.
         """
 
@@ -199,16 +221,16 @@ class AggregateTransaction(Transaction):
             self.network_type
         )
 
-    def signed_by_account(self, public_account: PublicAccount) -> bool:
-        """
-        Check if account has signed transaction.
-
-        :param public_account: Signer public account.
-        """
-        return (
-            public_account == self.signer
-            or any(i.signer == public_account for i in self.cosignatures)
-        )
+#    def signed_by_account(self, public_account: PublicAccount) -> bool:
+#        """
+#        Check if account has signed transaction.
+#
+#        :param public_account: Signer public account.
+#        """
+#        return (
+#            public_account == self.signer
+#            or any(i.signer == public_account for i in self.cosignatures)
+#        )
 
     # AGGREGATE
 
@@ -267,8 +289,7 @@ class AggregateTransaction(Transaction):
         # uint8_t[size - payload_size] cosignatures
         payload_size = util.u32_to_catbuffer(self.inner_transactions_size())
         transactions = self.to_inner_transactions_bytes(network_type)
-        cosignatures = self.to_cosignatures_bytes(network_type)
-        #logger.info("Specific %d %d %d = %d" % (len(payload_size), len(transactions), len(cosignatures), len(payload_size + transactions + cosignatures)))
+        #cosignatures = self.to_cosignatures_bytes(network_type)
         #return payload_size + transactions + cosignatures
         return payload_size + transactions
 

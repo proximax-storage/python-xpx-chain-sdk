@@ -849,8 +849,6 @@ class TransactionHTTP(HTTPSharedBase):
         return self(nis.get_transaction_statuses, hashes, **kwds)
 
     # TODO(ahuszagh)
-    # announceAggregateBonded
-    # announceAggregateBondedCosignature
     # getTransactionEffectiveFee
 
     def announce(
@@ -865,6 +863,32 @@ class TransactionHTTP(HTTPSharedBase):
         :return: Transaction announce response.
         """
         return self(nis.announce, transaction, **kwds)
+    
+    def announce_partial(
+        self,
+        transaction: models.SignedTransaction,
+        **kwds
+    ):
+        """
+        Announce partial transaction to network.
+
+        :param transaction: Signed transaction data.
+        :return: Transaction announce response.
+        """
+        return self(nis.announce_partial, transaction, **kwds)
+
+    def announce_cosignature(
+        self,
+        transaction: models.SignedTransaction,
+        **kwds
+    ):
+        """
+        Announce cosignature transaction to network.
+
+        :param transaction: Signed transaction data.
+        :return: Transaction announce response.
+        """
+        return self(nis.announce_cosignature, transaction, **kwds)
 
 # WEBSOCKET
 # ---------
