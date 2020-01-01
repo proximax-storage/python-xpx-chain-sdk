@@ -69,8 +69,7 @@ class InnerTransaction(TransactionBase):
             'version': 'version',
             'network_type': 'version',
             'type': 'type',
-            'transaction_info': 'meta',
-            'recipient': 'recipient'
+            'transaction_info': 'meta'
         },
     )
 
@@ -160,7 +159,6 @@ class InnerTransaction(TransactionBase):
         cb_get('network_type')
         cb_get('type')
         cb_get('transaction_info')
-        cb_get('recipient')
 
         return data
 
@@ -182,7 +180,6 @@ class InnerTransaction(TransactionBase):
         self._set('max_fee', None)
         self._set('deadline', None)
         self._set('transaction_info', None)
-        self._set('recipient', None)
 
 
 InnerTransactionList = typing.Sequence[InnerTransaction]

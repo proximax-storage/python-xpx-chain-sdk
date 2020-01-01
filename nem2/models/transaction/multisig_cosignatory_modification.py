@@ -51,6 +51,26 @@ class MultisigCosignatoryModification(util.Model):
     cosignatory_public_account: PublicAccount
     CATBUFFER_SIZE: typing.ClassVar[int] = 33 * util.U8_BYTES
 
+    def __init__(
+        self,
+        cosignatory_public_account: PublicAccount,
+        type: ModificationType
+    ) -> None:
+        self._set('cosignatory_public_account', cosignatory_public_account)
+        self._set('type', type)
+
+    @classmethod
+    def create(
+        cls,
+        cosignatory_public_account: PublicAccount,
+        type: ModificationType
+    ):
+        return cls(
+            cosignatory_public_account,
+            type
+        )
+
+
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
