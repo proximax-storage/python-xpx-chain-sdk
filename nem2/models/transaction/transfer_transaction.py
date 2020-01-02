@@ -74,13 +74,14 @@ class TransferTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        max_fee: int,
         recipient: RecipientType,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
-        transaction_info: typing.Optional[TransactionInfo] = None,
+        transaction_info: typing.Optional[TransactionInfo] = None
     ) -> None:
         super().__init__(
             TransactionType.TRANSFER,
@@ -88,9 +89,10 @@ class TransferTransaction(Transaction):
             version,
             deadline,
             max_fee,
+            fee_strategy,
             signature,
             signer,
-            transaction_info,
+            transaction_info
         )
         self._set('recipient', recipient)
         self._set('mosaics', mosaics or [])
@@ -104,7 +106,8 @@ class TransferTransaction(Transaction):
         network_type: NetworkType,
         mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
-        max_fee: int = 0,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new transfer transaction.
@@ -120,8 +123,9 @@ class TransferTransaction(Transaction):
             network_type,
             TransactionVersion.TRANSFER,
             deadline,
-            max_fee,
             recipient,
+            max_fee,
+            fee_strategy,
             mosaics,
             message
         )

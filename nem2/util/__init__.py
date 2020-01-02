@@ -9,6 +9,7 @@ from .identifier import *
 from .mixin import *
 from .reactive import *
 from .stdint import *
+from .fee import *
 
 # Modules
 #   bit
@@ -26,4 +27,5 @@ __all__ = (
     + mixin.__all__
     + reactive.__all__
     + stdint.__all__
+    + fee.__all__
 )
