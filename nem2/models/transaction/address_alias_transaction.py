@@ -73,10 +73,11 @@ class AddressAliasTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        max_fee: int,
         action_type: AliasActionType,
         namespace_id: NamespaceId,
         address: Address,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -87,6 +88,7 @@ class AddressAliasTransaction(Transaction):
             version,
             deadline,
             max_fee,
+            fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -103,7 +105,8 @@ class AddressAliasTransaction(Transaction):
         namespace_id: NamespaceId,
         address: Address,
         network_type: NetworkType,
-        max_fee: int = 0,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new address alias transaction.
@@ -119,10 +122,11 @@ class AddressAliasTransaction(Transaction):
             network_type,
             TransactionVersion.ADDRESS_ALIAS,
             deadline,
-            max_fee,
             action_type,
             namespace_id,
-            address
+            address,
+            max_fee,
+            fee_strategy,
         )
 
     # CATBUFFER

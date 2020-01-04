@@ -74,10 +74,11 @@ class MosaicSupplyChangeTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        max_fee: int,
         mosaic_id: MosaicId,
         direction: MosaicSupplyType,
         delta: int,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -88,6 +89,7 @@ class MosaicSupplyChangeTransaction(Transaction):
             version,
             deadline,
             max_fee,
+            fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -104,7 +106,8 @@ class MosaicSupplyChangeTransaction(Transaction):
         direction: MosaicSupplyType,
         delta: int,
         network_type: NetworkType,
-        max_fee: int = 0,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new mosaic supply change transaction.
@@ -122,10 +125,10 @@ class MosaicSupplyChangeTransaction(Transaction):
             network_type,
             TransactionVersion.MOSAIC_SUPPLY_CHANGE,
             deadline,
-            max_fee,
-            mosaic_id,
             direction,
             delta,
+            max_fee,
+            mosaic_id,
         )
 
     # CATBUFFER

@@ -33,6 +33,7 @@ from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic_id import MosaicId
 from ..namespace.alias_action_type import AliasActionType
 from ..namespace.namespace_id import NamespaceId
+from ... import util
 
 __all__ = ['AliasTransaction']
 
@@ -49,7 +50,8 @@ class AliasTransaction(TransactionBase):
         namespace_id: NamespaceId,
         address: Address,
         network_type: NetworkType,
-        max_fee: int = 0,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create new address alias transaction.
@@ -69,6 +71,7 @@ class AliasTransaction(TransactionBase):
             address,
             network_type,
             max_fee,
+            fee_strategy,
         )
 
     @staticmethod
@@ -78,7 +81,8 @@ class AliasTransaction(TransactionBase):
         namespace_id: NamespaceId,
         mosaic_id: MosaicId,
         network_type: NetworkType,
-        max_fee: int = 0,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new mosaic alias transaction.
@@ -98,4 +102,5 @@ class AliasTransaction(TransactionBase):
             mosaic_id,
             network_type,
             max_fee,
+            fee_strategy,
         )

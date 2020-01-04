@@ -103,10 +103,6 @@ class Transaction(TransactionBase):
         transaction = self.to_catbuffer()
         payload = account.sign(transaction, gen_hash)
         
-#f=open('/home/wirfeon/Downloads/modify_multisig_trans.bytes', 'rb')
-#payload=f.read()
-#f.close()
-
         hash = self.transaction_hash(payload, gen_hash)
         return SignedTransaction(
             payload,

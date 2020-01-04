@@ -24,6 +24,7 @@
 
 from __future__ import annotations
 
+from ..account.address import Address
 from .deadline import Deadline
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
@@ -56,12 +57,14 @@ class TransactionStatusError(util.DTO):
     hash: str
     status: str
     deadline: Deadline
+    channel_name: str
+    address: Address
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-        required_keys = {'hash', 'status', 'deadline'}
+        required_keys = {'hash', 'status', 'deadline', 'meta'}
         return (
             cls.validate_dto_required(data, required_keys)
             and cls.validate_dto_all(data, required_keys)
@@ -71,10 +74,16 @@ class TransactionStatusError(util.DTO):
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
+        meta = {
+            'channelName': self.channel_name,
+            'address': address.address,
+        }
+
         return {
             'hash': self.hash,
             'status': self.status,
             'deadline': util.u64_to_dto(self.deadline.to_timestamp()),
+            'meta': meta,
         }
 
     @classmethod
@@ -86,8 +95,11 @@ class TransactionStatusError(util.DTO):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
+        meta=data['meta']
         return cls(
             hash=data['hash'],
             status=data['status'],
             deadline=Deadline.create_from_timestamp(util.u64_from_dto(data['deadline'])),
+            channel_name=meta['channelName'],
+            address=Address.create_from_encoded(meta['address']),
         )

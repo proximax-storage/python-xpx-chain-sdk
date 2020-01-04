@@ -81,7 +81,8 @@ class AggregateTransaction(Transaction):
         type: TransactionType,
         version: TransactionVersion,
         deadline: Deadline,
-        max_fee: int,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         inner_transactions: typing.Optional[InnerTransactionList] = None,
         #cosignatures: typing.Optional[Cosignatures] = None,
         signature: typing.Optional[str] = None,
@@ -96,6 +97,7 @@ class AggregateTransaction(Transaction):
             version,
             deadline,
             max_fee,
+            fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -110,7 +112,8 @@ class AggregateTransaction(Transaction):
         inner_transactions: typing.Optional[InnerTransactionList],
         network_type: NetworkType,
         cosignatures: typing.Optional[Cosignatures] = None,
-        max_fee: int = 0,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create aggregate complete transaction object.
@@ -128,6 +131,7 @@ class AggregateTransaction(Transaction):
             TransactionVersion.AGGREGATE_COMPLETE,
             deadline,
             max_fee,
+            fee_strategy,
             inner_transactions,
             cosignatures,
         )
@@ -139,7 +143,8 @@ class AggregateTransaction(Transaction):
         inner_transactions: typing.Optional[InnerTransactionList],
         network_type: NetworkType,
         cosignatures: typing.Optional[Cosignatures] = None,
-        max_fee: int = 0,
+        max_fee: typing.Optional[int] = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create aggregate bonded transaction object.
@@ -157,6 +162,7 @@ class AggregateTransaction(Transaction):
             TransactionVersion.AGGREGATE_BONDED,
             deadline,
             max_fee,
+            fee_strategy,
             inner_transactions,
             cosignatures,
         )
