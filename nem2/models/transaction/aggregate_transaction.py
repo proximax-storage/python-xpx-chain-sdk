@@ -217,7 +217,12 @@ class AggregateTransaction(Transaction):
                 payload += cosignatory.sign_data(hash)
 
             new_size = len(payload)
-            payload = new_size.to_bytes(4, 'little') + payload[4:]
+            
+            if (self.max_fee is None):
+                new_fee = util.calculate_fee(self.fee_strategy, new_size)
+                payload = new_size.to_bytes(4, 'little') + payload[4:106] + new_fee.to_bytes(8, 'little') + payload[114:]
+            else:    
+                payload = new_size.to_bytes(4, 'little') + payload[4:]
 
         return SignedTransaction(
             payload,
