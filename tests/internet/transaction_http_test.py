@@ -118,7 +118,7 @@ class TestTransactionHttp(harness.TestCase):
             recipient=recipient.address,
             mosaics=[models.Mosaic(self.mosaic_id, amount)],
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM
+            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
         signed_tx = tx.sign_with(sender, self.gen_hash)
@@ -639,7 +639,7 @@ class TestTransactionHttp(harness.TestCase):
             mosaics=[models.Mosaic(self.mosaic_id, M10)],
             network_type=models.NetworkType.MIJIN_TEST,
         )
-        
+
         tx = models.AggregateTransaction.create_complete(
             deadline=models.Deadline.create(),
             inner_transactions=[bob_to_alice.to_aggregate(self.bob), alice_to_bob.to_aggregate(self.alice)],

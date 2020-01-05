@@ -27,5 +27,5 @@ DESCRIPTION = {
     FeeCalculationStrategy.HIGH: "High fee calculation strategy",
 }
 
-def calculate_fee(strategy: FeeCalculationStrategy, transaction_size: int) -> int:
-    return strategy * transaction_size
+def calculate_fee(strategy: FeeCalculationStrategy, max_fee: int, transaction_size: int) -> int:
+    return max(max_fee, strategy * transaction_size)

@@ -77,7 +77,7 @@ class SecretProofTransaction(Transaction):
         secret: typing.AnyStr,
         recipient: RecipientType,
         proof: typing.AnyStr,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
@@ -112,7 +112,7 @@ class SecretProofTransaction(Transaction):
         recipient: RecipientType,
         proof: typing.AnyStr,
         network_type: NetworkType,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """

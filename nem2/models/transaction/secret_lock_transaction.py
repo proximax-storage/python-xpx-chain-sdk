@@ -83,7 +83,7 @@ class SecretLockTransaction(Transaction):
         hash_type: HashType,
         secret: typing.AnyStr,
         recipient: RecipientType,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
@@ -119,7 +119,7 @@ class SecretLockTransaction(Transaction):
         secret: typing.AnyStr,
         recipient: RecipientType,
         network_type: NetworkType,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """

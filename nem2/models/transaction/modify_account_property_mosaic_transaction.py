@@ -102,7 +102,7 @@ class ModifyAccountPropertyMosaicTransaction(Transaction):
         deadline: Deadline,
         property_type: PropertyType,
         modifications: AccountPropertyModificationList,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
@@ -133,7 +133,7 @@ class ModifyAccountPropertyMosaicTransaction(Transaction):
         property_type: PropertyType,
         modifications: AccountPropertyModificationList,
         network_type: NetworkType,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """

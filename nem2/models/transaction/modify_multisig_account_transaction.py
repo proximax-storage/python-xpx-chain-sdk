@@ -75,7 +75,7 @@ class ModifyMultisigAccountTransaction(Transaction):
         deadline: Deadline,
         min_approval_delta: int,
         min_removal_delta: int,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         modifications: typing.Optional[MultisigCosignatoryModificationList] = None,
         signature: typing.Optional[str] = None,
@@ -105,7 +105,7 @@ class ModifyMultisigAccountTransaction(Transaction):
         min_removal_delta: int,
         modifications: MultisigCosignatoryModificationList,
         network_type: NetworkType,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """

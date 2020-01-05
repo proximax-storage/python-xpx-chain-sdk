@@ -76,7 +76,7 @@ class AddressAliasTransaction(Transaction):
         action_type: AliasActionType,
         namespace_id: NamespaceId,
         address: Address,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
@@ -105,7 +105,7 @@ class AddressAliasTransaction(Transaction):
         namespace_id: NamespaceId,
         address: Address,
         network_type: NetworkType,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """

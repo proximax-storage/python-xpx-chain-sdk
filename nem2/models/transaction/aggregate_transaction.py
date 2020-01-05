@@ -81,7 +81,7 @@ class AggregateTransaction(Transaction):
         type: TransactionType,
         version: TransactionVersion,
         deadline: Deadline,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         inner_transactions: typing.Optional[InnerTransactionList] = None,
         #cosignatures: typing.Optional[Cosignatures] = None,
@@ -112,7 +112,7 @@ class AggregateTransaction(Transaction):
         inner_transactions: typing.Optional[InnerTransactionList],
         network_type: NetworkType,
         cosignatures: typing.Optional[Cosignatures] = None,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
@@ -143,7 +143,7 @@ class AggregateTransaction(Transaction):
         inner_transactions: typing.Optional[InnerTransactionList],
         network_type: NetworkType,
         cosignatures: typing.Optional[Cosignatures] = None,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
@@ -208,6 +208,14 @@ class AggregateTransaction(Transaction):
         """
 
         transaction = self.to_catbuffer()
+      
+        if (cosignatories):
+            COSIGNATURE_SIZE = 96
+            new_fee = util.calculate_fee(self.fee_strategy, self.max_fee, self.catbuffer_size() + COSIGNATURE_SIZE * len(cosignatories))
+            
+            if (self.max_fee != new_fee):
+                transaction = transaction[0:106] + new_fee.to_bytes(8, 'little') + transaction[114:]
+                
         payload = initiator.sign(transaction, gen_hash)
         hash = self.transaction_hash(payload, gen_hash)
 
@@ -217,12 +225,7 @@ class AggregateTransaction(Transaction):
                 payload += cosignatory.sign_data(hash)
 
             new_size = len(payload)
-            
-            if (self.max_fee is None):
-                new_fee = util.calculate_fee(self.fee_strategy, new_size)
-                payload = new_size.to_bytes(4, 'little') + payload[4:106] + new_fee.to_bytes(8, 'little') + payload[114:]
-            else:    
-                payload = new_size.to_bytes(4, 'little') + payload[4:]
+            payload = new_size.to_bytes(4, 'little') + payload[4:]
 
         return SignedTransaction(
             payload,

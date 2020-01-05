@@ -75,7 +75,7 @@ class TransferTransaction(Transaction):
         version: TransactionVersion,
         deadline: Deadline,
         recipient: RecipientType,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
@@ -106,7 +106,7 @@ class TransferTransaction(Transaction):
         network_type: NetworkType,
         mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """

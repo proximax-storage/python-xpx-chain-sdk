@@ -77,7 +77,7 @@ class LockFundsTransaction(Transaction):
         mosaic: Mosaic,
         duration: int,
         signed_transaction: SignedTransaction,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
@@ -108,7 +108,7 @@ class LockFundsTransaction(Transaction):
         duration: int,
         signed_transaction: SignedTransaction,
         network_type: NetworkType,
-        max_fee: typing.Optional[int] = None,
+        max_fee: int = 0,
         fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """

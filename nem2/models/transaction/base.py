@@ -160,10 +160,9 @@ class TransactionBase(util.Model):
         if network_type is not None and network_type != self.network_type:
             raise ValueError('Network type does not match transaction.')
 
-        if (self.max_fee is None):
-            # Use fee calculation algorithm
-            max_fee = util.calculate_fee(self.fee_strategy, self.catbuffer_size())
-            self._set('max_fee', max_fee)
+        # Use fee calculation algorithm
+        max_fee = util.calculate_fee(self.fee_strategy, self.max_fee, self.catbuffer_size())
+        self._set('max_fee', max_fee)
 
         # Save shared and specific transaction data.
         shared = self.to_catbuffer_shared(self.network_type)
