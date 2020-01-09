@@ -41,6 +41,7 @@ from .account.multisig_account_info import *
 from .account.property_modification_type import *
 from .account.property_type import *
 from .account.public_account import *
+from .account.account_names import *
 from .account import *
 
 # Blockchain
@@ -169,6 +170,7 @@ __all__ = (
     + account_properties.__all__
     + account_properties_info.__all__
     + account_properties_metadata.__all__
+    + account_names.__all__
     + address.__all__
     + multisig_account_graph_info.__all__
     + multisig_account_info.__all__

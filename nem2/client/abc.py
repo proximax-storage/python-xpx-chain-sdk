@@ -440,6 +440,19 @@ class AccountHTTP(HTTPSharedBase):
         """
         return self(nis.get_account_metadata, public_account, **kwds)
 
+    def get_account_names(
+        self,
+        addresses: typing.Sequence[models.Address],
+        **kwds
+    ):
+        """
+        Get friendly names of accounts.
+
+        :param addresses: Sequence of account addresses.
+        :return: AccountNames object.
+        """
+        return self(nis.get_account_names, addresses, **kwds)
+
 
 
 class BlockchainHTTP(HTTPSharedBase):
@@ -482,19 +495,6 @@ class BlockchainHTTP(HTTPSharedBase):
         :return: Sequence of information models describing transactions.
         """
         return self(nis.get_merkle_by_hash_in_block, height, hash, **kwds)
-
-    # TODO(ahuszagh) Bugs.
-    #   getBlockByTransactionMerkle produces a 500 internal server error.
-    #       Response 500.
-    #       > GET {{url}}/block/{{height}}/transaction/{{transactionId}}/merkle
-    #       {
-    #           "code": "Internal",
-    #           "message": "Cannot read property 'queryDocument' of undefined"
-    #       }
-    #
-    #   getBlockReceiptsByTransactionMerkle produces a 500 internal server error.
-    #       Response 500.
-    #       > GET {url}}/block/{{height}}/receipt/{{transactionId}}/merkle
 
     def get_block_receipts(self, height: int, **kwds):
         """

@@ -176,7 +176,7 @@ def request_get_account_property(
     **kwds
 ):
     """
-    Make "/account/properties/{address}" request.
+    Make "/account/{address}/properties" request.
 
     :param client: Wrapper for client.
     :param address: Account address.
@@ -576,6 +576,44 @@ def process_get_account_metadata(
 
 
 get_account_metadata = request("get_account_metadata")
+
+
+def request_get_account_names(
+    client: client.Client,
+    addresses: typing.Sequence[models.Address],
+    **kwds
+):
+    """
+    Make "/account/names" request.
+
+    :param client: Wrapper for client.
+    :param addresses: Sequence of account addresses.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    url = f"/account/names"
+    json = {"addresses": [i.address for i in addresses]}
+    return client.post(url, json=json, **kwds)
+
+
+def process_get_account_names(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.AccountNames]:
+    """
+    Process the "/account/names" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return [models.AccountNames.create_from_dto(i, network_type) for i in json]
+
+
+get_account_names = request("get_account_names")
 
 
 # BLOCKCHAIN HTTP
@@ -1034,8 +1072,7 @@ def process_get_metadata(
     status: int,
     json: dict,
     network_type: models.NetworkType,
-#TODO - return type can be one of 3 types
-) -> models.AddressMetadataInfo:
+):
     """
     Process the "/metadata/{metadata_id}" HTTP response.
 
@@ -1069,8 +1106,7 @@ def process_get_metadatas(
     status: int,
     json: dict,
     network_type: models.NetworkType,
-#TODO - return type can be one of 3 types
-) -> models.AddressMetadataInfo:
+):
     """
     Process the "/metadata" HTTP response.
 
@@ -1605,8 +1641,6 @@ get_namespace_metadata = request("get_namespace_metadata")
 # ------------
 
 NETWORK_TYPE = {
-    # TODO(ahuszagh) Only the mijinTest variant is actually defined.
-    # The rest are borrowed from an outdated SDK.
     'mijin': models.NetworkType.MIJIN,
     'mijinTest': models.NetworkType.MIJIN_TEST,
     'public': models.NetworkType.MAIN_NET,
@@ -1960,6 +1994,10 @@ CLIENT_CB = {
     'get_account_metadata': (
         request_get_account_metadata,
         process_get_account_metadata,
+    ),
+    'get_account_names': (
+        request_get_account_names,
+        process_get_account_names,
     ),
 
     # BLOCKCHAIN
