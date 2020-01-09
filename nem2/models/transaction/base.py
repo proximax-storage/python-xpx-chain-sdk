@@ -117,10 +117,6 @@ class TransactionBase(util.Model):
         """Is transaction not known by the network."""
         return self.transaction_info is None
 
-    # TODO(ahuszagh) Finish the implementation...
-    # hasMissingSignatures
-    # reapplyGiven
-
     # CATBUFFER
 
     @classmethod

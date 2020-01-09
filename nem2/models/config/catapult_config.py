@@ -19,7 +19,7 @@ class CatapultConfig(util.DTO):
 
             ConfigDTO:
                 height: UInt64DTO
-                blockChainConfig: string
+                networkConfig: string
                 supportedEntityVersions: string
 
             CatapultConfigDTO:
@@ -27,17 +27,17 @@ class CatapultConfig(util.DTO):
     """
 
     height: int
-    blockchain_config: str
+    network_config: str
     supported_entity_versions: str
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-        required_l1 = {'catapultConfig'}
+        required_l1 = {'networkConfig'}
         required_l2 = {
             'height',
-            'blockChainConfig',
+            'networkConfig',
             'supportedEntityVersions'
         }
         return (
@@ -45,22 +45,22 @@ class CatapultConfig(util.DTO):
             cls.validate_dto_required(data, required_l1)
             and cls.validate_dto_all(data, required_l1)
             # Level 2
-            and cls.validate_dto_required(data['catapultConfig'], required_l2)
-            and cls.validate_dto_all(data['catapultConfig'], required_l2)
+            and cls.validate_dto_required(data['networkConfig'], required_l2)
+            and cls.validate_dto_all(data['networkConfig'], required_l2)
         )
 
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        catapult_config = {
+        network_config = {
             'height': util.u64_to_dto(self.height),
-            'blockChainConfig': self.public_key,
+            'networkConfig': self.public_key,
             'supportedEntityVersions': self.supported_entity_versions
         }
 
         return {
-            'catapultConfig': catapult_config,
+            'networkConfig': network_config,
         }
 
     @classmethod
@@ -72,9 +72,9 @@ class CatapultConfig(util.DTO):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        catapult_config = data['catapultConfig']
+        network_config = data['networkConfig']
         return cls(
-            height=util.u64_from_dto(catapult_config.get('height', [0, 0])),
-            blockchain_config=catapult_config['blockChainConfig'],
-            supported_entity_versions=catapult_config['supportedEntityVersions']
+            height=util.u64_from_dto(network_config.get('height', [0, 0])),
+            network_config=network_config['networkConfig'],
+            supported_entity_versions=network_config['supportedEntityVersions']
         )

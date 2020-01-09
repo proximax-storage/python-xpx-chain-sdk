@@ -14,7 +14,7 @@ from tests import config
             'method': 'get_blockchain_height',
             'validation': [
                 lambda x: (isinstance(x, int), True),
-                lambda x: (x >= config.Blockchain.height, True),
+                lambda x: (x >= 1, True),
             ]
         },
         {

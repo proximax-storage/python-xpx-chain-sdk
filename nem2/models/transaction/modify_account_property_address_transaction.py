@@ -55,7 +55,6 @@ PROPERTY_TYPES = (
 def to_catbuffer(modification: AccountPropertyModification) -> bytes:
     """Serialize account property address modification to catbuffer."""
 
-    # TODO(ahuszagh) Check when stabilized
     # uint8_t modification_type
     # uint8_t[25] value
     type = modification.modification_type.to_catbuffer()
@@ -66,7 +65,6 @@ def to_catbuffer(modification: AccountPropertyModification) -> bytes:
 def from_catbuffer(data: bytes) -> AccountPropertyModification:
     """Deserialize account property address modification from catbuffer."""
 
-    # TODO(ahuszagh) Check when stabilized
     # uint8_t modification_type
     # uint8_t[25] value
     modification_type = PropertyModificationType.create_from_catbuffer(data[:1])

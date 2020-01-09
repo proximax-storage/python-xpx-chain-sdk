@@ -24,136 +24,181 @@ M1000 = 1000 * M
 class Error(Exception):
     pass
 
-async def status(account):
-    async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
-        await listener.status(account.address)
-        
-        async for m in listener:
-            tx = m.message
-            raise Error(tx.status)
-
-async def confirmed(account):
-    async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
-        await listener.confirmed(account.address)
-        
-        async for m in listener:
-            return m.message
-
-async def aggregate_bonded_added(account):
-    async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
-        await listener.aggregate_bonded_added(account.address)
-        
-        async for m in listener:
-            return m.message
-
-@harness.http_test_case({
-    'clients': (client.TransactionHTTP, client.AsyncTransactionHTTP),
-    'tests': [
-#        {
-#            #/transaction/{transactionId}
-#            'name': 'test_get_transaction',
-#            'params': [config.Transaction.hash],
-#            'method': 'get_transaction',
-#            'validation': [
-#                lambda x: (isinstance(x, models.Transaction), True),
-#            ]
-#        },
-#        {
-#            #/transaction/{transactionId}
-#            'name': 'test_get_transactions',
-#            'params': [[config.Transaction.hash, '024C08B8767FCA0DCF7B631EC2631D9575FFB84E8E5EFA7C656B18FB1A1F34E8']],
-#            'method': 'get_transactions',
-#            'validation': [
-#                lambda x: (len(x), 2),
-#                lambda x: (isinstance(x[0], models.Transaction), True),
-#            ]
-#        },
-#        {
-#            #/transaction/{hash}/status
-#            'name': 'test_get_transaction_status',
-#            'params': [config.Transaction.hash],
-#            'method': 'get_transaction_status',
-#            'validation': [
-#                lambda x: (isinstance(x, models.TransactionStatus), True),
-#            ]
-#        },
-#        {
-#            #/transaction/statuses
-#            'name': 'test_get_transaction_statuses',
-#            'params': [[config.Transaction.hash, '024C08B8767FCA0DCF7B631EC2631D9575FFB84E8E5EFA7C656B18FB1A1F34E8']],
-#            'method': 'get_transaction_statuses',
-#            'validation': [
-#                lambda x: (len(x), 2),
-#                lambda x: (isinstance(x[0], models.TransactionStatus), True),
-#            ]
-#        },
-    ],
-})
 class TestTransactionHttp(harness.TestCase):
 
-    gen_hash: str = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
-    sleep_timeout: int = 60
-    step: float = 0.1
-
-    nemesis: models.Account
     alice: models.Account
     bob: models.Account
     mike: models.Account
 
-    mosaic_id: models.MosaicId
-
     def __init__(self, task) -> None:
         super().__init__(task)
 
-        self.nemesis = models.Account.create_from_private_key('28FCECEA252231D2C86E1BCF7DD541552BDBBEFBB09324758B3AC199B4AA7B78', models.NetworkType.MIJIN_TEST)
-        self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
-        self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
-        self.mike = models.Account.create_from_private_key   ('0000000000000000000000000000000000000000000000000000000000000001', models.NetworkType.MIJIN_TEST)
-        self.mosaic_id = models.MosaicId.create_from_hex('0dc67fbe1cad29e3')
+        if (task == 'test_get_transaction'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+
+        elif (task == 'test_get_transactions'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+
+        elif (task == 'test_get_transaction_status'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+
+        elif (task == 'test_get_transaction_statuses'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+
+        elif (task == 'test_transfer_transaction'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+
+        elif (task == 'test_message_transaction'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, M10)
+        
+        elif (task == 'test_account_link_transaction'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, M100)
+        
+        elif (task == 'test_modify_account_property_address_transaction'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, M100)
+        
+        elif (task == 'test_modify_account_property_mosaic_transaction'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, M100)
+        
+        elif (task == 'test_modify_account_property_entity_type_transaction'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, M100)
+        
+        elif (task == 'test_register_namespace_transaction'):
+            #self.mike = models.Account.create_from_private_key('0000000000000000000000000000000000000000000000000000000000000001', models.NetworkType.MIJIN_TEST)
+            self.mike = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.mike, 4 * M1000)
+        
+        elif (task == 'test_secret_lock_transaction'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, M100)
+            self.send_funds(config.nemesis, self.bob, M100)
+        
+        elif (task == 'test_aggregate_transaction_with_cosigners'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, M100)
+            self.send_funds(config.nemesis, self.bob, M100)
+
+        elif (task == 'test_aggregate_bonded_transaction'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, M100)
+            self.send_funds(config.nemesis, self.bob, M100)
+
+        elif (task == 'test_create_multisig_and_send_funds'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.multisig = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, M100)
+            self.send_funds(config.nemesis, self.bob, M100)
+            self.send_funds(config.nemesis, self.multisig, M100)
+
     
+    async def listen(self, account):
+        async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+            await listener.confirmed(account.address)
+            await listener.status(account.address)
+       
+            async for m in listener:
+                if (m.channel_name == 'status'):
+                    raise Error(m.message)
+                elif (m.channel_name == 'confirmedAdded'):
+                    return m.message
     
+    async def listen_bonded(self, account):
+        async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
+            await listener.aggregate_bonded_added(account.address)
+            await listener.status(account.address)
+       
+            async for m in listener:
+                if (m.channel_name == 'status'):
+                    raise Error(m.message)
+                elif (m.channel_name == 'partialAdded'):
+                    return m.message
+
     async def send_funds(self, sender, recipient, amount):
         tx = models.TransferTransaction.create(
             deadline=models.Deadline.create(),
             recipient=recipient.address,
-            mosaics=[models.Mosaic(self.mosaic_id, amount)],
+            mosaics=[models.Mosaic(config.mosaic_id, amount)],
             network_type=models.NetworkType.MIJIN_TEST,
             fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_with(sender, self.gen_hash)
+        signed_tx = tx.sign_with(sender, config.gen_hash)
         
-        task1 = asyncio.create_task(confirmed(sender))
-        task2 = asyncio.create_task(status(sender))
-      
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.TransferTransaction), True)
-                self.assertEqual(tx.recipient, recipient.address)
-                self.assertEqual(len(tx.mosaics), 1)
-                self.assertEqual(tx.mosaics[0].id, self.mosaic_id)
-                self.assertEqual(tx.mosaics[0].amount, amount)
-                break
+        tx = self.listen(sender)
+        self.assertEqual(isinstance(tx, models.TransferTransaction), True)
+        self.assertEqual(tx.recipient, recipient.address)
+        self.assertEqual(len(tx.mosaics), 1)
+        self.assertEqual(tx.mosaics[0].id, config.mosaic_id)
+        self.assertEqual(tx.mosaics[0].amount, amount)
 
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        return tx.transaction_info.hash
     
 
-    async def test_transfer_transaction(self): 
-        self.send_funds(self.nemesis, self.alice, M10)
+    # TESTS
+    async def test_get_transaction(self):
+        hash = self.send_funds(config.nemesis, self.alice, M10)
+
+        with client.TransactionHTTP(responses.ENDPOINT) as http:
+            reply = http.get_transaction(hash)
+            self.assertEqual(isinstance(reply, models.TransferTransaction), True)
+            self.assertEqual(reply.transaction_info.hash, hash)
 
     
+    async def test_get_transactions(self):
+        hash1 = self.send_funds(config.nemesis, self.alice, M10)
+        hash2 = self.send_funds(config.nemesis, self.alice, M10)
+
+        hashes = [hash1, hash2]
+        with client.TransactionHTTP(responses.ENDPOINT) as http:
+            reply = http.get_transactions(hashes)
+            self.assertEqual(len(reply), 2)
+            self.assertEqual(isinstance(reply[0], models.TransferTransaction), True)
+            self.assertEqual(reply[0].transaction_info.hash in hashes, True)
+            self.assertEqual(reply[1].transaction_info.hash in hashes, True)
+
+    
+    async def test_get_transaction_status(self):
+        hash = self.send_funds(config.nemesis, self.alice, M10)
+
+        with client.TransactionHTTP(responses.ENDPOINT) as http:
+            reply = http.get_transaction_status(hash)
+            self.assertEqual(isinstance(reply, models.TransactionStatus), True)
+            self.assertEqual(reply.hash, hash)
+
+
+    async def test_get_transaction_statuses(self):
+        hash1 = self.send_funds(config.nemesis, self.alice, M10)
+        hash2 = self.send_funds(config.nemesis, self.alice, M10)
+
+        hashes = [hash1, hash2]
+        with client.TransactionHTTP(responses.ENDPOINT) as http:
+            reply = http.get_transaction_statuses(hashes)
+            self.assertEqual(len(reply), 2)
+            self.assertEqual(isinstance(reply[0], models.TransactionStatus), True)
+            self.assertEqual(reply[0].hash in hashes, True)
+            self.assertEqual(reply[1].hash in hashes, True)
+
+    
+#    async def test_transfer_transaction(self): 
+#        self.send_funds(config.nemesis, self.alice, M10)
+
+
     async def test_message_transaction(self):
-        self.send_funds(self.nemesis, self.alice, M10)
-        
         message = models.PlainMessage(b'Hello world')
 
         tx = models.TransferTransaction.create(
@@ -164,33 +209,18 @@ class TestTransactionHttp(harness.TestCase):
             message=message
         )
 
-        signed_tx = tx.sign_with(self.alice, self.gen_hash)
-
-        task1 = asyncio.create_task(confirmed(self.alice))
-        task2 = asyncio.create_task(status(self.alice))
+        signed_tx = tx.sign_with(self.alice, config.gen_hash)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.TransferTransaction), True)
-                self.assertEqual(tx.recipient, self.bob.address)
-                self.assertEqual(tx.message, message)
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.alice)
+        self.assertEqual(isinstance(tx, models.TransferTransaction), True)
+        self.assertEqual(tx.recipient, self.bob.address)
+        self.assertEqual(tx.message, message)
 
     
     async def test_account_link_transaction(self):
-        self.send_funds(self.nemesis, self.alice, M100)
-        
         tx = models.AccountLinkTransaction.create(
             deadline=models.Deadline.create(),
             remote_account_key=self.bob.public_key,
@@ -199,28 +229,15 @@ class TestTransactionHttp(harness.TestCase):
             fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_with(self.alice, self.gen_hash)
-        
-        task1 = asyncio.create_task(confirmed(self.alice))
-        task2 = asyncio.create_task(status(self.alice))
+        signed_tx = tx.sign_with(self.alice, config.gen_hash)
         
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.AccountLinkTransaction), True)
-                self.assertEqual(tx.remote_account_key, self.bob.public_key.upper())
-                self.assertEqual(tx.link_action, models.LinkAction.LINK)
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.alice)
+        self.assertEqual(isinstance(tx, models.AccountLinkTransaction), True)
+        self.assertEqual(tx.remote_account_key, self.bob.public_key.upper())
+        self.assertEqual(tx.link_action, models.LinkAction.LINK)
         
         tx = models.AccountLinkTransaction.create(
             deadline=models.Deadline.create(),
@@ -230,34 +247,18 @@ class TestTransactionHttp(harness.TestCase):
             fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_with(self.alice, self.gen_hash)
-        
-        task1 = asyncio.create_task(confirmed(self.alice))
+        signed_tx = tx.sign_with(self.alice, config.gen_hash)
         
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.AccountLinkTransaction), True)
-                self.assertEqual(tx.remote_account_key, self.bob.public_key.upper())
-                self.assertEqual(tx.link_action, models.LinkAction.UNLINK)
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.alice)
+        self.assertEqual(isinstance(tx, models.AccountLinkTransaction), True)
+        self.assertEqual(tx.remote_account_key, self.bob.public_key.upper())
+        self.assertEqual(tx.link_action, models.LinkAction.UNLINK)
     
     
     async def test_modify_account_property_address_transaction(self):
-        self.send_funds(self.nemesis, self.alice, M100)
-        
-        task2 = asyncio.create_task(status(self.alice))
-
         for property_type in [models.PropertyType.ALLOW_ADDRESS, models.PropertyType.BLOCK_ADDRESS]:
             for modification_type in [models.PropertyModificationType.ADD, models.PropertyModificationType.REMOVE]:
         
@@ -269,35 +270,19 @@ class TestTransactionHttp(harness.TestCase):
                     modifications=[models.AccountPropertyModification(modification_type, self.bob.address)]
                 )
                 
-                signed_tx = tx.sign_with(self.alice, self.gen_hash)
-
-                task1 = asyncio.create_task(confirmed(self.alice))
+                signed_tx = tx.sign_with(self.alice, config.gen_hash)
 
                 with client.TransactionHTTP(responses.ENDPOINT) as http:
                     http.announce(signed_tx)
 
-                slept = 0
-                while (slept < self.sleep_timeout):
-                    if (task1.done()):
-                        tx = task1.result()
-                        self.assertEqual(isinstance(tx, models.ModifyAccountPropertyAddressTransaction), True)
-                        self.assertEqual(len(tx.modifications), 1)
-                        self.assertEqual(tx.property_type, property_type)
-                        self.assertEqual(tx.modifications[0].modification_type, modification_type)
-                        break
-                
-                    if (task2.done()):
-                        task2.result()
-
-                    await asyncio.sleep(self.step)
-                    slept += self.step
+                tx = self.listen(self.alice)
+                self.assertEqual(isinstance(tx, models.ModifyAccountPropertyAddressTransaction), True)
+                self.assertEqual(len(tx.modifications), 1)
+                self.assertEqual(tx.property_type, property_type)
+                self.assertEqual(tx.modifications[0].modification_type, modification_type)
 
         
     async def test_modify_account_property_mosaic_transaction(self):
-        self.send_funds(self.nemesis, self.alice, M100)
-        
-        task2 = asyncio.create_task(status(self.alice))
-
         for property_type in [models.PropertyType.ALLOW_MOSAIC, models.PropertyType.BLOCK_MOSAIC]:
             for modification_type in [models.PropertyModificationType.ADD, models.PropertyModificationType.REMOVE]:
 
@@ -306,38 +291,23 @@ class TestTransactionHttp(harness.TestCase):
                     network_type=models.NetworkType.MIJIN_TEST,
                     fee_strategy=util.FeeCalculationStrategy.MEDIUM,
                     property_type=property_type,
-                    modifications=[models.AccountPropertyModification(modification_type, self.mosaic_id)]
+                    modifications=[models.AccountPropertyModification(modification_type, config.mosaic_id)]
                 )
                 
-                signed_tx = tx.sign_with(self.alice, self.gen_hash)
-
-                task1 = asyncio.create_task(confirmed(self.alice))
+                signed_tx = tx.sign_with(self.alice, config.gen_hash)
 
                 with client.TransactionHTTP(responses.ENDPOINT) as http:
                     http.announce(signed_tx)
 
-                slept = 0
-                while (slept < self.sleep_timeout):
-                    if (task1.done()):
-                        tx = task1.result()
-                        self.assertEqual(isinstance(tx, models.ModifyAccountPropertyMosaicTransaction), True)
-                        self.assertEqual(len(tx.modifications), 1)
-                        self.assertEqual(tx.property_type, property_type)
-                        self.assertEqual(tx.modifications[0].modification_type, modification_type)
-                        self.assertEqual(tx.modifications[0].value, self.mosaic_id)
-                        break
-                    
-                    if (task2.done()):
-                        task2.result()
-
-                    await asyncio.sleep(self.step)
-                    slept += self.step
+                tx = self.listen(self.alice)
+                self.assertEqual(isinstance(tx, models.ModifyAccountPropertyMosaicTransaction), True)
+                self.assertEqual(len(tx.modifications), 1)
+                self.assertEqual(tx.property_type, property_type)
+                self.assertEqual(tx.modifications[0].modification_type, modification_type)
+                self.assertEqual(tx.modifications[0].value, config.mosaic_id)
 
         
     async def test_modify_account_property_entity_type_transaction(self):
-        self.send_funds(self.nemesis, self.alice, M100)
-        
-        task2 = asyncio.create_task(status(self.alice))
         tx_type = models.TransactionType.AGGREGATE_COMPLETE
 
         for property_type in [models.PropertyType.BLOCK_TRANSACTION]:
@@ -351,34 +321,20 @@ class TestTransactionHttp(harness.TestCase):
                     modifications=[models.AccountPropertyModification(modification_type, tx_type)]
                 )
                 
-                signed_tx = tx.sign_with(self.alice, self.gen_hash)
-
-                task1 = asyncio.create_task(confirmed(self.alice))
+                signed_tx = tx.sign_with(self.alice, config.gen_hash)
 
                 with client.TransactionHTTP(responses.ENDPOINT) as http:
                     http.announce(signed_tx)
 
-                slept = 0
-                while (slept < self.sleep_timeout):
-                    if (task1.done()):
-                        tx = task1.result()
-                        self.assertEqual(isinstance(tx, models.ModifyAccountPropertyEntityTypeTransaction), True)
-                        self.assertEqual(len(tx.modifications), 1)
-                        self.assertEqual(tx.property_type, property_type)
-                        self.assertEqual(tx.modifications[0].modification_type, modification_type)
-                        self.assertEqual(tx.modifications[0].value, tx_type)
-                        break
-
-                    if (task2.done()):
-                        task2.result()
-
-                    await asyncio.sleep(self.step)
-                    slept += self.step
+                tx = self.listen(self.alice)
+                self.assertEqual(isinstance(tx, models.ModifyAccountPropertyEntityTypeTransaction), True)
+                self.assertEqual(len(tx.modifications), 1)
+                self.assertEqual(tx.property_type, property_type)
+                self.assertEqual(tx.modifications[0].modification_type, modification_type)
+                self.assertEqual(tx.modifications[0].value, tx_type)
 
     
     async def test_register_namespace_transaction(self):
-        self.send_funds(self.nemesis, self.mike, 4 * M1000)
-        
         namespace_name = 'foo' + hexlify(os.urandom(4)).decode('utf-8')
         #namespace_name = 'foo'
 
@@ -390,27 +346,14 @@ class TestTransactionHttp(harness.TestCase):
             duration=60
         )
         
-        signed_tx = tx.sign_with(self.mike, self.gen_hash)
-
-        task1 = asyncio.create_task(confirmed(self.mike))
-        task2 = asyncio.create_task(status(self.mike))
+        signed_tx = tx.sign_with(self.mike, config.gen_hash)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
-                self.assertEqual(tx.namespace_name, namespace_name)
-                break
-                    
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.mike)
+        self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
+        self.assertEqual(tx.namespace_name, namespace_name)
 
         # Create sub namespace
         tx = models.RegisterNamespaceTransaction.create_sub_namespace(
@@ -420,28 +363,16 @@ class TestTransactionHttp(harness.TestCase):
             parent_namespace=namespace_name
         )
         
-        signed_tx = tx.sign_with(self.mike, self.gen_hash)
+        signed_tx = tx.sign_with(self.mike, config.gen_hash)
 
-        task1 = asyncio.create_task(confirmed(self.mike))
-        
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
-                self.assertEqual(tx.namespace_name, 'bar')
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.mike)
+        self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
+        self.assertEqual(tx.namespace_name, 'bar')
     
-        self.mikes_namespace = namespace_name + ".bar"
+        mikes_namespace = namespace_name + ".bar"
 
         # Link address alias
         for action_type in [models.AliasActionType.LINK, models.AliasActionType.UNLINK]:
@@ -451,34 +382,22 @@ class TestTransactionHttp(harness.TestCase):
                 max_fee=1,
                 fee_strategy=util.FeeCalculationStrategy.MEDIUM,
                 action_type=action_type,
-                namespace_id=models.NamespaceId(self.mikes_namespace),
+                namespace_id=models.NamespaceId(mikes_namespace),
                 address=self.mike.address
             )
             
-            signed_tx = tx.sign_with(self.mike, self.gen_hash)
+            signed_tx = tx.sign_with(self.mike, config.gen_hash)
 
-            task1 = asyncio.create_task(confirmed(self.mike))
-        
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
 
-            slept = 0
-            while (slept < self.sleep_timeout):
-                if (task1.done()):
-                    tx = task1.result()
-                    self.assertEqual(isinstance(tx, models.AddressAliasTransaction), True)
-                    self.assertEqual(tx.action_type, action_type)
-                    self.assertEqual(tx.address, self.mike.address)
-                    break
-
-                if (task2.done()):
-                    task2.result()
-
-                await asyncio.sleep(self.step)
-                slept += self.step
+            tx = self.listen(self.mike)
+            self.assertEqual(isinstance(tx, models.AddressAliasTransaction), True)
+            self.assertEqual(tx.action_type, action_type)
+            self.assertEqual(tx.address, self.mike.address)
 
         # Create mosaic
-        nonce = models.MosaicNonce(6)
+        nonce = models.MosaicNonce(1)
         mosaic_id = models.MosaicId.create_from_nonce(nonce, self.mike)
 
         tx = models.MosaicDefinitionTransaction.create(
@@ -490,27 +409,14 @@ class TestTransactionHttp(harness.TestCase):
             mosaic_properties=models.MosaicProperties(0x3, 3),
         )
         
-        signed_tx = tx.sign_with(self.mike, self.gen_hash)
+        signed_tx = tx.sign_with(self.mike, config.gen_hash)
         
-        task1 = asyncio.create_task(confirmed(self.mike))
-        task2 = asyncio.create_task(status(self.mike))
-
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
         
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.MosaicDefinitionTransaction), True)
-                self.assertEqual(tx.mosaic_id, mosaic_id)
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.mike)
+        self.assertEqual(isinstance(tx, models.MosaicDefinitionTransaction), True)
+        self.assertEqual(tx.mosaic_id, mosaic_id)
 
         # Link mosaic alias
         for action_type in [models.AliasActionType.LINK, models.AliasActionType.UNLINK]:
@@ -519,37 +425,23 @@ class TestTransactionHttp(harness.TestCase):
                 network_type=models.NetworkType.MIJIN_TEST,
                 max_fee=1,
                 action_type=action_type,
-                namespace_id=models.NamespaceId(self.mikes_namespace),
+                namespace_id=models.NamespaceId(mikes_namespace),
                 mosaic_id=mosaic_id,
             )
 
-            signed_tx = tx.sign_with(self.mike, self.gen_hash)
+            signed_tx = tx.sign_with(self.mike, config.gen_hash)
         
-            task1 = asyncio.create_task(confirmed(self.mike))
-
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
 
-            slept = 0
-            while (slept < self.sleep_timeout):
-                if (task1.done()):
-                    tx = task1.result()
-                    self.assertEqual(isinstance(tx, models.MosaicAliasTransaction), True)
-                    self.assertEqual(tx.mosaic_id, mosaic_id)
-                    self.assertEqual(tx.action_type, action_type)
-                    break
-            
-                if (task2.done()):
-                    task2.result()
-
-                await asyncio.sleep(self.step)
-                slept += self.step
+            tx = self.listen(self.mike)
+            self.assertEqual(isinstance(tx, models.MosaicAliasTransaction), True)
+            self.assertEqual(tx.mosaic_id, mosaic_id)
+            self.assertEqual(tx.action_type, action_type)
+            print("HEIGHT %d" % tx.transaction_info.height)
    
 
     async def test_secret_lock_transaction(self):
-        self.send_funds(self.nemesis, self.alice, M100)
-        self.send_funds(self.nemesis, self.bob, M100)
-        
         random_bytes = os.urandom(20)
         h = hashlib.sha3_256(random_bytes)
         secret = binascii.hexlify(h.digest()).decode('utf-8').upper()
@@ -558,7 +450,7 @@ class TestTransactionHttp(harness.TestCase):
         tx = models.SecretLockTransaction.create(
             deadline=models.Deadline.create(),
             network_type=models.NetworkType.MIJIN_TEST,
-            mosaic=models.Mosaic(self.mosaic_id, M1),
+            mosaic=models.Mosaic(config.mosaic_id, M1),
             duration=60,
             hash_type=models.HashType.SHA3_256,
             secret=secret,
@@ -566,28 +458,15 @@ class TestTransactionHttp(harness.TestCase):
             fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
         
-        signed_tx = tx.sign_with(self.alice, self.gen_hash)
-        
-        task1 = asyncio.create_task(confirmed(self.alice))
-        task2 = asyncio.create_task(status(self.alice))
+        signed_tx = tx.sign_with(self.alice, config.gen_hash)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.SecretLockTransaction), True)
-                self.assertEqual(tx.recipient, self.bob.address)
-                self.assertEqual(tx.secret, secret)
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.alice)
+        self.assertEqual(isinstance(tx, models.SecretLockTransaction), True)
+        self.assertEqual(tx.recipient, self.bob.address)
+        self.assertEqual(tx.secret, secret)
        
         tx = models.SecretProofTransaction.create(
             deadline=models.Deadline.create(),
@@ -599,44 +478,29 @@ class TestTransactionHttp(harness.TestCase):
             fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
         
-        signed_tx = tx.sign_with(self.alice, self.gen_hash)
-        
-        task1 = asyncio.create_task(confirmed(self.alice))
+        signed_tx = tx.sign_with(self.alice, config.gen_hash)
         
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.SecretProofTransaction), True)
-                self.assertEqual(tx.recipient, self.bob.address)
-                self.assertEqual(tx.secret, secret)
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.alice)
+        self.assertEqual(isinstance(tx, models.SecretProofTransaction), True)
+        self.assertEqual(tx.recipient, self.bob.address)
+        self.assertEqual(tx.secret, secret)
     
 
     async def test_aggregate_transaction_with_cosigners(self):
-        self.send_funds(self.nemesis, self.alice, M100)
-        self.send_funds(self.nemesis, self.bob, M100)
-
         alice_to_bob = models.TransferTransaction.create(
             deadline=models.Deadline.create(),
             recipient=self.bob.address,
-            mosaics=[models.Mosaic(self.mosaic_id, M10)],
+            mosaics=[models.Mosaic(config.mosaic_id, M10)],
             network_type=models.NetworkType.MIJIN_TEST,
         )
 
         bob_to_alice = models.TransferTransaction.create(
             deadline=models.Deadline.create(),
             recipient=self.alice.address,
-            mosaics=[models.Mosaic(self.mosaic_id, M10)],
+            mosaics=[models.Mosaic(config.mosaic_id, M10)],
             network_type=models.NetworkType.MIJIN_TEST,
         )
 
@@ -647,46 +511,30 @@ class TestTransactionHttp(harness.TestCase):
             fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(self.alice, self.gen_hash, [self.bob])
+        signed_tx = tx.sign_transaction_with_cosignatories(self.alice, config.gen_hash, [self.bob])
         
-        task1 = asyncio.create_task(confirmed(self.alice))
-        task2 = asyncio.create_task(status(self.alice))
-    
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
         
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
-                self.assertEqual(len(tx.inner_transactions), 2)
-                self.assertEqual(tx.inner_transactions[0].recipient, self.alice.address)
-                self.assertEqual(tx.inner_transactions[1].recipient, self.bob.address)
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.alice)
+        self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
+        self.assertEqual(len(tx.inner_transactions), 2)
+        self.assertEqual(tx.inner_transactions[0].recipient, self.alice.address)
+        self.assertEqual(tx.inner_transactions[1].recipient, self.bob.address)
        
     
     async def test_aggregate_bonded_transaction(self):
-        self.send_funds(self.nemesis, self.alice, M100)
-        self.send_funds(self.nemesis, self.bob, M100)
-
         alice_to_bob = models.TransferTransaction.create(
             deadline=models.Deadline.create(),
             recipient=self.bob.address,
-            mosaics=[models.Mosaic(self.mosaic_id, M10)],
+            mosaics=[models.Mosaic(config.mosaic_id, M10)],
             network_type=models.NetworkType.MIJIN_TEST,
         )
 
         bob_to_alice = models.TransferTransaction.create(
             deadline=models.Deadline.create(),
             recipient=self.alice.address,
-            mosaics=[models.Mosaic(self.mosaic_id, M10)],
+            mosaics=[models.Mosaic(config.mosaic_id, M10)],
             network_type=models.NetworkType.MIJIN_TEST,
         )
         
@@ -697,55 +545,30 @@ class TestTransactionHttp(harness.TestCase):
             fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_bonded = bonded.sign_transaction_with_cosignatories(self.alice, self.gen_hash)
+        signed_bonded = bonded.sign_transaction_with_cosignatories(self.alice, config.gen_hash)
 
         lock = models.LockFundsTransaction.create(
             deadline=models.Deadline.create(),
             network_type=models.NetworkType.MIJIN_TEST,
-            mosaic=models.Mosaic(self.mosaic_id, M10),
+            mosaic=models.Mosaic(config.mosaic_id, M10),
             duration=60,
             signed_transaction=signed_bonded,
             fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
         
-        signed_lock = lock.sign_with(self.alice, self.gen_hash)
+        signed_lock = lock.sign_with(self.alice, config.gen_hash)
 
-        task1 = asyncio.create_task(confirmed(self.alice))
-        task2 = asyncio.create_task(status(self.alice))
-    
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_lock)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.LockFundsTransaction), True)
-                break
-        
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
-       
-        task1 = asyncio.create_task(aggregate_bonded_added(self.alice))
+        tx = self.listen(self.alice)
+        self.assertEqual(isinstance(tx, models.LockFundsTransaction), True)
        
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce_partial(signed_bonded)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
-                break
-      
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen_bonded(self.alice)
+        self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
 
         with client.AccountHTTP(responses.ENDPOINT) as http:
             reply = http.aggregate_bonded_transactions(self.bob)
@@ -755,33 +578,14 @@ class TestTransactionHttp(harness.TestCase):
 
             signed_cosig = models.CosignatureTransaction.create(reply[0]).sign_with(self.bob)
             
-        task1 = asyncio.create_task(confirmed(self.bob))
-        task2 = asyncio.create_task(status(self.bob))
-
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce_cosignature(signed_cosig)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.bob)
+        self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
 
 
     async def test_create_multisig_and_send_funds(self):
-        multisig = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
-        
-        self.send_funds(self.nemesis, self.alice, M100)
-        self.send_funds(self.nemesis, self.bob, M100)
-        self.send_funds(self.nemesis, multisig, M100)
-
         change_to_multisig = models.ModifyMultisigAccountTransaction.create(
             deadline=models.Deadline.create(),
             min_approval_delta=2,
@@ -795,64 +599,38 @@ class TestTransactionHttp(harness.TestCase):
 
         tx = models.AggregateTransaction.create_complete(
             deadline=models.Deadline.create(),
-            inner_transactions=[change_to_multisig.to_aggregate(multisig)],
+            inner_transactions=[change_to_multisig.to_aggregate(self.multisig)],
             network_type=models.NetworkType.MIJIN_TEST,
             fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(multisig, self.gen_hash, [self.alice, self.bob])
+        signed_tx = tx.sign_transaction_with_cosignatories(self.multisig, config.gen_hash, [self.alice, self.bob])
         
-        task1 = asyncio.create_task(confirmed(multisig))
-        task2 = asyncio.create_task(status(multisig))
-
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.multisig)
+        self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
         
-        multisig_to_nemesis = models.TransferTransaction.create(
+        self.multisig_to_nemesis = models.TransferTransaction.create(
             deadline=models.Deadline.create(),
-            recipient=self.nemesis.address,
-            mosaics=[models.Mosaic(self.mosaic_id, M10)],
+            recipient=config.nemesis.address,
+            mosaics=[models.Mosaic(config.mosaic_id, M10)],
             network_type=models.NetworkType.MIJIN_TEST,
         )
             
         tx = models.AggregateTransaction.create_complete(
             deadline=models.Deadline.create(),
-            inner_transactions=[multisig_to_nemesis.to_aggregate(multisig)],
+            inner_transactions=[self.multisig_to_nemesis.to_aggregate(self.multisig)],
             network_type=models.NetworkType.MIJIN_TEST,
             fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(self.alice, self.gen_hash, [self.bob])
+        signed_tx = tx.sign_transaction_with_cosignatories(self.alice, config.gen_hash, [self.bob])
       
-        task1 = asyncio.create_task(confirmed(self.alice))
-        task2 = asyncio.create_task(status(self.alice))
-        
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
 
-        slept = 0
-        while (slept < self.sleep_timeout):
-            if (task1.done()):
-                tx = task1.result()
-                self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
-                break
-            
-            if (task2.done()):
-                task2.result()
-
-            await asyncio.sleep(self.step)
-            slept += self.step
+        tx = self.listen(self.alice)
+        self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
         

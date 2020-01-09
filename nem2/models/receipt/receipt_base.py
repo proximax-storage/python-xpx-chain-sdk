@@ -165,7 +165,6 @@ class ReceiptBase(util.Model):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        #TODO: There's no NetworkType in data yet
         # Load and check the network type.
         #nt = cls.DTO.load_network_type(data)
         #if network_type is not None and network_type != nt:

@@ -13,6 +13,7 @@ from tests import harness
             'method': 'get_network_type',
             'validation': [
                 lambda x: (isinstance(x, models.NetworkType), True),
+                lambda x: (x, models.NetworkType.MIJIN_TEST),
             ]
         },
     ],

@@ -69,7 +69,6 @@ class AccountProperties(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            # TODO(ahuszagh) Check when stabilized
             'address': util.b64encode(self.address.address.encode('ascii')),
             'properties': AccountProperty.sequence_to_dto(self.properties, network_type),
         }
@@ -86,7 +85,6 @@ class AccountProperties(util.DTO):
         address = util.b64decode(data['address']).decode('ascii')
         from_dto = AccountProperty.sequence_from_dto
         return cls(
-            # TODO(ahuszagh) Check when stabilized
             address=Address.create_from_raw_address(address),
             properties=from_dto(data['properties'], network_type),
         )

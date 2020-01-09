@@ -61,7 +61,6 @@ class AccountPropertiesMetadata(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            # TODO(ahuszagh) Check when stabilized
             'id': self.id,
         }
 
@@ -75,6 +74,5 @@ class AccountPropertiesMetadata(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls(
-            # TODO(ahuszagh) Check when stabilized
             id=data['id'],
         )

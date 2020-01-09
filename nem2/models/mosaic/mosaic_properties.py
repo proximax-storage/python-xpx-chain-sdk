@@ -30,6 +30,12 @@ from ... import util
 
 __all__ = ['MosaicProperties']
 
+
+import logging
+logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 DTOType = typing.Sequence[util.U64DTOType]
 DTO2Type = typing.Sequence[dict]
 FLAGS_ID = 0
@@ -178,7 +184,7 @@ class MosaicProperties(util.DTO):
         duration = 0
         
         for prop in data[0 : 3]:
-            prop_id = util.u8_from_dto(prop["key"])
+            prop_id = util.u8_from_dto(prop["id"])
 
             if (prop_id == 0):
                 flags = util.u64_from_dto(prop["value"])
@@ -233,7 +239,7 @@ class MosaicDefinitionProperties(util.Model):
     def validate_dto(cls, data: DTO2Type) -> bool:
         """Validate the data-transfer object."""
 
-        required_keys = {'key', 'value'}
+        required_keys = {'id', 'value'}
         return (
             len(data) >= 2
             and all((
@@ -249,12 +255,12 @@ class MosaicDefinitionProperties(util.Model):
         # A newer version of DTO, which is used in MosaicDefinitionTransactions.
         # We need to keep the two versions separate.
         data = [
-            {'key': FLAGS_ID, 'value': util.u64_to_dto(self.model.flags)},
-            {'key': DIVISIBILITY_ID, 'value': util.u64_to_dto(self.model.divisibility)},
+            {'id': FLAGS_ID, 'value': util.u64_to_dto(self.model.flags)},
+            {'id': DIVISIBILITY_ID, 'value': util.u64_to_dto(self.model.divisibility)},
         ]
         if self.model.duration != 0:
             data.append({
-                'key': DURATION_ID,
+                'id': DURATION_ID,
                 'value': util.u64_to_dto(self.model.duration)
             })
 
@@ -266,6 +272,13 @@ class MosaicDefinitionProperties(util.Model):
         data: DTO2Type,
         network_type: OptionalNetworkType = None,
     ):
+        # There's a data inconsistnecy in reply from node
+        # /mosaic routes contains 'id' field
+        # MosaciDefinition transactions replies with 'key' field
+        for item in data:
+            if (('key' in item) and ('id' not in item)):
+                item['id'] = item.pop('key')
+
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
@@ -273,7 +286,7 @@ class MosaicDefinitionProperties(util.Model):
         # We need to keep the two versions separate.
         kwds = {}
         for item in data:
-            kwds[PROPERTIES[item['key']]] = util.u64_from_dto(item['value'])
+            kwds[PROPERTIES[item['id']]] = util.u64_from_dto(item['value'])
         return cls(MosaicProperties(**kwds))
 
     def to_catbuffer(

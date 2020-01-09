@@ -45,7 +45,6 @@ ReceiptValue = typing.Union[
 ]
 ReceiptValueList = typing.Sequence[ReceiptValue]
 
-# TODO(ahuszagh) Add unittests.
 @util.inherit_doc
 @util.dataclass(frozen=True)
 class TransactionStatement(util.DTO):

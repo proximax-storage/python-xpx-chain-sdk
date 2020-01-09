@@ -38,8 +38,6 @@ PropertyValue = typing.Union[
     Address,
     MosaicId,
     TransactionType,
-    # TODO(ahuszagh) Add sentinel
-    #   I'm assuming it's empty or an address?
 ]
 PropertyValueList = typing.Sequence[PropertyValue]
 
@@ -119,7 +117,6 @@ class AccountProperty(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            # TODO(ahuszagh) Check when stabilized
             'propertyType': self.property_type.to_dto(network_type),
             'values': to_base64(int(self.property_type), self.values),
         }
@@ -136,7 +133,6 @@ class AccountProperty(util.DTO):
         property_type = data['propertyType']
         values = data['values']
         return cls(
-            # TODO(ahuszagh) Check when stabilized
             property_type=PropertyType.create_from_dto(property_type, network_type),
             values=from_base64(property_type, values),
         )

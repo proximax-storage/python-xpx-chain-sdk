@@ -108,7 +108,6 @@ class AccountPropertyModification(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            # TODO(ahuszagh) Check when stabilized
             'type': self.modification_type.to_dto(network_type),
             'value': to_dto(self.value),
         }
@@ -124,7 +123,6 @@ class AccountPropertyModification(util.DTO):
 
         type = data['type']
         return cls(
-            # TODO(ahuszagh) Check when stabilized
             modification_type=PropertyModificationType.create_from_dto(type),
             value=from_dto(data['value']),
         )

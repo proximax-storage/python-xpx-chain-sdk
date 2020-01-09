@@ -37,7 +37,6 @@ logger = logging.getLogger(__name__)
 __all__ = ['Statements']
 
 
-# TODO(ahuszagh) Add unittests.
 @util.inherit_doc
 @util.dataclass(frozen=True)
 class Statements(util.DTO):

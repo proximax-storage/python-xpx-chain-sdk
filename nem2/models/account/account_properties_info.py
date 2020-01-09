@@ -67,7 +67,6 @@ class AccountPropertiesInfo(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            # TODO(ahuszagh) Check when stabilized
             'meta': self.meta.to_dto(network_type),
             'accountProperties': self.account_properties.to_dto(network_type),
         }
@@ -83,7 +82,6 @@ class AccountPropertiesInfo(util.DTO):
 
         from_dto = AccountProperties.create_from_dto
         return cls(
-            # TODO(ahuszagh) Check when stabilized
             meta=AccountPropertiesMetadata.create_from_dto(data['meta'], network_type),
             account_properties=from_dto(data['accountProperties'], network_type),
         )
