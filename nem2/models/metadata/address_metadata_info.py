@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import typing
 
-from .metadata import Metadata
+from .address_metadata import AddressMetadata
 from ... import util
 
 __all__ = ['AddressMetadataInfo']
@@ -14,16 +14,16 @@ __all__ = ['AddressMetadataInfo']
 class AddressMetadataInfo(util.DTO):
     """
 
-    :param metadata:  Metadata info.
+    :param metadata:  Address metadata info.
 
     DTO Format:
         .. code-block:: yaml
 
             AddressMetadataInfoDTO:
-                metedata: MetadataDTO
+                metedata: AddressMetadataDTO
     """
 
-    metadata: Metadata
+    metadata: AddressMetadata
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
@@ -54,7 +54,6 @@ class AddressMetadataInfo(util.DTO):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        metadata = data['metadata']
         return cls(
-            metadata=Metadata.create_from_dto(metadata)
+            metadata=AddressMetadata.create_from_dto(data['metadata'])
         )

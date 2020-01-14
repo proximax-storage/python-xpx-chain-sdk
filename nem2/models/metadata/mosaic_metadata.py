@@ -3,15 +3,17 @@ from __future__ import annotations
 
 import typing
 
+from .metadata_type import MetadataType
+from ..mosaic.mosaic_id import MosaicId
 from .field import Field
 from ... import util
 
-__all__ = ['Metadata']
+__all__ = ['MosaicMetadata']
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-class Metadata(util.DTO):
+class MosaicMetadata(util.DTO):
     """
 
     :param metadataType:  Metadata type.
@@ -24,12 +26,12 @@ class Metadata(util.DTO):
             MetadataDTO:
                 metedataType: int
                 fields: FieldDTO[]
-                metedataId: string
+                metedataId: int
     """
 
-    metadata_type: int
-    filds: typing.Sequence[Field] 
-    metadata_id: str
+    metadata_type: MetadataType
+    flds: typing.Sequence[Field]
+    metadata_id: MosaicId
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
@@ -52,9 +54,9 @@ class Metadata(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            'metadataType': self.metadata_type,
-            'fields': [x.to_dto() for x in self.filds],
-            'metadataId': self.metadata_id
+            'metadataType': util.u8_to_dto(self.metadata_type),
+            'fields': [x.to_dto() for x in self.flds],
+            'metadataId': self.metadata_id.to_dto()
         }
 
     @classmethod
@@ -67,7 +69,7 @@ class Metadata(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls(
-            metadata_type=data["metadataType"],
-            filds=[x.create_from_dto(field) for field in data["fields"]],
-            metadata_id=data["metadataId"]
+            metadata_type=MetadataType.create_from_dto(data["metadataType"]),
+            flds=[Field.create_from_dto(f) for f in data["fields"]],
+            metadata_id=MosaicId(util.u64_from_dto(data['metadataId']))
         )

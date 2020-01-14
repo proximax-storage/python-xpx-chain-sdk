@@ -427,19 +427,6 @@ class AccountHTTP(HTTPSharedBase):
         """
         return self(nis.get_account_contracts, public_account, **kwds)
 
-    def metadata(
-        self,
-        public_account: models.PublicAccount,
-        **kwds
-    ):
-        """
-        Get account metadata.
-
-        :param public_account: Public account.
-        :return: List of ContractInfo object.
-        """
-        return self(nis.get_account_metadata, public_account, **kwds)
-
     def get_account_names(
         self,
         addresses: typing.Sequence[models.Address],
@@ -578,6 +565,45 @@ class ContractHTTP(HTTPSharedBase):
 
 class MetadataHTTP(HTTPSharedBase):
     """Abstract base class for the Metadata HTTP client."""
+    
+    def get_account_metadata(
+        self,
+        public_account: models.PublicAccount,
+        **kwds
+    ):
+        """
+        Get account metadata.
+
+        :param public_account: Public account.
+        :return: List of ContractInfo object.
+        """
+        return self(nis.get_account_metadata, public_account, **kwds)
+		
+    def get_mosaic_metadata(
+        self,
+        mosaic_id: models.MosaicId,
+        **kwds
+    ):
+        """
+        Get mosaic metadata.
+
+        :param mosaic_id: Mosaic.
+        :return: List of ContractInfo object.
+        """
+        return self(nis.get_mosaic_metadata, mosaic_id, **kwds)
+
+    def get_namespace_metadata(
+        self,
+        namespace_id: models.NamespaceId,
+        **kwds
+    ):
+        """
+        Get namespace metadata.
+
+        :param namespace_id: Namespace ID.
+        :return: Metadata for a namespace.
+        """
+        return self(nis.get_namespace_metadata, namespace_id, **kwds)
 
     def get_metadata(
         self,
@@ -687,19 +713,6 @@ class MosaicHTTP(HTTPSharedBase):
         :return: Mosaic names for IDS.
         """
         return self(nis.get_mosaic_names, ids, **kwds)
-		
-    def metadata(
-        self,
-        mosaic_id: models.MosaicId,
-        **kwds
-    ):
-        """
-        Get mosaic metadata.
-
-        :param mosaic_id: Mosaic.
-        :return: List of ContractInfo object.
-        """
-        return self(nis.get_mosaic_metadata, mosaic_id, **kwds)
 
 
 class NamespaceHTTP(HTTPSharedBase):
@@ -782,19 +795,6 @@ class NamespaceHTTP(HTTPSharedBase):
         :return: Address object.
         """
         return self(nis.get_linked_address, namespace_id, **kwds)
-
-    def metadata(
-        self,
-        namespace_id: models.NamespaceId,
-        **kwds
-    ):
-        """
-        Get namespace metadata.
-
-        :param namespace_id: Namespace ID.
-        :return: Metadata for a namespace.
-        """
-        return self(nis.get_namespace_metadata, namespace_id, **kwds)
 
 
 class NetworkHTTP(HTTPSharedBase):

@@ -396,6 +396,7 @@ class AggregateBondedTransaction(AggregateTransaction):
         cosignatures: Cosignatures,
         network_type: NetworkType,
         max_fee: int = 0,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create aggregate bonded transaction object.
@@ -412,6 +413,7 @@ class AggregateBondedTransaction(AggregateTransaction):
             cosignatures,
             network_type,
             max_fee,
+            fee_strategy,
         )
 
 
@@ -427,6 +429,7 @@ class AggregateCompleteTransaction(AggregateTransaction):
         cosignatures: typing.Optional[Cosignatures],
         network_type: NetworkType,
         max_fee: int = 0,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create aggregate complete transaction object.
@@ -443,4 +446,5 @@ class AggregateCompleteTransaction(AggregateTransaction):
             cosignatures,
             network_type,
             max_fee,
+            fee_strategy,
         )

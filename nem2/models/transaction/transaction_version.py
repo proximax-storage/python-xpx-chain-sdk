@@ -50,6 +50,9 @@ class TransactionVersion(util.U8Mixin, enum.IntEnum):
     MODIFY_ACCOUNT_PROPERTY_MOSAIC = 1
     MODIFY_ACCOUNT_PROPERTY_ENTITY_TYPE = 1
     LINK_ACCOUNT = 2
+    MODIFY_ACCOUNT_METADATA = 1,
+    MODIFY_MOSAIC_METADATA = 1,
+    MODIFY_NAMESPACE_METADATA = 1,
 
     def description(self) -> str:
         return DESCRIPTION[self]

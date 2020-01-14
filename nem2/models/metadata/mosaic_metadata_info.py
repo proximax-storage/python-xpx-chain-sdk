@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import typing
 
-from .metadata import Metadata
+from .mosaic_metadata import MosaicMetadata
 from ... import util
 
 __all__ = ['MosaicMetadataInfo']
@@ -14,16 +14,16 @@ __all__ = ['MosaicMetadataInfo']
 class MosaicMetadataInfo(util.DTO):
     """
 
-    :param metadata:  Metadata info.
+    :param metadata:  Mosaic metadata info.
 
     DTO Format:
         .. code-block:: yaml
 
             MosaicMetadataInfoDTO:
-                metedata: MetadataDTO
+                metedata: MosaicMetadataDTO
     """
 
-    metadata: Metadata
+    metadata: MosaicMetadata
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
@@ -54,7 +54,6 @@ class MosaicMetadataInfo(util.DTO):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        metadata = data['metadata']
         return cls(
-            metadata=Metadata.create_from_dto(metadata)
+            metadata=MosaicMetadata.create_from_dto(data['metadata'])
         )

@@ -39,17 +39,22 @@ class Field(util.DTO):
         return (
             # Level 1
             cls.validate_dto_required(data, required_l1)
-            and cls.validate_dto_all(data, required_l1)
         )
 
-    def to_dto(
+    def catbuffer_size_specific(self) -> int:
+        key_size = util.U8_BYTES * len(self.key)
+        value_size = util.U8_BYTES * len(self.value)
+
+        return key_size + value_size
+
+    def to_catbuffer_specific(
         self,
-        network_type: OptionalNetworkType = None,
-    ) -> dict:
-        return {
-            'key': key,
-            'value': self.value
-        }
+        network_type: NetworkType,
+    ) -> bytes:
+        key = self.key.encode('utf8')
+        value = self.value.encode('utf8')
+
+        return key + value
 
     @classmethod
     def create_from_dto(
@@ -61,6 +66,6 @@ class Field(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls(
-            key=data["key"],
-            value=data["value"]
+            key=data['key'],
+            value=data['value'],
         )

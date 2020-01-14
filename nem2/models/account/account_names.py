@@ -86,8 +86,6 @@ class AccountNames(util.DTO):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        logger.info(data)
-
         return cls(
             address=Address.create_from_encoded(data['address']),
             names=[NamespaceId(namespace_name) for namespace_name in data['names']],

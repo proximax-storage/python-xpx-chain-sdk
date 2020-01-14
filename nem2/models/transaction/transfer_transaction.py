@@ -45,6 +45,10 @@ __all__ = [
     'TransferInnerTransaction',
 ]
 
+import logging
+logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)

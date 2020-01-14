@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import typing
 
-from .metadata import Metadata
+from .namespace_metadata import NamespaceMetadata
 from ... import util
 
 __all__ = ['NamespaceMetadataInfo']
@@ -14,16 +14,16 @@ __all__ = ['NamespaceMetadataInfo']
 class NamespaceMetadataInfo(util.DTO):
     """
 
-    :param metadata:  Metadata info.
+    :param metadata:  Namespace metadata info.
 
     DTO Format:
         .. code-block:: yaml
 
             NamespaceMetadataInfoDTO:
-                metedata: MetadataDTO
+                metedata: NamespaceMetadataDTO
     """
 
-    metadata: Metadata
+    metadata: NamespaceMetadata
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
@@ -54,7 +54,6 @@ class NamespaceMetadataInfo(util.DTO):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        metadata = data['metadata']
         return cls(
-            metadata=Metadata.create_from_dto(metadata)
+            metadata=NamespaceMetadata.create_from_dto(data['metadata'])
         )

@@ -79,10 +79,16 @@ from .contract.contract_info import *
 
 # Metadata
 from .metadata.address_metadata_info import *
+from .metadata.address_metadata import *
 from .metadata.mosaic_metadata_info import *
+from .metadata.mosaic_metadata import *
 from .metadata.namespace_metadata_info import *
-from .metadata.metadata import *
+from .metadata.namespace_metadata import *
 from .metadata.field import *
+from .metadata.metadata_modification import *
+from .metadata.metadata_type import *
+from .metadata.metadata_modification_type import *
+from .metadata import *
 
 # Mosaic
 from .mosaic.mosaic import *
@@ -138,6 +144,10 @@ from .transaction.modify_account_property_address_transaction import *
 from .transaction.modify_account_property_entity_type_transaction import *
 from .transaction.modify_account_property_mosaic_transaction import *
 from .transaction.modify_account_property_transaction import *
+from .transaction.modify_account_metadata_transaction import *
+from .transaction.modify_mosaic_metadata_transaction import *
+from .transaction.modify_namespace_metadata_transaction import *
+from .transaction.modify_metadata_transaction import *
 from .transaction.modify_multisig_account_transaction import *
 from .transaction.mosaic_alias_transaction import *
 from .transaction.mosaic_definition_transaction import *
@@ -201,6 +211,18 @@ __all__ = (
     + resolution_statement.__all__
     + resolution_entry.__all__
 
+    # Metadata
+    + address_metadata_info.__all__
+    + address_metadata.__all__
+    + mosaic_metadata_info.__all__
+    + mosaic_metadata.__all__
+    + namespace_metadata_info.__all__
+    + namespace_metadata.__all__
+    + metadata_type.__all__
+    + metadata_modification_type.__all__
+    + metadata_modification.__all__
+    + field.__all__
+
     # Mosaic
     + mosaic.__all__
     + mosaic_id.__all__
@@ -252,6 +274,10 @@ __all__ = (
     + modify_account_property_entity_type_transaction.__all__
     + modify_account_property_mosaic_transaction.__all__
     + modify_account_property_transaction.__all__
+    + modify_account_metadata_transaction.__all__
+    + modify_mosaic_metadata_transaction.__all__
+    + modify_namespace_metadata_transaction.__all__
+    + modify_metadata_transaction.__all__
     + modify_multisig_account_transaction.__all__
     + mosaic_alias_transaction.__all__
     + mosaic_definition_transaction.__all__
