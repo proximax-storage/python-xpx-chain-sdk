@@ -1154,7 +1154,7 @@ def process_get_metadata(
     """
 
     assert status == 200
-    return models.AddressMetadataInfo.create_from_dto(json)
+    return models.MetadataInfo.create_from_dto(json)
 
 
 get_metadata = request("get_metadata")
@@ -1188,7 +1188,7 @@ def process_get_metadatas(
     """
 
     assert status == 200
-    return [models.AddressMetadataInfo.create_from_dto(i, network_type) for i in json]
+    return [models.MetadataInfo.create_from_dto(i, network_type) for i in json]
 
 
 get_metadatas = request("get_metadatas")

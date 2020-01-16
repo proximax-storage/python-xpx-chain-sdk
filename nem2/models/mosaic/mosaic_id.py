@@ -45,6 +45,9 @@ class MosaicId(util.IntMixin, util.Object):
     def __int__(self) -> int:
         return self.id
 
+    def get_id(self) -> str:
+        return util.hexlify(self.id.to_bytes(8, 'big'))
+
     @classmethod
     def create_from_nonce(
         cls,

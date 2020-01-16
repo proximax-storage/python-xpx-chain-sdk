@@ -207,91 +207,91 @@ class TestMetadataHttp(harness.TestCase):
         return mosaic_id
 
     # TESTS
-    def test_modify_address_metadata_transaction(self):
-        metadata_key = 'foo' + hexlify(os.urandom(4)).decode('ascii')
-        
-        for metadata_modification_type in [models.MetadataModificationType.ADD, models.MetadataModificationType.REMOVE]:
-            tx = models.ModifyAccountMetadataTransaction.create(
-                deadline=models.Deadline.create(),
-                network_type=models.NetworkType.MIJIN_TEST,
-                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
-                metadata_type=models.MetadataType.ADDRESS,
-                metadata_id=self.alice.address,
-                modifications=[
-                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key, 'bar')),
-                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key + '2', 'bar')),
-                ],
-            )
-
-            signed_tx = tx.sign_with(self.alice, config.gen_hash)
-
-            with client.TransactionHTTP(responses.ENDPOINT) as http:
-                http.announce(signed_tx)
-
-            tx = self.listen(self.alice)
-            self.assertEqual(isinstance(tx, models.ModifyAccountMetadataTransaction), True)
-            self.assertEqual(tx.metadata_id, self.alice.address)
-            self.assertEqual(len(tx.modifications) > 0, True)
-            self.assertEqual(tx.modifications[0].field.key, metadata_key)
-            self.assertEqual(tx.modifications[0].field.value, 'bar')
-    
-            
-    def test_modify_mosaic_metadata_transaction(self):
-        metadata_key = 'foo' + hexlify(os.urandom(4)).decode('ascii')
-        
-        for metadata_modification_type in [models.MetadataModificationType.ADD, models.MetadataModificationType.REMOVE]:
-            tx = models.ModifyMosaicMetadataTransaction.create(
-                deadline=models.Deadline.create(),
-                network_type=models.NetworkType.MIJIN_TEST,
-                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
-                metadata_type=models.MetadataType.MOSAIC,
-                metadata_id=self.mosaic_id,
-                modifications=[
-                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key, 'bar')),
-                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key + '2', 'bar')),
-                ],
-            )
-
-            signed_tx = tx.sign_with(self.alice, config.gen_hash)
-
-            with client.TransactionHTTP(responses.ENDPOINT) as http:
-                http.announce(signed_tx)
-
-            tx = self.listen(self.alice)
-            self.assertEqual(isinstance(tx, models.ModifyMosaicMetadataTransaction), True)
-            self.assertEqual(tx.metadata_id, self.mosaic_id)
-            self.assertEqual(len(tx.modifications) > 0, True)
-            self.assertEqual(tx.modifications[0].field.key, metadata_key)
-            self.assertEqual(tx.modifications[0].field.value, 'bar')
-    
-        
-    def test_modify_namespace_metadata_transaction(self):
-        metadata_key = 'foo' + hexlify(os.urandom(4)).decode('ascii')
-
-        for metadata_modification_type in [models.MetadataModificationType.ADD, models.MetadataModificationType.REMOVE]:
-            tx = models.ModifyNamespaceMetadataTransaction.create(
-                deadline=models.Deadline.create(),
-                network_type=models.NetworkType.MIJIN_TEST,
-                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
-                metadata_type=models.MetadataType.NAMESPACE,
-                metadata_id=models.NamespaceId(self.namespace),
-                modifications=[
-                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key, 'bar')),
-                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key + '2', 'bar')),
-                ],
-            )
-
-            signed_tx = tx.sign_with(self.alice, config.gen_hash)
-
-            with client.TransactionHTTP(responses.ENDPOINT) as http:
-                http.announce(signed_tx)
-
-            tx = self.listen(self.alice)
-            self.assertEqual(isinstance(tx, models.ModifyNamespaceMetadataTransaction), True)
-            self.assertEqual(tx.metadata_id, models.NamespaceId(self.namespace))
-            self.assertEqual(len(tx.modifications) > 0, True)
-            self.assertEqual(tx.modifications[0].field.key, metadata_key)
-            self.assertEqual(tx.modifications[0].field.value, 'bar')
+#    def test_modify_address_metadata_transaction(self):
+#        metadata_key = 'foo' + hexlify(os.urandom(4)).decode('ascii')
+#        
+#        for metadata_modification_type in [models.MetadataModificationType.ADD, models.MetadataModificationType.REMOVE]:
+#            tx = models.ModifyAccountMetadataTransaction.create(
+#                deadline=models.Deadline.create(),
+#                network_type=models.NetworkType.MIJIN_TEST,
+#                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
+#                metadata_type=models.MetadataType.ADDRESS,
+#                metadata_id=self.alice.address,
+#                modifications=[
+#                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key, 'bar')),
+#                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key + '2', 'bar')),
+#                ],
+#            )
+#
+#            signed_tx = tx.sign_with(self.alice, config.gen_hash)
+#
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(signed_tx)
+#
+#            tx = self.listen(self.alice)
+#            self.assertEqual(isinstance(tx, models.ModifyAccountMetadataTransaction), True)
+#            self.assertEqual(tx.metadata_id, self.alice.address)
+#            self.assertEqual(len(tx.modifications) > 0, True)
+#            self.assertEqual(tx.modifications[0].field.key, metadata_key)
+#            self.assertEqual(tx.modifications[0].field.value, 'bar')
+#    
+#            
+#    def test_modify_mosaic_metadata_transaction(self):
+#        metadata_key = 'foo' + hexlify(os.urandom(4)).decode('ascii')
+#        
+#        for metadata_modification_type in [models.MetadataModificationType.ADD, models.MetadataModificationType.REMOVE]:
+#            tx = models.ModifyMosaicMetadataTransaction.create(
+#                deadline=models.Deadline.create(),
+#                network_type=models.NetworkType.MIJIN_TEST,
+#                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
+#                metadata_type=models.MetadataType.MOSAIC,
+#                metadata_id=self.mosaic_id,
+#                modifications=[
+#                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key, 'bar')),
+#                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key + '2', 'bar')),
+#                ],
+#            )
+#
+#            signed_tx = tx.sign_with(self.alice, config.gen_hash)
+#
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(signed_tx)
+#
+#            tx = self.listen(self.alice)
+#            self.assertEqual(isinstance(tx, models.ModifyMosaicMetadataTransaction), True)
+#            self.assertEqual(tx.metadata_id, self.mosaic_id)
+#            self.assertEqual(len(tx.modifications) > 0, True)
+#            self.assertEqual(tx.modifications[0].field.key, metadata_key)
+#            self.assertEqual(tx.modifications[0].field.value, 'bar')
+#    
+#        
+#    def test_modify_namespace_metadata_transaction(self):
+#        metadata_key = 'foo' + hexlify(os.urandom(4)).decode('ascii')
+#
+#        for metadata_modification_type in [models.MetadataModificationType.ADD, models.MetadataModificationType.REMOVE]:
+#            tx = models.ModifyNamespaceMetadataTransaction.create(
+#                deadline=models.Deadline.create(),
+#                network_type=models.NetworkType.MIJIN_TEST,
+#                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
+#                metadata_type=models.MetadataType.NAMESPACE,
+#                metadata_id=models.NamespaceId(self.namespace),
+#                modifications=[
+#                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key, 'bar')),
+#                    models.MetadataModification(metadata_modification_type, models.Field(metadata_key + '2', 'bar')),
+#                ],
+#            )
+#
+#            signed_tx = tx.sign_with(self.alice, config.gen_hash)
+#
+#            with client.TransactionHTTP(responses.ENDPOINT) as http:
+#                http.announce(signed_tx)
+#
+#            tx = self.listen(self.alice)
+#            self.assertEqual(isinstance(tx, models.ModifyNamespaceMetadataTransaction), True)
+#            self.assertEqual(tx.metadata_id, models.NamespaceId(self.namespace))
+#            self.assertEqual(len(tx.modifications) > 0, True)
+#            self.assertEqual(tx.modifications[0].field.key, metadata_key)
+#            self.assertEqual(tx.modifications[0].field.value, 'bar')
 
 
     def test_account_metadata(self):
@@ -301,6 +301,23 @@ class TestMetadataHttp(harness.TestCase):
             self.assertEqual(len(reply.metadata.flds), 2)
             self.assertEqual(reply.metadata.flds[0], self.modifications[0].field)
             self.assertEqual(reply.metadata.flds[1], self.modifications[1].field)
+        
+        with client.MetadataHTTP(responses.ENDPOINT) as http:
+            reply = http.get_metadata(self.alice.address.plain())
+            self.assertEqual(isinstance(reply, models.MetadataInfo), True)
+            self.assertEqual(isinstance(reply.metadata, models.AddressMetadata), True)
+            self.assertEqual(len(reply.metadata.flds), 2)
+            self.assertEqual(reply.metadata.flds[0], self.modifications[0].field)
+            self.assertEqual(reply.metadata.flds[1], self.modifications[1].field)
+        
+        with client.MetadataHTTP(responses.ENDPOINT) as http:
+            reply = http.get_metadatas([self.alice.address.plain()])
+            self.assertEqual(len(reply) > 0, True)
+            self.assertEqual(isinstance(reply[0], models.MetadataInfo), True)
+            self.assertEqual(isinstance(reply[0].metadata, models.AddressMetadata), True)
+            self.assertEqual(len(reply[0].metadata.flds), 2)
+            self.assertEqual(reply[0].metadata.flds[0], self.modifications[0].field)
+            self.assertEqual(reply[0].metadata.flds[1], self.modifications[1].field)
 
 
     def test_mosaic_metadata(self):
@@ -311,6 +328,23 @@ class TestMetadataHttp(harness.TestCase):
             self.assertEqual(reply.metadata.flds[0], self.modifications[0].field)
             self.assertEqual(reply.metadata.flds[1], self.modifications[1].field)
 
+        with client.MetadataHTTP(responses.ENDPOINT) as http:
+            reply = http.get_metadata(self.mosaic_id.get_id())
+            self.assertEqual(isinstance(reply, models.MetadataInfo), True)
+            self.assertEqual(isinstance(reply.metadata, models.MosaicMetadata), True)
+            self.assertEqual(len(reply.metadata.flds), 2)
+            self.assertEqual(reply.metadata.flds[0], self.modifications[0].field)
+            self.assertEqual(reply.metadata.flds[1], self.modifications[1].field)
+        
+        with client.MetadataHTTP(responses.ENDPOINT) as http:
+            reply = http.get_metadatas([self.mosaic_id.get_id()])
+            self.assertEqual(len(reply) > 0, True)
+            self.assertEqual(isinstance(reply[0], models.MetadataInfo), True)
+            self.assertEqual(isinstance(reply[0].metadata, models.MosaicMetadata), True)
+            self.assertEqual(len(reply[0].metadata.flds), 2)
+            self.assertEqual(reply[0].metadata.flds[0], self.modifications[0].field)
+            self.assertEqual(reply[0].metadata.flds[1], self.modifications[1].field)
+
 
     def test_namespace_metadata(self):
         with client.MetadataHTTP(responses.ENDPOINT) as http:
@@ -319,3 +353,20 @@ class TestMetadataHttp(harness.TestCase):
             self.assertEqual(len(reply.metadata.flds), 2)
             self.assertEqual(reply.metadata.flds[0], self.modifications[0].field)
             self.assertEqual(reply.metadata.flds[1], self.modifications[1].field)
+
+        with client.MetadataHTTP(responses.ENDPOINT) as http:
+            reply = http.get_metadata(models.NamespaceId(self.namespace).get_id())
+            self.assertEqual(isinstance(reply, models.MetadataInfo), True)
+            self.assertEqual(isinstance(reply.metadata, models.NamespaceMetadata), True)
+            self.assertEqual(len(reply.metadata.flds), 2)
+            self.assertEqual(reply.metadata.flds[0], self.modifications[0].field)
+            self.assertEqual(reply.metadata.flds[1], self.modifications[1].field)
+        
+        with client.MetadataHTTP(responses.ENDPOINT) as http:
+            reply = http.get_metadatas([models.NamespaceId(self.namespace).get_id()])
+            self.assertEqual(len(reply) > 0, True)
+            self.assertEqual(isinstance(reply[0], models.MetadataInfo), True)
+            self.assertEqual(isinstance(reply[0].metadata, models.NamespaceMetadata), True)
+            self.assertEqual(len(reply[0].metadata.flds), 2)
+            self.assertEqual(reply[0].metadata.flds[0], self.modifications[0].field)
+            self.assertEqual(reply[0].metadata.flds[1], self.modifications[1].field)

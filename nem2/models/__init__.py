@@ -88,6 +88,7 @@ from .metadata.field import *
 from .metadata.metadata_modification import *
 from .metadata.metadata_type import *
 from .metadata.metadata_modification_type import *
+from .metadata.metadata_info import *
 from .metadata import *
 
 # Mosaic
@@ -221,6 +222,7 @@ __all__ = (
     + metadata_type.__all__
     + metadata_modification_type.__all__
     + metadata_modification.__all__
+    + metadata_info.__all__
     + field.__all__
 
     # Mosaic
