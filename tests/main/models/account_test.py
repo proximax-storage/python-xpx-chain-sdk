@@ -1,7 +1,7 @@
 from nem2 import models
 from nem2 import util
 from tests import harness
-
+from tests import config
 
 @harness.model_test_case({
     'type': models.Account,
@@ -47,8 +47,8 @@ class TestAccount(harness.TestCase):
     @harness.ignore_warnings_test
     def test_sign(self):
         transaction = 'bb000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'
-        signed = util.hexlify(self.model.sign(transaction))
-        self.assertEqual(signed, 'bb000000d0092d8eaf91c07069eeef6651cd313e792b27d2cb31473ceaac40f78ee2121acb5f665826083b87b374c9eb67aefef6b8cf74f0298820a9143b34055e15900c1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7')
+        signed = util.hexlify(self.model.sign(transaction, config.gen_hash))
+        self.assertEqual(signed, 'bb000000111f1e4ca0f97a1020e9339e9c21dddddd231a48c28d0b3eade6c9567d6092ee9a36490c2ea6482cd7cef7c4f07d49e5ba33d4b278bd4ff95e56e916f448890a1b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955019052420000000000000000f1b4815c00000000009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7')
 
     @harness.ignore_warnings_test
     def test_sign_data(self):
@@ -84,19 +84,21 @@ class TestAccount(harness.TestCase):
         'public_key': '7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808',
         'public_key_height': 1,
         'mosaics': [],
-        'importance': 0,
-        'importance_height': 0,
+        'account_type': 0,
+        'linked_account_key': '',
+        'snapshots': [],
     },
     'dto': {
         'meta': {},
         'account': {
-            'address': '90f6c07a4cf9ad1bf0644d419218b72fcdf1efcc07a6c9202c',
+            'address': '9082ed88057540e360203c14fa38cb062c55b53429447dc718',
             'addressHeight': [1, 0],
             'publicKey': '7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808',
             'publicKeyHeight': [1, 0],
             'mosaics': [],
-            'importance': [0, 0],
-            'importanceHeight': [0, 0],
+            'accountType': 0,
+            'linkedAccountKey': '',
+            'snapshots': [],
         },
     }
 })
@@ -132,7 +134,7 @@ class TestAccountMetadata(harness.TestCase):
         'propertyType': 0x01,
         'values': [
             'kCiRICJxVnplFmh3pkfYpf/Tu+Ywq5JeRg==',
-            'kPbAekz5rRvwZE1Bkhi3L83x78wHpskgLA==',
+            'kILtiAV1QONgIDwU+jjLBixVtTQpRH3HGA==',
         ],
     },
 })

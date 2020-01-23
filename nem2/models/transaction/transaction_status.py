@@ -25,7 +25,7 @@
 from __future__ import annotations
 import typing
 
-from .deadline import Deadline, TIMESTAMP_NEMESIS_BLOCK_DTO
+from .deadline import Deadline, TIMESTAMP_NEMESIS_BLOCK, TIMESTAMP_NEMESIS_BLOCK_DTO
 from .transaction_status_group import TransactionStatusGroup
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
@@ -84,7 +84,7 @@ class TransactionStatus(util.DTO):
             data['group'] = typing.cast(str, self.group.value)
         if self.hash:
             data['hash'] = self.hash
-        if timestamp != Deadline.TIMESTAMP_NEMESIS_BLOCK:
+        if timestamp != TIMESTAMP_NEMESIS_BLOCK:
             data['deadline'] = util.u64_to_dto(timestamp)
         if self.height:
             data['height'] = util.u64_to_dto(self.height)

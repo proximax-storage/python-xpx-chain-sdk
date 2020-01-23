@@ -60,7 +60,6 @@ class TestMosaicId(harness.TestCase):
         'owner': models.PublicAccount.create_from_public_key('a04335f99d9ee3787528a16c7a302f80d511e9cf71d97d95c2182e0ea75a1ef9', models.NetworkType.MIJIN_TEST),
         'revision': 1,
         'properties': models.MosaicProperties(0x2, 6, 0),
-        'levy': models.MosaicLevy(),
     },
     'dto': {
         'meta': {
@@ -72,8 +71,7 @@ class TestMosaicId(harness.TestCase):
             'height': [1, 0],
             'owner': 'a04335f99d9ee3787528a16c7a302f80d511e9cf71d97d95c2182e0ea75a1ef9',
             'revision': 1,
-            'properties': [[2, 0], [6, 0], [0, 0]],
-            'levy': {},
+            'properties': [{'id': 0, 'value': [2, 0]}, {'id': 1, 'value': [6, 0]}, {'id': 2, 'value': [0, 0]}],
         },
     },
 })
@@ -82,55 +80,15 @@ class TestMosaicInfo(harness.TestCase):
 
 
 @harness.model_test_case({
-    'type': models.MosaicLevy,
-    'network_type': models.NetworkType.MIJIN_TEST,
-    'data': {},
-    'dto': {},
-    'eq': False,
-})
-class TestMosaicLevy(harness.TestCase):
-    pass
-
-
-@harness.enum_test_case({
-    'type': models.MosaicLevyType,
-    'enums': [
-        models.MosaicLevyType.ABSOLUTE,
-        models.MosaicLevyType.CALCULATED,
-    ],
-    'values': [
-        1,
-        2,
-    ],
-    'descriptions': [
-        'The levy is an absolute fee',
-        'The levy is calculated from',
-    ],
-    'dto': [
-        1,
-        2,
-    ],
-    'catbuffer': [
-        b'\x01',
-        b'\x02',
-    ],
-})
-class TestMosaicLevyType(harness.TestCase):
-    pass
-
-
-@harness.model_test_case({
     'type': models.MosaicName,
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
         'mosaic_id': models.MosaicId(0xd525ad41d95fcf29),
-        'name': 'xem',
-        'parent_id': models.NamespaceId(0x84b3552d375ffa4b),
+        'names': ['xem'],
     },
     'dto': {
         'mosaicId': [0xd95fcf29, 0xd525ad41],
-        'name': 'xem',
-        'parentId': [0x375ffa4b, 0x84b3552d]
+        'names': ['xem'],
     },
 })
 class TestMosaicName(harness.TestCase):
@@ -187,21 +145,19 @@ class TestMosaicNonce(harness.TestCase):
         'divisibility': 1,
         'duration': 100,
     },
-    'dto': [[3, 0], [1, 0], [100, 0]],
+    'dto': [{'id': 0, 'value': [3, 0]}, {'id': 1, 'value': [1, 0]}, {'id': 2, 'value': [100, 0]}],
 })
 class TestMosaicProperties(harness.TestCase):
 
     def test_properties(self):
         self.assertEqual(self.model.supply_mutable, True)
         self.assertEqual(self.model.transferable, True)
-        self.assertEqual(self.model.levy_mutable, False)
 
     def test_create(self):
         self.assertEqual(self.type.create().flags, 0x2)
         self.assertEqual(self.type.create(supply_mutable=True).flags, 0x3)
         self.assertEqual(self.type.create(transferable=True).flags, 0x2)
         self.assertEqual(self.type.create(transferable=False).flags, 0x0)
-        self.assertEqual(self.type.create(levy_mutable=True).flags, 0x6)
 
 
 @harness.enum_test_case({

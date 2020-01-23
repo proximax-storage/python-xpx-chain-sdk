@@ -14,80 +14,64 @@ class Error(Exception):
 @harness.http_test_case({
     'clients': (client.AccountHTTP, client.AsyncAccountHTTP),
     'tests': [
-#        {
-#            #/account/{accountId}
-#            'name': 'test_get_account_info',
-#            'params': [config.nemesis.address],
-#            'method': 'get_account_info',
-#            'validation': [
-#                lambda x: (x.public_key, config.nemesis.public_key.upper()),
-#            ]
-#        },
-#        {
-#            #/account
-#            'name': 'test_get_accounts_info',
-#            'params': [[config.nemesis.address]],
-#            'method': 'get_accounts_info',
-#            'validation': [
-#                lambda x: (len(x), 1),
-#                lambda x: (x[0].public_key, config.nemesis.public_key.upper()),
-#            ]
-#        },
-#        {
-#            #/account/{publicKey}/transaction
-#            'name': 'test_account_transactions',
-#            'params': [config.nemesis],
-#            'method': 'transactions',
-#            'validation': [
-#                lambda x: (len(x) > 0, True),
-#                lambda x: (x[0].type, 16724),
-#            ]
-#        },
-#        {
-#            #/account/{publicKey}/transaction/incoming
-#            'name': 'test_incoming_transactions',
-#            'params': [config.nemesis],
-#            'method': 'incoming_transactions',
-#            'validation': [
-#                lambda x: (len(x) > 0, True),
-#                lambda x: (x[0].recipient.address, config.nemesis.address.address),
-#                lambda x: (x[0].type, 16724),
-#            ],
-#        },
-#        {
-#            #/account/{publicKey}/transaction/outgoing
-#            'name': 'test_outgoing_transactions',
-#            'params': [config.nemesis_signer],
-#            'method': 'outgoing_transactions',
-#            'validation': [
-#                lambda x: (len(x) > 0, True),
-#            ],
-#        },
-#        {
-#            #/account/{publicKey}/transaction/unconfirmed
-#            'name': 'test_unconfirmed_transactions',
-#            'params': [config.nemesis],
-#            'method': 'unconfirmed_transactions',
-#            'validation': [
-#                lambda x: (len(x), 0),
-#            ],
-#        },
-#        {
-#            #/account/{publicKey}/transaction/partial
-#            'name': 'test_aggregate_bonded_transactions',
-#            'params': [config.nemesis],
-#            'method': 'aggregate_bonded_transactions',
-#            'validation': [
-#                lambda x: (len(x), 0),
-#            ],
-#        },
+        {
+            #/account/{accountId}
+            'name': 'test_get_account_info',
+            'params': [config.nemesis.address],
+            'method': 'get_account_info',
+            'validation': [
+                lambda x: (x.public_key, config.nemesis.public_key.upper()),
+            ]
+        },
+        {
+            #/account
+            'name': 'test_get_accounts_info',
+            'params': [[config.nemesis.address]],
+            'method': 'get_accounts_info',
+            'validation': [
+                lambda x: (len(x), 1),
+                lambda x: (x[0].public_key, config.nemesis.public_key.upper()),
+            ]
+        },
+        {
+            #/account/{publicKey}/transaction/unconfirmed
+            'name': 'test_unconfirmed_transactions',
+            'params': [config.nemesis],
+            'method': 'unconfirmed_transactions',
+            'validation': [
+                lambda x: (len(x), 0),
+            ],
+        },
+        {
+            #/account/{publicKey}/transaction/partial
+            'name': 'test_aggregate_bonded_transactions',
+            'params': [config.nemesis],
+            'method': 'aggregate_bonded_transactions',
+            'validation': [
+                lambda x: (len(x), 0),
+            ],
+        },
     ],
 })
 class TestAccountHttp(harness.TestCase):
     def __init__(self, task) -> None:
         super().__init__(task)
 
-        if (task == 'test_multisig_account_info'):
+        if (task == 'test_account_transactions'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, 100000000)
+
+        elif (task == 'test_incoming_transactions'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, 100000000)
+        
+        elif (task == 'test_outgoing_transactions'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, 100000000)
+            self.send_funds(self.alice, self.bob, 10000000)
+        
+        elif (task == 'test_multisig_account_info'):
             self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
             self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
             self.multisig = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
@@ -117,10 +101,9 @@ class TestAccountHttp(harness.TestCase):
                 deadline=models.Deadline.create(),
                 inner_transactions=[nemesis_to_alice.to_aggregate(config.nemesis), nemesis_to_bob.to_aggregate(config.nemesis), nemesis_to_multisig.to_aggregate(config.nemesis)],
                 network_type=models.NetworkType.MIJIN_TEST,
-                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
             )
 
-            signed_tx = tx.sign_transaction_with_cosignatories(config.nemesis, config.gen_hash)
+            signed_tx = tx.sign_transaction_with_cosignatories(config.nemesis, config. gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
@@ -143,10 +126,9 @@ class TestAccountHttp(harness.TestCase):
                 deadline=models.Deadline.create(),
                 inner_transactions=[change_to_multisig.to_aggregate(self.multisig)],
                 network_type=models.NetworkType.MIJIN_TEST,
-                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
             )
 
-            signed_tx = tx.sign_transaction_with_cosignatories(self.multisig, config.gen_hash, [self.alice, self.bob])
+            signed_tx = tx.sign_transaction_with_cosignatories(self.multisig, config.gen_hash, [self.alice, self.bob], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
@@ -206,10 +188,9 @@ class TestAccountHttp(harness.TestCase):
                     nemesis_to_multisig2.to_aggregate(config.nemesis),
                 ],
                 network_type=models.NetworkType.MIJIN_TEST,
-                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
             )
 
-            signed_tx = tx.sign_transaction_with_cosignatories(config.nemesis, config.gen_hash)
+            signed_tx = tx.sign_transaction_with_cosignatories(config.nemesis, config. gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
@@ -232,10 +213,9 @@ class TestAccountHttp(harness.TestCase):
                 deadline=models.Deadline.create(),
                 inner_transactions=[change_to_multisig.to_aggregate(self.multisig)],
                 network_type=models.NetworkType.MIJIN_TEST,
-                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
             )
 
-            signed_tx = tx.sign_transaction_with_cosignatories(self.multisig, config.gen_hash, [self.alice, self.bob])
+            signed_tx = tx.sign_transaction_with_cosignatories(self.multisig, config.gen_hash, [self.alice, self.bob], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
@@ -258,10 +238,9 @@ class TestAccountHttp(harness.TestCase):
                 deadline=models.Deadline.create(),
                 inner_transactions=[change_to_multisig.to_aggregate(self.multisig2)],
                 network_type=models.NetworkType.MIJIN_TEST,
-                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
             )
 
-            signed_tx = tx.sign_transaction_with_cosignatories(self.multisig2, config.gen_hash, [self.alice, self.bob, self.mike])
+            signed_tx = tx.sign_transaction_with_cosignatories(self.multisig2, config.gen_hash, [self.alice, self.bob, self.mike], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
@@ -282,7 +261,7 @@ class TestAccountHttp(harness.TestCase):
                 duration=60
             )
 
-            signed_tx = tx.sign_with(self.mike, config.gen_hash)
+            signed_tx = tx.sign_with(self.mike, config. gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
@@ -299,7 +278,7 @@ class TestAccountHttp(harness.TestCase):
                 parent_namespace=namespace_name
             )
 
-            signed_tx = tx.sign_with(self.mike, config.gen_hash)
+            signed_tx = tx.sign_with(self.mike, config. gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
@@ -315,13 +294,12 @@ class TestAccountHttp(harness.TestCase):
                 deadline=models.Deadline.create(),
                 network_type=models.NetworkType.MIJIN_TEST,
                 max_fee=1,
-                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
                 action_type=models.AliasActionType.LINK,
                 namespace_id=models.NamespaceId(self.mikes_namespace),
                 address=self.mike.address
             )
 
-            signed_tx = tx.sign_with(self.mike, config.gen_hash)
+            signed_tx = tx.sign_with(self.mike, config. gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
@@ -348,10 +326,9 @@ class TestAccountHttp(harness.TestCase):
             recipient=recipient.address,
             mosaics=[models.Mosaic(config.mosaic_id, amount)],
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_with(sender, config.gen_hash)
+        signed_tx = tx.sign_with(sender, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -363,7 +340,7 @@ class TestAccountHttp(harness.TestCase):
         self.assertEqual(tx.mosaics[0].id, config.mosaic_id)
         self.assertEqual(tx.mosaics[0].amount, amount)
 
-        return tx.transaction_info.hash
+        return tx
     
     def test_multisig_account_info(self):
         with client.AccountHTTP(responses.ENDPOINT) as http:
@@ -384,3 +361,30 @@ class TestAccountHttp(harness.TestCase):
             self.assertEqual(isinstance(info[0], models.AccountNames), True)
             self.assertEqual(len(info[0].names), 1)
             self.assertEqual(info[0].names[0], models.NamespaceId(self.mikes_namespace))
+    
+    
+    def test_account_transactions(self):
+        with client.AccountHTTP(responses.ENDPOINT) as http:
+            info = http.transactions(self.alice)
+            self.assertEqual(len(info), 1)
+            self.assertEqual(len(info[0].mosaics), 1)
+            self.assertEqual(info[0].mosaics[0], models.Mosaic(config.mosaic_id, 100000000))
+            self.assertEqual(info[0].signer.public_key, config.nemesis.public_key.upper())
+    
+    
+    def test_incoming_transactions(self):
+        with client.AccountHTTP(responses.ENDPOINT) as http:
+            info = http.incoming_transactions(self.alice)
+            self.assertEqual(len(info), 1)
+            self.assertEqual(len(info[0].mosaics), 1)
+            self.assertEqual(info[0].mosaics[0], models.Mosaic(config.mosaic_id, 100000000))
+            self.assertEqual(info[0].signer.public_key, config.nemesis.public_key.upper())
+    
+    
+    def test_outgoing_transactions(self):
+        with client.AccountHTTP(responses.ENDPOINT) as http:
+            info = http.outgoing_transactions(self.alice)
+            self.assertEqual(len(info), 1)
+            self.assertEqual(len(info[0].mosaics), 1)
+            self.assertEqual(info[0].mosaics[0], models.Mosaic(config.mosaic_id, 10000000))
+            self.assertEqual(info[0].recipient, self.bob.address)

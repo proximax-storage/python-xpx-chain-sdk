@@ -102,7 +102,7 @@ class MultisigCosignatoryModification(util.Model):
         public_key = data['cosignatoryPublicKey']
         type = ModificationType.create_from_dto(data['type'], network_type)
         public_account = PublicAccount.create_from_public_key(public_key, network_type)
-        return cls(type, public_account)
+        return cls(public_account, type)
 
     def to_catbuffer(
         self,
@@ -120,4 +120,4 @@ class MultisigCosignatoryModification(util.Model):
     ):
         type, data = ModificationType.create_from_catbuffer_pair(data, network_type)
         cosignatory = PublicAccount.create_from_public_key(data[:32], network_type)
-        return cls(type, cosignatory)
+        return cls(cosignatory, type)

@@ -78,7 +78,7 @@ class SecretProofTransaction(Transaction):
         recipient: RecipientType,
         proof: typing.AnyStr,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        #fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -93,7 +93,7 @@ class SecretProofTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            fee_strategy,
+            #fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -113,7 +113,7 @@ class SecretProofTransaction(Transaction):
         proof: typing.AnyStr,
         network_type: NetworkType,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
+        #fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new secret proof transaction.
@@ -134,7 +134,7 @@ class SecretProofTransaction(Transaction):
             recipient,
             proof,
             max_fee,
-            fee_strategy,
+            #fee_strategy,
         )
 
     # CATBUFFER

@@ -80,7 +80,7 @@ class TransferTransaction(Transaction):
         deadline: Deadline,
         recipient: RecipientType,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        #fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
         signature: typing.Optional[str] = None,
@@ -93,7 +93,7 @@ class TransferTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            fee_strategy,
+            #fee_strategy,
             signature,
             signer,
             transaction_info
@@ -111,7 +111,7 @@ class TransferTransaction(Transaction):
         mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
+        #fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new transfer transaction.
@@ -129,7 +129,7 @@ class TransferTransaction(Transaction):
             deadline,
             recipient,
             max_fee,
-            fee_strategy,
+            #fee_strategy,
             mosaics,
             message
         )
@@ -205,7 +205,7 @@ class TransferTransaction(Transaction):
         data = data[util.U16_BYTES:]
         mosaics_count = util.u8_from_catbuffer(data[:util.U8_BYTES])
         data = data[util.U8_BYTES:]
-        message = PlainMessage(data[:message_size])
+        message = PlainMessage(data[1:message_size])
         data = data[message_size:]
         data = self.load_mosaics_bytes(data, mosaics_count, network_type)
 

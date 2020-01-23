@@ -158,8 +158,6 @@ class BlockInfo(util.DTO):
         signature = util.encode_hex(signature)
         previous_block_hash = util.encode_hex(previous_block_hash)
         block_transactions_hash = util.encode_hex(block_transactions_hash)
-        # TODO(ahuszagh)
-        #   Should be fixed in an upcoming version.
         block_receipts_hash = util.encode_base64(block_receipts_hash)
         state_hash = util.encode_hex(state_hash)
         self._set('hash', hash)
@@ -182,6 +180,7 @@ class BlockInfo(util.DTO):
         self._set('state_hash', state_hash)
         self._set('fee_interest', fee_interest)
         self._set('fee_interest_denominator', fee_interest_denominator)
+        self._set('beneficiary', beneficiary)
         self._set('merkle_tree', merkle_tree or [])
 
     @classmethod
@@ -242,7 +241,7 @@ class BlockInfo(util.DTO):
         block = {
             'signature': self.signature,
             'signer': self.signer.public_key,
-            'version': int(self.version) | (int(network_type) << 8),
+            'version': int(self.version) | (int(network_type) << 24),
             'type': self.type.to_dto(network_type),
             'height': util.u64_to_dto(self.height),
             'timestamp': util.u64_to_dto(self.timestamp),
@@ -257,8 +256,6 @@ class BlockInfo(util.DTO):
         }
 
         if self.beneficiary is not None:
-            # TODO(ahuszagh) Is base64-encoded rather than hex-encoded.
-            #   Should be fixed in an upcoming version.
             public_key = util.unhexlify(self.beneficiary.public_key)
             meta['beneficiary'] = util.b64encode(public_key)
 

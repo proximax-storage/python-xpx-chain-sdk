@@ -78,7 +78,7 @@ class LockFundsTransaction(Transaction):
         duration: int,
         signed_transaction: SignedTransaction,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -91,7 +91,7 @@ class LockFundsTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -109,7 +109,7 @@ class LockFundsTransaction(Transaction):
         signed_transaction: SignedTransaction,
         network_type: NetworkType,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new lock funds transaction.
@@ -129,7 +129,7 @@ class LockFundsTransaction(Transaction):
             duration,
             signed_transaction,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
         )
 
     @property

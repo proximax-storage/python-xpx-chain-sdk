@@ -26,6 +26,10 @@ from __future__ import annotations
 import binascii
 import typing
 
+import logging
+logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 __all__ = [
     'decode_hex',
     'encode_hex',

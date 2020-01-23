@@ -82,7 +82,7 @@ class AggregateTransaction(Transaction):
         version: TransactionVersion,
         deadline: Deadline,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         inner_transactions: typing.Optional[InnerTransactionList] = None,
         #cosignatures: typing.Optional[Cosignatures] = None,
         signature: typing.Optional[str] = None,
@@ -97,7 +97,7 @@ class AggregateTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -113,7 +113,7 @@ class AggregateTransaction(Transaction):
         network_type: NetworkType,
         cosignatures: typing.Optional[Cosignatures] = None,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create aggregate complete transaction object.
@@ -131,7 +131,7 @@ class AggregateTransaction(Transaction):
             TransactionVersion.AGGREGATE_COMPLETE,
             deadline,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
             inner_transactions,
             cosignatures,
         )
@@ -144,7 +144,7 @@ class AggregateTransaction(Transaction):
         network_type: NetworkType,
         cosignatures: typing.Optional[Cosignatures] = None,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create aggregate bonded transaction object.
@@ -162,7 +162,7 @@ class AggregateTransaction(Transaction):
             TransactionVersion.AGGREGATE_BONDED,
             deadline,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
             inner_transactions,
             cosignatures,
         )
@@ -197,7 +197,8 @@ class AggregateTransaction(Transaction):
         self,
         initiator: Account,
         gen_hash: typing.AnyStr,
-        cosignatories: typing.Optional[Account] = None
+        cosignatories: typing.Optional[Account] = None,
+        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO,
     ) -> SignedTransaction:
         """
         Sign transaction with cosignatories.
@@ -207,11 +208,11 @@ class AggregateTransaction(Transaction):
         :param cosignatories: Sequence of accounts cosigning transaction.
         """
 
-        transaction = self.to_catbuffer()
+        transaction = self.to_catbuffer(fee_strategy=fee_strategy)
       
         if (cosignatories):
             COSIGNATURE_SIZE = 96
-            new_fee = util.calculate_fee(self.fee_strategy, self.max_fee, self.catbuffer_size() + COSIGNATURE_SIZE * len(cosignatories))
+            new_fee = util.calculate_fee(fee_strategy, self.max_fee, self.catbuffer_size() + COSIGNATURE_SIZE * len(cosignatories))
             
             if (self.max_fee != new_fee):
                 transaction = transaction[0:106] + new_fee.to_bytes(8, 'little') + transaction[114:]
@@ -396,7 +397,7 @@ class AggregateBondedTransaction(AggregateTransaction):
         cosignatures: Cosignatures,
         network_type: NetworkType,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create aggregate bonded transaction object.
@@ -413,7 +414,7 @@ class AggregateBondedTransaction(AggregateTransaction):
             cosignatures,
             network_type,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
         )
 
 
@@ -429,7 +430,7 @@ class AggregateCompleteTransaction(AggregateTransaction):
         cosignatures: typing.Optional[Cosignatures],
         network_type: NetworkType,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create aggregate complete transaction object.
@@ -446,5 +447,5 @@ class AggregateCompleteTransaction(AggregateTransaction):
             cosignatures,
             network_type,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
         )

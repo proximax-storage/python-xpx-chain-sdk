@@ -52,7 +52,7 @@ class ModifyMetadataTransaction(TransactionBase):
         modifications: MetadataModificationList,
         network_type: NetworkType,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create new modify account addresses transaction.
@@ -71,7 +71,7 @@ class ModifyMetadataTransaction(TransactionBase):
             modifications,
             network_type,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
         )
 
 

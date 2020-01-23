@@ -74,7 +74,7 @@ class AccountLinkTransaction(Transaction):
         remote_account_key: typing.AnyStr,
         link_action: LinkAction,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -88,7 +88,7 @@ class AccountLinkTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -104,7 +104,7 @@ class AccountLinkTransaction(Transaction):
         link_action: LinkAction,
         network_type: NetworkType,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new account link transaction.
@@ -122,7 +122,7 @@ class AccountLinkTransaction(Transaction):
             remote_account_key,
             link_action,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
         )
 
     # CATBUFFER

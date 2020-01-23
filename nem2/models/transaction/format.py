@@ -171,7 +171,7 @@ def save_signer_dto(signer, network_type):
 
 
 def save_version_dto(version, network_type):
-    return version | (int(network_type) << 8)
+    return version | (int(network_type) << 24)
 
 
 def save_transaction_info_dto(transaction_info, network_type):

@@ -92,7 +92,7 @@ class ModifyNamespaceMetadataTransaction(Transaction):
         metadata_id: NamespaceId,
         modifications: MetadataModificationList,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -105,7 +105,7 @@ class ModifyNamespaceMetadataTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -123,7 +123,7 @@ class ModifyNamespaceMetadataTransaction(Transaction):
         modifications: MetadataModificationList,
         network_type: NetworkType,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new namespace metadata modification transaction.
@@ -144,7 +144,7 @@ class ModifyNamespaceMetadataTransaction(Transaction):
             metadata_id,
             modifications,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
         )
 
     # CATBUFFER

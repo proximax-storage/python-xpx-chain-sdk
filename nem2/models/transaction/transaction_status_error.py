@@ -64,10 +64,13 @@ class TransactionStatusError(util.DTO):
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-        required_keys = {'hash', 'status', 'deadline', 'meta'}
+        required_keys_l1 = {'hash', 'status', 'deadline', 'meta'}
+        required_keys_l2 = {'channelName', 'address'}
         return (
-            cls.validate_dto_required(data, required_keys)
-            and cls.validate_dto_all(data, required_keys)
+            cls.validate_dto_required(data, required_keys_l1)
+            and cls.validate_dto_all(data, required_keys_l1)
+            and cls.validate_dto_required(data['meta'], required_keys_l2)
+            and cls.validate_dto_all(data['meta'], required_keys_l2)
         )
 
     def to_dto(
@@ -76,7 +79,7 @@ class TransactionStatusError(util.DTO):
     ) -> dict:
         meta = {
             'channelName': self.channel_name,
-            'address': address.address,
+            'address': self.address.address,
         }
 
         return {
@@ -101,5 +104,5 @@ class TransactionStatusError(util.DTO):
             status=data['status'],
             deadline=Deadline.create_from_timestamp(util.u64_from_dto(data['deadline'])),
             channel_name=meta['channelName'],
-            address=Address.create_from_encoded(meta['address']),
+            address=Address.create_from_raw_address(meta['address']),
         )

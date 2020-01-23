@@ -51,7 +51,7 @@ class AliasTransaction(TransactionBase):
         address: Address,
         network_type: NetworkType,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create new address alias transaction.
@@ -71,7 +71,7 @@ class AliasTransaction(TransactionBase):
             address,
             network_type,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
         )
 
     @staticmethod
@@ -82,7 +82,7 @@ class AliasTransaction(TransactionBase):
         mosaic_id: MosaicId,
         network_type: NetworkType,
         max_fee: int = 0,
-        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
+        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new mosaic alias transaction.
@@ -102,5 +102,5 @@ class AliasTransaction(TransactionBase):
             mosaic_id,
             network_type,
             max_fee,
-            fee_strategy,
+            ####fee_strategy,
         )

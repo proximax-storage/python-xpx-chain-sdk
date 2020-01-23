@@ -90,7 +90,7 @@ class Transaction(TransactionBase):
 
     # SIGNING
 
-    def sign_with(self, account: Account, gen_hash: typing.AnyStr) -> SignedTransaction:
+    def sign_with(self, account: Account, gen_hash: typing.AnyStr, fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO) -> SignedTransaction:
         """
         Serialize and sign transaction.
 
@@ -100,7 +100,7 @@ class Transaction(TransactionBase):
         """
 
         # Serialize transaction data, sign, and generate a hash.
-        transaction = self.to_catbuffer()
+        transaction = self.to_catbuffer(fee_strategy=fee_strategy)
         payload = account.sign(transaction, gen_hash)
         
         hash = self.transaction_hash(payload, gen_hash)

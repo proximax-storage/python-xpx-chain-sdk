@@ -25,7 +25,6 @@
 from __future__ import annotations
 
 from .mosaic_id import MosaicId
-from .mosaic_levy import MosaicLevy
 from .mosaic_properties import MosaicProperties
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import OptionalNetworkType
@@ -35,7 +34,7 @@ __all__ = ['MosaicInfo']
 
 
 @util.inherit_doc
-@util.dataclass(frozen=True, levy=MosaicLevy())
+@util.dataclass(frozen=True)
 class MosaicInfo(util.DTO):
     """
     Information describing a mosaic.
@@ -49,7 +48,6 @@ class MosaicInfo(util.DTO):
     :param height: Block height when mosaic was created.
     :param owner: Account that owns mosaic.
     :param properties: Mosaic properties.
-    :param levy: (Optional) Levy for mosaic.
 
     DTO Format:
         .. code-block:: yaml
@@ -66,7 +64,6 @@ class MosaicInfo(util.DTO):
                 owner: string
                 revision: integer
                 properties: MosaicPropertiesDTO
-                levy: MosaicLevyDTO
 
             MosaicInfoDTO:
                 meta: MosaicMetaDTO
@@ -80,7 +77,6 @@ class MosaicInfo(util.DTO):
     owner: PublicAccount
     revision: int
     properties: MosaicProperties
-    levy: MosaicLevy
 
     @property
     def divisibility(self) -> int:
@@ -99,10 +95,6 @@ class MosaicInfo(util.DTO):
     def is_transferable(self) -> bool:
         """Allow transfer of funds from non-creator accounts. Default true."""
         return self.properties.transferable
-
-    def is_levy_mutable(self) -> bool:
-        """Get if levy is mutable. Default false."""
-        return self.properties.levy_mutable
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:

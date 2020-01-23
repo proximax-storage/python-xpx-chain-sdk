@@ -166,9 +166,9 @@ class MosaicProperties(util.DTO):
     ) -> DTOType:
         # For indefinite mosaics, the duration is optional (default 0).
         return [
-            util.u64_to_dto(self.flags),
-            util.u64_to_dto(self.divisibility),
-            util.u64_to_dto(self.duration),
+            {'id': 0, 'value': util.u64_to_dto(self.flags)},
+            {'id': 1, 'value': util.u64_to_dto(self.divisibility)},
+            {'id': 2, 'value': util.u64_to_dto(self.duration)},
         ]
 
     @classmethod
@@ -182,7 +182,7 @@ class MosaicProperties(util.DTO):
 
         # For indefinite mosaics, the duration is optional (default 0).
         duration = 0
-        
+       
         for prop in data[0 : 3]:
             prop_id = util.u8_from_dto(prop["id"])
 

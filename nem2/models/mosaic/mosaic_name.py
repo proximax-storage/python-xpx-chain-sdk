@@ -69,7 +69,7 @@ class MosaicName(util.DTO):
     ) -> dict:
         return {
             'mosaicId': util.u64_to_dto(int(self.mosaic_id)),
-            'names': self.name,
+            'names': self.names,
         }
 
     @classmethod

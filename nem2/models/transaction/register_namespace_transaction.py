@@ -84,11 +84,11 @@ class RegisterNamespaceTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        max_fee: int,
-        fee_strategy: util.FeeCalculationStrategy,
         namespace_type: NamespaceType,
         namespace_name: str,
         namespace_id: NamespaceId,
+        max_fee: int = 0,
+        ##fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         duration: typing.Optional[int] = None,
         parent_id: typing.Optional[NamespaceId] = None,
         signature: typing.Optional[str] = None,
@@ -107,7 +107,7 @@ class RegisterNamespaceTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            fee_strategy,
+            ##fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -138,13 +138,12 @@ class RegisterNamespaceTransaction(Transaction):
             network_type,
             TransactionVersion.REGISTER_NAMESPACE,
             deadline,
-            0,
-            util.FeeCalculationStrategy.ZERO,
+            #util.FeeCalculationStrategy.ZERO,
             NamespaceType.ROOT_NAMESPACE,
             namespace_name,
             NamespaceId(namespace_name),
-            duration,
-            None,
+            duration=duration,
+            parent_id=None,
         )
 
     @classmethod
@@ -173,13 +172,12 @@ class RegisterNamespaceTransaction(Transaction):
             network_type,
             TransactionVersion.REGISTER_NAMESPACE,
             deadline,
-            0,
-            util.FeeCalculationStrategy.ZERO,
+            #util.FeeCalculationStrategy.ZERO,
             NamespaceType.SUB_NAMESPACE,
             namespace_name.split('.')[-1],
             NamespaceId(id),
-            None,
-            parent_id
+            duration=None,
+            parent_id=parent_id
         )
 
     # CATBUFFER

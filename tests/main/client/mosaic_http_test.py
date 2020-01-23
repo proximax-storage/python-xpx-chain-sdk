@@ -35,9 +35,6 @@ from tests import responses
                 lambda x: (x[0].meta_id, '5CC07CBC3A48065F47D6DF80'),
             ]
         },
-        # TODO(ahuszagh)
-        #   Check if POST /mosaic/names got removed.
-        #       It did, but temporarily. Leave the functionality in.
     ],
 })
 class TestMosaicHTTP(harness.TestCase):

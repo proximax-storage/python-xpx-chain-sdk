@@ -72,7 +72,6 @@ class TestTransactionHttp(harness.TestCase):
             self.send_funds(config.nemesis, self.alice, M100)
         
         elif (task == 'test_register_namespace_transaction'):
-            #self.mike = models.Account.create_from_private_key('0000000000000000000000000000000000000000000000000000000000000001', models.NetworkType.MIJIN_TEST)
             self.mike = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.mike, 4 * M1000)
         
@@ -131,10 +130,9 @@ class TestTransactionHttp(harness.TestCase):
             recipient=recipient.address,
             mosaics=[models.Mosaic(config.mosaic_id, amount)],
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_with(sender, config.gen_hash)
+        signed_tx = tx.sign_with(sender, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
         
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -205,11 +203,10 @@ class TestTransactionHttp(harness.TestCase):
             deadline=models.Deadline.create(),
             recipient=self.bob.address,
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
             message=message
         )
 
-        signed_tx = tx.sign_with(self.alice, config.gen_hash)
+        signed_tx = tx.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -226,10 +223,9 @@ class TestTransactionHttp(harness.TestCase):
             remote_account_key=self.bob.public_key,
             link_action=models.LinkAction.LINK,
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_with(self.alice, config.gen_hash)
+        signed_tx = tx.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
         
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -244,10 +240,9 @@ class TestTransactionHttp(harness.TestCase):
             remote_account_key=self.bob.public_key,
             link_action=models.LinkAction.UNLINK,
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_with(self.alice, config.gen_hash)
+        signed_tx = tx.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
         
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -265,12 +260,11 @@ class TestTransactionHttp(harness.TestCase):
                 tx = models.ModifyAccountPropertyAddressTransaction.create(
                     deadline=models.Deadline.create(),
                     network_type=models.NetworkType.MIJIN_TEST,
-                    fee_strategy=util.FeeCalculationStrategy.MEDIUM,
                     property_type=property_type,
                     modifications=[models.AccountPropertyModification(modification_type, self.bob.address)]
                 )
                 
-                signed_tx = tx.sign_with(self.alice, config.gen_hash)
+                signed_tx = tx.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
                 with client.TransactionHTTP(responses.ENDPOINT) as http:
                     http.announce(signed_tx)
@@ -289,12 +283,11 @@ class TestTransactionHttp(harness.TestCase):
                 tx = models.ModifyAccountPropertyMosaicTransaction.create(
                     deadline=models.Deadline.create(),
                     network_type=models.NetworkType.MIJIN_TEST,
-                    fee_strategy=util.FeeCalculationStrategy.MEDIUM,
                     property_type=property_type,
                     modifications=[models.AccountPropertyModification(modification_type, config.mosaic_id)]
                 )
                 
-                signed_tx = tx.sign_with(self.alice, config.gen_hash)
+                signed_tx = tx.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
                 with client.TransactionHTTP(responses.ENDPOINT) as http:
                     http.announce(signed_tx)
@@ -316,12 +309,11 @@ class TestTransactionHttp(harness.TestCase):
                 tx = models.ModifyAccountPropertyEntityTypeTransaction.create(
                     deadline=models.Deadline.create(),
                     network_type=models.NetworkType.MIJIN_TEST,
-                    fee_strategy=util.FeeCalculationStrategy.MEDIUM,
                     property_type=property_type,
                     modifications=[models.AccountPropertyModification(modification_type, tx_type)]
                 )
                 
-                signed_tx = tx.sign_with(self.alice, config.gen_hash)
+                signed_tx = tx.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
                 with client.TransactionHTTP(responses.ENDPOINT) as http:
                     http.announce(signed_tx)
@@ -346,7 +338,7 @@ class TestTransactionHttp(harness.TestCase):
             duration=60
         )
         
-        signed_tx = tx.sign_with(self.mike, config.gen_hash)
+        signed_tx = tx.sign_with(self.mike, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -363,7 +355,7 @@ class TestTransactionHttp(harness.TestCase):
             parent_namespace=namespace_name
         )
         
-        signed_tx = tx.sign_with(self.mike, config.gen_hash)
+        signed_tx = tx.sign_with(self.mike, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -380,13 +372,12 @@ class TestTransactionHttp(harness.TestCase):
                 deadline=models.Deadline.create(),
                 network_type=models.NetworkType.MIJIN_TEST,
                 max_fee=1,
-                fee_strategy=util.FeeCalculationStrategy.MEDIUM,
                 action_type=action_type,
                 namespace_id=models.NamespaceId(mikes_namespace),
                 address=self.mike.address
             )
             
-            signed_tx = tx.sign_with(self.mike, config.gen_hash)
+            signed_tx = tx.sign_with(self.mike, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
@@ -403,13 +394,12 @@ class TestTransactionHttp(harness.TestCase):
         tx = models.MosaicDefinitionTransaction.create(
             deadline=models.Deadline.create(),
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
             nonce=nonce,
             mosaic_id=mosaic_id,
             mosaic_properties=models.MosaicProperties(0x3, 3),
         )
         
-        signed_tx = tx.sign_with(self.mike, config.gen_hash)
+        signed_tx = tx.sign_with(self.mike, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
         
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -429,7 +419,7 @@ class TestTransactionHttp(harness.TestCase):
                 mosaic_id=mosaic_id,
             )
 
-            signed_tx = tx.sign_with(self.mike, config.gen_hash)
+            signed_tx = tx.sign_with(self.mike, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
         
             with client.TransactionHTTP(responses.ENDPOINT) as http:
                 http.announce(signed_tx)
@@ -438,7 +428,6 @@ class TestTransactionHttp(harness.TestCase):
             self.assertEqual(isinstance(tx, models.MosaicAliasTransaction), True)
             self.assertEqual(tx.mosaic_id, mosaic_id)
             self.assertEqual(tx.action_type, action_type)
-            print("HEIGHT %d" % tx.transaction_info.height)
    
 
     async def test_secret_lock_transaction(self):
@@ -455,10 +444,9 @@ class TestTransactionHttp(harness.TestCase):
             hash_type=models.HashType.SHA3_256,
             secret=secret,
             recipient=self.bob.address,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
         
-        signed_tx = tx.sign_with(self.alice, config.gen_hash)
+        signed_tx = tx.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -475,10 +463,9 @@ class TestTransactionHttp(harness.TestCase):
             secret=secret,
             proof=proof,
             recipient=self.bob.address,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
         
-        signed_tx = tx.sign_with(self.alice, config.gen_hash)
+        signed_tx = tx.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
         
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -508,10 +495,9 @@ class TestTransactionHttp(harness.TestCase):
             deadline=models.Deadline.create(),
             inner_transactions=[bob_to_alice.to_aggregate(self.bob), alice_to_bob.to_aggregate(self.alice)],
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(self.alice, config.gen_hash, [self.bob])
+        signed_tx = tx.sign_transaction_with_cosignatories(self.alice, config.gen_hash, [self.bob], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
         
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -542,10 +528,9 @@ class TestTransactionHttp(harness.TestCase):
             deadline=models.Deadline.create(),
             inner_transactions=[bob_to_alice.to_aggregate(self.bob), alice_to_bob.to_aggregate(self.alice)],
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_bonded = bonded.sign_transaction_with_cosignatories(self.alice, config.gen_hash)
+        signed_bonded = bonded.sign_transaction_with_cosignatories(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
         lock = models.LockFundsTransaction.create(
             deadline=models.Deadline.create(),
@@ -553,10 +538,9 @@ class TestTransactionHttp(harness.TestCase):
             mosaic=models.Mosaic(config.mosaic_id, M10),
             duration=60,
             signed_transaction=signed_bonded,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
         
-        signed_lock = lock.sign_with(self.alice, config.gen_hash)
+        signed_lock = lock.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_lock)
@@ -601,10 +585,9 @@ class TestTransactionHttp(harness.TestCase):
             deadline=models.Deadline.create(),
             inner_transactions=[change_to_multisig.to_aggregate(self.multisig)],
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(self.multisig, config.gen_hash, [self.alice, self.bob])
+        signed_tx = tx.sign_transaction_with_cosignatories(self.multisig, config.gen_hash, [self.alice, self.bob], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
         
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)
@@ -623,10 +606,9 @@ class TestTransactionHttp(harness.TestCase):
             deadline=models.Deadline.create(),
             inner_transactions=[self.multisig_to_nemesis.to_aggregate(self.multisig)],
             network_type=models.NetworkType.MIJIN_TEST,
-            fee_strategy=util.FeeCalculationStrategy.MEDIUM,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(self.alice, config.gen_hash, [self.bob])
+        signed_tx = tx.sign_transaction_with_cosignatories(self.alice, config.gen_hash, [self.bob], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
       
         with client.TransactionHTTP(responses.ENDPOINT) as http:
             http.announce(signed_tx)

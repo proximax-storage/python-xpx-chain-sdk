@@ -58,8 +58,10 @@ def to_dto(value: PropertyValue) -> DTOType:
 def from_dto(data: DTOType) -> PropertyValue:
     """Load property modification value from DTO."""
 
-    if isinstance(data, str):
+    if (isinstance(data, str) and (len(data) == 50)):
         return Address.create_from_encoded(data)
+    elif (isinstance(data, str) and (len(data) == 40)):
+        return Address.create_from_raw_address(data)
     elif isinstance(data, list):
         return MosaicId(util.u64_from_dto(data))
     elif isinstance(data, int):

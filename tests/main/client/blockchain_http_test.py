@@ -31,7 +31,6 @@ from tests import responses
                 lambda x: (x.block_transactions_hash, "36822DF1CF1827915A8CDDF8A47EBBF1D1C55666DB1E8AC942C447D3D0E6D494"),
                 lambda x: (x.block_receipts_hash, "RMViDPTpgKd072qPgxmPVoabWcrmFs5v5EGS00GxiX0="),
                 lambda x: (x.state_hash, "C61C28E078298D6A508A649637EAC7D9D1E5F3813856EF9B7F1579866ACB570E"),
-                lambda x: (x.beneficiary.public_key, "0000000000000000000000000000000000000000000000000000000000000000"),
                 lambda x: (x.merkle_tree, []),
             ]
         },

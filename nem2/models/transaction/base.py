@@ -69,7 +69,7 @@ class TransactionBase(util.Model):
     version: TransactionVersion
     deadline: typing.Optional[Deadline]
     max_fee: typing.Optional[int]
-    fee_strategy: typing.Optional[util.FeeCalculationStrategy]
+    #####fee_strategy: typing.Optional[util.FeeCalculationStrategy]
     signature: typing.Optional[str]
     signer: typing.Optional[PublicAccount]
     transaction_info: typing.Optional[TransactionInfoType]
@@ -151,13 +151,14 @@ class TransactionBase(util.Model):
     def to_catbuffer(
         self,
         network_type: OptionalNetworkType = None,
+        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO,
     ) -> bytes:
         # Check network type matches transaction.
         if network_type is not None and network_type != self.network_type:
             raise ValueError('Network type does not match transaction.')
 
         # Use fee calculation algorithm
-        max_fee = util.calculate_fee(self.fee_strategy, self.max_fee, self.catbuffer_size())
+        max_fee = util.calculate_fee(fee_strategy, self.max_fee, self.catbuffer_size())
         self._set('max_fee', max_fee)
 
         # Save shared and specific transaction data.

@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 __all__ = [
     'ChronoUnit',
     'Deadline',
+    'TIMESTAMP_NEMESIS_BLOCK',
 ]
 
 
@@ -75,6 +76,7 @@ KEYWORDS = {
     ChronoUnit.HOURS: "hours",
 }
 
+TIMESTAMP_NEMESIS_BLOCK: typing.ClassVar[int] = 1459468800000
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -91,7 +93,6 @@ class Deadline(util.Object):
     """
 
     deadline: datetime.datetime
-    TIMESTAMP_NEMESIS_BLOCK: typing.ClassVar[int] = 1459468800000
 
     @classmethod
     def create(
@@ -121,7 +122,7 @@ class Deadline(util.Object):
         """Export deadline to UTC timestamp."""
 
         utc = self.deadline.replace(tzinfo=datetime.timezone.utc)
-        return int(utc.timestamp() * 1000) - self.TIMESTAMP_NEMESIS_BLOCK
+        return int(utc.timestamp() * 1000) - TIMESTAMP_NEMESIS_BLOCK
 
     @classmethod
     def create_from_timestamp(cls, timestamp: int):
@@ -130,6 +131,7 @@ class Deadline(util.Object):
 
         :param timestamp: Timestamp in UTC timezone.
         """
+        timestamp = (timestamp + TIMESTAMP_NEMESIS_BLOCK) / 1000
         utc = datetime.datetime.fromtimestamp(timestamp, datetime.timezone.utc)
         local = utc.replace(tzinfo=None)
         return cls(local)
@@ -149,4 +151,4 @@ class Deadline(util.Object):
 
 # Private
 # Data-transfer object for the nemesis block timestamp.
-TIMESTAMP_NEMESIS_BLOCK_DTO = util.u64_to_dto(Deadline.TIMESTAMP_NEMESIS_BLOCK)
+TIMESTAMP_NEMESIS_BLOCK_DTO = util.u64_to_dto(TIMESTAMP_NEMESIS_BLOCK)

@@ -93,7 +93,7 @@ class Message(util.Model):
         data: bytes,
         network_type: OptionalNetworkType = None,
     ):
-        return cls.create(data), data[len(data):]
+        return cls.create(data[1:]), data[len(data):]
     
     def catbuffer_size_specific(self) -> int:
         return util.U8_BYTES + len(self.payload)
