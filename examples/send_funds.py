@@ -84,8 +84,7 @@ with client.MosaicHTTP(endpoint) as http:
     xpx = http.get_mosaic(namespace_info.alias.value)
 
 # Generate two random accounts: Alice and Bob
-#alice = models.Account.generate_new_account(network_type)
-alice = models.Account.create_from_private_key('b7db20d03d0b9cde35044125e373c2fe12e6b53bfa4cba9c52de3c73c9b21aad', network_type)
+alice = models.Account.generate_new_account(network_type)
 bob = models.Account.generate_new_account(network_type)
 
 # Print their addresses, private and public keys
