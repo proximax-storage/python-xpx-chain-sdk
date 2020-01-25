@@ -12,8 +12,8 @@ import os
 from nem2 import util
 import time
 from binascii import hexlify
-import nest_asyncio
-nest_asyncio.apply()
+#import nest_asyncio
+#nest_asyncio.apply()
 
 M = 1000000
 M1 = M
@@ -33,6 +33,7 @@ class TestTransactionHttp(harness.TestCase):
     def __init__(self, task) -> None:
         super().__init__(task)
 
+        print(responses.ENDPOINT)
         if (task == 'test_get_transaction'):
             self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
 
@@ -124,7 +125,7 @@ class TestTransactionHttp(harness.TestCase):
                 elif (m.channel_name == 'partialAdded'):
                     return m.message
 
-    async def send_funds(self, sender, recipient, amount):
+    def send_funds(self, sender, recipient, amount):
         tx = models.TransferTransaction.create(
             deadline=models.Deadline.create(),
             recipient=recipient.address,
@@ -148,7 +149,7 @@ class TestTransactionHttp(harness.TestCase):
     
 
     # TESTS
-    async def test_get_transaction(self):
+    def test_get_transaction(self):
         hash = self.send_funds(config.nemesis, self.alice, M10)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
@@ -157,7 +158,7 @@ class TestTransactionHttp(harness.TestCase):
             self.assertEqual(reply.transaction_info.hash, hash)
 
     
-    async def test_get_transactions(self):
+    def test_get_transactions(self):
         hash1 = self.send_funds(config.nemesis, self.alice, M10)
         hash2 = self.send_funds(config.nemesis, self.alice, M10)
 
@@ -170,7 +171,7 @@ class TestTransactionHttp(harness.TestCase):
             self.assertEqual(reply[1].transaction_info.hash in hashes, True)
 
     
-    async def test_get_transaction_status(self):
+    def test_get_transaction_status(self):
         hash = self.send_funds(config.nemesis, self.alice, M10)
 
         with client.TransactionHTTP(responses.ENDPOINT) as http:
@@ -179,7 +180,7 @@ class TestTransactionHttp(harness.TestCase):
             self.assertEqual(reply.hash, hash)
 
 
-    async def test_get_transaction_statuses(self):
+    def test_get_transaction_statuses(self):
         hash1 = self.send_funds(config.nemesis, self.alice, M10)
         hash2 = self.send_funds(config.nemesis, self.alice, M10)
 
@@ -192,11 +193,11 @@ class TestTransactionHttp(harness.TestCase):
             self.assertEqual(reply[1].hash in hashes, True)
 
     
-#    async def test_transfer_transaction(self): 
+#    def test_transfer_transaction(self): 
 #        self.send_funds(config.nemesis, self.alice, M10)
 
 
-    async def test_message_transaction(self):
+    def test_message_transaction(self):
         message = models.PlainMessage(b'Hello world')
 
         tx = models.TransferTransaction.create(
@@ -217,7 +218,7 @@ class TestTransactionHttp(harness.TestCase):
         self.assertEqual(tx.message, message)
 
     
-    async def test_account_link_transaction(self):
+    def test_account_link_transaction(self):
         tx = models.AccountLinkTransaction.create(
             deadline=models.Deadline.create(),
             remote_account_key=self.bob.public_key,
@@ -253,7 +254,7 @@ class TestTransactionHttp(harness.TestCase):
         self.assertEqual(tx.link_action, models.LinkAction.UNLINK)
     
     
-    async def test_modify_account_property_address_transaction(self):
+    def test_modify_account_property_address_transaction(self):
         for property_type in [models.PropertyType.ALLOW_ADDRESS, models.PropertyType.BLOCK_ADDRESS]:
             for modification_type in [models.PropertyModificationType.ADD, models.PropertyModificationType.REMOVE]:
         
@@ -276,7 +277,7 @@ class TestTransactionHttp(harness.TestCase):
                 self.assertEqual(tx.modifications[0].modification_type, modification_type)
 
         
-    async def test_modify_account_property_mosaic_transaction(self):
+    def test_modify_account_property_mosaic_transaction(self):
         for property_type in [models.PropertyType.ALLOW_MOSAIC, models.PropertyType.BLOCK_MOSAIC]:
             for modification_type in [models.PropertyModificationType.ADD, models.PropertyModificationType.REMOVE]:
 
@@ -300,7 +301,7 @@ class TestTransactionHttp(harness.TestCase):
                 self.assertEqual(tx.modifications[0].value, config.mosaic_id)
 
         
-    async def test_modify_account_property_entity_type_transaction(self):
+    def test_modify_account_property_entity_type_transaction(self):
         tx_type = models.TransactionType.AGGREGATE_COMPLETE
 
         for property_type in [models.PropertyType.BLOCK_TRANSACTION]:
@@ -326,7 +327,7 @@ class TestTransactionHttp(harness.TestCase):
                 self.assertEqual(tx.modifications[0].value, tx_type)
 
     
-    async def test_register_namespace_transaction(self):
+    def test_register_namespace_transaction(self):
         namespace_name = 'foo' + hexlify(os.urandom(4)).decode('utf-8')
         #namespace_name = 'foo'
 
@@ -430,7 +431,7 @@ class TestTransactionHttp(harness.TestCase):
             self.assertEqual(tx.action_type, action_type)
    
 
-    async def test_secret_lock_transaction(self):
+    def test_secret_lock_transaction(self):
         random_bytes = os.urandom(20)
         h = hashlib.sha3_256(random_bytes)
         secret = binascii.hexlify(h.digest()).decode('utf-8').upper()
@@ -476,7 +477,7 @@ class TestTransactionHttp(harness.TestCase):
         self.assertEqual(tx.secret, secret)
     
 
-    async def test_aggregate_transaction_with_cosigners(self):
+    def test_aggregate_transaction_with_cosigners(self):
         alice_to_bob = models.TransferTransaction.create(
             deadline=models.Deadline.create(),
             recipient=self.bob.address,
@@ -509,7 +510,7 @@ class TestTransactionHttp(harness.TestCase):
         self.assertEqual(tx.inner_transactions[1].recipient, self.bob.address)
        
     
-    async def test_aggregate_bonded_transaction(self):
+    def test_aggregate_bonded_transaction(self):
         alice_to_bob = models.TransferTransaction.create(
             deadline=models.Deadline.create(),
             recipient=self.bob.address,
@@ -569,7 +570,7 @@ class TestTransactionHttp(harness.TestCase):
         self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
 
 
-    async def test_create_multisig_and_send_funds(self):
+    def test_create_multisig_and_send_funds(self):
         change_to_multisig = models.ModifyMultisigAccountTransaction.create(
             deadline=models.Deadline.create(),
             min_approval_delta=2,

@@ -104,5 +104,5 @@ class TransactionStatusError(util.DTO):
             status=data['status'],
             deadline=Deadline.create_from_timestamp(util.u64_from_dto(data['deadline'])),
             channel_name=meta['channelName'],
-            address=Address.create_from_raw_address(meta['address']),
+            address=Address.create_from_encoded(meta['address']),
         )

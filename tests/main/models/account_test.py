@@ -250,10 +250,10 @@ class TestAddress(harness.TestCase):
         public_key = self.extras['public_key']
 
         value = self.type.create_from_public_key(public_key, models.NetworkType.MAIN_NET)
-        self.assertEqual(value.address, 'ND5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L4CNFATI')
+        self.assertEqual(value.address, 'XD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L4X2EMBY')
 
         value = self.type.create_from_public_key(public_key, models.NetworkType.TEST_NET)
-        self.assertEqual(value.address, 'TD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L4SH3LND')
+        self.assertEqual(value.address, 'VD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L4UGKOZU')
 
         value = self.type.create_from_public_key(public_key, models.NetworkType.MIJIN)
         self.assertEqual(value.address, 'MD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L4R2R2JH')

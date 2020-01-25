@@ -48,8 +48,8 @@ class NetworkType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
                 description: string
     """
 
-    MAIN_NET   = 0x68       # noqa: E221
-    TEST_NET   = 0x98       # noqa: E221
+    MAIN_NET   = 0xb8       # noqa: E221
+    TEST_NET   = 0xa8       # noqa: E221
     MIJIN      = 0x60       # noqa: E221
     MIJIN_TEST = 0x90       # noqa: E221
 
@@ -91,15 +91,15 @@ DESCRIPTION = {
 }
 
 TO_IDENTIFIER = {
-    NetworkType.MAIN_NET: b"N",
-    NetworkType.TEST_NET: b"T",
+    NetworkType.MAIN_NET: b"X",
+    NetworkType.TEST_NET: b"V",
     NetworkType.MIJIN: b"M",
     NetworkType.MIJIN_TEST: b"S",
 }
 
 FROM_IDENTIFIER = {
-    b"N": NetworkType.MAIN_NET,
-    b"T": NetworkType.TEST_NET,
+    b"X": NetworkType.MAIN_NET,
+    b"V": NetworkType.TEST_NET,
     b"M": NetworkType.MIJIN,
     b"S": NetworkType.MIJIN_TEST,
 }

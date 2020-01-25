@@ -485,8 +485,6 @@ def model_test_dto(self):
     nt = self.network_type
     self.maxDiff=2048
     self.assertEqual(self.model.to_dto(nt), self.dto)
-    print(self.model)
-    print(self.type.create_from_dto(self.dto, nt))
     self.assertEqual(self.model, self.type.create_from_dto(self.dto, nt))
 
 
@@ -497,9 +495,6 @@ def model_test_catbuffer(self):
     encoded = util.encode_hex(self.catbuffer)
     decoded = util.decode_hex(self.catbuffer)
     self.maxDiff=2048
-    print(self.model.to_catbuffer(nt))
-    print(util.hexlify(self.model.to_catbuffer(nt)))
-    print(encoded)
     self.assertEqual(util.hexlify(self.model.to_catbuffer(nt)), encoded)
     self.assertEqual(self.model, self.type.create_from_catbuffer(decoded, nt))
 
