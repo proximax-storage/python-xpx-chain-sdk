@@ -1,26 +1,45 @@
-NEM2 SDK Python
-===============
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**Table of Contents**
+# ProximaX Sirius Blockchain Python SDK
+Official ProximaX Sirius Blockchain SDK Library in Python.
 
-- [Getting Started](#getting-started)
-- [Optimization](#optimization)
-- [Testing](#testing)
-- [License](#license)
-- [Contributing](#contributing)
+The ProximaX Sirius Blockchain Python SDK is a Python library for interacting with the Sirius Blockchain.
 
-# Getting Started
+## Getting Started
+Clone the repository and build the SDK.
+```bash
+git clone git@github.com:proximax-storage/python-xpx-chain-sdk.git
+cd python-xpx-chain-sdk/
+python setup.py install
+```
+You can now start using the SDK modules.
 
+## Example
+```python
+from nem2 import client
 
-# Optimization
+# Get the current chain height of the Sirius test net
+with client.BlockchainHTTP('bctestnet1.brimstone.xpxsirius.io:3000') as http:
+    reply = http.get_blockchain_height()
+    
+print(reply)
+```
+For further examples please refer to [examples](examples/) directory or [E2E tests](tests/internet/)
 
-The NEM2 SDK makes copious use of assertions to ensure functionality is correct during debugging, and during use of the client, it may be preferable to disable these assertions. This may be done by either setting the environment variable `PYTHONOPTIMIZE=TRUE`, or through the command-line flag `-O`.
+##### ed25519 Secrets Warning
+`SecretsWarning: Security warning: signing message using insecure ed25519 implementation, secrets may be leaked.`
+
+SDK includes fallback ed25519 implementation in python when C implementation is not present. Python ed25519 implementation may lead to the disclosure of the secrets due to python's arbitrary-precision integer arithmetic. To get ed25519 C implementation please refer to https://pypi.org/project/ed25519sha3/
+
+## Optimization
+
+The SDK makes copious use of assertions to ensure functionality is correct during debugging, and during use of the client, it may be preferable to disable these assertions. This may be done by either setting the environment variable `PYTHONOPTIMIZE=TRUE`, or through the command-line flag `-O`.
 
 In addition, installing [uvloop](https://github.com/magicstack/uvloop) may further improve asynchronous code performance.
 
-# Testing
+## Testing
 
-The NEM2 SDK uses numerous tools to ensure type correctness, robust testing, and style conventions are preserved over multiple configurations. Before submitting any contributions, please resolve any issues that result from the following commands before committing:
+The SDK uses numerous tools to ensure type correctness, robust testing, and style conventions are preserved over multiple configurations. Before submitting any contributions, please resolve any issues that result from the following commands before committing:
 
 ```bash
 # Run tox, which invokes numerous virtual envs to validate all configurations
@@ -35,10 +54,6 @@ The NEM2 SDK uses numerous tools to ensure type correctness, robust testing, and
 $ tox
 ```
 
-# License
-
-Lexical is licensed under the Apache 2.0 license. See the LICENSE for more information. The nem2-sdk-python derives from both [nem2-docs](https://github.com/nemtech/nem2-docs) and the [nem2-sdk-typescript-javascript](https://github.com/nemtech/nem2-sdk-typescript-javascript).
-
-# Contributing
+## Contributing
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in lexical by you, as defined in the Apache-2.0 license, shall be licensed as above, without any additional terms or conditions.
