@@ -24,11 +24,11 @@ java -jar ~/bin/swagger-codegen-cli.jar generate \
     --lang python \
     --output swagger/codegen
 
-# Remove existing nem2 infrastructure folder.
-rm -r nem2/infrastructure
+# Remove existing xpx infrastructure folder.
+rm -r xpx/infrastructure
 
 # Move generate code to infrastructure.
-mv swagger/codegen/swagger_client nem2/infrastructure
+mv swagger/codegen/swagger_client xpx/infrastructure
 
 # Remove remaining code
 rm -r swagger/codegen

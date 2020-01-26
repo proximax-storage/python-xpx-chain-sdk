@@ -1,5 +1,5 @@
 
-from nem2 import models
+from xpx import models
 
 gen_hash = '7B631D803F912B00DC0CBED3014BBD17A302BA50B99D233B9C2D9533B842ABDF'
 

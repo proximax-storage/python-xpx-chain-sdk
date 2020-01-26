@@ -4,11 +4,11 @@ API Reference
 Client
 ------
 
-.. automodule:: nem2.client
+.. automodule:: xpx.client
    :exclude-members: create_from_http
 
 Models
 ------
 
-.. automodule:: nem2.models
+.. automodule:: xpx.models
    :exclude-members: abcs, asdict, astuple, fields, replace

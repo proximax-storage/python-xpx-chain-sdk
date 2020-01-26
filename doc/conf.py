@@ -7,9 +7,9 @@ from sphinx.ext import autodoc
 
 # PROJECT INFORMATION
 
-project = 'nem2'
-copyright = '2019, NEM Foundation'
-author = 'NEM Foundation'
+project = 'xpx'
+copyright = '2020, ProximaX'
+author = 'ProximaX'
 version = ''
 release = '0.0.1'
 
@@ -49,28 +49,28 @@ html_static_path = ['_static']
 
 # OPTIONS FOR HTMLHELP OUTPUT
 
-htmlhelp_basename = 'nem2doc'
+htmlhelp_basename = 'xpxdoc'
 
 # OPTIONS FOR LATEX OUTPUT
 
 latex_elements = {}
 latex_documents = [
-    (master_doc, 'nem2.tex', 'nem2 Documentation',
+    (master_doc, 'xpx.tex', 'xpx Documentation',
      'NEM Foundation', 'manual'),
 ]
 
 # OPTIONS FOR MANUAL PAGE OUTPUT
 
 man_pages = [
-    (master_doc, 'nem2', 'nem2 Documentation',
+    (master_doc, 'xpx', 'xpx Documentation',
      [author], 1)
 ]
 
 # OPTIONS FOR TEXINFO OUTPUT
 
 texinfo_documents = [
-    (master_doc, 'nem2', 'nem2 Documentation',
-     author, 'nem2', 'One line description of project.',
+    (master_doc, 'xpx', 'xpx Documentation',
+     author, 'xpx', 'One line description of project.',
      'Miscellaneous'),
 ]
 

@@ -1,5 +1,5 @@
-from nem2 import client
-from nem2 import models
+from xpx import client
+from xpx import models
 from tests import harness
 
 

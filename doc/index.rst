@@ -1,4 +1,4 @@
-NEM2 Documentation
+ProximaX Documentation
 ==================
 
 # TODO(ahuszagh) Add build successes on travis.

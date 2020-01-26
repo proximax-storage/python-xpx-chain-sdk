@@ -1,4 +1,4 @@
-from nem2.util.signature import ed25519
+from xpx.util.signature import ed25519
 from tests import harness
 
 

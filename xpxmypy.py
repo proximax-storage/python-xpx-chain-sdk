@@ -1,5 +1,5 @@
 """
-    nem2mypy
+    xpxmypy
     ========
 
     Custom plugin for annotating NEM's dynamic model classes.
@@ -27,12 +27,12 @@ from mypy import nodes
 from mypy import types
 from mypy.plugins import common
 
-GLOB_IMPORT = 'nem2.util.glob_import'
-MODULE_IMPORT = 'nem2.util.module_import'
-DATACLASS = 'nem2.util.dataclasses.dataclass'
-INT_MIXIN = 'nem2.util.mixin.IntMixin'
+GLOB_IMPORT = 'xpx.util.glob_import'
+MODULE_IMPORT = 'xpx.util.module_import'
+DATACLASS = 'xpx.util.dataclasses.dataclass'
+INT_MIXIN = 'xpx.util.mixin.IntMixin'
 MULTISIG_ACCOUNT_GRAPH_INFO = (
-    'nem2.models.account.'
+    'xpx.models.account.'
     'multisig_account_graph_info.'
     'MultisigAccountGraphInfo'
 )
@@ -173,8 +173,8 @@ def add_dataclass_hook(ctx):
     add_model_set(ctx)
 
 
-class Nem2Plugin(Plugin):
-    """Plugin to support basic, automatically generated NEM models."""
+class XPXPlugin(Plugin):
+    """Plugin to support basic, automatically generated ProximaX Sirius models."""
 
     def get_class_decorator_hook(self, fullname: str):
         if fullname == DATACLASS:
@@ -190,4 +190,4 @@ class Nem2Plugin(Plugin):
 def plugin(version: str) -> 'Plugin':
     """Get the application plugin."""
 
-    return Nem2Plugin
+    return XPXPlugin

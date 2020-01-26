@@ -70,12 +70,12 @@ def __aiter__(self):
 
 async def __anext__(self):
     # Use a name that's unlikely to be ever touched.
-    if not hasattr(self, '_nem2_async_iter'):
-        self._nem2_async_iter = AsyncIterable(self)
+    if not hasattr(self, '_xpx_async_iter'):
+        self._xpx_async_iter = AsyncIterable(self)
     try:
-        return await self._nem2_async_iter.__anext__()
+        return await self._xpx_async_iter.__anext__()
     except StopAsyncIteration:
-        self._nem2_async_iter = None
+        self._xpx_async_iter = None
         raise
 
 

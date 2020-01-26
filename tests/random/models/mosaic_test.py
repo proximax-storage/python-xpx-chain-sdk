@@ -1,7 +1,7 @@
 import binascii
 import string
 
-from nem2 import models
+from xpx import models
 from tests import harness
 
 

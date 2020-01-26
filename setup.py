@@ -48,14 +48,14 @@ def unittest_command(suite):
 
 
 LICENSE = "Apache-2.0"
-MAINTAINER = ['Alex Huszagh']
-MAINTAINER_EMAIL = ['ahuszagh@gmail.com']
-NAME = "nem2"
-URL = "https://github.com/nemtech/nem2-sdk-python.git"
+MAINTAINER = ['Jan']
+MAINTAINER_EMAIL = ['wirfeon@gmail.com']
+NAME = "xpx"
+URL = "https://github.com/proximax-storage/python-xpx-chain-sdk"
 VERSION = "0.0.1"
 
-DESCRIPTION = "Python SDK for NEM2."
-LONG_DESCRIPTION = "TODO(ahuszagh) Implement..."
+DESCRIPTION = "ProximaX Sirius Blockchain Python SDK"
+LONG_DESCRIPTION = "ProximaX Sirius Blockchain Python SDK is a Python library for interacting with the Sirius Blockchain."
 
 PACKAGES = setuptools.find_packages()
 
@@ -103,7 +103,7 @@ PROJECTDIR = os.path.dirname(os.path.realpath(__file__))
 MOCKDIR = os.path.join(PROJECTDIR, 'mock')
 COMMANDS = {
     'bandit': shell_command(
-        command=[sys.executable, "-m", "bandit", "-r", "nem2", "-c", ".bandit.yml"],
+        command=[sys.executable, "-m", "bandit", "-r", "xpx", "-c", ".bandit.yml"],
         short_description="Run bandit on project.",
     ),
     'coverage': shell_command(
@@ -117,7 +117,7 @@ COMMANDS = {
         PYTHONPATH=MOCKDIR
     ),
     'flake8': shell_command(
-        command=[sys.executable, "-m", "flake8", "--max-complexity", "10", "nem2"],
+        command=[sys.executable, "-m", "flake8", "--max-complexity", "10", "xpx"],
         short_description="Run flake8 on project.",
     ),
     'flake8_tests': shell_command(
@@ -125,19 +125,19 @@ COMMANDS = {
         short_description="Run flake8 on unit tests.",
     ),
     'mypy': shell_command(
-        command=[sys.executable, "-m", "mypy", "nem2"],
+        command=[sys.executable, "-m", "mypy", "xpx"],
         short_description="Run mypy on project.",
     ),
     'pylint': shell_command(
-        command=[sys.executable, "-m", "pylint", "nem2"],
+        command=[sys.executable, "-m", "pylint", "xpx"],
         short_description="Run pylint on project.",
     ),
     'radon_cc': shell_command(
-        command=[sys.executable, "-m", "radon", "cc", "--min", "C", "nem2"],
+        command=[sys.executable, "-m", "radon", "cc", "--min", "C", "xpx"],
         short_description="Run radon's code-complexity checker on project.",
     ),
     'radon_mi': shell_command(
-        command=[sys.executable, "-m", "radon", "mi", "--min", "B", "nem2"],
+        command=[sys.executable, "-m", "radon", "mi", "--min", "B", "xpx"],
         short_description="Run radon's maintainability index checker on project.",
     ),
     'random': shell_command(

@@ -1,4 +1,4 @@
-from nem2 import util
+from xpx import util
 from tests import harness
 
 

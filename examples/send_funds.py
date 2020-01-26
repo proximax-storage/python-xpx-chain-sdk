@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-from nem2 import models
-from nem2 import client
-from nem2 import util
+from xpx import models
+from xpx import client
+from xpx import util
 
 import requests
 import asyncio

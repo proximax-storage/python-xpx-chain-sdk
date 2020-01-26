@@ -1,4 +1,4 @@
-from nem2.util import bit
+from xpx.util import bit
 from tests import harness
 
 

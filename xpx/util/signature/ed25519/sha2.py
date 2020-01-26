@@ -32,7 +32,7 @@ try:
         create_keypair
     )
 except ImportError:
-    from nem2.util import hashlib
+    from xpx.util import hashlib
     from . import fallback
 
     def hash512(data: bytes):

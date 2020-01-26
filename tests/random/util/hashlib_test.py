@@ -1,4 +1,4 @@
-from nem2.util import hashlib
+from xpx.util import hashlib
 from tests import harness
 
 

@@ -1,5 +1,5 @@
-from nem2 import client
-from nem2 import models
+from xpx import client
+from xpx import models
 from tests import harness
 from tests import config
 from tests import responses
@@ -9,7 +9,7 @@ import binascii
 import asyncio
 import hashlib
 import os
-from nem2 import util
+from xpx import util
 import time
 from binascii import hexlify
 #import nest_asyncio
@@ -33,7 +33,6 @@ class TestTransactionHttp(harness.TestCase):
     def __init__(self, task) -> None:
         super().__init__(task)
 
-        print(responses.ENDPOINT)
         if (task == 'test_get_transaction'):
             self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
 

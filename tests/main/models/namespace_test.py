@@ -1,4 +1,4 @@
-from nem2 import models
+from xpx import models
 from tests import harness
 
 
@@ -9,7 +9,7 @@ from tests import harness
         'value': models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54'),
     },
     # TODO(ahuszagh) Check the format, and confirm.
-    # https://nem2.slack.com/archives/CEZKUE4KB/p1553274126174200
+    # https://xpx.slack.com/archives/CEZKUE4KB/p1553274126174200
     'dto': {
         'type': 2,
         'address': '90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',
@@ -46,7 +46,7 @@ class TestAddressAlias(harness.TestCase):
         'value': models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54'),
     },
     # TODO(ahuszagh) Check the format, and confirm.
-    # https://nem2.slack.com/archives/CEZKUE4KB/p1553274126174200
+    # https://xpx.slack.com/archives/CEZKUE4KB/p1553274126174200
     'dto': {
         'type': 2,
         'address': '90fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc',

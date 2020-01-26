@@ -10,7 +10,7 @@
     Example:
         .. code-block:: python
 
-           >>> from nem2.util import observable
+           >>> from xpx.util import observable
            >>> import asyncio
            >>> loop = asyncio.get_event_loop()
            >>> @observable

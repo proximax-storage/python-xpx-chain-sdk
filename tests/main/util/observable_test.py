@@ -1,6 +1,6 @@
 import sys
 
-from nem2 import util
+from xpx import util
 from tests import harness
 
 HAS_REACTIVE = 'rx' in sys.modules

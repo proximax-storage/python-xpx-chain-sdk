@@ -43,9 +43,9 @@ import unittest
 import warnings
 import websockets
 
-from nem2 import client
-from nem2 import models
-from nem2 import util
+from xpx import client
+from xpx import models
+from xpx import util
 from . import aitertools
 from . import responses
 

@@ -1,7 +1,7 @@
 import binascii
 
 from Crypto.Hash import SHA3_224, SHA3_256, SHA3_384, SHA3_512
-from nem2.util import hashlib
+from xpx.util import hashlib
 from tests import harness
 from .helper import *
 

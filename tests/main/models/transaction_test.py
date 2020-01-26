@@ -1,8 +1,8 @@
 import datetime
 import random
 
-from nem2 import util
-from nem2 import models
+from xpx import util
+from xpx import models
 from tests import harness
 from tests import config
 from binascii import hexlify

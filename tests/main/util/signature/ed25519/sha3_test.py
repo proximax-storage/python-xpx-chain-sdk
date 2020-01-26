@@ -1,7 +1,7 @@
 import binascii
 import warnings
 
-from nem2.util.signature.ed25519 import sha3 as ed25519
+from xpx.util.signature.ed25519 import sha3 as ed25519
 from tests import harness
 
 # DUMMY DATA

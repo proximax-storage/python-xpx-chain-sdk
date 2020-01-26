@@ -1,7 +1,7 @@
 import copy
 import typing
 
-from nem2 import util
+from xpx import util
 from tests import harness
 
 T = typing.TypeVar('T')

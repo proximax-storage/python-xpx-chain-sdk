@@ -1,6 +1,6 @@
-from nem2 import models
-from nem2 import util
-from nem2.models.transaction.recipient import Recipient
+from xpx import models
+from xpx import util
+from xpx.models.transaction.recipient import Recipient
 from tests import harness
 
 

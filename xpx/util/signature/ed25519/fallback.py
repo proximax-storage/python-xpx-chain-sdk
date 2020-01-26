@@ -42,7 +42,7 @@ import os
 import typing
 import warnings
 
-from nem2.util import bit
+from xpx.util import bit
 
 # EXCEPTIONS
 

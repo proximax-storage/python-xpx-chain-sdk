@@ -1,7 +1,7 @@
 import binascii
 
-from nem2.util.hashlib.keccak import crypto
-from nem2.util.hashlib.keccak import fallback
+from xpx.util.hashlib.keccak import crypto
+from xpx.util.hashlib.keccak import fallback
 from tests import harness
 from .helper import *
 

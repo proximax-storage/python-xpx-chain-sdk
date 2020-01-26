@@ -2,8 +2,8 @@ import asyncio
 import aiohttp
 import requests
 
-from nem2 import client
-from nem2 import models
+from xpx import client
+from xpx import models
 from tests import harness
 from tests import responses
 
