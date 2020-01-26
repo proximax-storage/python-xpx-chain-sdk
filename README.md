@@ -1,16 +1,30 @@
-NEM2 SDK Python
+ProximaX Sirius Blockchain Python SDK
 ===============
 
-**Table of Contents**
-
-- [Getting Started](#getting-started)
-- [Optimization](#optimization)
-- [Testing](#testing)
-- [License](#license)
-- [Contributing](#contributing)
-
 # Getting Started
+Clone the repository and build the SDK.
+```bash
+git clone git@github.com:proximax-storage/python-xpx-chain-sdk.git
+cd python-xpx-chain-sdk/
+python setup.py install
+```
+You can now start using the SDK modules.
 
+# Example
+```python
+from nem2 import client
+
+with client.BlockchainHTTP('bctestnet1.brimstone.xpxsirius.io:3000') as http:
+    reply = http.get_blockchain_height()
+    
+print(reply)
+```
+For further examples please refer to [examples](examples/) directory or [E2E tests](tests/internet/)
+
+#### ed25519 Secrets Warning
+`SecretsWarning: Security warning: signing message using insecure ed25519 implementation, secrets may be leaked.`
+
+SDK includes fallback ed25519 implementation in python when C implementation is not present. Python ed25519 implementation may lead to the disclosure of the secrets due to python's arbitrary-precision integer arithmetic. To get ed25519 C implementation please refer to https://pypi.org/project/ed25519sha3/
 
 # Optimization
 
