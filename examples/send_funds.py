@@ -7,8 +7,6 @@ from nem2 import util
 import requests
 import asyncio
 
-network_type = models.NetworkType.TEST_NET
-
 nodes = [
     "bctestnet1.brimstone.xpxsirius.io:3000",
     "bctestnet2.brimstone.xpxsirius.io:3000",
