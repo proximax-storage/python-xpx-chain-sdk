@@ -1,8 +1,9 @@
-name: Python CI
+name: Python tox
 on: [push]
 
 jobs:
-  build:
+  test:
+    name: Runs Python tox tests
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
