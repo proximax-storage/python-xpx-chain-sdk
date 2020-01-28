@@ -48,8 +48,8 @@ def unittest_command(suite):
 
 
 LICENSE = "Apache-2.0"
-MAINTAINER = ['Jan']
-MAINTAINER_EMAIL = ['wirfeon@gmail.com']
+MAINTAINER = "Jan"
+MAINTAINER_EMAIL = "wirfeon@gmail.com"
 NAME = "xpx"
 URL = "https://github.com/proximax-storage/python-xpx-chain-sdk"
 VERSION = "0.0.1"

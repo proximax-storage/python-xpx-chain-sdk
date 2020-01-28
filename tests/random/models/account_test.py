@@ -22,13 +22,13 @@ class TestAccount(harness.TestCase):
 
 class TestAddress(harness.TestCase):
 
-    @harness.randomize(address={'pattern': r'[MNSTmnst][A-Za-z2-7]{39}'})
+    @harness.randomize(address={'pattern': r'[MSXVmsxv][A-Za-z2-7]{39}'})
     def test_mostly_valid(self, address: str):
         model = models.Address(address)
         self.assertEqual(model.address.lower(), address.lower())
         self.assertFalse(model.is_valid())
 
-    @harness.randomize(address={'pattern': r'[A-LO-RU-Za-lo-ru-z][A-Za-z2-7]{39}'})
+    @harness.randomize(address={'pattern': r'[A-LN-RT-UY-Za-ln-rt-uy-z][A-Za-z2-7]{39}'})
     def test_invalid_identifier(self, address: str):
         with self.assertRaises(KeyError):
             models.Address(address)
