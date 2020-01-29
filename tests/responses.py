@@ -27,7 +27,7 @@ import os
 
 DIR = os.path.dirname(os.path.realpath(__file__))
 DATADIR = os.path.join(DIR, 'data')
-ENDPOINT = os.environ.get('NIS2_ENDPOINT', 'localhost:3000')
+ENDPOINT = os.environ.get('NIS2_ENDPOINT', '//localhost:3000')
 
 
 def load_response(name):

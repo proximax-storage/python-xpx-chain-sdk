@@ -26,7 +26,7 @@ def shell_command(command, short_description, **env):
             pass
 
         def run(self):
-            subprocess.call(command, **kwds)
+            subprocess.check_call(command, **kwds)
 
     return ShellCommand
 
@@ -97,7 +97,7 @@ EXTRAS_REQUIRE = {
 }
 
 # Define endpoint for internet tests in a single place.
-ENDPOINT = "localhost:3000"
+ENDPOINT = "//localhost:3000"
 # Inject a mockdir to inject custom HTTP clients.
 PROJECTDIR = os.path.dirname(os.path.realpath(__file__))
 MOCKDIR = os.path.join(PROJECTDIR, 'mock')
