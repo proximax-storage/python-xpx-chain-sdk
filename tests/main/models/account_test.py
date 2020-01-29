@@ -237,7 +237,7 @@ class TestAccountPropertiesMetadata(harness.TestCase):
 class TestAddress(harness.TestCase):
 
     def test_properties(self):
-        self.assertNotEqual(self.model.network_type, self.network_type)
+        self.assertEqual(self.model.network_type, self.network_type)
         self.assertEqual(self.model.encoded, self.extras['encoded'])
 
     def test_create_from_raw_address(self):
