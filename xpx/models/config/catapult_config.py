@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['CatapultConfig']
@@ -55,7 +56,7 @@ class CatapultConfig(util.DTO):
     ) -> dict:
         network_config = {
             'height': util.u64_to_dto(self.height),
-            'networkConfig': self.public_key,
+            'networkConfig': self.network_config,
             'supportedEntityVersions': self.supported_entity_versions
         }
 

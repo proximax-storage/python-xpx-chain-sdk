@@ -112,7 +112,7 @@ class Address(util.Object):
         return util.b32decode(self.address)
 
     @classmethod
-    def create_from_raw_address(cls, address: str):
+    def create_from_raw_address(cls, address: str) -> Address:
         """
         Create Address from human-readable, raw address.
 
@@ -122,7 +122,7 @@ class Address(util.Object):
         return cls(address)
 
     @classmethod
-    def create_from_encoded(cls, address: typing.AnyStr):
+    def create_from_encoded(cls, address: typing.AnyStr) -> Address:
         """
         Create Address from encoded address.
 

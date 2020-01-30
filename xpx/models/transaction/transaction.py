@@ -90,7 +90,12 @@ class Transaction(TransactionBase):
 
     # SIGNING
 
-    def sign_with(self, account: Account, gen_hash: typing.AnyStr, fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO) -> SignedTransaction:
+    def sign_with(
+        self, 
+        account: Account, 
+        gen_hash: typing.AnyStr, 
+        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO,
+    ) -> SignedTransaction:
         """
         Serialize and sign transaction.
 

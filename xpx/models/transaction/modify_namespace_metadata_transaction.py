@@ -80,7 +80,7 @@ class ModifyNamespaceMetadataTransaction(Transaction):
 
     metadata_type: MetadataType
     metadata_id: NamespaceId
-    modifications: typing.Sequence[MetadataModificationList]
+    modifications: MetadataModificationList
 
     def __init__(
         self,
@@ -192,8 +192,8 @@ class ModifyNamespaceMetadataTransaction(Transaction):
     ) -> dict:
         return {
             'metadataType': util.u8_to_dto(self.metadata_type),
-            'metadataId': util.u6_to_dto(int(self.metadata_id)),
-            'modifications': [x.to_dto_specific(network_type) for x in self.modifications],
+            'metadataId': util.u8_to_dto(int(self.metadata_id)),
+            'modifications': [MetadataModification.to_dto(x, network_type) for x in self.modifications],
         }
 
     def load_dto_specific(

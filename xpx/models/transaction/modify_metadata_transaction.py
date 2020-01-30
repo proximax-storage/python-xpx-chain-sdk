@@ -31,6 +31,9 @@ from .modify_account_metadata_transaction import (
 )
 from .transaction import TransactionBase
 from .transaction_type import TransactionType
+from ..metadata.metadata_type import MetadataType
+from ..metadata.metadata_modification import MetadataModification
+from .recipient import Recipient, RecipientType
 from ..account.address import Address
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic_id import MosaicId
@@ -38,6 +41,7 @@ from ... import util
 
 __all__ = ['ModifyMetadataTransaction']
 
+MetadataModificationList = typing.Sequence[MetadataModification]
 
 class ModifyMetadataTransaction(TransactionBase):
     """Abstract class for account property modification transactions."""

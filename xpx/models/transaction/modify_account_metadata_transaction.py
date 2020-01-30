@@ -80,7 +80,7 @@ class ModifyAccountMetadataTransaction(Transaction):
 
     metadata_type: MetadataType
     metadata_id: RecipientType
-    modifications: typing.Sequence[MetadataModificationList]
+    modifications: MetadataModificationList
 
     def __init__(
         self,
@@ -192,8 +192,8 @@ class ModifyAccountMetadataTransaction(Transaction):
     ) -> dict:
         return {
             'metadataType': util.u8_to_dto(self.metadata_type),
-            'metadataId': self.metadata_id.to_dto_spcecific(network_type),
-            'modifications': [x.to_dto_specific(network_type) for x in self.modifications],
+            'metadataId': Recipient.to_dto(self.metadata_id, network_type),
+            'modifications': [MetadataModification.to_dto(x, network_type) for x in self.modifications],
         }
 
     def load_dto_specific(

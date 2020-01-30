@@ -71,7 +71,7 @@ class AccountLinkTransaction(Transaction):
         network_type: NetworkType,
         version: TransactionVersion,
         deadline: Deadline,
-        remote_account_key: typing.AnyStr,
+        remote_account_key: str,
         link_action: LinkAction,
         max_fee: int = 0,
         ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
@@ -100,7 +100,7 @@ class AccountLinkTransaction(Transaction):
     def create(
         cls,
         deadline: Deadline,
-        remote_account_key: typing.AnyStr,
+        remote_account_key: str,
         link_action: LinkAction,
         network_type: NetworkType,
         max_fee: int = 0,

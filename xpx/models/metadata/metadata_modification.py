@@ -27,7 +27,7 @@ import typing
 
 from .field import Field
 from .metadata_modification_type import MetadataModificationType
-from ..blockchain.network_type import OptionalNetworkType
+from ..blockchain.network_type import NetworkType, OptionalNetworkType
 from ..mosaic.mosaic_id import MosaicId
 from ..transaction.transaction_type import TransactionType
 from ... import util

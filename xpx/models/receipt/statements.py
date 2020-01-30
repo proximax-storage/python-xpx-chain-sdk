@@ -74,7 +74,7 @@ class Statements(util.DTO):
     ) -> dict:
         return {
             'transactionStatements': [i.to_dto(network_type) for i in self.transaction_statements],
-            'addressResolutionStatements': [i.to_dto(network_type) for i in self.address_resultion_statements],
+            'addressResolutionStatements': [i.to_dto(network_type) for i in self.address_resolution_statements],
             'mosaicResolutionStatements': [i.to_dto(network_type) for i in self.mosaic_resolution_statements],
         }
 

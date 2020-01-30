@@ -38,6 +38,8 @@ from .transaction_version import TransactionVersion
 from ..account.account import Account
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
+from .recipient import Recipient
+from ..mosaic.mosaic import Mosaic
 from ... import util
 
 __all__ = ['AggregateTransaction', 'AggregateBondedTransaction', 'AggregateCompleteTransaction']
@@ -169,35 +171,35 @@ class AggregateTransaction(Transaction):
 
     # SIGNING
 
-    def sign_with(
-        self, 
-        account: Account,
-        gen_hash: typing.AnyStr
-    ) -> SignedTransaction:
-        """
-        Sign transaction.
-
-        :param account: Escrow account.
-        :param gen_hash: Generation hash
-        """
-
-        transaction = self.to_catbuffer()
-        payload = account.sign(transaction, gen_hash)
-        hash = self.transaction_hash(payload, gen_hash)
-
-        return SignedTransaction(
-            payload,
-            hash,
-            account.public_key,
-            self.type,
-            self.network_type
-        )
+#    def sign_with(
+#        self, 
+#        account: Account,
+#        gen_hash: typing.AnyStr
+#    ) -> SignedTransaction:
+#        """
+#        Sign transaction.
+#
+#        :param account: Escrow account.
+#        :param gen_hash: Generation hash
+#        """
+#
+#        transaction = self.to_catbuffer()
+#        payload = account.sign(transaction, gen_hash)
+#        hash = self.transaction_hash(payload, gen_hash)
+#
+#        return SignedTransaction(
+#            payload,
+#            hash,
+#            account.public_key,
+#            self.type,
+#            self.network_type
+#        )
 
     def sign_transaction_with_cosignatories(
         self,
         initiator: Account,
         gen_hash: typing.AnyStr,
-        cosignatories: typing.Optional[Account] = None,
+        cosignatories: typing.Optional[typing.Sequence[Account]] = None,
         fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO,
     ) -> SignedTransaction:
         """
@@ -348,12 +350,6 @@ class AggregateTransaction(Transaction):
     ) -> bytes:
         """Load transfer-specific data data from catbuffer."""
 
-        # uint32_t payload_size
-        # uint8_t[payload_size] transactions
-        # uint8_t[size - payload_size] cosignatures
-        # TODO(ahuszagh) Implement...
-        # payload_size = util.u32_from_catbuffer(data[:4])
-
         raise NotImplementedError
 
     # DTO
@@ -368,11 +364,7 @@ class AggregateTransaction(Transaction):
         self,
         network_type: NetworkType,
     ) -> dict:
-        return {
-            'recipient': Recipient.to_dto(self.recipient, network_type),
-            'mosaics': Mosaic.sequence_to_dto(self.mosaics, network_type),
-            'message': self.message.to_dto(network_type),
-        }
+        raise NotImplementedError
 
     
     def load_dto_specific(
@@ -411,8 +403,8 @@ class AggregateBondedTransaction(AggregateTransaction):
         return cls.create_bonded(
             deadline,
             inner_transactions,
-            cosignatures,
             network_type,
+            cosignatures,
             max_fee,
             ####fee_strategy,
         )

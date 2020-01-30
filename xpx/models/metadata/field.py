@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import typing
 
+from ..blockchain.network_type import NetworkType, OptionalNetworkType
 from ... import util
 
 __all__ = ['Field']

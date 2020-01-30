@@ -7,6 +7,7 @@ from .address_metadata import AddressMetadata
 from .mosaic_metadata import MosaicMetadata
 from .namespace_metadata import NamespaceMetadata
 from .metadata_type import MetadataType
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['MetadataInfo']

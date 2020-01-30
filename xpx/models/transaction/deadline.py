@@ -76,7 +76,7 @@ KEYWORDS = {
     ChronoUnit.HOURS: "hours",
 }
 
-TIMESTAMP_NEMESIS_BLOCK: typing.ClassVar[int] = 1459468800000
+TIMESTAMP_NEMESIS_BLOCK: int = 1459468800000
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -144,7 +144,7 @@ class Deadline(util.Object):
 
         :param timestamp: Timestamp in UTC timezone.
         """
-        ts = timestamp + cls.TIMESTAMP_NEMESIS_BLOCK / 1000
+        ts = timestamp + TIMESTAMP_NEMESIS_BLOCK / 1000
         utc = datetime.datetime.fromtimestamp(ts, datetime.timezone.utc)
         local = utc.replace(tzinfo=None)
         return cls(local)

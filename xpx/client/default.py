@@ -110,7 +110,7 @@ class HTTP(HTTPBase, abc.HTTP):
         return BlockchainHTTP.create_from_http(self)
 
     @property
-    def config(self) -> ContractHTTP:
+    def contract(self) -> ContractHTTP:
         return ContractHTTP.create_from_http(self)
 
     @property
@@ -234,7 +234,7 @@ class AsyncHTTP(AsyncHTTPBase, abc.HTTP):
         return AsyncBlockchainHTTP.create_from_http(self)
 
     @property
-    def config(self) -> AsyncContractHTTP:
+    def contract(self) -> AsyncContractHTTP:
         return AsyncContractHTTP.create_from_http(self)
 
     @property

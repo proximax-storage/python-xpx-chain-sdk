@@ -79,8 +79,8 @@ class ModifyMosaicMetadataTransaction(Transaction):
     """
 
     metadata_type: MetadataType
-    metadata_id: RecipientType
-    modifications: typing.Sequence[MetadataModificationList]
+    metadata_id: MosaicId
+    modifications: MetadataModificationList
 
     def __init__(
         self,
@@ -193,7 +193,7 @@ class ModifyMosaicMetadataTransaction(Transaction):
         return {
             'metadataType': util.u8_to_dto(self.metadata_type),
             'metadataId': util.u64_to_dto(int(self.metadata_id)),
-            'modifications': [x.to_dto_specific(network_type) for x in self.modifications],
+            'modifications': [MetadataModification.to_dto(x, network_type) for x in self.modifications],
         }
 
     def load_dto_specific(

@@ -717,9 +717,9 @@ def request_get_merkle_by_hash_in_block(
 
 def process_get_merkle_by_hash_in_block(
     status: int,
-    json: list,
+    json: dict,
     network_type: models.NetworkType,
-) -> typing.Sequence[models.Transaction]:
+) -> models.MerkleProofInfo:
     """
     Process the "/block/{height}/transaction/{hash}/merkle" HTTP response.
 
@@ -754,9 +754,9 @@ def request_get_block_receipts(
 
 def process_get_block_receipts(
     status: int,
-    json: list,
+    json: dict,
     network_type: models.NetworkType,
-) -> typing.Sequence[models.Transaction]:
+) -> models.Statements:
     """
     Process the "/block/{height}/receipts" HTTP response.
 
@@ -946,7 +946,7 @@ get_diagnostic_server = request("get_diagnostic_server")
 
 def request_get_contracts(
     client: client.Client,
-    addresses: typing.Sequence(models.Address),
+    addresses: typing.Sequence[models.Address],
     **kwds
 ):
     """
@@ -961,7 +961,7 @@ def request_get_contracts(
 
 def process_get_contracts(
     status: int,
-    json: dict,
+    json: list,
     network_type: models.NetworkType,
 ) -> typing.Sequence[models.ContractInfo]:
     """
@@ -973,7 +973,7 @@ def process_get_contracts(
     """
 
     assert status == 200
-    return [models.CatapultInfo.create_from_dto(i, network_type) for i in json]
+    return [models.ContractInfo.create_from_dto(i, network_type) for i in json]
 
 
 get_contracts = request("get_contracts")
@@ -1007,7 +1007,7 @@ def process_get_contract(
     """
 
     assert status == 200
-    return models.CatapultInfo.create_from_dto(json, network_type)
+    return models.ContractInfo.create_from_dto(json, network_type)
 
 
 get_contract = request("get_contract")
@@ -1036,7 +1036,7 @@ def request_get_account_metadata(
 
 def process_get_account_metadata(
     status: int,
-    json: list,
+    json: dict,
     network_type: models.NetworkType,
 ) -> models.AddressMetadataInfo:
     """
@@ -1073,9 +1073,9 @@ def request_get_mosaic_metadata(
 
 def process_get_mosaic_metadata(
     status: int,
-    json: list,
+    json: dict,
     network_type: models.NetworkType,
-) -> models.AddressMetadataInfo:
+) -> models.MosaicMetadataInfo:
     """
     Process the "/mosaic/{mosaic_id}/metadata" HTTP response.
 
@@ -1162,7 +1162,7 @@ get_metadata = request("get_metadata")
 
 def request_get_metadatas(
     client: client.Client,
-    metadata_ids: typing.Sequence(str),
+    metadata_ids: typing.Sequence[str],
     **kwds
 ):
     """
@@ -1176,9 +1176,9 @@ def request_get_metadatas(
 
 def process_get_metadatas(
     status: int,
-    json: dict,
+    json: list,
     network_type: models.NetworkType,
-):
+) -> typing.Sequence[models.MetadataInfo]:
     """
     Process the "/metadata" HTTP response.
 

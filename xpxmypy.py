@@ -161,7 +161,7 @@ def add_dataclass_hook(ctx):
     var_nodes = [i for i in info.names.values() if isinstance(i.node, nodes.Var)]
     member_vars = [i for i in var_nodes if is_model_field(i)]
     var_types = [i.type for i in member_vars]
-    var_fields = [i.node.name().lstrip('_') for i in member_vars]
+    var_fields = [i.node.name.lstrip('_') for i in member_vars]
 
     # Don't override init if present.
     if '__init__' not in info.names.keys():
