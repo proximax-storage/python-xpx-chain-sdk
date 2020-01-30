@@ -1,6 +1,6 @@
 import sys
 
-from xpx import util
+from xpxchain import util
 from tests import harness
 
 HAS_REACTIVE = 'rx' in sys.modules

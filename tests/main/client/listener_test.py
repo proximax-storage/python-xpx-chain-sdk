@@ -1,4 +1,4 @@
-from xpx import models
+from xpxchain import models
 from tests import harness
 
 BLOCK_VALIDATOR = [

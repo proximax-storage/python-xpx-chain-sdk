@@ -7,7 +7,7 @@ from sphinx.ext import autodoc
 
 # PROJECT INFORMATION
 
-project = 'xpx'
+project = 'xpx-chain'
 copyright = '2020, ProximaX'
 author = 'ProximaX'
 version = ''
@@ -49,28 +49,28 @@ html_static_path = ['_static']
 
 # OPTIONS FOR HTMLHELP OUTPUT
 
-htmlhelp_basename = 'xpxdoc'
+htmlhelp_basename = 'xpxchaindoc'
 
 # OPTIONS FOR LATEX OUTPUT
 
 latex_elements = {}
 latex_documents = [
-    (master_doc, 'xpx.tex', 'xpx Documentation',
-     'NEM Foundation', 'manual'),
+    (master_doc, 'xpxchain.tex', 'XPX Chain SDK Documentation',
+     'ProximaX', 'manual'),
 ]
 
 # OPTIONS FOR MANUAL PAGE OUTPUT
 
 man_pages = [
-    (master_doc, 'xpx', 'xpx Documentation',
+    (master_doc, 'xpxchain', 'xpx Documentation',
      [author], 1)
 ]
 
 # OPTIONS FOR TEXINFO OUTPUT
 
 texinfo_documents = [
-    (master_doc, 'xpx', 'xpx Documentation',
-     author, 'xpx', 'One line description of project.',
+    (master_doc, 'xpxchain', 'XPX Chain SDK Documentation',
+     author, 'xpxchain', 'One line description of project.',
      'Miscellaneous'),
 ]
 

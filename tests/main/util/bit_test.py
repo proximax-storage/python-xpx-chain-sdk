@@ -1,4 +1,4 @@
-from xpx.util import bit
+from xpxchain.util import bit
 from tests import harness
 
 

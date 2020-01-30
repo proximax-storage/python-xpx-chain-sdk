@@ -1,5 +1,5 @@
-from xpx import client
-from xpx import models
+from xpxchain import client
+from xpxchain import models
 from tests import harness
 from tests import config
 from tests import responses
@@ -9,7 +9,7 @@ import binascii
 import asyncio
 import hashlib
 import os
-from xpx import util
+from xpxchain import util
 import time
 from binascii import hexlify
 #import nest_asyncio

@@ -1,4 +1,4 @@
-from xpx.util.signature import ed25519
+from xpxchain.util.signature import ed25519
 from tests import harness
 
 

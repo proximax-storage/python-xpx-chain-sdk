@@ -1,5 +1,5 @@
 """
-    xpxmypy
+    xpxchainmypy
     ========
 
     Custom plugin for annotating NEM's dynamic model classes.
@@ -27,12 +27,12 @@ from mypy import nodes
 from mypy import types
 from mypy.plugins import common
 
-GLOB_IMPORT = 'xpx.util.glob_import'
-MODULE_IMPORT = 'xpx.util.module_import'
-DATACLASS = 'xpx.util.dataclasses.dataclass'
-INT_MIXIN = 'xpx.util.mixin.IntMixin'
+GLOB_IMPORT = 'xpxchain.util.glob_import'
+MODULE_IMPORT = 'xpxchain.util.module_import'
+DATACLASS = 'xpxchain.util.dataclasses.dataclass'
+INT_MIXIN = 'xpxchain.util.mixin.IntMixin'
 MULTISIG_ACCOUNT_GRAPH_INFO = (
-    'xpx.models.account.'
+    'xpxchain.models.account.'
     'multisig_account_graph_info.'
     'MultisigAccountGraphInfo'
 )

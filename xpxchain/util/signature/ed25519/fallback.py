@@ -42,7 +42,7 @@ import os
 import typing
 import warnings
 
-from xpx.util import bit
+from xpxchain.util import bit
 
 # EXCEPTIONS
 

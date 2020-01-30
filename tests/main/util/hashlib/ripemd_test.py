@@ -1,7 +1,7 @@
 import binascii
 
 from Crypto.Hash import RIPEMD160 as ripemd160_c
-from xpx.util import hashlib
+from xpxchain.util import hashlib
 from tests import harness
 from .helper import *
 

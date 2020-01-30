@@ -1,7 +1,7 @@
 import binascii
 import string
 
-from xpx import models
+from xpxchain import models
 from tests import harness
 
 

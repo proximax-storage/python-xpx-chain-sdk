@@ -1,5 +1,5 @@
-from xpx import models
-from xpx import util
+from xpxchain import models
+from xpxchain import util
 from tests import harness
 from tests import config
 

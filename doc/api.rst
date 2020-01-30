@@ -4,11 +4,11 @@ API Reference
 Client
 ------
 
-.. automodule:: xpx.client
+.. automodule:: xpxchain.client
    :exclude-members: create_from_http
 
 Models
 ------
 
-.. automodule:: xpx.models
+.. automodule:: xpxchain.models
    :exclude-members: abcs, asdict, astuple, fields, replace

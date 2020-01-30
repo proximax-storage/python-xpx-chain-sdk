@@ -1,4 +1,4 @@
-from xpx.util import hashlib
+from xpxchain.util import hashlib
 from tests import harness
 
 

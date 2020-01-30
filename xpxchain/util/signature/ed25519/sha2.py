@@ -32,7 +32,7 @@ try:
         create_keypair
     )
 except ImportError:
-    from xpx.util import hashlib
+    from xpxchain.util import hashlib
     from . import fallback
 
     def hash512(data: bytes):

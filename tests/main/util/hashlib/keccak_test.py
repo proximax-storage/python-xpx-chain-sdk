@@ -1,7 +1,7 @@
 import binascii
 
-from xpx.util.hashlib.keccak import crypto
-from xpx.util.hashlib.keccak import fallback
+from xpxchain.util.hashlib.keccak import crypto
+from xpxchain.util.hashlib.keccak import fallback
 from tests import harness
 from .helper import *
 

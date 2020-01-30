@@ -2,7 +2,7 @@
     codegen
     =======
 
-    Automate swagger codegen for xpx/infrastructure.
+    Automate swagger codegen for xpxchain/infrastructure.
 
     License
     -------
@@ -108,7 +108,7 @@ def fetch_swagger_codegen():
 
 OPENAPI_DIR = os.path.dirname(os.path.realpath(__file__))
 PROJECT_DIR = os.path.dirname(OPENAPI_DIR)
-NEM2_DIR = os.path.join(PROJECT_DIR, 'xpx')
+NEM2_DIR = os.path.join(PROJECT_DIR, 'xpxchain')
 
 def generate_infrastructure():
     """Run openapi-generator-cli to generate the Python code for infrastructure."""
@@ -242,7 +242,7 @@ def replace_infrastructure():
     codegen = os.path.join(OPENAPI_DIR, 'codegen')
     src = os.path.join(codegen, 'infrastructure')
 
-    # Remove the old, existing xpx infrastructure folder.
+    # Remove the old, existing xpxchain infrastructure folder.
     shutil.rmtree(dst, ignore_errors=True)
 
     # Move the swagger client to the infrastructure folder.

@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-from xpx import models
-from xpx import client
-from xpx import util
+from xpxchain import models
+from xpxchain import client
+from xpxchain import util
 
 import requests
 import asyncio

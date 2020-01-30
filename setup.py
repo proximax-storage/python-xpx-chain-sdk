@@ -50,7 +50,7 @@ def unittest_command(suite):
 LICENSE = "Apache-2.0"
 MAINTAINER = "Jan"
 MAINTAINER_EMAIL = "wirfeon@gmail.com"
-NAME = "xpx"
+NAME = "xpx-chain"
 URL = "https://github.com/proximax-storage/python-xpx-chain-sdk"
 VERSION = "0.0.1"
 
@@ -103,7 +103,7 @@ PROJECTDIR = os.path.dirname(os.path.realpath(__file__))
 MOCKDIR = os.path.join(PROJECTDIR, 'mock')
 COMMANDS = {
     'bandit': shell_command(
-        command=[sys.executable, "-m", "bandit", "-r", "xpx", "-c", ".bandit.yml"],
+        command=[sys.executable, "-m", "bandit", "-r", "xpxchain", "-c", ".bandit.yml"],
         short_description="Run bandit on project.",
     ),
     'coverage': shell_command(
@@ -117,7 +117,7 @@ COMMANDS = {
         PYTHONPATH=MOCKDIR
     ),
     'flake8': shell_command(
-        command=[sys.executable, "-m", "flake8", "--max-complexity", "10", "xpx"],
+        command=[sys.executable, "-m", "flake8", "--max-complexity", "10", "xpxchain"],
         short_description="Run flake8 on project.",
     ),
     'flake8_tests': shell_command(
@@ -125,19 +125,19 @@ COMMANDS = {
         short_description="Run flake8 on unit tests.",
     ),
     'mypy': shell_command(
-        command=[sys.executable, "-m", "mypy", "xpx"],
+        command=[sys.executable, "-m", "mypy", "xpxchain"],
         short_description="Run mypy on project.",
     ),
     'pylint': shell_command(
-        command=[sys.executable, "-m", "pylint", "xpx"],
+        command=[sys.executable, "-m", "pylint", "xpxchain"],
         short_description="Run pylint on project.",
     ),
     'radon_cc': shell_command(
-        command=[sys.executable, "-m", "radon", "cc", "--min", "C", "xpx"],
+        command=[sys.executable, "-m", "radon", "cc", "--min", "C", "xpxchain"],
         short_description="Run radon's code-complexity checker on project.",
     ),
     'radon_mi': shell_command(
-        command=[sys.executable, "-m", "radon", "mi", "--min", "B", "xpx"],
+        command=[sys.executable, "-m", "radon", "mi", "--min", "B", "xpxchain"],
         short_description="Run radon's maintainability index checker on project.",
     ),
     'random': shell_command(

@@ -1,8 +1,8 @@
 import datetime
 import random
 
-from xpx import util
-from xpx import models
+from xpxchain import util
+from xpxchain import models
 from tests import harness
 from tests import config
 from binascii import hexlify

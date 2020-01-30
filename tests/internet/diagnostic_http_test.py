@@ -1,5 +1,5 @@
-from xpx import client
-from xpx import models
+from xpxchain import client
+from xpxchain import models
 from tests import harness
 from tests import config
 

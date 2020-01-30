@@ -24,11 +24,11 @@ java -jar ~/bin/swagger-codegen-cli.jar generate \
     --lang python \
     --output swagger/codegen
 
-# Remove existing xpx infrastructure folder.
-rm -r xpx/infrastructure
+# Remove existing xpx chain infrastructure folder.
+rm -r xpxchain/infrastructure
 
 # Move generate code to infrastructure.
-mv swagger/codegen/swagger_client xpx/infrastructure
+mv swagger/codegen/swagger_client xpxchain/infrastructure
 
 # Remove remaining code
 rm -r swagger/codegen

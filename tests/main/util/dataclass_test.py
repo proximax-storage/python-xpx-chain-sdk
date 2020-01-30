@@ -1,7 +1,7 @@
 import copy
 import typing
 
-from xpx import util
+from xpxchain import util
 from tests import harness
 
 T = typing.TypeVar('T')

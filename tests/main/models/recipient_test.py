@@ -1,6 +1,6 @@
-from xpx import models
-from xpx import util
-from xpx.models.transaction.recipient import Recipient
+from xpxchain import models
+from xpxchain import util
+from xpxchain.models.transaction.recipient import Recipient
 from tests import harness
 
 

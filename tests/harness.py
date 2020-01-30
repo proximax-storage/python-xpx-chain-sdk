@@ -43,9 +43,9 @@ import unittest
 import warnings
 import websockets
 
-from xpx import client
-from xpx import models
-from xpx import util
+from xpxchain import client
+from xpxchain import models
+from xpxchain import util
 from . import aitertools
 from . import responses
 
