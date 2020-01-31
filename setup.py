@@ -64,6 +64,7 @@ REQUIRES = [
     'bidict>=0.18',
     'requests>=2.21',
     'websockets>=7.0',
+    'ed25519sha3>=1.4.1',
 ]
 
 TESTS_REQUIRE = [

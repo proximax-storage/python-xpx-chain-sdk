@@ -4,6 +4,7 @@ from __future__ import annotations
 import typing
 
 from .address_metadata import AddressMetadata
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['AddressMetadataInfo']

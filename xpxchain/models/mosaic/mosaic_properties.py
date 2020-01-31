@@ -36,7 +36,6 @@ logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s
 logger = logging.getLogger(__name__)
 
 
-DTOType = typing.Sequence[util.U64DTOType]
 DTO2Type = typing.Sequence[dict]
 FLAGS_ID = 0
 DIVISIBILITY_ID = 1
@@ -152,7 +151,7 @@ class MosaicProperties(util.DTO):
         return cls(flags, divisibility, duration)
 
     @classmethod
-    def validate_dto(cls, data: DTOType) -> bool:
+    def validate_dto(cls, data: typing.Sequence[dict]) -> bool:
         """Validate the data-transfer object."""
 
         return (
@@ -163,7 +162,7 @@ class MosaicProperties(util.DTO):
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
-    ) -> DTOType:
+    ) -> typing.Sequence[dict]:
         # For indefinite mosaics, the duration is optional (default 0).
         return [
             {'id': 0, 'value': util.u64_to_dto(self.flags)},
@@ -174,9 +173,9 @@ class MosaicProperties(util.DTO):
     @classmethod
     def create_from_dto(
         cls,
-        data: DTOType,
+        data: typing.Sequence[dict],
         network_type: OptionalNetworkType = None,
-    ):
+    ) -> MosaicProperties:
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 

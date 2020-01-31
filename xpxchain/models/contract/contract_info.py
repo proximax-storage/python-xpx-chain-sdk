@@ -4,6 +4,7 @@ from __future__ import annotations
 import typing
 
 from ..account.address import Address
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['ContractInfo']
@@ -34,7 +35,7 @@ class ContractInfo(util.DTO):
     """
 
     multisig: str
-    multisigAddress: Address
+    multisig_address: Address
     start: int
     duration: int
     hash: str

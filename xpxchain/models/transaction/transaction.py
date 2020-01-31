@@ -106,10 +106,10 @@ class Transaction(TransactionBase):
 
         # Serialize transaction data, sign, and generate a hash.
         transaction = self.to_catbuffer(fee_strategy=fee_strategy)
-        payload = account.sign(transaction, gen_hash)
+        payload = account.sign(transaction, gen_hash) #type: ignore
         
-        hash = self.transaction_hash(payload, gen_hash)
-        return SignedTransaction(
+        hash = self.transaction_hash(payload, gen_hash) #type: ignore
+        return SignedTransaction( #type: ignore
             payload,
             hash,
             account.public_key,

@@ -50,7 +50,7 @@ class PublicAccount(util.Object):
     def __init__(
         self,
         address: Address,
-        public_key: typing.AnyStr,
+        public_key: str,
     ) -> None:
         public_key = util.encode_hex(public_key)
         if len(public_key) != 64:

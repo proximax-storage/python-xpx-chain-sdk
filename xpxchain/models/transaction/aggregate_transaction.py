@@ -219,8 +219,8 @@ class AggregateTransaction(Transaction):
             if (self.max_fee != new_fee):
                 transaction = transaction[0:106] + new_fee.to_bytes(8, 'little') + transaction[114:]
                 
-        payload = initiator.sign(transaction, gen_hash)
-        hash = self.transaction_hash(payload, gen_hash)
+        payload = initiator.sign(transaction, gen_hash) #type: ignore
+        hash = self.transaction_hash(payload, gen_hash) #type: ignore
 
         if (cosignatories):
             for cosignatory in cosignatories:
@@ -230,7 +230,7 @@ class AggregateTransaction(Transaction):
             new_size = len(payload)
             payload = new_size.to_bytes(4, 'little') + payload[4:]
 
-        return SignedTransaction(
+        return SignedTransaction( #type: ignore
             payload,
             hash,
             initiator.public_key,

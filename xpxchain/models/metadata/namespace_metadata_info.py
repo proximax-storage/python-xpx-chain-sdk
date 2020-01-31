@@ -4,6 +4,7 @@ from __future__ import annotations
 import typing
 
 from .namespace_metadata import NamespaceMetadata
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = ['NamespaceMetadataInfo']

@@ -71,7 +71,7 @@ class MerkleProofInfo(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            'merklePath': [i.to_dto(network_type) for i in self.payload],
+            'merklePath': [i.to_dto(network_type) for i in self.merkle_path],
         }
 
     @classmethod

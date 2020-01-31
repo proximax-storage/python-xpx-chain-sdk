@@ -112,4 +112,4 @@ class AggregateTransactionCosignature(util.Model):
         # uint8_t[64] signature
         signer = PublicAccount.create_from_public_key(data[:32], network_type)
         signature = data[32:96]
-        return cls(signature, signer)
+        return cls(signature, signer) #type: ignore
