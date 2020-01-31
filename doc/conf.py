@@ -11,7 +11,7 @@ project = 'xpx-chain'
 copyright = '2020, ProximaX'
 author = 'ProximaX'
 version = ''
-release = '0.0.1'
+release = '0.6.0'
 
 # GENERAL CONFIGURATION
 
