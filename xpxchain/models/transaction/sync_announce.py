@@ -73,8 +73,8 @@ class SyncAnnounce(util.DTO):
         address = Address.create_from_public_key(public_key, network_type)
 
         return cls(
-            payload=transaction.payload,
-            hash=transaction.hash,
+            payload=transaction.payload, #type: ignore
+            hash=transaction.hash, #type: ignore
             address=address.address,
         )
 

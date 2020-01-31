@@ -60,9 +60,9 @@ class SignedTransaction(util.Object):
 
     def __init__(
         self,
-        payload: AnyStr1,
-        hash: AnyStr2,
-        signer: AnyStr3,
+        payload: typing.AnyStr,
+        hash: typing.AnyStr,
+        signer: typing.AnyStr,
         type: TransactionType,
         network_type: NetworkType,
     ) -> None:
@@ -93,7 +93,7 @@ class SignedTransaction(util.Object):
         :param type: Transaction type.
         :param network_type: Signer network type.
         """
-        return cls('', hash, '', type, network_type)
+        return cls('', hash, '', type, network_type) #type: ignore
 
     def __eq__(self, other) -> bool:
         # Since we may use `create_from_announced` and we want it

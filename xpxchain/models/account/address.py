@@ -132,7 +132,7 @@ class Address(util.Object):
 
         address = util.decode_hex(address, with_prefix=True)
         if len(address) != 25:
-            raise ValueError(f"{address} is not a valid encoded address")
+            raise ValueError(f"{address!r} is not a valid encoded address")
         raw_address = util.b32encode(address)
         return cls.create_from_raw_address(raw_address)
 
@@ -152,7 +152,7 @@ class Address(util.Object):
 
         key = util.decode_hex(public_key, with_prefix=True)
         if len(key) != 32:
-            raise ValueError(f"{public_key} is not a valid public key")
+            raise ValueError(f"{public_key!r} is not a valid public key")
         address: bytes = public_key_to_address(key, network_type)
 
         return cls.create_from_encoded(address)

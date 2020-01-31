@@ -65,8 +65,8 @@ class Source(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {
-            'primaryId': self.position,
-            'secondaryId': self.hash,
+            'primaryId': self.primary_id,
+            'secondaryId': self.secondary_id,
         }
 
     @classmethod

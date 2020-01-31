@@ -95,9 +95,9 @@ class Account(util.Object):
         private_key = util.decode_hex(private_key)
         signing_key = ed25519.sha3.SigningKey(private_key)
         public_key = signing_key.get_verifying_key().to_bytes()
-        address = Address.create_from_public_key(public_key, network_type)
+        address = Address.create_from_public_key(public_key, network_type) 
 
-        return cls(address, public_key, private_key)
+        return cls(address, public_key, private_key) #type: ignore
 
     @classmethod
     def generate_new_account(

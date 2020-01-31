@@ -188,9 +188,9 @@ class AsyncHTTPBase(HTTPSharedBase):
 
     @classmethod
     def create_from_http(cls: typing.Type[T], http) -> T:
-        inst = super(AsyncHTTPBase, cls).create_from_http(http)
+        inst = super(AsyncHTTPBase, cls).create_from_http(http) #type: ignore
         setattr(inst, '_loop', getattr(http, '_loop'))
-        return inst
+        return inst #type: ignore
 
     @property
     def loop(self) -> util.OptionalLoopType:

@@ -5,6 +5,7 @@ import typing
 
 from .metadata_type import MetadataType
 from ..account.address import Address
+from ..blockchain.network_type import OptionalNetworkType
 from .field import Field
 from ... import util
 
@@ -56,7 +57,7 @@ class AddressMetadata(util.DTO):
         return {
             'metadataType': util.u8_to_dto(self.metadata_type),
             'fields': [x.to_dto() for x in self.flds],
-            'metadataId': self.metadata_id.to_dto()
+            'metadataId': self.metadata_id.plain(),
         }
 
     @classmethod
