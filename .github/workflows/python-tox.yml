@@ -1,8 +1,5 @@
 name: Python tox
-on:
-  push:
-    tags-ignore:
-      - v*
+on: [push]
 
 jobs:
   test:
