@@ -27,19 +27,18 @@ import typing
 
 from ..blockchain.network_type import OptionalNetworkType, NetworkType
 from ..account.public_account import PublicAccount
+from ..mosaic.mosaic import Mosaic
 from .receipt_version import ReceiptVersion
+from .receipt_type import ReceiptType
 from .receipt import Receipt
-from .registry import register_receipt
 from ... import util
 
 __all__ = [
     'BalanceTransferReceipt',
 ]
 
-
 @util.inherit_doc
 @util.dataclass(frozen=True)
-@register_receipt('BALANCE_TRANSFER')
 class BalanceTransferReceipt(Receipt):
     """
     Balance Transfer Receipt.
@@ -52,34 +51,27 @@ class BalanceTransferReceipt(Receipt):
     :param amount: Amount to change.
     """
 
-    #account: PublicAccount
-    sender: str
-    recipient: str
-    mosaic_id: int
-    amount: int
+    sender: PublicAccount
+    recipient: PublicAccount
+    mosaic: Mosaic
 
     def __init__(
         self,
-        #network_type: NetworkType,
+        type: ReceiptType,
         version: ReceiptVersion,
-        sender: str,
-        recipient: str,
-        mosaic_id: int,
-        amount: int
+        sender: PublicAccount,
+        recipient: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
     ) -> None:
         super().__init__(
-            ReceiptVersion.BALANCE_CHANGE,
-            #network_type,
+            type,
             version,
-            sender,
-            recipient,
-            mosaic_id,
-            amount
+            network_type,
         )
         self._set('sender', sender)
         self._set('recipient', recipient)
-        self._set('mosaic_id', mosaic_id)
-        self._set('amount', amount)
+        self._set('mosaic', mosaic)
 
     # DTO
 
@@ -90,30 +82,29 @@ class BalanceTransferReceipt(Receipt):
 
     def to_dto_specific(
         self,
-        #network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> dict:
+        mosaic_data = self.mosaic.to_dto(network_type)
+
         return {
-            #'account': self.account.public_key,
-            'sender': self.sender,
-            'recipient': self.recipient,
-            'mosaic': util.u64_to_dto(self.mosaic_id),
-            'amount': util.u64_to_dto(self.amount),
+            'sender': self.sender.public_key,
+            'recipient': self.recipient.public_key,
+            'mosaicId': mosaic_data['id'],
+            'amount': mosaic_data['amount'],
+
         }
 
     def load_dto_specific(
         self,
         data: dict,
-        #network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> None:
-        #account = PublicAccount.create_from_public_key(data['account'], network_type)
-        sender = data['sender']
-        recipient = data['recipient']
-        mosaic_id = util.u64_from_dto(data['mosaicId'])
-        amount = util.u64_from_dto(data['amount'])
+        sender = PublicAccount.create_from_public_key(data['sender'], network_type)
+        recipient = PublicAccount.create_from_public_key(data['recipient'], network_type)
+        mosaic = Mosaic.create_from_dto({'id': data['mosaicId'], 'amount': data['amount']})
 
         self._set('sender', sender)
         self._set('recipient', recipient)
-        self._set('mosaic_id', mosaic_id)
-        self._set('amount', amount)
+        self._set('mosaic', mosaic)
 
 

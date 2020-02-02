@@ -28,8 +28,8 @@ import typing
 from ..blockchain.network_type import OptionalNetworkType, NetworkType
 from ..account.public_account import PublicAccount
 from .receipt_version import ReceiptVersion
+from .receipt_type import ReceiptType
 from .receipt import Receipt
-from .registry import register_receipt
 from ... import util
 
 __all__ = [
@@ -39,7 +39,6 @@ __all__ = [
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-@register_receipt('ARTIFACT_EXPIRY')
 class ArtifactExpiryReceipt(Receipt):
     """
     Balance Change Receipt.
@@ -49,20 +48,19 @@ class ArtifactExpiryReceipt(Receipt):
     :param artifactId: Artifact in question.
     """
 
-    #account: PublicAccount
     artifact_id: int
 
     def __init__(
         self,
-        #network_type: NetworkType,
+        type: ReceiptType,
         version: ReceiptVersion,
         artifact_id: int,
+        network_type: OptionalNetworkType,
     ) -> None:
         super().__init__(
-            ReceiptVersion.BALANCE_CHANGE,
-            #network_type,
+            type,
             version,
-            artifact_id,
+            network_type,
         )
         self._set('artifact_id', artifact_id)
 
@@ -75,7 +73,7 @@ class ArtifactExpiryReceipt(Receipt):
 
     def to_dto_specific(
         self,
-        #network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> dict:
         return {
             'artifactId': util.u64_to_dto(self.artifact_id),
@@ -84,7 +82,7 @@ class ArtifactExpiryReceipt(Receipt):
     def load_dto_specific(
         self,
         data: dict,
-        #network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> None:
         artifact_id = util.u64_from_dto(data['artifactId'])
 

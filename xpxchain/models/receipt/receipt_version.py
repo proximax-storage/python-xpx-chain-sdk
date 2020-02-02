@@ -34,11 +34,22 @@ __all__ = ['ReceiptVersion']
 class ReceiptVersion(util.U8Mixin, enum.IntEnum):
     """Receipt version."""
 
-    #TODO: Set the right values
-    BALANCE_CHANGE = 1
-    BALANCE_TRANSFER = 0
-    ARTIFACT_EXPIRY = 0
-    INFLATION = 0
+    HARVEST_FEE = 1
+    INFALTION = 1
+    ADDRESS_ALIAS_RESOLUTION = 1
+    MOSAIC_ALIAS_RESOLUTION = 1
+    TRANSACTION_GROUP = 1
+    MOSAIC_EXPIRED = 1
+    MOSAIC_LEVY = 1
+    MOSAIC_RENTAL_FEE = 1
+    NAMESPACE_EXPIRED = 1
+    NAMESPACE_RENTAL_FEE = 1
+    LOCKHASH_COMPLETED = 1
+    LOCKHASH_EXPIRED = 1
+    LOCKSECRET_COMPLETED = 1
+    LOCKSECRET_EXPIRED = 1
+    LOCKHASH_CREATED = 1
+    LOCKSECRET_CREATED = 1
 
     def description(self) -> str:
         return DESCRIPTION[self]

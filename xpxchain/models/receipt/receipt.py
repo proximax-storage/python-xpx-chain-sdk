@@ -26,7 +26,7 @@ from __future__ import annotations
 import bidict
 import typing
 
-from ..blockchain.network_type import NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 from .format import DTOFormat
 from .receipt_base import ReceiptBase
 from ... import util
@@ -44,12 +44,11 @@ class Receipt(ReceiptBase):
 
     __slots__ = ()
     # Overridable classvars.
-    TYPE_MAP: typing.ClassVar[TypeMap] = bidict.bidict()
+    #TYPE_MAP: typing.ClassVar[TypeMap] = bidict.bidict()
     DTO: typing.ClassVar[DTOFormat] = DTOFormat(
         names={
-            'version': 'version',
-            #'network_type': 'version',
             'type': 'type',
+            'version': 'version',
         },
     )
 
@@ -65,12 +64,11 @@ class Receipt(ReceiptBase):
 
     def to_dto_shared(
         self,
-        #network_type: NetworkType
+        network_type: OptionalNetworkType
     ) -> dict:
         # Shared data and callbacks.
         data: dict = {}
         cb = lambda k, v: self.DTO.save(k, data, v)
-        #cb = lambda k, v: self.DTO.save(k, data, v, network_type)
         cb_get = lambda k: cb(k, getattr(self, k))
 
         # Save shared data.
@@ -84,14 +82,12 @@ class Receipt(ReceiptBase):
     def load_dto_shared(
         self,
         data: dict,
-        #network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> None:
         # Shared data and callbacks.
         cb = lambda k: self.DTO.load(k, data)
-        #cb = lambda k: self.DTO.load(k, data, network_type)
         cb_set = lambda k: self._set(k, cb(k))
 
         # Load shared data.
         cb_set('version')
-        #self._set('network_type', network_type)
         cb_set('type')

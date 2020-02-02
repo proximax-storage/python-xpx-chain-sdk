@@ -71,7 +71,7 @@ class ResolutionStatement(util.DTO):
 
     @classmethod
     def create_from_dto(
-        self,
+        cls,
         data: dict,
         network_type: OptionalNetworkType = None,
     ):

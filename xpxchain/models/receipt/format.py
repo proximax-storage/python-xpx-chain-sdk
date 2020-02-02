@@ -66,7 +66,6 @@ class FormatBase(util.Object):
         return type_map[self.load_type(data)]
 
 
-
 # DTO HELPERS
 @util.dataclass(frozen=True)
 class DTOFormat(FormatBase):
@@ -98,12 +97,6 @@ def save_version_dto(version):
     return version
 
 
-SAVE_DTO = {
-    'version': save_version_dto,
-    'type': lambda x, n: x.to_dto(n),
-}
-
-
 #def load_version_dto(data, network_type):
 #    return data & 0xFF
 def load_version_dto(data):
@@ -113,9 +106,12 @@ def load_version_dto(data):
 #def load_network_type_dto(data, network_type):
 #    return NetworkType((data >> 24) & 0x000000ff)
 
+SAVE_DTO = {
+    'version': save_version_dto,
+    'type': lambda x, n: x.to_catbuffer(n),
+}
 
 LOAD_DTO = {
     'version': load_version_dto,
-    #'network_type': load_network_type_dto,
-    'type': ReceiptType.create_from_dto,
+    'type': ReceiptType.create_from_catbuffer,
 }

@@ -55,8 +55,8 @@ class ReceiptBase(util.Model):
     # FIELDS
 
     type: ReceiptType
-    network_type: NetworkType
     version: ReceiptVersion
+    network_type: OptionalNetworkType
 
     # OVERRIDABLE CLASSVARS
     # The following classvars should be re-implemented for each
@@ -96,14 +96,14 @@ class ReceiptBase(util.Model):
 
     def to_dto_shared(
         self,
-        network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> dict:
         """Export shared receipt data to DTO. Internal use only."""
         raise util.AbstractMethodError
 
     def to_dto_specific(
         self,
-        network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> dict:
         """Export receipt-specific data to DTO. Internal use only."""
         raise util.AbstractMethodError
@@ -124,7 +124,7 @@ class ReceiptBase(util.Model):
     def load_dto_shared(
         self,
         data: dict,
-        network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> None:
         """Load shared receipt data from DTO. Internal use only."""
         raise util.AbstractMethodError
@@ -132,7 +132,7 @@ class ReceiptBase(util.Model):
     def load_dto_specific(
         self,
         data: dict,
-        network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> None:
         """Load receipt-specific data from DTO. Internal use only."""
         raise util.AbstractMethodError
@@ -171,7 +171,6 @@ class ReceiptBase(util.Model):
         #    raise ValueError('Network type does not match receipt.')
 
         # Load shared and specific receipt data.
-        inst.load_dto_shared(data)
-        #inst.load_dto_specific(data, nt)
-        inst.load_dto_specific(data)
+        inst.load_dto_shared(data, network_type)
+        inst.load_dto_specific(data, network_type)
         return inst
