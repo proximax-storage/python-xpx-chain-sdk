@@ -23,10 +23,13 @@
 """
 
 from __future__ import annotations
-import typing
 
+import typing
 from ..blockchain.network_type import OptionalNetworkType
 from .balance_change_receipt import BalanceChangeReceipt
+from .balance_transfer_receipt import BalanceTransferReceipt
+from .artifact_expiry_receipt import ArtifactExpiryReceipt
+from .inflation_receipt import InflationReceipt
 from .receipt import Receipt
 from .source import Source
 from ... import util
@@ -35,12 +38,13 @@ from ... import util
 __all__ = ['TransactionStatement']
 
 ReceiptValue = typing.Union[
-#    BalanceTransferReceipt,
     BalanceChangeReceipt,
-#    ArtifactExpiryReceipt,
-#    InflationReceipt
+    BalanceTransferReceipt,
+    ArtifactExpiryReceipt,
+    InflationReceipt,
 ]
 ReceiptValueList = typing.Sequence[ReceiptValue]
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -48,8 +52,8 @@ class TransactionStatement(util.DTO):
     """
     Transaction statement information.
 
-    :param height: 
-    :param source: 
+    :param height:
+    :param source:
     :param receipts: The array of receipts.
 
     DTO Format:
@@ -58,7 +62,12 @@ class TransactionStatement(util.DTO):
             TransactionStatementsDTO:
                 height: UInt64DTO
                 source: SourceDTO
-                receipts: anyOf(BalanceTransferReceiptDTO, BalanceChangeReceiptDTO, ArtifactExpiryReceiptDTO, InflationReceiptDTO)[] 
+                receipts: anyOf(
+                    BalanceTransferReceiptDTO,
+                    BalanceChangeReceiptDTO,
+                    ArtifactExpiryReceiptDTO,
+                    InflationReceiptDTO
+                )[]
     """
 
     height: int
@@ -68,7 +77,6 @@ class TransactionStatement(util.DTO):
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
-
 
         required_l1 = {'height', 'source', 'receipts'}
         return (

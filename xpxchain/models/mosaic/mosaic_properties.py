@@ -31,8 +31,6 @@ from ... import util
 __all__ = ['MosaicProperties']
 
 
-
-
 DTO2Type = typing.Sequence[dict]
 FLAGS_ID = 0
 DIVISIBILITY_ID = 1
@@ -178,8 +176,8 @@ class MosaicProperties(util.DTO):
 
         # For indefinite mosaics, the duration is optional (default 0).
         duration = 0
-       
-        for prop in data[0 : 3]:
+
+        for prop in data[0:3]:
             prop_id = util.u8_from_dto(prop["id"])
 
             if (prop_id == 0):

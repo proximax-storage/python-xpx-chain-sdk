@@ -38,8 +38,6 @@ from .transaction_version import TransactionVersion
 from ..account.account import Account
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
-from .recipient import Recipient
-from ..mosaic.mosaic import Mosaic
 from ... import util
 
 __all__ = ['AggregateTransaction', 'AggregateBondedTransaction', 'AggregateCompleteTransaction']
@@ -65,7 +63,6 @@ class AggregateTransaction(Transaction):
     :param deadline: Deadline to include transaction.
     :param max_fee: Max fee for the transaction. Higher fees increase priority.
     :param inner_transactions: Inner transactions to be included.
-    :param cosignatures: Transaction cosigner signatures.
     :param signature: (Optional) Transaction signature.
     :param signer: (Optional) Account of transaction creator.
     :param transaction_info: (Optional) Transaction metadata.
@@ -81,9 +78,7 @@ class AggregateTransaction(Transaction):
         version: TransactionVersion,
         deadline: Deadline,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         inner_transactions: typing.Optional[InnerTransactionList] = None,
-        #cosignatures: typing.Optional[Cosignatures] = None,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -96,13 +91,11 @@ class AggregateTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            ####fee_strategy,
             signature,
             signer,
             transaction_info,
         )
         self._set('inner_transactions', inner_transactions or [])
-        #self._set('cosignatures', cosignatures or [])
 
     @classmethod
     def create_complete(
@@ -112,7 +105,6 @@ class AggregateTransaction(Transaction):
         network_type: NetworkType,
         cosignatures: typing.Optional[Cosignatures] = None,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create aggregate complete transaction object.
@@ -130,7 +122,6 @@ class AggregateTransaction(Transaction):
             TransactionVersion.AGGREGATE_COMPLETE,
             deadline,
             max_fee,
-            ####fee_strategy,
             inner_transactions,
             cosignatures,
         )
@@ -143,7 +134,6 @@ class AggregateTransaction(Transaction):
         network_type: NetworkType,
         cosignatures: typing.Optional[Cosignatures] = None,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create aggregate bonded transaction object.
@@ -161,7 +151,6 @@ class AggregateTransaction(Transaction):
             TransactionVersion.AGGREGATE_BONDED,
             deadline,
             max_fee,
-            ####fee_strategy,
             inner_transactions,
             cosignatures,
         )
@@ -169,7 +158,7 @@ class AggregateTransaction(Transaction):
     # SIGNING
 
 #    def sign_with(
-#        self, 
+#        self,
 #        account: Account,
 #        gen_hash: typing.AnyStr
 #    ) -> SignedTransaction:
@@ -208,16 +197,20 @@ class AggregateTransaction(Transaction):
         """
 
         transaction = self.to_catbuffer(fee_strategy=fee_strategy)
-      
+
         if (cosignatories):
             COSIGNATURE_SIZE = 96
-            new_fee = util.calculate_fee(fee_strategy, self.max_fee, self.catbuffer_size() + COSIGNATURE_SIZE * len(cosignatories))
-            
+            new_fee = util.calculate_fee(
+                fee_strategy,
+                self.max_fee,
+                self.catbuffer_size() + COSIGNATURE_SIZE * len(cosignatories)
+            )
+
             if (self.max_fee != new_fee):
                 transaction = transaction[0:106] + new_fee.to_bytes(8, 'little') + transaction[114:]
-                
-        payload = initiator.sign(transaction, gen_hash) #type: ignore
-        hash = self.transaction_hash(payload, gen_hash) #type: ignore
+
+        payload = initiator.sign(transaction, gen_hash)  # type: ignore
+        hash = self.transaction_hash(payload, gen_hash)  # type: ignore
 
         if (cosignatories):
             for cosignatory in cosignatories:
@@ -227,24 +220,13 @@ class AggregateTransaction(Transaction):
             new_size = len(payload)
             payload = new_size.to_bytes(4, 'little') + payload[4:]
 
-        return SignedTransaction( #type: ignore
+        return SignedTransaction(  # type: ignore
             payload,
             hash,
             initiator.public_key,
             self.type,
             self.network_type
         )
-
-#    def signed_by_account(self, public_account: PublicAccount) -> bool:
-#        """
-#        Check if account has signed transaction.
-#
-#        :param public_account: Signer public account.
-#        """
-#        return (
-#            public_account == self.signer
-#            or any(i.signer == public_account for i in self.cosignatures)
-#        )
 
     # AGGREGATE
 
@@ -266,8 +248,6 @@ class AggregateTransaction(Transaction):
         # The payload size is the size from all inner transactions.
         extra_size = util.U32_BYTES
         payload_size = self.inner_transactions_size()
-        #cosignatures_size = self.cosignatures_size()
-        #return extra_size + payload_size + cosignatures_size
         return extra_size + payload_size
 
     def to_inner_transactions_bytes(
@@ -303,8 +283,6 @@ class AggregateTransaction(Transaction):
         # uint8_t[size - payload_size] cosignatures
         payload_size = util.u32_to_catbuffer(self.inner_transactions_size())
         transactions = self.to_inner_transactions_bytes(network_type)
-        #cosignatures = self.to_cosignatures_bytes(network_type)
-        #return payload_size + transactions + cosignatures
         return payload_size + transactions
 
     def load_inner_transactions_bytes(
@@ -356,14 +334,12 @@ class AggregateTransaction(Transaction):
         required_keys = {'transactions'}
         return cls.validate_dto_required(data, required_keys)
 
-	
     def to_dto_specific(
         self,
         network_type: NetworkType,
     ) -> dict:
         raise NotImplementedError
 
-    
     def load_dto_specific(
         self,
         data: dict,
@@ -386,7 +362,6 @@ class AggregateBondedTransaction(AggregateTransaction):
         cosignatures: Cosignatures,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create aggregate bonded transaction object.
@@ -403,7 +378,6 @@ class AggregateBondedTransaction(AggregateTransaction):
             network_type,
             cosignatures,
             max_fee,
-            ####fee_strategy,
         )
 
 
@@ -419,7 +393,6 @@ class AggregateCompleteTransaction(AggregateTransaction):
         cosignatures: typing.Optional[Cosignatures],
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create aggregate complete transaction object.
@@ -436,5 +409,4 @@ class AggregateCompleteTransaction(AggregateTransaction):
             cosignatures,
             network_type,
             max_fee,
-            ####fee_strategy,
         )

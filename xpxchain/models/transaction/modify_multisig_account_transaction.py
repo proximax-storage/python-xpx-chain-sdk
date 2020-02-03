@@ -76,7 +76,6 @@ class ModifyMultisigAccountTransaction(Transaction):
         min_approval_delta: int,
         min_removal_delta: int,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         modifications: typing.Optional[MultisigCosignatoryModificationList] = None,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
@@ -88,7 +87,6 @@ class ModifyMultisigAccountTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -106,7 +104,6 @@ class ModifyMultisigAccountTransaction(Transaction):
         modifications: MultisigCosignatoryModificationList,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new transfer transaction.
@@ -125,7 +122,6 @@ class ModifyMultisigAccountTransaction(Transaction):
             min_approval_delta,
             min_removal_delta,
             max_fee,
-            ####fee_strategy,
             modifications
         )
 

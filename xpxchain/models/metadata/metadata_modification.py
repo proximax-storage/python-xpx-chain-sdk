@@ -32,8 +32,6 @@ from ... import util
 __all__ = ['MetadataModification']
 
 
-
-
 @util.inherit_doc
 @util.dataclass(frozen=True)
 class MetadataModification(util.DTO):
@@ -99,6 +97,8 @@ class MetadataModification(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls(
-            modification_type=MetadataModificationType.create_from_dto(data['modificationType']),
+            modification_type=MetadataModificationType.create_from_dto(
+                data['modificationType']
+            ),
             field=Field(data['key'], data['value']),
         )

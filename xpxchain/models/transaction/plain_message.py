@@ -48,7 +48,7 @@ class PlainMessage(Message):
 
     @classmethod
     def create(cls, payload: typing.AnyStr):
-        return cls(payload) #type: ignore
+        return cls(payload)  # type: ignore
 
 
 EMPTY_MESSAGE = PlainMessage(b'')

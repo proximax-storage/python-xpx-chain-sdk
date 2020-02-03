@@ -101,7 +101,7 @@ class MosaicNonce(util.Model):
     @classmethod
     def validate_dto(cls, data: int) -> bool:
         """Validate the data-transfer object."""
-        return isinstance(data, int) and 0 <= data < (1<<32)
+        return isinstance(data, int) and 0 <= data < (1 << 32)
 
     def to_dto(
         self,

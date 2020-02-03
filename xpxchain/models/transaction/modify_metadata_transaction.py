@@ -30,18 +30,15 @@ from .modify_account_metadata_transaction import (
     ModifyAccountMetadataTransaction
 )
 from .transaction import TransactionBase
-from .transaction_type import TransactionType
 from ..metadata.metadata_type import MetadataType
 from ..metadata.metadata_modification import MetadataModification
-from .recipient import Recipient, RecipientType
-from ..account.address import Address
+from .recipient import RecipientType
 from ..blockchain.network_type import NetworkType
-from ..mosaic.mosaic_id import MosaicId
-from ... import util
 
 __all__ = ['ModifyMetadataTransaction']
 
 MetadataModificationList = typing.Sequence[MetadataModification]
+
 
 class ModifyMetadataTransaction(TransactionBase):
     """Abstract class for account property modification transactions."""
@@ -56,7 +53,6 @@ class ModifyMetadataTransaction(TransactionBase):
         modifications: MetadataModificationList,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create new modify account addresses transaction.
@@ -75,7 +71,4 @@ class ModifyMetadataTransaction(TransactionBase):
             modifications,
             network_type,
             max_fee,
-            ####fee_strategy,
         )
-
-

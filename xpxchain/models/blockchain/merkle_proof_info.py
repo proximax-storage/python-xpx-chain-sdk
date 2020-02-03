@@ -55,7 +55,6 @@ class MerkleProofInfo(util.DTO):
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-
         required_l1 = {'merklePath'}
         return (
             # Level 1

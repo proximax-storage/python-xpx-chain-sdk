@@ -23,10 +23,8 @@
 """
 
 from __future__ import annotations
-import typing
 
-from ..blockchain.network_type import OptionalNetworkType, NetworkType
-from ..account.public_account import PublicAccount
+from ..blockchain.network_type import OptionalNetworkType
 from .receipt_version import ReceiptVersion
 from .receipt_type import ReceiptType
 from .receipt import Receipt
@@ -47,7 +45,7 @@ class ArtifactExpiryReceipt(Receipt):
     Balance Change Receipt.
 
     :param network_type: Network type.
-    :param version: The version of the receipt.    
+    :param version: The version of the receipt.
     :param artifactId: Artifact in question.
     """
 
@@ -120,6 +118,7 @@ class MosaicExpiredReceipt(ArtifactExpiryReceipt):
             network_type,
         )
 
+
 @util.inherit_doc
 @register_receipt('NAMESPACE_EXPIRED')
 class NamespaceExpiredReceipt(ArtifactExpiryReceipt):
@@ -147,4 +146,3 @@ class NamespaceExpiredReceipt(ArtifactExpiryReceipt):
             artifact_id,
             network_type,
         )
-

@@ -23,10 +23,8 @@
 """
 
 from __future__ import annotations
-import typing
 
-from ..blockchain.network_type import OptionalNetworkType, NetworkType
-from ..account.public_account import PublicAccount
+from ..blockchain.network_type import OptionalNetworkType
 from .receipt_version import ReceiptVersion
 from .receipt_type import ReceiptType
 from ..mosaic.mosaic import Mosaic
@@ -47,7 +45,7 @@ class InflationReceipt(Receipt):
     Native currency mosaics were created due to inflation..
 
     :param network_type: Network type.
-    :param version: The version of the receipt.    
+    :param version: The version of the receipt.
     :param mosaicId: Mosaic.
     :param amount: Amount to change.
     """
@@ -80,7 +78,7 @@ class InflationReceipt(Receipt):
         network_type: OptionalNetworkType,
     ) -> dict:
         mosaic_data = self.mosaic.to_dto(network_type)
-    
+
         return {
             'mosaicId': mosaic_data['id'],
             'amount': mosaic_data['amount'],
@@ -94,4 +92,3 @@ class InflationReceipt(Receipt):
         mosaic = Mosaic.create_from_dto({'id': data['mosaicId'], 'amount': data['amount']})
 
         self._set('mosaic', mosaic)
-

@@ -90,7 +90,7 @@ class SignedTransaction(util.Object):
         :param type: Transaction type.
         :param network_type: Signer network type.
         """
-        return cls('', hash, '', type, network_type) #type: ignore
+        return cls('', hash, '', type, network_type)  # type: ignore
 
     def __eq__(self, other) -> bool:
         # Since we may use `create_from_announced` and we want it

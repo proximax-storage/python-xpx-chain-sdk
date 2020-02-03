@@ -25,7 +25,6 @@
 from __future__ import annotations
 import datetime
 import enum
-import typing
 
 from ... import util
 
@@ -74,6 +73,7 @@ KEYWORDS = {
 }
 
 TIMESTAMP_NEMESIS_BLOCK: int = 1459468800000
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -133,7 +133,6 @@ class Deadline(util.Object):
         local = utc.replace(tzinfo=None)
         return cls(local)
 
-
     @classmethod
     def create_fake(cls, timestamp: int):
         """
@@ -145,6 +144,7 @@ class Deadline(util.Object):
         utc = datetime.datetime.fromtimestamp(ts, datetime.timezone.utc)
         local = utc.replace(tzinfo=None)
         return cls(local)
+
 
 # Private
 # Data-transfer object for the nemesis block timestamp.

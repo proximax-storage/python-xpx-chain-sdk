@@ -27,7 +27,6 @@ from __future__ import annotations
 import typing
 from .mosaic_id import MosaicId
 from ..blockchain.network_type import OptionalNetworkType
-from ..namespace.namespace_id import NamespaceId
 from ... import util
 
 __all__ = ['MosaicName']

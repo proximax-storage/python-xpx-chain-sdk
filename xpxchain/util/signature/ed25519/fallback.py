@@ -48,7 +48,7 @@ from xpxchain.util import bit
 
 HashFuncType = typing.Callable[[bytes], bytes]
 SECRET_LEAK_MSG = (
-    'Security warning: {} using insecure ed25519' #nosec
+    'Security warning: {} using insecure ed25519'  # nosec
     ' implementation, secrets may be leaked.'
 )
 

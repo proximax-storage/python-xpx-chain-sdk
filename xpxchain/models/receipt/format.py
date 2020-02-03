@@ -25,9 +25,6 @@
 from __future__ import annotations
 import typing
 
-from .receipt_type import ReceiptType
-from .receipt_version import ReceiptVersion
-from ..blockchain.network_type import NetworkType
 from ... import util
 
 

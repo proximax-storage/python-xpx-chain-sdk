@@ -38,7 +38,6 @@ from ... import util
 __all__ = ['Transaction']
 
 
-
 @util.inherit_doc
 class Transaction(TransactionBase):
     """Abstract, non-embedded transaction base class."""
@@ -88,9 +87,9 @@ class Transaction(TransactionBase):
     # SIGNING
 
     def sign_with(
-        self, 
-        account: Account, 
-        gen_hash: typing.AnyStr, 
+        self,
+        account: Account,
+        gen_hash: typing.AnyStr,
         fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO,
     ) -> SignedTransaction:
         """
@@ -103,10 +102,10 @@ class Transaction(TransactionBase):
 
         # Serialize transaction data, sign, and generate a hash.
         transaction = self.to_catbuffer(fee_strategy=fee_strategy)
-        payload = account.sign(transaction, gen_hash) #type: ignore
-        
-        hash = self.transaction_hash(payload, gen_hash) #type: ignore
-        return SignedTransaction( #type: ignore
+        payload = account.sign(transaction, gen_hash)  # type: ignore
+
+        hash = self.transaction_hash(payload, gen_hash)  # type: ignore
+        return SignedTransaction(  # type: ignore
             payload,
             hash,
             account.public_key,

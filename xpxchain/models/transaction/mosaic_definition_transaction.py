@@ -45,8 +45,6 @@ __all__ = [
 ]
 
 
-
-
 @util.inherit_doc
 @util.dataclass(frozen=True)
 @register_transaction('MOSAIC_DEFINITION')
@@ -78,8 +76,7 @@ class MosaicDefinitionTransaction(Transaction):
         nonce: MosaicNonce,
         mosaic_id: MosaicId,
         mosaic_properties: MosaicProperties,
-        max_fee: int = 0, 
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
+        max_fee: int = 0,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -90,7 +87,6 @@ class MosaicDefinitionTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -108,7 +104,6 @@ class MosaicDefinitionTransaction(Transaction):
         mosaic_properties: MosaicProperties,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new mosaic definition transaction.
@@ -128,7 +123,6 @@ class MosaicDefinitionTransaction(Transaction):
             mosaic_id,
             mosaic_properties,
             max_fee,
-            ####fee_strategy,
         )
 
     # CATBUFFER

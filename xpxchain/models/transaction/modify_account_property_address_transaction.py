@@ -101,7 +101,6 @@ class ModifyAccountPropertyAddressTransaction(Transaction):
         property_type: PropertyType,
         modifications: AccountPropertyModificationList,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -116,7 +115,6 @@ class ModifyAccountPropertyAddressTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -132,7 +130,6 @@ class ModifyAccountPropertyAddressTransaction(Transaction):
         modifications: AccountPropertyModificationList,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new modify account addresses transaction.
@@ -150,7 +147,6 @@ class ModifyAccountPropertyAddressTransaction(Transaction):
             property_type,
             modifications,
             max_fee,
-            ####fee_strategy,
         )
 
     # CATBUFFER

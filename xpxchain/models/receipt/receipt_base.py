@@ -28,10 +28,8 @@ import typing
 from .format import DTOFormat
 from .receipt_type import ReceiptType
 from .receipt_version import ReceiptVersion
-from ..blockchain.network_type import NetworkType, OptionalNetworkType
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
-
-
 
 
 ReceiptBaseType = typing.TypeVar('ReceiptBaseType', bound='ReceiptBase')
@@ -163,8 +161,8 @@ class ReceiptBase(util.Model):
             raise ValueError('Invalid data-transfer object.')
 
         # Load and check the network type.
-        #nt = cls.DTO.load_network_type(data)
-        #if network_type is not None and network_type != nt:
+        # nt = cls.DTO.load_network_type(data)
+        # if network_type is not None and network_type != nt:
         #    raise ValueError('Network type does not match receipt.')
 
         # Load shared and specific receipt data.

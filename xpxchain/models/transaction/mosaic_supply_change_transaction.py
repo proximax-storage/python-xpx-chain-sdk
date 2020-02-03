@@ -78,7 +78,6 @@ class MosaicSupplyChangeTransaction(Transaction):
         direction: MosaicSupplyType,
         delta: int,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -89,7 +88,6 @@ class MosaicSupplyChangeTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -107,7 +105,6 @@ class MosaicSupplyChangeTransaction(Transaction):
         delta: int,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new mosaic supply change transaction.

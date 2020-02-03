@@ -34,7 +34,6 @@ from ... import util
 __all__ = ['Receipt']
 
 
-
 @util.inherit_doc
 class Receipt(ReceiptBase):
     """Abstract, non-embedded Receipt base class."""
@@ -42,7 +41,7 @@ class Receipt(ReceiptBase):
     __slots__ = ()
     # Overridable classvars.
     TYPE_MAP: typing.ClassVar[TypeMap] = bidict.bidict()
-    
+
     DTO: typing.ClassVar[DTOFormat] = DTOFormat(
         names={
             'type': 'type',

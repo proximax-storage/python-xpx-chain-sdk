@@ -25,8 +25,8 @@
 from __future__ import annotations
 import typing
 
-from ..blockchain.network_type import OptionalNetworkType, NetworkType
 from .resolution_entry import ResolutionEntry
+from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
 __all__ = [
@@ -38,10 +38,11 @@ __all__ = [
 @util.dataclass(frozen=True)
 class ResolutionStatement(util.DTO):
     """
-    A resolution statement keeps the relation between a namespace alias used in a transaction and the real address or mosaicId.
+    A resolution statement keeps the relation between a namespace alias used in a transaction
+    and the real address or mosaicId.
 
-    :param height: 
-    :param unresolved: 
+    :param height:
+    :param unresolved:
     :param resolutionEntries: The array of resolution entries linked to the unresolved namespaceId.
     """
 
@@ -79,8 +80,7 @@ class ResolutionStatement(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls(
-            height = util.u64_from_dto(data['mosaicId']),
-            unresolved = util.u64_from_dto(data['unresolved']),
-            resolution_entries = [ResolutionEntry.create_from_dto(i) for i in data['resolutionEntries']]
+            height=util.u64_from_dto(data['mosaicId']),
+            unresolved=util.u64_from_dto(data['unresolved']),
+            resolution_entries=[ResolutionEntry.create_from_dto(i) for i in data['resolutionEntries']]
         )
-            

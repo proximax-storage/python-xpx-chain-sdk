@@ -71,7 +71,7 @@ class AccountNames(util.DTO):
         return {
             'address': self.address.address,
             # TODO
-            #'names': AccountProperty.sequence_to_dto(self.properties, network_type),
+            # 'names': AccountProperty.sequence_to_dto(self.properties, network_type),
         }
 
     @classmethod

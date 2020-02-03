@@ -1,8 +1,6 @@
 
 from __future__ import annotations
 
-import typing
-
 from .address_metadata import AddressMetadata
 from .mosaic_metadata import MosaicMetadata
 from .namespace_metadata import NamespaceMetadata
@@ -35,14 +33,13 @@ class MetadataInfo(util.DTO):
 
         required_l1 = {'metadata'}
         required_l2 = {'metadataType', 'fields', 'metadataId'}
-        
+
         return (
             # Level 1
             cls.validate_dto_required(data, required_l1)
             and cls.validate_dto_all(data, required_l1)
             and cls.validate_dto_required(data['metadata'], required_l2)
             and cls.validate_dto_all(data['metadata'], required_l2)
-            
         )
 
     def to_dto(
@@ -61,7 +58,7 @@ class MetadataInfo(util.DTO):
     ):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
-    
+
         metadata = data['metadata']
 
         if (metadata['metadataType'] == MetadataType.ADDRESS):
@@ -76,5 +73,5 @@ class MetadataInfo(util.DTO):
             return cls(
                 metadata=NamespaceMetadata.create_from_dto(metadata)
             )
-        else: 
+        else:
             raise ValueError('Invalid data-transfer object.')

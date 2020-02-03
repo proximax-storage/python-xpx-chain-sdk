@@ -191,10 +191,10 @@ class BlockInfo(util.DTO):
         required_l21 = {
             'hash',
             'generationHash'
-#            'subCacheMerkleRoots',
-#            'totalFee',
-#            'numTransactions',
-#            'numStatements'
+            # 'subCacheMerkleRoots',
+            # 'totalFee',
+            # 'numTransactions',
+            # 'numStatements'
         }
         required_l22 = {
             'signature',
@@ -206,24 +206,24 @@ class BlockInfo(util.DTO):
             'difficulty',
             'previousBlockHash',
             'blockTransactionsHash'
-#            'feeMultiplier',
-#            'blockReceiptsHash',
-#            'stateHash',
-#            'beneficiary',
-#            'feeInterest',
-#            'feeInterestDenominator'
+            # 'feeMultiplier',
+            # 'blockReceiptsHash',
+            # 'stateHash',
+            # 'beneficiary',
+            # 'feeInterest',
+            # 'feeInterestDenominator'
         }
-        
+
         return (
             # Level 1
             cls.validate_dto_required(data, required_l1)
             and cls.validate_dto_all(data, required_l1)
             # Level 2_1
             and cls.validate_dto_required(data['meta'], required_l21)
-#            and cls.validate_dto_all(data['meta'], required_l21)
+            # and cls.validate_dto_all(data['meta'], required_l21)
             # Level 2_2
             and cls.validate_dto_required(data['block'], required_l22)
-#            and cls.validate_dto_all(data['block'], required_l22)
+            # and cls.validate_dto_all(data['block'], required_l22)
         )
 
     def to_dto(

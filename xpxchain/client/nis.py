@@ -956,6 +956,7 @@ def request_get_contracts(
     json = {"addresses": [i.address for i in addresses]}
     return client.post(url, json=json, **kwds)
 
+
 def process_get_contracts(
     status: int,
     json: list,
@@ -989,6 +990,7 @@ def request_get_contract(
 
     url = f"/contract/{contract_id}"
     return client.get(url, **kwds)
+
 
 def process_get_contract(
     status: int,
@@ -1120,6 +1122,7 @@ def process_get_namespace_metadata(
     assert status == 200
     return models.NamespaceMetadataInfo.create_from_dto(json, network_type)
 
+
 get_namespace_metadata = request("get_namespace_metadata")
 
 
@@ -1136,6 +1139,7 @@ def request_get_metadata(
 
     url = f"/metadata/{metadata_id}"
     return client.get(url, **kwds)
+
 
 def process_get_metadata(
     status: int,
@@ -1170,6 +1174,7 @@ def request_get_metadatas(
     url = f"/metadata"
     json = {"metadataIds": metadata_ids}
     return client.post(url, json=json, **kwds)
+
 
 def process_get_metadatas(
     status: int,
@@ -2044,7 +2049,7 @@ CLIENT_CB = {
         request_get_contracts,
         process_get_contracts,
     ),
-    
+
     # METADATA
     'get_account_metadata': (
         request_get_account_metadata,
@@ -2072,7 +2077,7 @@ CLIENT_CB = {
         request_get_config,
         process_get_config,
     ),
-    
+
     # NODE
     'get_node_info': (
         request_get_node_info,

@@ -32,8 +32,6 @@ from .transaction import Transaction
 from .transaction_info import TransactionInfo
 from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
-from .recipient import Recipient, RecipientType
-from ..mosaic.mosaic import Mosaic
 from ..namespace.namespace_id import NamespaceId
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
@@ -41,7 +39,6 @@ from ..metadata.metadata_type import MetadataType
 from ..metadata.metadata_modification_type import MetadataModificationType
 from ..metadata.metadata_modification import MetadataModification
 from ... import util
-
 
 
 MetadataModificationList = typing.Sequence[MetadataModification]
@@ -54,6 +51,7 @@ __all__ = [
 TYPES = (
     TransactionType.MODIFY_NAMESPACE_METADATA,
 )
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -89,7 +87,6 @@ class ModifyNamespaceMetadataTransaction(Transaction):
         metadata_id: NamespaceId,
         modifications: MetadataModificationList,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -102,7 +99,6 @@ class ModifyNamespaceMetadataTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -120,7 +116,6 @@ class ModifyNamespaceMetadataTransaction(Transaction):
         modifications: MetadataModificationList,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new namespace metadata modification transaction.
@@ -141,7 +136,6 @@ class ModifyNamespaceMetadataTransaction(Transaction):
             metadata_id,
             modifications,
             max_fee,
-            ####fee_strategy,
         )
 
     # CATBUFFER
@@ -174,7 +168,6 @@ class ModifyNamespaceMetadataTransaction(Transaction):
     ) -> bytes:
         """Load address alias-specific data data from catbuffer."""
         raise ValueError('Not implemented.')
-
 
     # DTO
 
@@ -212,5 +205,3 @@ class ModifyNamespaceMetadataInnerTransaction(InnerTransaction, ModifyNamespaceM
     """Embedded namespace metadata modification transaction."""
 
     __slots__ = ()
-
-
