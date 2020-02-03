@@ -46,7 +46,7 @@ class ReceiptType(util.U16Mixin, util.EnumMixin, enum.IntEnum):
     LOCKSECRET_CREATED = 0x3152
     MOSAIC_EXPIRED = 0x414D
     NAMESPACE_EXPIRED = 0x414E
-    INFALTION = 0x5143
+    INFLATION = 0x5143
     TRANSACTION_GROUP = 0xE134
     ADDRESS_ALIAS_RESOLUTION = 0xF143
     MOSAIC_ALIAS_RESOLUTION = 0xF243
@@ -68,7 +68,7 @@ DESCRIPTION = {
     ReceiptType.LOCKSECRET_CREATED: "Lock secret created receipt type.",
     ReceiptType.MOSAIC_EXPIRED: "Mosaic expired receipt type.",
     ReceiptType.NAMESPACE_EXPIRED: "Namespace expired receipt type.",
-    ReceiptType.INFALTION: "Inflation receipt type.",
+    ReceiptType.INFLATION: "Inflation receipt type.",
     ReceiptType.TRANSACTION_GROUP: "Transaction group receipt type.",
     ReceiptType.ADDRESS_ALIAS_RESOLUTION: "Address alias resolution receipt type.",
     ReceiptType.MOSAIC_ALIAS_RESOLUTION: "Mosaic alias resolution receipt type.",
