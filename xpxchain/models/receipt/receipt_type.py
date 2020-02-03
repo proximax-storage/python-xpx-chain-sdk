@@ -36,7 +36,7 @@ class ReceiptType(util.U16Mixin, util.EnumMixin, enum.IntEnum):
 
     MOSAIC_RENTAL_FEE = 0x134D
     NAMESPACE_RENTAL_FEE = 0x124E
-    HARVEST_FEE = 0x2143
+    VALIDATE_FEE = 0x2143
     MOSAIC_LEVY = 0x124D
     LOCKHASH_COMPLETED = 0x2248
     LOCKHASH_EXPIRED = 0x2348
@@ -59,7 +59,7 @@ DESCRIPTION = {
 
     ReceiptType.MOSAIC_RENTAL_FEE: "Mosaic rental fee receipt type.",
     ReceiptType.NAMESPACE_RENTAL_FEE: "Namespace rental fee receipt type.",
-    ReceiptType.HARVEST_FEE: "Harvest fee receipt type.",
+    ReceiptType.VALIDATE_FEE: "Harvest fee receipt type.",
     ReceiptType.LOCKHASH_COMPLETED: "Lock hash completed receipt type.",
     ReceiptType.LOCKHASH_EXPIRED: "Lock hash expired receipt type.",
     ReceiptType.LOCKSECRET_COMPLETED: "Lock secret completed receipt type.",

@@ -30,10 +30,13 @@ from ..account.public_account import PublicAccount
 from .receipt_version import ReceiptVersion
 from .receipt_type import ReceiptType
 from .receipt import Receipt
+from .registry import register_receipt
 from ... import util
 
 __all__ = [
     'ArtifactExpiryReceipt',
+    'MosaicExpiredReceipt',
+    'NamespaceExpiredReceipt',
 ]
 
 
@@ -88,4 +91,60 @@ class ArtifactExpiryReceipt(Receipt):
 
         self._set('artifact_id', artifact_id)
 
+
+@util.inherit_doc
+@register_receipt('MOSAIC_EXPIRED')
+class MosaicExpiredReceipt(ArtifactExpiryReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        artifact_id: int,
+        network_type: OptionalNetworkType,
+    ) -> MosaicExpiredReceipt:
+        return cls(
+            type,
+            version,
+            artifact_id,
+            network_type,
+        )
+
+@util.inherit_doc
+@register_receipt('NAMESPACE_EXPIRED')
+class NamespaceExpiredReceipt(ArtifactExpiryReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        artifact_id: int,
+        network_type: OptionalNetworkType,
+    ) -> NamespaceExpiredReceipt:
+        return cls(
+            type,
+            version,
+            artifact_id,
+            network_type,
+        )
 

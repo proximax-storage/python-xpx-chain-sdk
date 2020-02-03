@@ -28,7 +28,7 @@ import typing
 
 from ..blockchain.network_type import OptionalNetworkType
 from .format import DTOFormat
-from .receipt_base import ReceiptBase
+from .receipt_base import TypeMap, ReceiptBase
 from ... import util
 
 __all__ = ['Receipt']
@@ -44,7 +44,8 @@ class Receipt(ReceiptBase):
 
     __slots__ = ()
     # Overridable classvars.
-    #TYPE_MAP: typing.ClassVar[TypeMap] = bidict.bidict()
+    TYPE_MAP: typing.ClassVar[TypeMap] = bidict.bidict()
+    
     DTO: typing.ClassVar[DTOFormat] = DTOFormat(
         names={
             'type': 'type',

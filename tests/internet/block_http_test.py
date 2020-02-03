@@ -48,7 +48,7 @@ from tests import responses
                 lambda x: (isinstance(x.transaction_statements[0], models.TransactionStatement), True),
                 lambda x: (len(x.transaction_statements[0].receipts), 1),
                 lambda x: (isinstance(x.transaction_statements[0].receipts[0], models.BalanceChangeReceipt), True),
-                lambda x: (x.transaction_statements[0].receipts[0].account, config.nemesis_harvesting_public_key)
+                lambda x: (x.transaction_statements[0].receipts[0].account.public_key, config.nemesis_harvesting_public_key)
             ]
         },
         #TODO: Looks like there's no hash in receipts yet 

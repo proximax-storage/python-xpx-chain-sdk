@@ -38,28 +38,16 @@ class FormatBase(util.Object):
     """Utilities to simplify loading and saving to interchange formats."""
 
     def save(self, key, data, value) -> None:
-    #def save(self, key, data, value, network_type) -> None:
         """Save value to interchange format by key."""
         raise util.AbstractMethodError
 
     def load(self, key, data):
-    #def load(self, key, data, network_type):
         """Load value from interchange format by key."""
         raise util.AbstractMethodError
 
-    def load_size(self, data):
-        """Load transaction size."""
-        return self.load('size', data)
-        #return self.load('size', data, None)
-
     def load_type(self, data):
         """Load transaction type."""
-        #return self.load('version', data, None)
-        return self.load('version', data)
-
-    #def load_network_type(self, data):
-    #    """Load network type."""
-    #    return self.load('network_type', data, None)
+        return self.load('type', data)
 
     def find_receipt(self, type_map, data):
         """Find derived receipt class via the receipt type."""
@@ -74,44 +62,41 @@ class DTOFormat(FormatBase):
     names: typing.Dict[str, str]
 
     def save(self, key, data, value) -> None:
-    #def save(self, key, data, value, network_type) -> None:
         name = self.names[key]
         cb = SAVE_DTO[key]
         if value is not None:
             data[name] = cb(value)
-            #data[name] = cb(value, network_type)
 
     def load(self, key, data):
-    #def load(self, key, data, network_type):
         name = self.names[key]
         cb = LOAD_DTO[key]
         value = data.get(name)
         if value is not None:
             return cb(value)
-            #return cb(value, network_type)
 
 
-#def save_version_dto(version, network_type):
-#    return version | (int(network_type) << 8)
 def save_version_dto(version):
     return version
 
 
-#def load_version_dto(data, network_type):
-#    return data & 0xFF
-def load_version_dto(data):
+def save_type_dto(data):
     return data
 
 
-#def load_network_type_dto(data, network_type):
-#    return NetworkType((data >> 24) & 0x000000ff)
+def load_version_dto(version):
+    return version
+
+
+def load_type_dto(data):
+    return data
+
 
 SAVE_DTO = {
     'version': save_version_dto,
-    'type': lambda x, n: x.to_catbuffer(n),
+    'type': save_type_dto,
 }
 
 LOAD_DTO = {
     'version': load_version_dto,
-    'type': ReceiptType.create_from_catbuffer,
+    'type': load_type_dto,
 }

@@ -31,6 +31,7 @@ from .receipt_version import ReceiptVersion
 from .receipt_type import ReceiptType
 from ..mosaic.mosaic import Mosaic
 from .receipt import Receipt
+from .registry import register_receipt
 from ... import util
 
 __all__ = [
@@ -40,6 +41,7 @@ __all__ = [
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
+@register_receipt('INFLATION')
 class InflationReceipt(Receipt):
     """
     Native currency mosaics were created due to inflation..
@@ -92,5 +94,4 @@ class InflationReceipt(Receipt):
         mosaic = Mosaic.create_from_dto({'id': data['mosaicId'], 'amount': data['amount']})
 
         self._set('mosaic', mosaic)
-
 

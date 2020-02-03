@@ -31,10 +31,14 @@ from ..mosaic.mosaic import Mosaic
 from .receipt_version import ReceiptVersion
 from .receipt_type import ReceiptType
 from .receipt import Receipt
+from .registry import register_receipt
 from ... import util
 
 __all__ = [
     'BalanceTransferReceipt',
+    'MosaicLevyReceipt',
+    'MosaicRentalFeeReceipt',
+    'NamespaceRentalFeeReceipt',
 ]
 
 @util.inherit_doc
@@ -107,4 +111,100 @@ class BalanceTransferReceipt(Receipt):
         self._set('recipient', recipient)
         self._set('mosaic', mosaic)
 
+
+@util.inherit_doc
+@register_receipt('MOSAIC_LEVY')
+class MosaicLevyReceipt(BalanceTransferReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.    
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        sender: PublicAccount,
+        recipient: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> MosaicLevyReceipt:
+        return cls(
+            type,
+            version,
+            sender,
+            recipient,
+            mosaic,
+            network_type,
+        )
+
+@util.inherit_doc
+@register_receipt('MOSAIC_RENTAL_FEE')
+class MosaicRentalFeeReceipt(BalanceTransferReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.    
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        sender: PublicAccount,
+        recipient: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> MosaicRentalFeeReceipt:
+        return cls(
+            type,
+            version,
+            sender,
+            recipient,
+            mosaic,
+            network_type,
+        )
+
+@util.inherit_doc
+@register_receipt('NAMESPACE_RENTAL_FEE')
+class NamespaceRentalFeeReceipt(BalanceTransferReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.    
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        sender: PublicAccount,
+        recipient: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> NamespaceRentalFeeReceipt:
+        return cls(
+            type,
+            version,
+            sender,
+            recipient,
+            mosaic,
+            network_type,
+        )
 
