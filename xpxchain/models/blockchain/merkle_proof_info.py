@@ -29,9 +29,6 @@ from .merkle_path_item import MerklePathItem
 from .network_type import OptionalNetworkType
 from ... import util
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 __all__ = ['MerkleProofInfo']
 

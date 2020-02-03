@@ -32,9 +32,6 @@ from . import client
 from .. import util
 from .. import models
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 OptionalNetworkType = typing.Optional[models.NetworkType]
 

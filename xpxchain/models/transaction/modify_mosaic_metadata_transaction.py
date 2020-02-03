@@ -43,9 +43,6 @@ from ..metadata.metadata_modification import MetadataModification
 from ... import util
 
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 MetadataModificationList = typing.Sequence[MetadataModification]
 

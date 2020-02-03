@@ -849,7 +849,6 @@ def ignore_warnings_test(test):
 with contextlib.suppress(ImportError):
     # Check we can import all our dependencies and generate the decorators.
     from collections import deque
-    import logging
     import os.path
     import random
     import rstr
@@ -1160,7 +1159,6 @@ with contextlib.suppress(ImportError):
         if not INITIALIZED_LOGGER:
             now = datetime.datetime.now()
             strtime = now.strftime("%Y-%m-%d-%H-%M-%S")
-            logging.basicConfig(filename=f'{testdir}/random-{strtime}.log')
             INITIALIZED_LOGGER = True
             with open(f'{testdir}/random-{strtime}.seed', 'w') as f:
                 f.write(str(random.getstate()))

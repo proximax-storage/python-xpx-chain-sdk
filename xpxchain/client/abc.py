@@ -31,9 +31,6 @@ from . import nis
 from .. import models
 from .. import util
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 T = typing.TypeVar('T')
 MessageType = typing.Union[

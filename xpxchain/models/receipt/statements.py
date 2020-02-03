@@ -30,9 +30,6 @@ from .transaction_statement import TransactionStatement
 from .resolution_statement import ResolutionStatement
 from ... import util
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 __all__ = ['Statements']
 

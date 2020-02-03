@@ -1,8 +1,6 @@
 
 from __future__ import annotations
 
-import typing
-
 from .namespace_metadata import NamespaceMetadata
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
@@ -31,7 +29,7 @@ class NamespaceMetadataInfo(util.DTO):
         """Validate the data-transfer object."""
 
         required_l1 = {'metadata'}
-        
+
         return (
             # Level 1
             cls.validate_dto_required(data, required_l1)

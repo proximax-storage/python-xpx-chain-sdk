@@ -44,9 +44,6 @@ from ... import util
 
 __all__ = ['AggregateTransaction', 'AggregateBondedTransaction', 'AggregateCompleteTransaction']
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 Cosignature = AggregateTransactionCosignature
 Cosignatures = typing.Sequence[Cosignature]

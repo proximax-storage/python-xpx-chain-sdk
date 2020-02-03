@@ -1,8 +1,6 @@
 
 from __future__ import annotations
 
-import typing
-
 from ..blockchain.network_type import NetworkType, OptionalNetworkType
 from ... import util
 
@@ -36,7 +34,7 @@ class Field(util.DTO):
             'key',
             'value'
         }
-        
+
         return (
             # Level 1
             cls.validate_dto_required(data, required_l1)
