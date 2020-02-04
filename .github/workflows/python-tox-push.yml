@@ -1,4 +1,4 @@
-name: Python tox
+name: Python Tox on Push
 on: [push]
 
 jobs:
