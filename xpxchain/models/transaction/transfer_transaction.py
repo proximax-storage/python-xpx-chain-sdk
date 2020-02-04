@@ -45,10 +45,6 @@ __all__ = [
     'TransferInnerTransaction',
 ]
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -80,7 +76,6 @@ class TransferTransaction(Transaction):
         deadline: Deadline,
         recipient: RecipientType,
         max_fee: int = 0,
-        #fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
         signature: typing.Optional[str] = None,
@@ -93,7 +88,6 @@ class TransferTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            #fee_strategy,
             signature,
             signer,
             transaction_info
@@ -111,7 +105,6 @@ class TransferTransaction(Transaction):
         mosaics: typing.Optional[MosaicList] = None,
         message: Message = EMPTY_MESSAGE,
         max_fee: int = 0,
-        #fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new transfer transaction.
@@ -129,7 +122,6 @@ class TransferTransaction(Transaction):
             deadline,
             recipient,
             max_fee,
-            #fee_strategy,
             mosaics,
             message
         )

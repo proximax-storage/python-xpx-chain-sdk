@@ -36,7 +36,8 @@ class ReceiptType(util.U16Mixin, util.EnumMixin, enum.IntEnum):
 
     MOSAIC_RENTAL_FEE = 0x134D
     NAMESPACE_RENTAL_FEE = 0x124E
-    HARVEST_FEE = 0x2143
+    VALIDATE_FEE = 0x2143
+    MOSAIC_LEVY = 0x124D
     LOCKHASH_COMPLETED = 0x2248
     LOCKHASH_EXPIRED = 0x2348
     LOCKSECRET_COMPLETED = 0x2252
@@ -45,7 +46,7 @@ class ReceiptType(util.U16Mixin, util.EnumMixin, enum.IntEnum):
     LOCKSECRET_CREATED = 0x3152
     MOSAIC_EXPIRED = 0x414D
     NAMESPACE_EXPIRED = 0x414E
-    INFALTION = 0x5143
+    INFLATION = 0x5143
     TRANSACTION_GROUP = 0xE134
     ADDRESS_ALIAS_RESOLUTION = 0xF143
     MOSAIC_ALIAS_RESOLUTION = 0xF243
@@ -58,7 +59,7 @@ DESCRIPTION = {
 
     ReceiptType.MOSAIC_RENTAL_FEE: "Mosaic rental fee receipt type.",
     ReceiptType.NAMESPACE_RENTAL_FEE: "Namespace rental fee receipt type.",
-    ReceiptType.HARVEST_FEE: "Harvest fee receipt type.",
+    ReceiptType.VALIDATE_FEE: "Harvest fee receipt type.",
     ReceiptType.LOCKHASH_COMPLETED: "Lock hash completed receipt type.",
     ReceiptType.LOCKHASH_EXPIRED: "Lock hash expired receipt type.",
     ReceiptType.LOCKSECRET_COMPLETED: "Lock secret completed receipt type.",
@@ -67,7 +68,7 @@ DESCRIPTION = {
     ReceiptType.LOCKSECRET_CREATED: "Lock secret created receipt type.",
     ReceiptType.MOSAIC_EXPIRED: "Mosaic expired receipt type.",
     ReceiptType.NAMESPACE_EXPIRED: "Namespace expired receipt type.",
-    ReceiptType.INFALTION: "Inflation receipt type.",
+    ReceiptType.INFLATION: "Inflation receipt type.",
     ReceiptType.TRANSACTION_GROUP: "Transaction group receipt type.",
     ReceiptType.ADDRESS_ALIAS_RESOLUTION: "Address alias resolution receipt type.",
     ReceiptType.MOSAIC_ALIAS_RESOLUTION: "Mosaic alias resolution receipt type.",

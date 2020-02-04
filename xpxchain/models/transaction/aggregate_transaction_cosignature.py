@@ -59,7 +59,6 @@ class AggregateTransactionCosignature(util.Model):
         self._set('signature', signature)
         self._set('signer', signer)
 
-
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
@@ -112,4 +111,4 @@ class AggregateTransactionCosignature(util.Model):
         # uint8_t[64] signature
         signer = PublicAccount.create_from_public_key(data[:32], network_type)
         signature = data[32:96]
-        return cls(signature, signer) #type: ignore
+        return cls(signature, signer)  # type: ignore

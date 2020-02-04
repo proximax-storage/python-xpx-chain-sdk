@@ -77,7 +77,6 @@ class Message(util.Model):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        type = data["type"]
         payload = util.unhexlify(data['payload'])
         return cls.create(payload)
 
@@ -94,6 +93,6 @@ class Message(util.Model):
         network_type: OptionalNetworkType = None,
     ):
         return cls.create(data[1:]), data[len(data):]
-    
+
     def catbuffer_size_specific(self) -> int:
         return util.U8_BYTES + len(self.payload)

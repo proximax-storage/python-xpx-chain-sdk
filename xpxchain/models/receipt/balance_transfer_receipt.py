@@ -23,63 +23,59 @@
 """
 
 from __future__ import annotations
-import typing
 
-from ..blockchain.network_type import OptionalNetworkType, NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 from ..account.public_account import PublicAccount
+from ..mosaic.mosaic import Mosaic
 from .receipt_version import ReceiptVersion
+from .receipt_type import ReceiptType
 from .receipt import Receipt
 from .registry import register_receipt
 from ... import util
 
 __all__ = [
     'BalanceTransferReceipt',
+    'MosaicLevyReceipt',
+    'MosaicRentalFeeReceipt',
+    'NamespaceRentalFeeReceipt',
 ]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-@register_receipt('BALANCE_TRANSFER')
 class BalanceTransferReceipt(Receipt):
     """
     Balance Transfer Receipt.
 
     :param network_type: Network type.
-    :param version: The version of the receipt.    
+    :param version: The version of the receipt.
     :param sender: The public key of the sender.
     :param recipient: The public key of the recipient.
     :param mosaicId: Mosaic.
     :param amount: Amount to change.
     """
 
-    #account: PublicAccount
-    sender: str
-    recipient: str
-    mosaic_id: int
-    amount: int
+    sender: PublicAccount
+    recipient: PublicAccount
+    mosaic: Mosaic
 
     def __init__(
         self,
-        #network_type: NetworkType,
+        type: ReceiptType,
         version: ReceiptVersion,
-        sender: str,
-        recipient: str,
-        mosaic_id: int,
-        amount: int
+        sender: PublicAccount,
+        recipient: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
     ) -> None:
         super().__init__(
-            ReceiptVersion.BALANCE_CHANGE,
-            #network_type,
+            type,
             version,
-            sender,
-            recipient,
-            mosaic_id,
-            amount
+            network_type,
         )
         self._set('sender', sender)
         self._set('recipient', recipient)
-        self._set('mosaic_id', mosaic_id)
-        self._set('amount', amount)
+        self._set('mosaic', mosaic)
 
     # DTO
 
@@ -90,30 +86,126 @@ class BalanceTransferReceipt(Receipt):
 
     def to_dto_specific(
         self,
-        #network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> dict:
+        mosaic_data = self.mosaic.to_dto(network_type)
+
         return {
-            #'account': self.account.public_key,
-            'sender': self.sender,
-            'recipient': self.recipient,
-            'mosaic': util.u64_to_dto(self.mosaic_id),
-            'amount': util.u64_to_dto(self.amount),
+            'sender': self.sender.public_key,
+            'recipient': self.recipient.public_key,
+            'mosaicId': mosaic_data['id'],
+            'amount': mosaic_data['amount'],
+
         }
 
     def load_dto_specific(
         self,
         data: dict,
-        #network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> None:
-        #account = PublicAccount.create_from_public_key(data['account'], network_type)
-        sender = data['sender']
-        recipient = data['recipient']
-        mosaic_id = util.u64_from_dto(data['mosaicId'])
-        amount = util.u64_from_dto(data['amount'])
+        sender = PublicAccount.create_from_public_key(data['sender'], network_type)
+        recipient = PublicAccount.create_from_public_key(data['recipient'], network_type)
+        mosaic = Mosaic.create_from_dto({'id': data['mosaicId'], 'amount': data['amount']})
 
         self._set('sender', sender)
         self._set('recipient', recipient)
-        self._set('mosaic_id', mosaic_id)
-        self._set('amount', amount)
+        self._set('mosaic', mosaic)
 
 
+@util.inherit_doc
+@register_receipt('MOSAIC_LEVY')
+class MosaicLevyReceipt(BalanceTransferReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        sender: PublicAccount,
+        recipient: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> MosaicLevyReceipt:
+        return cls(
+            type,
+            version,
+            sender,
+            recipient,
+            mosaic,
+            network_type,
+        )
+
+
+@util.inherit_doc
+@register_receipt('MOSAIC_RENTAL_FEE')
+class MosaicRentalFeeReceipt(BalanceTransferReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        sender: PublicAccount,
+        recipient: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> MosaicRentalFeeReceipt:
+        return cls(
+            type,
+            version,
+            sender,
+            recipient,
+            mosaic,
+            network_type,
+        )
+
+
+@util.inherit_doc
+@register_receipt('NAMESPACE_RENTAL_FEE')
+class NamespaceRentalFeeReceipt(BalanceTransferReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        sender: PublicAccount,
+        recipient: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> NamespaceRentalFeeReceipt:
+        return cls(
+            type,
+            version,
+            sender,
+            recipient,
+            mosaic,
+            network_type,
+        )

@@ -61,7 +61,7 @@ class NamespaceId(util.IntMixin, util.Object):
 
     def get_id(self) -> str:
         return util.hexlify(self.id.to_bytes(8, 'big'))
-   
+
     @property
     def encoded(self) -> str:
         """Get the namespace ID as a hex-encoded string."""

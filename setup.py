@@ -118,7 +118,7 @@ COMMANDS = {
         PYTHONPATH=MOCKDIR
     ),
     'flake8': shell_command(
-        command=[sys.executable, "-m", "flake8", "--max-complexity", "10", "xpxchain"],
+        command=[sys.executable, "-m", "flake8", "--max-complexity", "10", "--max-line-length", "120", "xpxchain"],
         short_description="Run flake8 on project.",
     ),
     'flake8_tests': shell_command(

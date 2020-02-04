@@ -35,9 +35,6 @@ AnyStr1 = typing.TypeVar('AnyStr1', bytes, str)
 AnyStr2 = typing.TypeVar('AnyStr2', bytes, str)
 AnyStr3 = typing.TypeVar('AnyStr3', bytes, str)
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -93,7 +90,7 @@ class SignedTransaction(util.Object):
         :param type: Transaction type.
         :param network_type: Signer network type.
         """
-        return cls('', hash, '', type, network_type) #type: ignore
+        return cls('', hash, '', type, network_type)  # type: ignore
 
     def __eq__(self, other) -> bool:
         # Since we may use `create_from_announced` and we want it

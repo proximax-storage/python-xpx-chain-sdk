@@ -119,7 +119,7 @@ class MosaicInfo(util.DTO):
             and cls.validate_dto_all(data['meta'], required_l21)
             # Level 2_2
             and cls.validate_dto_required(data['mosaic'], required_l22)
-#            and cls.validate_dto_all(data['mosaic'], required_l22)
+            # and cls.validate_dto_all(data['mosaic'], required_l22)
         )
 
     def to_dto(

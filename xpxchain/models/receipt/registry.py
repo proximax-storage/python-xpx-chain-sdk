@@ -25,13 +25,12 @@
 """
 
 from .receipt_type import ReceiptType
-from .receipt_version import ReceiptVersion
 
 
 def register_receipt(name: str):
-    """Register receipt by type."""
+    """Register receipt by its type."""
 
-    type = getattr(ReceiptVersion, name)
+    type = getattr(ReceiptType, name)
 
     def decorator(cls):
         cls.TYPE_MAP[type] = cls

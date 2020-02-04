@@ -23,59 +23,62 @@
 """
 
 from __future__ import annotations
-import typing
 
-from ..blockchain.network_type import OptionalNetworkType, NetworkType
+from ..blockchain.network_type import OptionalNetworkType
 from ..account.public_account import PublicAccount
+from ..mosaic.mosaic import Mosaic
 from .receipt_version import ReceiptVersion
+from .receipt_type import ReceiptType
 from .receipt import Receipt
 from .registry import register_receipt
 from ... import util
 
+
 __all__ = [
     'BalanceChangeReceipt',
+    'BalanceChangeCreditReceipt',
+    'BalanceChangeDebitReceipt',
+    'ValidateFeeReceipt',
+    'LockHashCreatedReceipt',
+    'LockHashCompletedReceipt',
+    'LockHashExpiredReceipt',
+    'LockSecretCreatedReceipt',
+    'LockSecretCompletedReceipt',
+    'LockSecretExpiredReceipt',
 ]
 
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
-@register_receipt('BALANCE_CHANGE')
 class BalanceChangeReceipt(Receipt):
     """
     Balance Change Receipt.
 
     :param network_type: Network type.
-    :param version: The version of the receipt.    
+    :param version: The version of the receipt.
     :param account: The target account public key.
     :param mosaicId: Mosaic.
     :param amount: Amount to change.
     """
 
-    #account: PublicAccount
-    account: str
-    mosaic_id: int
-    amount: int
+    account: PublicAccount
+    mosaic: Mosaic
 
     def __init__(
         self,
-        #network_type: NetworkType,
+        type: ReceiptType,
         version: ReceiptVersion,
-        account: str,
-        mosaic_id: int,
-        amount: int
+        account: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
     ) -> None:
         super().__init__(
-            ReceiptVersion.BALANCE_CHANGE,
-            #network_type,
+            type,
             version,
-            account,
-            mosaic_id,
-            amount
+            network_type,
         )
         self._set('account', account)
-        self._set('mosaic_id', mosaic_id)
-        self._set('amount', amount)
-
+        self._set('mosaic', mosaic)
     # DTO
 
     @classmethod
@@ -85,27 +88,300 @@ class BalanceChangeReceipt(Receipt):
 
     def to_dto_specific(
         self,
-        #network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> dict:
+        mosaic_data = self.mosaic.to_dto(network_type)
+
         return {
-            #'account': self.account.public_key,
-            'account': self.account,
-            'mosaic': util.u64_to_dto(self.mosaic_id),
-            'amount': util.u64_to_dto(self.amount),
+            'account': self.account.public_key,
+            'mosaicId': mosaic_data['id'],
+            'amount': mosaic_data['amount'],
         }
 
     def load_dto_specific(
         self,
         data: dict,
-        #network_type: NetworkType,
+        network_type: OptionalNetworkType,
     ) -> None:
-        #account = PublicAccount.create_from_public_key(data['account'], network_type)
-        account = data['account']
-        mosaic_id = util.u64_from_dto(data['mosaicId'])
-        amount = util.u64_from_dto(data['amount'])
+        account = PublicAccount.create_from_public_key(data['account'], network_type)
+        mosaic = Mosaic.create_from_dto({'id': data['mosaicId'], 'amount': data['amount']})
 
         self._set('account', account)
-        self._set('mosaic_id', mosaic_id)
-        self._set('amount', amount)
+        self._set('mosaic', mosaic)
 
 
+@util.inherit_doc
+class BalanceChangeCreditReceipt(BalanceChangeReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        account: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> BalanceChangeCreditReceipt:
+        return cls(
+            type,
+            version,
+            account,
+            mosaic,
+            network_type
+        )
+
+
+@util.inherit_doc
+class BalanceChangeDebitReceipt(BalanceChangeReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        account: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> BalanceChangeDebitReceipt:
+        return cls(
+            type,
+            version,
+            account,
+            mosaic,
+            network_type
+        )
+
+
+@util.inherit_doc
+@register_receipt('VALIDATE_FEE')
+class ValidateFeeReceipt(BalanceChangeCreditReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        account: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> ValidateFeeReceipt:
+        return cls(
+            type,
+            version,
+            account,
+            mosaic,
+            network_type
+        )
+
+
+@util.inherit_doc
+@register_receipt('LOCKHASH_CREATED')
+class LockHashCreatedReceipt(BalanceChangeDebitReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        account: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> LockHashCreatedReceipt:
+        return cls(
+            type,
+            version,
+            account,
+            mosaic,
+            network_type
+        )
+
+
+@util.inherit_doc
+@register_receipt('LOCKHASH_COMPLETED')
+class LockHashCompletedReceipt(BalanceChangeCreditReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        account: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> LockHashCompletedReceipt:
+        return cls(
+            type,
+            version,
+            account,
+            mosaic,
+            network_type
+        )
+
+
+@util.inherit_doc
+@register_receipt('LOCKHASH_EXPIRED')
+class LockHashExpiredReceipt(BalanceChangeCreditReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        account: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> LockHashExpiredReceipt:
+        return cls(
+            type,
+            version,
+            account,
+            mosaic,
+            network_type
+        )
+
+
+@util.inherit_doc
+@register_receipt('LOCKSECRET_CREATED')
+class LockSecretCreatedReceipt(BalanceChangeDebitReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        account: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> LockSecretCreatedReceipt:
+        return cls(
+            type,
+            version,
+            account,
+            mosaic,
+            network_type
+        )
+
+
+@util.inherit_doc
+@register_receipt('LOCKSECRET_COMPLETED')
+class LockSecretCompletedReceipt(BalanceChangeCreditReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        account: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> LockSecretCompletedReceipt:
+        return cls(
+            type,
+            version,
+            account,
+            mosaic,
+            network_type
+        )
+
+
+@util.inherit_doc
+@register_receipt('LOCKSECRET_EXPIRED')
+class LockSecretExpiredReceipt(BalanceChangeCreditReceipt):
+    """
+    Balance Change Receipt.
+
+    :param network_type: Network type.
+    :param version: The version of the receipt.
+    :param account: The target account public key.
+    :param mosaicId: Mosaic.
+    :param amount: Amount to change.
+    """
+
+    @classmethod
+    def create(
+        cls,
+        type: ReceiptType,
+        version: ReceiptVersion,
+        account: PublicAccount,
+        mosaic: Mosaic,
+        network_type: OptionalNetworkType,
+    ) -> LockSecretExpiredReceipt:
+        return cls(
+            type,
+            version,
+            account,
+            mosaic,
+            network_type
+        )

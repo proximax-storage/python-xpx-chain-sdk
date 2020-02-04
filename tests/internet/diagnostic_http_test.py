@@ -1,14 +1,13 @@
 from xpxchain import client
 from xpxchain import models
 from tests import harness
-from tests import config
 
 
 @harness.http_test_case({
     'clients': (client.BlockchainHTTP, client.AsyncBlockchainHTTP),
     'tests': [
         {
-            #/diagnostic/storage
+            # /diagnostic/storage
             'name': 'test_get_diagnostic_storage',
             'params': [],
             'method': 'get_diagnostic_storage',
@@ -17,7 +16,7 @@ from tests import config
             ]
         },
         {
-            #/diagnostic/server
+            # /diagnostic/server
             'name': 'test_get_diagnostic_server',
             'params': [],
             'method': 'get_diagnostic_server',

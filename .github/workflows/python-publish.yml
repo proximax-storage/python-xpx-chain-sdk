@@ -17,7 +17,12 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install wheel
+        pip install wheel tox tox-gh-actions
+    - name: Run tox
+      run: |
+        tox -c tox-publish.ini
+    - name: Install project
+      run: |
         python setup.py install
     - name: Build Artifact
       run: |

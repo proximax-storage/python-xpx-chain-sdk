@@ -31,9 +31,6 @@ from . import nis
 from .. import models
 from .. import util
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 T = typing.TypeVar('T')
 MessageType = typing.Union[
@@ -104,7 +101,6 @@ class HTTPSharedBase(util.Object):
             network_type = kwds.pop('network_type')
         except KeyError:
             network_type = self.network_type
-        logger.debug("NET %s" % (network_type))
 
         return typing.cast(T, cb(self.raw, network_type, *args, **kwds))
 
@@ -188,9 +184,9 @@ class AsyncHTTPBase(HTTPSharedBase):
 
     @classmethod
     def create_from_http(cls: typing.Type[T], http) -> T:
-        inst = super(AsyncHTTPBase, cls).create_from_http(http) #type: ignore
+        inst = super(AsyncHTTPBase, cls).create_from_http(http)  # type: ignore
         setattr(inst, '_loop', getattr(http, '_loop'))
-        return inst #type: ignore
+        return inst  # type: ignore
 
     @property
     def loop(self) -> util.OptionalLoopType:
@@ -221,22 +217,17 @@ class HTTP(HTTPSharedBase):
     def blockchain(self) -> BlockchainHTTP:
         """Get BlockchainHTTP to the same endpoint."""
         raise util.AbstractMethodError
-    
+
     @property
     def contract(self) -> ContractHTTP:
         """Get ContractHTTP to the same endpoint."""
         raise util.AbstractMethodError
-    
+
     @property
-    def contract(self) -> MetadataHTTP:
+    def metadata(self) -> MetadataHTTP:
         """Get MetadataHTTP to the same endpoint."""
         raise util.AbstractMethodError
-    
-    @property
-    def contract(self) -> MetadataHTTP:
-        """Get MetadataHTTP to the same endpoint."""
-        raise util.AbstractMethodError
-    
+
     @property
     def config(self) -> ConfigHTTP:
         """Get ConfigHTTP to the same endpoint."""
@@ -441,7 +432,6 @@ class AccountHTTP(HTTPSharedBase):
         return self(nis.get_account_names, addresses, **kwds)
 
 
-
 class BlockchainHTTP(HTTPSharedBase):
     """Abstract base class for the blockchain HTTP client."""
 
@@ -534,6 +524,7 @@ class BlockchainHTTP(HTTPSharedBase):
         """
         return self(nis.get_diagnostic_server, **kwds)
 
+
 class ContractHTTP(HTTPSharedBase):
     """Abstract base class for the Contract HTTP client."""
 
@@ -563,9 +554,10 @@ class ContractHTTP(HTTPSharedBase):
         """
         return self(nis.get_contracts, addresses, **kwds)
 
+
 class MetadataHTTP(HTTPSharedBase):
     """Abstract base class for the Metadata HTTP client."""
-    
+
     def get_account_metadata(
         self,
         public_account: models.PublicAccount,
@@ -578,7 +570,7 @@ class MetadataHTTP(HTTPSharedBase):
         :return: List of ContractInfo object.
         """
         return self(nis.get_account_metadata, public_account, **kwds)
-		
+
     def get_mosaic_metadata(
         self,
         mosaic_id: models.MosaicId,
@@ -631,6 +623,7 @@ class MetadataHTTP(HTTPSharedBase):
         """
         return self(nis.get_metadatas, metadata_ids, **kwds)
 
+
 class ConfigHTTP(HTTPSharedBase):
     """Abstract base class for the Config HTTP client."""
 
@@ -647,6 +640,7 @@ class ConfigHTTP(HTTPSharedBase):
         """
         return self(nis.get_config, height, **kwds)
 
+
 class NodeHTTP(HTTPSharedBase):
     """Abstract base class for the Node HTTP client."""
 
@@ -660,7 +654,7 @@ class NodeHTTP(HTTPSharedBase):
         :return: NodeInfo.
         """
         return self(nis.get_node_info, **kwds)
-    
+
     def get_node_time(
         self,
         **kwds
@@ -671,6 +665,7 @@ class NodeHTTP(HTTPSharedBase):
         :return: NodeTime.
         """
         return self(nis.get_node_time, **kwds)
+
 
 class MosaicHTTP(HTTPSharedBase):
     """Abstract base class for the mosaic HTTP client."""
@@ -863,7 +858,7 @@ class TransactionHTTP(HTTPSharedBase):
         :return: Transaction announce response.
         """
         return self(nis.announce, transaction, **kwds)
-    
+
     def announce_partial(
         self,
         transaction: models.SignedTransaction,
@@ -960,7 +955,7 @@ class Listener(util.Object):
 
     async def __anext__(self) -> typing.Optional[ListenerMessage]:
         """Iterate over subscribed messages."""
-        
+
         message: bytes = await self._iter.__anext__()
         data = json.loads(message)
         if 'transaction' in data:

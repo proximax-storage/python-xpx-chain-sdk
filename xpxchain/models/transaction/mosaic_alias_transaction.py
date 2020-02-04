@@ -74,7 +74,6 @@ class MosaicAliasTransaction(Transaction):
         namespace_id: NamespaceId,
         mosaic_id: MosaicId,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -85,7 +84,6 @@ class MosaicAliasTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -103,7 +101,6 @@ class MosaicAliasTransaction(Transaction):
         mosaic_id: MosaicId,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new mosaic alias transaction.
@@ -123,7 +120,6 @@ class MosaicAliasTransaction(Transaction):
             namespace_id,
             mosaic_id,
             max_fee,
-            ####fee_strategy,
         )
 
     # CATBUFFER

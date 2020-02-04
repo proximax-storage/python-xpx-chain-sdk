@@ -32,9 +32,7 @@ from .transaction import Transaction
 from .transaction_info import TransactionInfo
 from .transaction_type import TransactionType
 from .transaction_version import TransactionVersion
-from .recipient import Recipient, RecipientType
 from ..mosaic.mosaic import MosaicId
-from ..namespace.namespace_id import NamespaceId
 from ..account.public_account import PublicAccount
 from ..blockchain.network_type import NetworkType
 from ..metadata.metadata_type import MetadataType
@@ -42,10 +40,6 @@ from ..metadata.metadata_modification_type import MetadataModificationType
 from ..metadata.metadata_modification import MetadataModification
 from ... import util
 
-
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 MetadataModificationList = typing.Sequence[MetadataModification]
 
@@ -57,6 +51,7 @@ __all__ = [
 TYPES = (
     TransactionType.MODIFY_MOSAIC_METADATA,
 )
+
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -92,7 +87,6 @@ class ModifyMosaicMetadataTransaction(Transaction):
         metadata_id: MosaicId,
         modifications: MetadataModificationList,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
         signature: typing.Optional[str] = None,
         signer: typing.Optional[PublicAccount] = None,
         transaction_info: typing.Optional[TransactionInfo] = None,
@@ -105,7 +99,6 @@ class ModifyMosaicMetadataTransaction(Transaction):
             version,
             deadline,
             max_fee,
-            ####fee_strategy,
             signature,
             signer,
             transaction_info,
@@ -123,7 +116,6 @@ class ModifyMosaicMetadataTransaction(Transaction):
         modifications: MetadataModificationList,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new account metadata modification transaction.
@@ -144,7 +136,6 @@ class ModifyMosaicMetadataTransaction(Transaction):
             metadata_id,
             modifications,
             max_fee,
-            ####fee_strategy,
         )
 
     # CATBUFFER
@@ -177,7 +168,6 @@ class ModifyMosaicMetadataTransaction(Transaction):
     ) -> bytes:
         """Load address alias-specific data data from catbuffer."""
         raise ValueError('Not implemented.')
-
 
     # DTO
 
@@ -215,5 +205,3 @@ class ModifyMosaicMetadataInnerTransaction(InnerTransaction, ModifyMosaicMetadat
     """Embedded mosaic metadata modification transaction."""
 
     __slots__ = ()
-
-

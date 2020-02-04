@@ -3,11 +3,12 @@ from xpxchain import models
 from tests import harness
 from tests import config
 
+
 @harness.http_test_case({
     'clients': (client.NamespaceHTTP, client.AsyncNamespaceHTTP),
     'tests': [
         {
-            #/namespace/{namespaceId}
+            # /namespace/{namespaceId}
             'name': 'test_get_namespace',
             'params': [models.NamespaceId('prx.xpx')],
             'method': 'get_namespace',
@@ -17,7 +18,7 @@ from tests import config
             ]
         },
         {
-            #/account/{accountId}/namespaces
+            # /account/{accountId}/namespaces
             'name': 'test_get_namespaces_from_account',
             'params': [config.nemesis_signer.address],
             'method': 'get_namespaces_from_account',
@@ -27,7 +28,7 @@ from tests import config
             ]
         },
         {
-            #/account/namespaces
+            # /account/namespaces
             'name': 'test_get_namespaces_from_accounts',
             'params': [[config.nemesis_signer.address]],
             'method': 'get_namespaces_from_accounts',
@@ -37,7 +38,7 @@ from tests import config
             ]
         },
         {
-            #/namespace/names
+            # /namespace/names
             'name': 'test_get_namespaces_name',
             'params': [[models.NamespaceId.create_from_hex('b16d77fd8b6fb3be')]],
             'method': 'get_namespaces_name',

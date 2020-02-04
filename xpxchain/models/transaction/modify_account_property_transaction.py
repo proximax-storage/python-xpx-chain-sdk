@@ -43,7 +43,6 @@ from ..account.property_modification_type import PropertyModificationType
 from ..account.property_type import PropertyType
 from ..blockchain.network_type import NetworkType
 from ..mosaic.mosaic_id import MosaicId
-from ... import util
 
 __all__ = ['AccountPropertyTransaction']
 
@@ -62,7 +61,6 @@ class AccountPropertyTransaction(TransactionBase):
         modifications: AccountPropertyModificationList,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO,
     ):
         """
         Create new modify account addresses transaction.
@@ -80,7 +78,6 @@ class AccountPropertyTransaction(TransactionBase):
             modifications,
             network_type,
             max_fee,
-            ####fee_strategy,
         )
 
     @staticmethod
@@ -90,7 +87,6 @@ class AccountPropertyTransaction(TransactionBase):
         modifications: AccountPropertyModificationList,
         network_type: NetworkType,
         max_fee: int = 0,
-        ####fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.ZERO
     ):
         """
         Create new modify account mosaics transaction.
@@ -108,7 +104,6 @@ class AccountPropertyTransaction(TransactionBase):
             modifications,
             network_type,
             max_fee,
-            ####fee_strategy,
         )
 
     @staticmethod

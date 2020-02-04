@@ -7,6 +7,7 @@ __all__ = [
     'calculate_fee'
 ]
 
+
 @util.inherit_doc
 class FeeCalculationStrategy(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """ Fee calculation strategy """
@@ -26,6 +27,7 @@ DESCRIPTION = {
     FeeCalculationStrategy.MEDIUM: "Medium fee calculation strategy",
     FeeCalculationStrategy.HIGH: "High fee calculation strategy",
 }
+
 
 def calculate_fee(strategy: FeeCalculationStrategy, max_fee: int, transaction_size: int) -> int:
     return max(max_fee, strategy * transaction_size)

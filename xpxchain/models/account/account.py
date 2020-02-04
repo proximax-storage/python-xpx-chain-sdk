@@ -33,9 +33,6 @@ from ...util.signature import ed25519
 
 __all__ = ['Account']
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -95,9 +92,9 @@ class Account(util.Object):
         private_key = util.decode_hex(private_key)
         signing_key = ed25519.sha3.SigningKey(private_key)
         public_key = signing_key.get_verifying_key().to_bytes()
-        address = Address.create_from_public_key(public_key, network_type) 
+        address = Address.create_from_public_key(public_key, network_type)
 
-        return cls(address, public_key, private_key) #type: ignore
+        return cls(address, public_key, private_key)  # type: ignore
 
     @classmethod
     def generate_new_account(

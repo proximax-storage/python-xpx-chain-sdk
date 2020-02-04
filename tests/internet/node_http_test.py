@@ -3,11 +3,12 @@ from xpxchain import models
 from tests import harness
 from tests import config
 
+
 @harness.http_test_case({
     'clients': (client.NodeHTTP, client.AsyncNodeHTTP),
     'tests': [
         {
-            #/node/info
+            # /node/info
             'name': 'test_get_node_info',
             'params': [],
             'method': 'get_node_info',
@@ -17,7 +18,7 @@ from tests import config
             ]
         },
         {
-            #/node/time
+            # /node/time
             'name': 'test_get_node_time',
             'params': [],
             'method': 'get_node_time',

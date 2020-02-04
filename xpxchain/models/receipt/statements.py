@@ -30,9 +30,6 @@ from .transaction_statement import TransactionStatement
 from .resolution_statement import ResolutionStatement
 from ... import util
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 __all__ = ['Statements']
 
@@ -59,7 +56,6 @@ class Statements(util.DTO):
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
-
 
         required_l1 = {'transactionStatements', 'addressResolutionStatements', 'mosaicResolutionStatements'}
         return (
@@ -88,7 +84,13 @@ class Statements(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls(
-            transaction_statements=[TransactionStatement.create_from_dto(i, network_type) for i in data['transactionStatements']],
-            address_resolution_statements=[ResolutionStatement.create_from_dto(i, network_type) for i in data['addressResolutionStatements']],
-            mosaic_resolution_statements=[ResolutionStatement.create_from_dto(i, network_type) for i in data['mosaicResolutionStatements']]
+            transaction_statements=[
+                TransactionStatement.create_from_dto(i, network_type) for i in data['transactionStatements']
+            ],
+            address_resolution_statements=[
+                ResolutionStatement.create_from_dto(i, network_type) for i in data['addressResolutionStatements']
+            ],
+            mosaic_resolution_statements=[
+                ResolutionStatement.create_from_dto(i, network_type) for i in data['mosaicResolutionStatements']
+            ]
         )

@@ -43,7 +43,7 @@ class AddressMetadata(util.DTO):
             'fields',
             'metadataId'
         }
-        
+
         return (
             # Level 1
             cls.validate_dto_required(data, required_l1)

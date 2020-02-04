@@ -70,7 +70,6 @@ class MultisigCosignatoryModification(util.Model):
             type
         )
 
-
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""

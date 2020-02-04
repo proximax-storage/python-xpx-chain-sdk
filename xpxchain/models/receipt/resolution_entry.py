@@ -48,7 +48,7 @@ class ResolutionEntry(util.DTO):
                 resolved: Uint64DTO
     """
 
-    source: int
+    source: Source
     resolved: int
 
     @classmethod

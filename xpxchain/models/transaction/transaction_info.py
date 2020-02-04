@@ -62,17 +62,15 @@ class TransactionInfo(util.DTO):
             and self.hash != self.merkle_component_hash
         )
 
-
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-        #required_keys = {'height', 'index', 'id'}
         required_keys = {'height'}
-        all_keys = required_keys | {'hash', 'merkleComponentHash'}
+        # all_keys = required_keys | {'hash', 'merkleComponentHash'}
         return (
             cls.validate_dto_required(data, required_keys)
-#            and cls.validate_dto_all(data, all_keys)
+            # and cls.validate_dto_all(data, all_keys)
         )
 
     def to_dto(

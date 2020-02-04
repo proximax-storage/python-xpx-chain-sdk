@@ -32,9 +32,6 @@ from ... import util
 
 __all__ = ['AccountNames']
 
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 @util.inherit_doc
 @util.dataclass(frozen=True)
@@ -74,7 +71,7 @@ class AccountNames(util.DTO):
         return {
             'address': self.address.address,
             # TODO
-            #'names': AccountProperty.sequence_to_dto(self.properties, network_type),
+            # 'names': AccountProperty.sequence_to_dto(self.properties, network_type),
         }
 
     @classmethod

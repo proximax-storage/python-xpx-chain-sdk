@@ -23,21 +23,13 @@
 """
 
 from __future__ import annotations
-import typing
 
 from .field import Field
 from .metadata_modification_type import MetadataModificationType
 from ..blockchain.network_type import NetworkType, OptionalNetworkType
-from ..mosaic.mosaic_id import MosaicId
-from ..transaction.transaction_type import TransactionType
 from ... import util
 
 __all__ = ['MetadataModification']
-
-
-import logging
-logging.basicConfig(format='[%(filename)s:%(lineno)d] %(levelname)s: %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 @util.inherit_doc
@@ -105,6 +97,8 @@ class MetadataModification(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls(
-            modification_type=MetadataModificationType.create_from_dto(data['modificationType']),
+            modification_type=MetadataModificationType.create_from_dto(
+                data['modificationType']
+            ),
             field=Field(data['key'], data['value']),
         )

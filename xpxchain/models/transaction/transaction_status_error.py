@@ -98,7 +98,7 @@ class TransactionStatusError(util.DTO):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        meta=data['meta']
+        meta = data['meta']
         return cls(
             hash=data['hash'],
             status=data['status'],

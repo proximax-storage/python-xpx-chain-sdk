@@ -100,7 +100,7 @@ class U8Mixin(abc.Model):
         data: stdint.U8DTOType
     ) -> bool:
         """Validate the data-transfer object."""
-        return isinstance(data, int) and 0 <= data < (1<<8)
+        return isinstance(data, int) and 0 <= data < (1 << 8)
 
     def to_dto(
         self: U8MixinType,
@@ -152,7 +152,7 @@ class U16Mixin(abc.Model):
         data: stdint.U16DTOType
     ) -> bool:
         """Validate the data-transfer object."""
-        return isinstance(data, int) and 0 <= data < (1<<16)
+        return isinstance(data, int) and 0 <= data < (1 << 16)
 
     def to_dto(
         self: U16MixinType,
@@ -204,7 +204,7 @@ class U32Mixin(abc.Model):
         data: stdint.U32DTOType
     ) -> bool:
         """Validate the data-transfer object."""
-        return isinstance(data, int) and 0 <= data < (1<<32)
+        return isinstance(data, int) and 0 <= data < (1 << 32)
 
     def to_dto(
         self,

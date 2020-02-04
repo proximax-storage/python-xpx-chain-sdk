@@ -5,7 +5,7 @@ from xpxchain import util
 from xpxchain import models
 from tests import harness
 from tests import config
-from binascii import hexlify
+
 
 def psuedo_entropy(size: int) -> bytes:
     return bytes([random.randint(0, 255) for _ in range(size)])
@@ -142,7 +142,7 @@ class TestAccountPropertyTransaction(harness.TestCase):
             network_type=self.network_type,
         )
         catbuffer = util.hexlify(model.to_catbuffer(self.network_type))
-        self.maxDiff=2048
+        self.maxDiff = 2048
         self.assertEqual(catbuffer, '850000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100009050420000000000000000683d8c8b1500000002010055a9be17159a696c')
 
     def test_create_entity_type_property_modification_transaction(self):
@@ -156,7 +156,7 @@ class TestAccountPropertyTransaction(harness.TestCase):
             network_type=self.network_type,
         )
         catbuffer = util.hexlify(model.to_catbuffer(self.network_type))
-        self.maxDiff=2048
+        self.maxDiff = 2048
         self.assertEqual(catbuffer, '7f0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100009050430000000000000000683d8c8b150000000401004841')
 
     def test_create_address_filter(self):
@@ -279,7 +279,7 @@ class TestAliasTransaction(harness.TestCase):
             network_type=network_type,
         )
         catbuffer = '9c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000904e420000000000000000683d8c8b15000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'
-        self.maxDiff=2048
+        self.maxDiff = 2048
         self.assertEqual(catbuffer, util.hexlify(model.to_catbuffer(network_type)))
 
     def test_create_for_mosaic(self):
@@ -293,7 +293,7 @@ class TestAliasTransaction(harness.TestCase):
             network_type=network_type,
         )
         catbuffer = '8b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000904e430000000000000000683d8c8b15000000004471f4e23b4cb688a6c03b484fd6f72f'
-        self.maxDiff=2048
+        self.maxDiff = 2048
         self.assertEqual(catbuffer, util.hexlify(model.to_catbuffer(network_type)))
 
 
@@ -313,6 +313,7 @@ class TestAliasTransaction(harness.TestCase):
 })
 class TestCosignatureSignedTransaction(harness.TestCase):
     pass
+
 
 @harness.enum_test_case({
     'type': models.ChronoUnit,
@@ -450,11 +451,11 @@ class TestInnnerTransaction(harness.TestCase):
 
     def test_create_from_catbuffer(self):
         transactions = [
-# TODO: get new catbuffers
-#            (models.TransactionType.ADDRESS_ALIAS, '4a0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955010000904e42004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'),
-#            (models.TransactionType.MOSAIC_ALIAS, '390000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e43004471f4e23b4cb688a6c03b484fd6f72f'),
-#            (models.TransactionType.SECRET_PROOF, '6b0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501905242009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'),
-#            (models.TransactionType.TRANSFER, '600000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd589550390544190fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc0c000148656c6c6f20776f726c64210500000000000000e803000000000000'),
+            # TODO: get new catbuffers
+            # (models.TransactionType.ADDRESS_ALIAS, '4a0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd58955010000904e42004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'),
+            # (models.TransactionType.MOSAIC_ALIAS, '390000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501904e43004471f4e23b4cb688a6c03b484fd6f72f'),
+            # (models.TransactionType.SECRET_PROOF, '6b0000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd5895501905242009b3155b37159da50aa52d5967c509b410f5a36a3b1e31ecb5ac76675d79b4a5e2000b778a39a3663719dfc5e48c9d78431b1e45c2af9df538782bf199c189dabeac7'),
+            # (models.TransactionType.TRANSFER, '600000001b153f8b76ef60a4bfe152f4de3698bd230bac9dc239d4e448715aa46bd589550390544190fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc0c000148656c6c6f20776f726c64210500000000000000e803000000000000'),
         ]
 
         for type, payload in transactions:
@@ -535,7 +536,7 @@ class TestLinkAction(harness.TestCase):
 class TestLockFundsTransaction(harness.TestCase):
 
     def test_create(self):
-        self.maxDiff=2048
+        self.maxDiff = 2048
         self.assertEqual(self.model, self.type.create(
             deadline=self.data['deadline'],
             mosaic=self.data['mosaic'],
@@ -1216,6 +1217,7 @@ class TestSecretLockTransaction(harness.TestCase):
             network_type=self.data['network_type'],
         ))
 
+
 @harness.transaction_test_case({
     'type': models.SecretProofTransaction,
     'network_type': models.NetworkType.MIJIN_TEST,
@@ -1610,28 +1612,28 @@ class TestTransactionStatus(harness.TestCase):
     pass
 
 
-#@harness.model_test_case({
-#    'type': models.TransactionStatusError,
-#    'network_type': models.NetworkType.MIJIN_TEST,
-#    'data': {
-#        'hash': 'b2635223db45cfbb4e21cdfc359fe7f222a6e5f6000c99ca9e729db02e6661f5',
-#        'status': 'Success',
-#        'deadline': models.Deadline.create_from_timestamp(1),
-#        'address': models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54'),
-#        'channel_name': 'status',
-#    },
-#    'dto': {
-#        'hash': 'b2635223db45cfbb4e21cdfc359fe7f222a6e5f6000c99ca9e729db02e6661f5',
-#        'status': 'Success',
-#        'deadline': [1, 0],
-#        'meta': {
-#            'address': 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54',
-#            'channelName': 'status',
-#        },
-#    },
-#})
-#class TestTransactionStatusError(harness.TestCase):
-#    pass
+# @harness.model_test_case({
+#     'type': models.TransactionStatusError,
+#     'network_type': models.NetworkType.MIJIN_TEST,
+#     'data': {
+#         'hash': 'b2635223db45cfbb4e21cdfc359fe7f222a6e5f6000c99ca9e729db02e6661f5',
+#         'status': 'Success',
+#         'deadline': models.Deadline.create_from_timestamp(1),
+#         'address': models.Address('SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54'),
+#         'channel_name': 'status',
+#     },
+#     'dto': {
+#         'hash': 'b2635223db45cfbb4e21cdfc359fe7f222a6e5f6000c99ca9e729db02e6661f5',
+#         'status': 'Success',
+#         'deadline': [1, 0],
+#         'meta': {
+#             'address': 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54',
+#             'channelName': 'status',
+#         },
+#     },
+# })
+# class TestTransactionStatusError(harness.TestCase):
+#     pass
 
 
 @harness.enum_test_case({
