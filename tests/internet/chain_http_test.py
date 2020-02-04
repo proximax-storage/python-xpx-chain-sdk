@@ -1,14 +1,13 @@
 from xpxchain import client
 from xpxchain import models
 from tests import harness
-from tests import config
 
 
 @harness.http_test_case({
     'clients': (client.BlockchainHTTP, client.AsyncBlockchainHTTP),
     'tests': [
         {
-            #/chain/height
+            # /chain/height
             'name': 'test_get_blockchain_height',
             'params': [],
             'method': 'get_blockchain_height',
@@ -18,7 +17,7 @@ from tests import config
             ]
         },
         {
-            #/chain/score
+            # /chain/score
             'name': 'test_get_blockchain_score',
             'params': [],
             'method': 'get_blockchain_score',

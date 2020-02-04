@@ -8,18 +8,14 @@ import os
 from binascii import hexlify
 
 
-class Error(Exception):
-    pass
-
-
 class TestMetadataHttp(harness.TestCase):
     def __init__(self, task) -> None:
         super().__init__(task)
 
         if (task == 'test_account_metadata'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.alice, 100000000)
-            
+
             self.modifications = [
                 models.MetadataModification(models.MetadataModificationType.ADD, models.Field('foo', 'bar')),
                 models.MetadataModification(models.MetadataModificationType.ADD, models.Field('foo2', 'bar')),
@@ -41,11 +37,11 @@ class TestMetadataHttp(harness.TestCase):
             tx = self.listen(self.alice)
 
         elif (task == 'test_mosaic_metadata'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.alice, 1000000000)
-            
+
             self.mosaic_id = self.create_mosaic(self.alice, 1)
-            
+
             self.modifications = [
                 models.MetadataModification(models.MetadataModificationType.ADD, models.Field('foo', 'bar')),
                 models.MetadataModification(models.MetadataModificationType.ADD, models.Field('foo2', 'bar')),
@@ -65,14 +61,14 @@ class TestMetadataHttp(harness.TestCase):
                 http.announce(signed_tx)
 
             tx = self.listen(self.alice)
-        
+
         elif (task == 'test_namespace_metadata'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.alice, 2000000000)
-            
+
             self.namespace = 'foo' + hexlify(os.urandom(4)).decode('utf-8') + ".bar"
             self.create_namespace(self.alice, self.namespace)
-            
+
             self.modifications = [
                 models.MetadataModification(models.MetadataModificationType.ADD, models.Field('foo', 'bar')),
                 models.MetadataModification(models.MetadataModificationType.ADD, models.Field('foo2', 'bar')),
@@ -92,18 +88,18 @@ class TestMetadataHttp(harness.TestCase):
                 http.announce(signed_tx)
 
             tx = self.listen(self.alice)
-    
+
         elif (task == 'test_modify_address_metadata_transaction'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.alice, 100000000)
-        
+
         elif (task == 'test_modify_mosaic_metadata_transaction'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.alice, 1000000000)
             self.mosaic_id = self.create_mosaic(self.alice, 1)
 
         elif (task == 'test_modify_namespace_metadata_transaction'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.alice, 1000000000)
             self.namespace = 'foo' + hexlify(os.urandom(4)).decode('utf-8') + ".bar"
             self.create_namespace(self.alice, self.namespace)
@@ -115,7 +111,7 @@ class TestMetadataHttp(harness.TestCase):
 
             async for m in listener:
                 if (m.channel_name == 'status'):
-                    raise Error(m.message)
+                    raise Exception(m.message)
                 elif (m.channel_name == 'confirmedAdded'):
                     return m.message
 
@@ -140,7 +136,7 @@ class TestMetadataHttp(harness.TestCase):
         # self.assertEqual(tx.mosaics[0].amount, amount)
 
         return tx
-    
+
     def create_namespace(self, account, namespace):
         namespace = namespace.split(".")
 
@@ -206,7 +202,7 @@ class TestMetadataHttp(harness.TestCase):
     # TESTS
     def test_modify_address_metadata_transaction(self):
         metadata_key = 'foo' + hexlify(os.urandom(4)).decode('ascii')
-        
+
         for metadata_modification_type in [models.MetadataModificationType.ADD, models.MetadataModificationType.REMOVE]:
             tx = models.ModifyAccountMetadataTransaction.create(
                 deadline=models.Deadline.create(),
@@ -230,10 +226,10 @@ class TestMetadataHttp(harness.TestCase):
             self.assertEqual(len(tx.modifications) > 0, True)
             self.assertEqual(tx.modifications[0].field.key, metadata_key)
             self.assertEqual(tx.modifications[0].field.value, 'bar')
-         
+
     def test_modify_mosaic_metadata_transaction(self):
         metadata_key = 'foo' + hexlify(os.urandom(4)).decode('ascii')
-        
+
         for metadata_modification_type in [models.MetadataModificationType.ADD, models.MetadataModificationType.REMOVE]:
             tx = models.ModifyMosaicMetadataTransaction.create(
                 deadline=models.Deadline.create(),
@@ -257,7 +253,7 @@ class TestMetadataHttp(harness.TestCase):
             self.assertEqual(len(tx.modifications) > 0, True)
             self.assertEqual(tx.modifications[0].field.key, metadata_key)
             self.assertEqual(tx.modifications[0].field.value, 'bar')
-        
+
     def test_modify_namespace_metadata_transaction(self):
         metadata_key = 'foo' + hexlify(os.urandom(4)).decode('ascii')
 
@@ -292,7 +288,7 @@ class TestMetadataHttp(harness.TestCase):
             self.assertEqual(len(reply.metadata.flds), 2)
             self.assertEqual(reply.metadata.flds[0], self.modifications[0].field)
             self.assertEqual(reply.metadata.flds[1], self.modifications[1].field)
-        
+
         with client.MetadataHTTP(responses.ENDPOINT) as http:
             reply = http.get_metadata(self.alice.address.plain())
             self.assertEqual(isinstance(reply, models.MetadataInfo), True)
@@ -300,7 +296,7 @@ class TestMetadataHttp(harness.TestCase):
             self.assertEqual(len(reply.metadata.flds), 2)
             self.assertEqual(reply.metadata.flds[0], self.modifications[0].field)
             self.assertEqual(reply.metadata.flds[1], self.modifications[1].field)
-        
+
         with client.MetadataHTTP(responses.ENDPOINT) as http:
             reply = http.get_metadatas([self.alice.address.plain()])
             self.assertEqual(len(reply) > 0, True)
@@ -325,7 +321,7 @@ class TestMetadataHttp(harness.TestCase):
             self.assertEqual(len(reply.metadata.flds), 2)
             self.assertEqual(reply.metadata.flds[0], self.modifications[0].field)
             self.assertEqual(reply.metadata.flds[1], self.modifications[1].field)
-        
+
         with client.MetadataHTTP(responses.ENDPOINT) as http:
             reply = http.get_metadatas([self.mosaic_id.get_id()])
             self.assertEqual(len(reply) > 0, True)
@@ -350,7 +346,7 @@ class TestMetadataHttp(harness.TestCase):
             self.assertEqual(len(reply.metadata.flds), 2)
             self.assertEqual(reply.metadata.flds[0], self.modifications[0].field)
             self.assertEqual(reply.metadata.flds[1], self.modifications[1].field)
-        
+
         with client.MetadataHTTP(responses.ENDPOINT) as http:
             reply = http.get_metadatas([models.NamespaceId(self.namespace).get_id()])
             self.assertEqual(len(reply) > 0, True)

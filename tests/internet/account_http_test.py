@@ -7,6 +7,7 @@ from tests import responses
 import os
 from binascii import hexlify
 
+
 class Error(Exception):
     pass
 
@@ -15,7 +16,7 @@ class Error(Exception):
     'clients': (client.AccountHTTP, client.AsyncAccountHTTP),
     'tests': [
         {
-            #/account/{accountId}
+            # /account/{accountId}
             'name': 'test_get_account_info',
             'params': [config.nemesis.address],
             'method': 'get_account_info',
@@ -24,7 +25,7 @@ class Error(Exception):
             ]
         },
         {
-            #/account
+            # /account
             'name': 'test_get_accounts_info',
             'params': [[config.nemesis.address]],
             'method': 'get_accounts_info',
@@ -34,7 +35,7 @@ class Error(Exception):
             ]
         },
         {
-            #/account/{publicKey}/transaction/unconfirmed
+            # /account/{publicKey}/transaction/unconfirmed
             'name': 'test_unconfirmed_transactions',
             'params': [config.nemesis],
             'method': 'unconfirmed_transactions',
@@ -43,7 +44,7 @@ class Error(Exception):
             ],
         },
         {
-            #/account/{publicKey}/transaction/partial
+            # /account/{publicKey}/transaction/partial
             'name': 'test_aggregate_bonded_transactions',
             'params': [config.nemesis],
             'method': 'aggregate_bonded_transactions',
@@ -58,23 +59,23 @@ class TestAccountHttp(harness.TestCase):
         super().__init__(task)
 
         if (task == 'test_account_transactions'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.alice, 100000000)
 
         elif (task == 'test_incoming_transactions'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.alice, 100000000)
-        
+
         elif (task == 'test_outgoing_transactions'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
-            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.alice, 100000000)
             self.send_funds(self.alice, self.bob, 10000000)
-        
+
         elif (task == 'test_multisig_account_info'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
-            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
-            self.multisig = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
+            self.multisig = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
 
             nemesis_to_bob = models.TransferTransaction.create(
                 deadline=models.Deadline.create(),
@@ -89,7 +90,7 @@ class TestAccountHttp(harness.TestCase):
                 mosaics=[models.Mosaic(config.mosaic_id, 10000000)],
                 network_type=models.NetworkType.MIJIN_TEST,
             )
-            
+
             nemesis_to_multisig = models.TransferTransaction.create(
                 deadline=models.Deadline.create(),
                 recipient=self.multisig.address,
@@ -137,11 +138,11 @@ class TestAccountHttp(harness.TestCase):
             self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
 
         elif (task == 'test_multisig_account_graph_info'):
-            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
-            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
-            self.mike = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
-            self.multisig = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
-            self.multisig2 = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
+            self.mike = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
+            self.multisig = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
+            self.multisig2 = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
 
             nemesis_to_bob = models.TransferTransaction.create(
                 deadline=models.Deadline.create(),
@@ -156,21 +157,21 @@ class TestAccountHttp(harness.TestCase):
                 mosaics=[models.Mosaic(config.mosaic_id, 100000000)],
                 network_type=models.NetworkType.MIJIN_TEST,
             )
-            
+
             nemesis_to_mike = models.TransferTransaction.create(
                 deadline=models.Deadline.create(),
                 recipient=self.mike.address,
                 mosaics=[models.Mosaic(config.mosaic_id, 100000000)],
                 network_type=models.NetworkType.MIJIN_TEST,
             )
-            
+
             nemesis_to_multisig = models.TransferTransaction.create(
                 deadline=models.Deadline.create(),
                 recipient=self.multisig.address,
                 mosaics=[models.Mosaic(config.mosaic_id, 100000000)],
                 network_type=models.NetworkType.MIJIN_TEST,
             )
-            
+
             nemesis_to_multisig2 = models.TransferTransaction.create(
                 deadline=models.Deadline.create(),
                 recipient=self.multisig2.address,
@@ -181,10 +182,10 @@ class TestAccountHttp(harness.TestCase):
             tx = models.AggregateTransaction.create_complete(
                 deadline=models.Deadline.create(),
                 inner_transactions=[
-                    nemesis_to_alice.to_aggregate(config.nemesis), 
-                    nemesis_to_bob.to_aggregate(config.nemesis), 
-                    nemesis_to_mike.to_aggregate(config.nemesis), 
-                    nemesis_to_multisig.to_aggregate(config.nemesis), 
+                    nemesis_to_alice.to_aggregate(config.nemesis),
+                    nemesis_to_bob.to_aggregate(config.nemesis),
+                    nemesis_to_mike.to_aggregate(config.nemesis),
+                    nemesis_to_multisig.to_aggregate(config.nemesis),
                     nemesis_to_multisig2.to_aggregate(config.nemesis),
                 ],
                 network_type=models.NetworkType.MIJIN_TEST,
@@ -249,7 +250,7 @@ class TestAccountHttp(harness.TestCase):
             self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
 
         elif (task == 'test_account_names'):
-            self.mike = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy = lambda x: os.urandom(32))
+            self.mike = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
             self.send_funds(config.nemesis, self.mike, 1000000000)
             namespace_name = 'foo' + hexlify(os.urandom(4)).decode('utf-8')
 
@@ -307,7 +308,7 @@ class TestAccountHttp(harness.TestCase):
             tx = self.listen(self.mike)
             self.assertEqual(isinstance(tx, models.AddressAliasTransaction), True)
             self.assertEqual(tx.action_type, models.AliasActionType.LINK)
-            self.assertEqual(tx.address, self.mike.address) 
+            self.assertEqual(tx.address, self.mike.address)
 
     async def listen(self, account):
         async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
@@ -341,18 +342,16 @@ class TestAccountHttp(harness.TestCase):
         self.assertEqual(tx.mosaics[0].amount, amount)
 
         return tx
-    
+
     def test_multisig_account_info(self):
         with client.AccountHTTP(responses.ENDPOINT) as http:
             info = http.get_multisig_account_info(self.multisig.address)
-            self.assertEqual(isinstance(info, models.MultisigAccountInfo), True) 
-    
-            
+            self.assertEqual(isinstance(info, models.MultisigAccountInfo), True)
+
     def test_multisig_account_graph_info(self):
         with client.AccountHTTP(responses.ENDPOINT) as http:
             info = http.get_multisig_account_graph_info(self.multisig.address)
-            self.assertEqual(isinstance(info, models.MultisigAccountGraphInfo), True) 
-
+            self.assertEqual(isinstance(info, models.MultisigAccountGraphInfo), True)
 
     def test_account_names(self):
         with client.AccountHTTP(responses.ENDPOINT) as http:
@@ -361,8 +360,7 @@ class TestAccountHttp(harness.TestCase):
             self.assertEqual(isinstance(info[0], models.AccountNames), True)
             self.assertEqual(len(info[0].names), 1)
             self.assertEqual(info[0].names[0], models.NamespaceId(self.mikes_namespace))
-    
-    
+
     def test_account_transactions(self):
         with client.AccountHTTP(responses.ENDPOINT) as http:
             info = http.transactions(self.alice)
@@ -370,8 +368,7 @@ class TestAccountHttp(harness.TestCase):
             self.assertEqual(len(info[0].mosaics), 1)
             self.assertEqual(info[0].mosaics[0], models.Mosaic(config.mosaic_id, 100000000))
             self.assertEqual(info[0].signer.public_key, config.nemesis.public_key.upper())
-    
-    
+
     def test_incoming_transactions(self):
         with client.AccountHTTP(responses.ENDPOINT) as http:
             info = http.incoming_transactions(self.alice)
@@ -379,8 +376,7 @@ class TestAccountHttp(harness.TestCase):
             self.assertEqual(len(info[0].mosaics), 1)
             self.assertEqual(info[0].mosaics[0], models.Mosaic(config.mosaic_id, 100000000))
             self.assertEqual(info[0].signer.public_key, config.nemesis.public_key.upper())
-    
-    
+
     def test_outgoing_transactions(self):
         with client.AccountHTTP(responses.ENDPOINT) as http:
             info = http.outgoing_transactions(self.alice)

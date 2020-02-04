@@ -7,7 +7,7 @@ from tests import harness
     'clients': (client.MosaicHTTP, client.AsyncMosaicHTTP),
     'tests': [
         {
-            #/mosaic/{mosaicId}
+            # /mosaic/{mosaicId}
             'name': 'test_get_mosaic',
             'params': [models.MosaicId.create_from_hex('0dc67fbe1cad29e3')],
             'method': 'get_mosaic',
@@ -16,7 +16,7 @@ from tests import harness
             ]
         },
         {
-            #/mosaic
+            # /mosaic
             'name': 'test_get_mosaics',
             'params': [[models.MosaicId.create_from_hex('0dc67fbe1cad29e3')]],
             'method': 'get_mosaics',
@@ -26,7 +26,7 @@ from tests import harness
             ]
         },
         {
-            #/mosaic/names
+            # /mosaic/names
             'name': 'test_get_mosaic_names',
             'params': [[models.MosaicId.create_from_hex('0dc67fbe1cad29e3')]],
             'method': 'get_mosaic_names',

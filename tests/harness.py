@@ -474,7 +474,7 @@ def model_test_fields(self):
     """Test the model fields method."""
 
     fields = self.model.fields()
-    self.maxDiff=2048
+    self.maxDiff = 2048
     self.assertIsInstance(fields, tuple)
     self.assertEqual(fields, dataclasses.fields(self.model))
 
@@ -483,7 +483,7 @@ def model_test_dto(self):
     """Test the conversion to and from DTO."""
 
     nt = self.network_type
-    self.maxDiff=2048
+    self.maxDiff = 2048
     self.assertEqual(self.model.to_dto(nt), self.dto)
     self.assertEqual(self.model, self.type.create_from_dto(self.dto, nt))
 
@@ -494,7 +494,7 @@ def model_test_catbuffer(self):
     nt = self.network_type
     encoded = util.encode_hex(self.catbuffer)
     decoded = util.decode_hex(self.catbuffer)
-    self.maxDiff=2048
+    self.maxDiff = 2048
     self.assertEqual(util.hexlify(self.model.to_catbuffer(nt)), encoded)
     self.assertEqual(self.model, self.type.create_from_catbuffer(decoded, nt))
 
@@ -588,7 +588,7 @@ def transaction_test_to_aggregate(self):
     # Convert to inner transaction and serialize.
     inner = self.model.to_aggregate(signer.public_account)
     catbuffer = inner.to_catbuffer(fee_strategy=self.extras['fee_strategy'])
-    self.maxDiff=2048
+    self.maxDiff = 2048
     self.assertEqual(util.hexlify(catbuffer), self.extras['embedded'])
 
     with self.assertRaises(TypeError):
@@ -604,7 +604,7 @@ def transaction_test_sign_with(self):
 
     # Sign transaction and check signed data.
     signed_transaction = self.model.sign_with(signer, self.extras['gen_hash'])
-    self.maxDiff=2048
+    self.maxDiff = 2048
     self.assertEqual(signed_transaction.payload, self.extras['signed']['payload'])
     self.assertEqual(signed_transaction.hash, self.extras['signed']['hash'])
     self.assertEqual(signed_transaction.signer, signer.public_key)
@@ -849,6 +849,7 @@ def ignore_warnings_test(test):
 with contextlib.suppress(ImportError):
     # Check we can import all our dependencies and generate the decorators.
     from collections import deque
+    import logging
     import os.path
     import random
     import rstr
@@ -1159,6 +1160,7 @@ with contextlib.suppress(ImportError):
         if not INITIALIZED_LOGGER:
             now = datetime.datetime.now()
             strtime = now.strftime("%Y-%m-%d-%H-%M-%S")
+            logging.basicConfig(filename=f'{testdir}/random-{strtime}.log')
             INITIALIZED_LOGGER = True
             with open(f'{testdir}/random-{strtime}.seed', 'w') as f:
                 f.write(str(random.getstate()))

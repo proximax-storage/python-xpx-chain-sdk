@@ -3,6 +3,7 @@ from xpxchain import util
 from tests import harness
 from tests import config
 
+
 @harness.model_test_case({
     'type': models.Account,
     'network_type': models.NetworkType.MIJIN_TEST,
