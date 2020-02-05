@@ -5,8 +5,8 @@ on:
     - '**'
     - '!doc/**'
     - '!**README.md'
-  tags:
-    - v*
+    tags-ignore:
+    - b*
   pull_request:
     branches:
       - master
