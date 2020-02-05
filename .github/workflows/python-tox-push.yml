@@ -3,11 +3,6 @@ on:
   push:
     tags-ignore:
     - v*
-  push:
-    paths:
-    - '**'
-    - '!doc/**'
-    - '!**README.md'
   pull_request:
     branches:
       - master
