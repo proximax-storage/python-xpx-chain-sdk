@@ -1,4 +1,4 @@
-name: Python Tox on Push
+name: Python Tox
 on: 
   push:
     paths-ignore:
