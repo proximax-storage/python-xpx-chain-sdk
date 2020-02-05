@@ -40,7 +40,11 @@ The SDK makes copious use of assertions to ensure functionality is correct durin
 
 In addition, installing [uvloop](https://github.com/magicstack/uvloop) may further improve asynchronous code performance.
 
-## Testing
+## Contributing
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in lexical by you, as defined in the Apache-2.0 license, shall be licensed as above, without any additional terms or conditions.
+
+#### Testing
 
 The SDK uses numerous tools to ensure type correctness, robust testing, and style conventions are preserved over multiple configurations. Before submitting any contributions, please resolve any issues that result from the following commands before committing:
 
@@ -56,7 +60,3 @@ The SDK uses numerous tools to ensure type correctness, robust testing, and styl
 # Invokes the documentation builder, Sphinx.
 $ tox
 ```
-
-## Contributing
-
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in lexical by you, as defined in the Apache-2.0 license, shall be licensed as above, without any additional terms or conditions.
