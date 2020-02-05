@@ -5,6 +5,8 @@ on:
     - '**'
     - '!doc/**'
     - '!**README.md'
+    tags-ignore:
+    - v*
 
 jobs:
   test:
