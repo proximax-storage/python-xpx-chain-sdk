@@ -1,9 +1,10 @@
 name: Python Tox
 on: 
   push:
-    paths-ignore:
-    - 'doc/**'
-    - 'README.md'
+    paths:
+    - '**'
+    - '!doc/**'
+    - '!**/README.md'
     tags-ignore:
     - v*
   pull_request:
