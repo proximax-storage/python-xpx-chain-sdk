@@ -1,6 +1,8 @@
 name: Python Tox
 on: 
   push:
+    tags-ignore:
+    - v*
     paths:
     - '**'
     - '!doc/**'
