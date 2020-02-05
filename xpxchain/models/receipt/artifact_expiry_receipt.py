@@ -42,11 +42,12 @@ __all__ = [
 @util.dataclass(frozen=True)
 class ArtifactExpiryReceipt(Receipt):
     """
-    Balance Change Receipt.
+    Artifact Expiry Receipt.
 
-    :param network_type: Network type.
+    :param type: The type of the receipt.
     :param version: The version of the receipt.
     :param artifactId: Artifact in question.
+    :param network_type: Network type.
     """
 
     artifact_id: int
