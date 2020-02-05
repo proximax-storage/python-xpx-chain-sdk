@@ -1,5 +1,14 @@
 name: Python Tox on Push
-on: [push]
+on: 
+  push:
+    paths-ignore:
+    - 'doc/**'
+    - 'README.md'
+    tags-ignore:
+    - v*
+  pull_request:
+    branches:
+      - master
 
 jobs:
   test:
