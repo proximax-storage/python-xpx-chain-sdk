@@ -4,7 +4,7 @@ on:
     paths:
     - '**'
     - '!doc/**'
-    - '!**/README.md'
+    - '!**README.md'
 
 jobs:
   test:
