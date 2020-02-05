@@ -5,6 +5,9 @@ on:
     - '**'
     - '!doc/**'
     - '!**README.md'
+  pull_request:
+    branches:
+      - master
 
 jobs:
   test:
