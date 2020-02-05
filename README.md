@@ -1,6 +1,7 @@
 <p align="center"><a href="https://golang.org" target="_blank" rel="noopener noreferrer"><img width="300" src="https://github.com/proximax-storage/python-xpx-chain-sdk/raw/master/doc/ProximaX%20-%20Sirius%20Chain%20-%20Python%20-%20SDK.png" alt="Python logo"></a></p>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Tests](https://github.com/proximax-storage/python-xpx-chain-sdk/workflows/Python%20Tox%20on%20Push/badge.svg)
 
 # ProximaX Sirius Blockchain Python SDK
 Official ProximaX Sirius Blockchain SDK Library in Python.
