@@ -3,6 +3,8 @@ on:
   push:
     paths:
     - '**'
+    - '!doc/**'
+    - '!**/README.md'
 
 jobs:
   test:
