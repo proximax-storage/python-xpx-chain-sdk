@@ -1,0 +1,24 @@
+name: Coveralls
+on: ["push", "pull_request"]
+
+jobs:
+  coverage:
+    name: Check Test Coverage
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions coveralls
+    - name: Run tox
+      run: tox -e coverage 
+    - name: Publish to coveralls
+      if: success()
+      run: coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.coveralls_repo_token }}
