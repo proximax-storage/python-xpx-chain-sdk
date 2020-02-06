@@ -19,7 +19,7 @@ jobs:
         pip install wheel tox tox-gh-actions
     - name: Run tox
       run: |
-        tox -c tox-publish.ini
+        tox
     - name: Install project
       run: |
         python setup.py install

@@ -16,8 +16,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox tox-gh-actions coveralls
     - name: Run tox
-      # run: tox -c tox-coverage.ini
-      run: tox -e coverage -c tox-publish.ini
+      run: tox -e coverage 
     - name: Publish to coveralls
       if: success()
       run: coveralls
