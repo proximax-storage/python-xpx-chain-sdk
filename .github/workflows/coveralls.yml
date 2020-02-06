@@ -14,9 +14,10 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install tox tox-gh-actions coveralls
-    - name: Run tox coverage
-      run: tox -e coverage
+        pip install nose2 coveralls
+        python setup.py install
+    - name: Run nose2
+      run: nose2 --config .nose2
     - name: Publish to coveralls
       if: success()
       run: coveralls
