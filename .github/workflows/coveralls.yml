@@ -19,7 +19,6 @@ jobs:
     - name: Run nose2
       run: nose2 --config .nose2
     - name: Publish to coveralls
-      if: success()
       run: coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.coveralls_repo_token }}
