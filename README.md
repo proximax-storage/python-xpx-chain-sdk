@@ -2,6 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Python Tox](https://github.com/proximax-storage/python-xpx-chain-sdk/workflows/Python%20Tox/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/proximax-storage/python-xpx-chain-sdk/badge.svg?branch=coverage)](https://coveralls.io/github/proximax-storage/python-xpx-chain-sdk?branch=coverage)
 
 # ProximaX Sirius Blockchain Python SDK
 Official ProximaX Sirius Blockchain SDK Library in Python.
