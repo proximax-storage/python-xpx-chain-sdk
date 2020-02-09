@@ -14,7 +14,7 @@ from tests import config
             'method': 'get_namespace',
             'validation': [
                 lambda x: (isinstance(x, models.NamespaceInfo), True),
-                lambda x: (x.owner.public_key, config.nemesis_signer_public_key),
+                lambda x: (x.owner.public_key, config.nemesis_signer.public_key.upper()),
             ]
         },
         {

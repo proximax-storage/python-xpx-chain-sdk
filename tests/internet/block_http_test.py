@@ -35,7 +35,7 @@ from tests import responses
             'validation': [
                 lambda x: (len(x) > 0, True),
                 lambda x: (isinstance(x[0], models.Transaction), True),
-                lambda x: (x[0].signer.public_key, config.nemesis_signer_public_key),
+                lambda x: (x[0].signer.public_key, config.nemesis_signer.public_key.upper()),
             ]
         },
         {
