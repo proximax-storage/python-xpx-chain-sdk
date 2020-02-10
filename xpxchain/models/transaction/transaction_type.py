@@ -55,6 +55,7 @@ class TransactionType(util.U16Mixin, util.EnumMixin, enum.IntEnum):
     MODIFY_ACCOUNT_METADATA = 0x413D
     MODIFY_MOSAIC_METADATA = 0x423D
     MODIFY_NAMESPACE_METADATA = 0x433D
+    NETWORK_CONFIG = 0x4159
 
     def description(self) -> str:
         return DESCRIPTION[self]
@@ -82,4 +83,5 @@ DESCRIPTION = {
     TransactionType.MODIFY_ACCOUNT_METADATA: "Modify account metadata transaction type",
     TransactionType.MODIFY_MOSAIC_METADATA: "Modify mosaic metadata transaction type",
     TransactionType.MODIFY_NAMESPACE_METADATA: "Modify namespace metadata transaction type",
+    TransactionType.NETWORK_CONFIG: "Network configuration transaction",
 }

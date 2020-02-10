@@ -155,6 +155,7 @@ from .transaction.mosaic_definition_transaction import *
 from .transaction.mosaic_supply_change_transaction import *
 from .transaction.multisig_cosignatory_modification import *
 from .transaction.multisig_cosignatory_modification_type import *
+from .transaction.network_config_transaction import *
 from .transaction.plain_message import *
 from .transaction.register_namespace_transaction import *
 from .transaction.secret_lock_transaction import *
@@ -286,6 +287,7 @@ __all__ = (
     + mosaic_supply_change_transaction.__all__
     + multisig_cosignatory_modification.__all__
     + multisig_cosignatory_modification_type.__all__
+    + network_config_transaction.__all__
     + plain_message.__all__
     + register_namespace_transaction.__all__
     + secret_lock_transaction.__all__
