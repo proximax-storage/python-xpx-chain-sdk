@@ -54,6 +54,7 @@ class TransactionVersion(util.U8Mixin, enum.IntEnum):
     MODIFY_MOSAIC_METADATA = 1,
     MODIFY_NAMESPACE_METADATA = 1,
     NETWORK_CONFIG = 1,
+    BLOCKCHAIN_UPGRADE = 1,
 
     def description(self) -> str:
         return DESCRIPTION[self]

@@ -131,6 +131,7 @@ from .transaction.aggregate_transaction_cosignature import *
 from .transaction.aggregate_transaction_info import *
 from .transaction.aggregate_transaction import *
 from .transaction.alias_transaction import *
+from .transaction.blockchain_upgrade_transaction import *
 from .transaction.cosignature_signed_transaction import *
 from .transaction.cosignature_transaction import *
 from .transaction.deadline import *
@@ -263,6 +264,7 @@ __all__ = (
     + aggregate_transaction_info.__all__
     + aggregate_transaction.__all__
     + alias_transaction.__all__
+    + blockchain_upgrade_transaction.__all__
     + cosignature_signed_transaction.__all__
     + cosignature_transaction.__all__
     + deadline.__all__

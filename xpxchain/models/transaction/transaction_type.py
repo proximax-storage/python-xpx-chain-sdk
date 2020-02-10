@@ -50,11 +50,10 @@ class TransactionType(util.U16Mixin, util.EnumMixin, enum.IntEnum):
     MODIFY_ACCOUNT_PROPERTY_MOSAIC = 0x4250
     MODIFY_ACCOUNT_PROPERTY_ENTITY_TYPE = 0x4350
     LINK_ACCOUNT = 0x414C
-    BLOCKCHAIN_UPGRADE = 0x4158
-    NETWORK_CONFIG_ENTITY = 0x4159
     MODIFY_ACCOUNT_METADATA = 0x413D
     MODIFY_MOSAIC_METADATA = 0x423D
     MODIFY_NAMESPACE_METADATA = 0x433D
+    BLOCKCHAIN_UPGRADE = 0x4158
     NETWORK_CONFIG = 0x4159
 
     def description(self) -> str:
@@ -78,10 +77,9 @@ DESCRIPTION = {
     TransactionType.MODIFY_ACCOUNT_PROPERTY_MOSAIC: "Modify account property mosaic transaction type.",    # noqa: E501
     TransactionType.MODIFY_ACCOUNT_PROPERTY_ENTITY_TYPE: "Modify account property entity type transaction type.",  # noqa: E501
     TransactionType.LINK_ACCOUNT: "Link account transaction type.",
-    TransactionType.NETWORK_CONFIG_ENTITY: "",
-    TransactionType.BLOCKCHAIN_UPGRADE: "",
     TransactionType.MODIFY_ACCOUNT_METADATA: "Modify account metadata transaction type",
     TransactionType.MODIFY_MOSAIC_METADATA: "Modify mosaic metadata transaction type",
     TransactionType.MODIFY_NAMESPACE_METADATA: "Modify namespace metadata transaction type",
+    TransactionType.BLOCKCHAIN_UPGRADE: "Blockchain upgrade transaction",
     TransactionType.NETWORK_CONFIG: "Network configuration transaction",
 }
