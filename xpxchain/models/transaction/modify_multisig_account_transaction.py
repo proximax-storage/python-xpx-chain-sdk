@@ -128,8 +128,8 @@ class ModifyMultisigAccountTransaction(Transaction):
     # CATBUFFER
 
     def catbuffer_size_specific(self) -> int:
-        approval_size = util.U8_BYTES
-        removal_size = util.U8_BYTES
+        approval_size = util.I8_BYTES
+        removal_size = util.I8_BYTES
         modification_size = MultisigCosignatoryModification.CATBUFFER_SIZE
         modifications_size = util.U8_BYTES + modification_size * len(self.modifications)
         return approval_size + removal_size + modifications_size
@@ -140,13 +140,13 @@ class ModifyMultisigAccountTransaction(Transaction):
     ) -> bytes:
         """Export modify multisig account-specific data to catbuffer."""
 
-        # uint8 min_removal_delta
-        # uint8 min_approval_delta
+        # int8 min_removal_delta
+        # int8 min_approval_delta
         # uint8 modifications_count
         # CosignatoryModification { uint8 modification_type; uint8[32] key; }
         # CosignatoryModification[modifications_count] modifications
-        removal = util.u8_to_catbuffer(self.min_removal_delta)
-        approval = util.u8_to_catbuffer(self.min_approval_delta)
+        removal = util.i8_to_catbuffer(self.min_removal_delta)
+        approval = util.i8_to_catbuffer(self.min_approval_delta)
         modifications_count = util.u8_to_catbuffer(len(self.modifications))
         modifications = MultisigCosignatoryModification.sequence_to_catbuffer(
             self.modifications,
@@ -163,13 +163,13 @@ class ModifyMultisigAccountTransaction(Transaction):
         """Load modify multisig account-specific data from catbuffer."""
 
         from_catbuffer = MultisigCosignatoryModification.sequence_from_catbuffer_pair
-        # uint8 min_removal_delta
-        # uint8 min_approval_delta
+        # int8 min_removal_delta
+        # int8 min_approval_delta
         # uint8 modifications_count
         # CosignatoryModification { uint8 modification_type; uint8[32] key; }
         # CosignatoryModification[modifications_count] modifications
-        removal = util.u8_from_catbuffer(data[:1])
-        approval = util.u8_from_catbuffer(data[1:2])
+        removal = util.i8_from_catbuffer(data[:1])
+        approval = util.i8_from_catbuffer(data[1:2])
         modifications_count = util.u8_from_catbuffer(data[2:3])
         data = data[3:]
         modifications, data = from_catbuffer(data, modifications_count, network_type)
@@ -205,8 +205,8 @@ class ModifyMultisigAccountTransaction(Transaction):
         data: dict,
         network_type: NetworkType,
     ) -> None:
-        approval = util.u8_from_dto(data['minApprovalDelta'])
-        removal = util.u8_from_dto(data['minRemovalDelta'])
+        approval = util.i8_from_dto(data['minApprovalDelta'])
+        removal = util.i8_from_dto(data['minRemovalDelta'])
         modifications = MultisigCosignatoryModification.sequence_from_dto(
             data.get('modifications', []),
             network_type
