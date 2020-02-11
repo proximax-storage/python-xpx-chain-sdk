@@ -115,6 +115,8 @@ class MosaicNonce(util.Model):
         data: int,
         network_type: OptionalNetworkType = None,
     ):
+        data &= 0xffffffff
+
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
