@@ -1235,6 +1235,41 @@ def process_get_config(
 get_config = request("get_config")
 
 
+def request_get_upgrade(
+    client: client.Client,
+    height: int,
+    **kwds
+):
+    """
+    Make "/upgrade/{height}" request.
+
+    :param height: The height of the blockchain to get upgrade.
+    """
+
+    url = f"/upgrade/{height}"
+    return client.get(url, **kwds)
+
+
+def process_get_upgrade(
+    status: int,
+    json: dict,
+    network_type: models.NetworkType,
+) -> models.CatapultUpgrade:
+    """
+    Process the "/upgrade/{height}" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    :param network_type: Network type.
+    """
+
+    assert status == 200
+    return models.CatapultUpgrade.create_from_dto(json, network_type)
+
+
+get_upgrade = request("get_upgrade")
+
+
 # NODE HTTP
 # -----------
 
@@ -2076,6 +2111,10 @@ CLIENT_CB = {
     'get_config': (
         request_get_config,
         process_get_config,
+    ),
+    'get_upgrade': (
+        request_get_upgrade,
+        process_get_upgrade,
     ),
 
     # NODE

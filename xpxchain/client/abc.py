@@ -640,6 +640,19 @@ class ConfigHTTP(HTTPSharedBase):
         """
         return self(nis.get_config, height, **kwds)
 
+    def get_upgrade(
+        self,
+        height: int,
+        **kwds
+    ):
+        """
+        Gets upgrade of network at height.
+
+        :param height: The height of the blockchain to get upgrade.
+        :return: CatapultUpgrade.
+        """
+        return self(nis.get_upgrade, height, **kwds)
+
 
 class NodeHTTP(HTTPSharedBase):
     """Abstract base class for the Node HTTP client."""

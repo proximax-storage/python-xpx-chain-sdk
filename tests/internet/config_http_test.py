@@ -14,6 +14,14 @@ from tests import harness
                 lambda x: (isinstance(x, models.CatapultConfig), True),
             ]
         },
+        {
+            'name': 'test_get_upgrade',
+            'params': [100, ],
+            'method': 'get_upgrade',
+            'validation': [
+                lambda x: (isinstance(x, models.CatapultUpgrade), True),
+            ]
+        },
     ],
 })
 class TestConfigHttp(harness.TestCase):

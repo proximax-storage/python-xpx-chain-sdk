@@ -73,9 +73,12 @@ from .receipt import *
 
 # Config
 from .config.catapult_config import *
+from .config.catapult_upgrade import *
+from .config import *
 
 # Contract
 from .contract.contract_info import *
+from .contract import *
 
 # Metadata
 from .metadata.address_metadata_info import *
@@ -213,6 +216,10 @@ __all__ = (
     + transaction_statement.__all__
     + resolution_statement.__all__
     + resolution_entry.__all__
+
+    # Config
+    + catapult_config.__all__
+    + catapult_upgrade.__all__
 
     # Metadata
     + address_metadata_info.__all__
