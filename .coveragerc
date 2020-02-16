@@ -11,7 +11,7 @@ omit =
     # Ignore test directory utilities.
     *tests*
     # Ignore mypy plugins.
-    nem2mypy.py
+    xpxchainmypy.py
     # Ignore the setup script.
     setup.py
     # Ignore hash and signature implementations.
@@ -22,12 +22,7 @@ omit =
     nem2/util/reactive.py
     # Ignore incomplete or not yet implemented models in the catapult API.
     # TODO: Restore these models when they are stabilized in catapult.
-    nem2/models/account/account_metadata.py
-    nem2/models/account/account_properties.py
-    nem2/models/account/account_properties_info.py
-    nem2/models/account/account_properties_metadata.py
-    nem2/models/account/property_type.py
-    nem2/models/mosaic/mosaic_info.py
+    nem2/models/account/account_meta.py
     nem2/models/mosaic/mosaic_levy.py
 
 [report]

@@ -42,7 +42,7 @@ PropertyValue = typing.Union[
 PropertyValueList = typing.Sequence[PropertyValue]
 
 
-def to_base64(
+def to_dto(
     property_type: int,
     values: typing.Sequence[PropertyValue],
 ) -> typing.List[str]:
@@ -50,19 +50,18 @@ def to_base64(
 
     if property_type & 0x01:
         # We have an address.
-        cast = lambda x: typing.cast(Address, x)
-        return [util.b64encode(cast(i).encoded) for i in values]
+        return [i.hex for i in values]  # type: ignore
     elif property_type & 0x02:
         # We have a mosaic.
-        raise NotImplementedError
+        return [util.u64_to_dto(i) for i in values]  # type: ignore
     elif property_type & 0x04:
         # We have a transaction.
-        raise NotImplementedError
+        return [i.to_dto() for i in values]  # type: ignore
     else:
         raise ValueError('Unknown property type.')
 
 
-def from_base64(
+def from_dto(
     property_type: int,
     values: typing.List[str],
 ) -> typing.Sequence[PropertyValue]:
@@ -70,13 +69,13 @@ def from_base64(
 
     if property_type & 0x01:
         # We have an address.
-        return [Address.create_from_encoded(util.b64decode(i)) for i in values]
+        return [Address.create_from_encoded(i) for i in values]  # type: ignore
     elif property_type & 0x02:
         # We have a mosaic.
-        raise NotImplementedError
+        return [MosaicId(util.u64_from_dto(i)) for i in values]  # type: ignore
     elif property_type & 0x04:
         # We have a transaction.
-        raise NotImplementedError
+        return [TransactionType.create_from_dto(i) for i in values]  # type: ignore
     else:
         raise ValueError('Unknown property type.')
 
@@ -118,7 +117,7 @@ class AccountProperty(util.DTO):
     ) -> dict:
         return {
             'propertyType': self.property_type.to_dto(network_type),
-            'values': to_base64(int(self.property_type), self.values),
+            'values': to_dto(int(self.property_type), self.values),
         }
 
     @classmethod
@@ -134,5 +133,5 @@ class AccountProperty(util.DTO):
         values = data['values']
         return cls(
             property_type=PropertyType.create_from_dto(property_type, network_type),
-            values=from_base64(property_type, values),
+            values=from_dto(property_type, values),
         )

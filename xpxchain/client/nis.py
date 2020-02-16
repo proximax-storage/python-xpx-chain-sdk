@@ -167,7 +167,7 @@ def process_get_accounts_info(
 get_accounts_info = request("get_accounts_info")
 
 
-def request_get_account_property(
+def request_get_account_properties(
     client: client.Client,
     address: models.Address,
     **kwds
@@ -180,17 +180,17 @@ def request_get_account_property(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/account/properties/{address.address}"
+    url = f"/account/{address.address}/properties"
     return client.get(url, **kwds)
 
 
-def process_get_account_property(
+def process_get_account_properties(
     status: int,
     json: dict,
     network_type: models.NetworkType,
-) -> models.AccountPropertiesInfo:
+) -> models.AccountProperties:
     """
-    Process the "/account/properties/{address}" HTTP response.
+    Process the "/account/{address}/properties" HTTP response.
 
     :param status: Status code for HTTP response.
     :param json: JSON data for response message.
@@ -198,13 +198,13 @@ def process_get_account_property(
     """
 
     assert status == 200
-    return models.AccountPropertiesInfo.create_from_dto(json, network_type)
+    return models.AccountProperties.create_from_dto(json, network_type)
 
 
-get_account_property = request("get_account_property")
+get_account_properties = request("get_account_properties")
 
 
-def request_get_account_properties(
+def request_get_accounts_properties(
     client: client.Client,
     addresses: typing.Sequence[models.Address],
     **kwds
@@ -222,11 +222,11 @@ def request_get_account_properties(
     return client.post(url, json=json, **kwds)
 
 
-def process_get_account_properties(
+def process_get_accounts_properties(
     status: int,
     json: dict,
     network_type: models.NetworkType,
-) -> models.AccountPropertiesInfo:
+) -> typing.Sequence[models.AccountProperties]:
     """
     Process the "/account/properties" HTTP response.
 
@@ -236,10 +236,10 @@ def process_get_account_properties(
     """
 
     assert status == 200
-    return models.AccountPropertiesInfo.create_from_dto(json, network_type)
+    return [models.AccountProperties.create_from_dto(i, network_type) for i in json]
 
 
-get_account_properties = request("get_account_properties")
+get_accounts_properties = request("get_accounts_properties")
 
 
 def request_get_multisig_account_info(
@@ -1988,13 +1988,13 @@ CLIENT_CB = {
         request_get_accounts_info,
         process_get_accounts_info,
     ),
-    'get_account_property': (
-        request_get_account_property,
-        process_get_account_property,
-    ),
     'get_account_properties': (
         request_get_account_properties,
         process_get_account_properties,
+    ),
+    'get_accounts_properties': (
+        request_get_accounts_properties,
+        process_get_accounts_properties,
     ),
     'get_multisig_account_info': (
         request_get_multisig_account_info,

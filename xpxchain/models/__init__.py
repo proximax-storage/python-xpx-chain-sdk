@@ -30,11 +30,9 @@
 # Account
 from .account.account import *
 from .account.account_info import *
-from .account.account_metadata import *
+from .account.account_meta import *
 from .account.account_property import *
 from .account.account_properties import *
-from .account.account_properties_info import *
-from .account.account_properties_metadata import *
 from .account.address import *
 from .account.multisig_account_graph_info import *
 from .account.multisig_account_info import *
@@ -181,11 +179,9 @@ __all__ = (
     # Account
     account.__all__
     + account_info.__all__
-    + account_metadata.__all__
+    + account_meta.__all__
     + account_property.__all__
     + account_properties.__all__
-    + account_properties_info.__all__
-    + account_properties_metadata.__all__
     + account_names.__all__
     + address.__all__
     + multisig_account_graph_info.__all__

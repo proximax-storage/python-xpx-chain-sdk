@@ -288,7 +288,7 @@ class AccountHTTP(HTTPSharedBase):
         """
         return self(nis.get_accounts_info, addresses, **kwds)
 
-    def get_account_property(
+    def get_account_properties(
         self,
         address: models.Address,
         **kwds
@@ -299,9 +299,9 @@ class AccountHTTP(HTTPSharedBase):
         :param address: Account address.
         :return: AccountPropertiesInfo object.
         """
-        return self(nis.get_account_property, address, **kwds)
+        return self(nis.get_account_properties, address, **kwds)
 
-    def get_account_properties(
+    def get_accounts_properties(
         self,
         addresses: typing.Sequence[models.Address],
         **kwds
@@ -312,7 +312,7 @@ class AccountHTTP(HTTPSharedBase):
         :param addresses: Sequence of account addresses.
         :return: AccountPropertiesInfo object.
         """
-        return self(nis.get_account_properties, addresses, **kwds)
+        return self(nis.get_accounts_properties, addresses, **kwds)
 
     def get_multisig_account_info(
         self,

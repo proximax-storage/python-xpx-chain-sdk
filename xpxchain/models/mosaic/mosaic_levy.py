@@ -56,10 +56,10 @@ class MosaicLevy(util.DTO):
             MosaicLevyDTO: null
     """
 
-    # #type: MosaicLevyType
-    # #recipient: Address
-    # #mosaic_id: MosaicId
-    # #fee: int
+    # type: MosaicLevyType
+    # recipient: Address
+    # mosaic_id: MosaicId
+    # fee: int
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
@@ -71,12 +71,12 @@ class MosaicLevy(util.DTO):
         network_type: OptionalNetworkType = None,
     ) -> dict:
         return {}
-        # #return {
-        # #    'type': self.type.to_dto(),
-        # #    'recipient': self.recipient.to_dto(),
-        # #    'mosaicId': self.mosaic_id.to_dto(),
-        # #    'fee': self.fee
-        # #}
+        # return {
+        #     'type': self.type.to_dto(),
+        #     'recipient': self.recipient.to_dto(),
+        #     'mosaicId': self.mosaic_id.to_dto(),
+        #     'fee': self.fee
+        # }
 
     @classmethod
     def create_from_dto(
@@ -88,9 +88,9 @@ class MosaicLevy(util.DTO):
             raise ValueError('Invalid data-transfer object.')
 
         return cls()
-        # #return cls(
-        # #    type=MosaicLevyType.create_from_dto(data['type']),
-        # #    recipient=Address.create_from_dto(data['recipient']),
-        # #    mosaic_id=MosaicId.create_from_dto(data['mosaicId']),
-        # #    fee=data['fee'],
-        # #)
+        # return cls(
+        #     type=MosaicLevyType.create_from_dto(data['type']),
+        #     recipient=Address.create_from_dto(data['recipient']),
+        #     mosaic_id=MosaicId.create_from_dto(data['mosaicId']),
+        #     fee=data['fee'],
+        # )

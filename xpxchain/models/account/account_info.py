@@ -24,7 +24,7 @@
 
 from __future__ import annotations
 
-from .account_metadata import AccountMetadata
+from .account_meta import AccountMeta
 from .address import Address
 from .public_account import PublicAccount
 from ..blockchain.network_type import OptionalNetworkType
@@ -66,7 +66,7 @@ class AccountInfo(util.DTO):
                 account: AccountDTO
     """
 
-    meta: AccountMetadata
+    meta: AccountMeta
     address: Address
     address_height: int
     public_key: str
@@ -138,7 +138,7 @@ class AccountInfo(util.DTO):
         meta = data['meta']
         account = data['account']
         return cls(
-            meta=AccountMetadata.create_from_dto(meta, network_type),
+            meta=AccountMeta.create_from_dto(meta, network_type),
             address=Address.create_from_encoded(account['address']),
             address_height=util.u64_from_dto(account.get('addressHeight', [0, 0])),
             public_key=account['publicKey'],
