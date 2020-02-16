@@ -23,7 +23,6 @@ omit =
     # Ignore incomplete or not yet implemented models in the catapult API.
     # TODO: Restore these models when they are stabilized in catapult.
     nem2/models/account/account_meta.py
-    nem2/models/mosaic/mosaic_levy.py
 
 [report]
 show_missing = True
