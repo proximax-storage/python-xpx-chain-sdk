@@ -111,6 +111,11 @@ class Address(util.Object):
         """Get encoded address."""
         return util.b32decode(self.address)
 
+    @property
+    def hex(self) -> str:
+        """Get hex address."""
+        return util.encode_hex(self.encoded).upper()
+
     @classmethod
     def create_from_raw_address(cls, address: str) -> Address:
         """

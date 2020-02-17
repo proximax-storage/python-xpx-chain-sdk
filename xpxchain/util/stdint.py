@@ -26,6 +26,7 @@ import typing
 
 __all__ = [
     # DTO Types
+    'I8DTOType',
     'U8DTOType',
     'U16DTOType',
     'U32DTOType',
@@ -33,11 +34,24 @@ __all__ = [
     'U128DTOType',
 
     # Byte sizes
+    'I8_BYTES',
     'U8_BYTES',
     'U16_BYTES',
     'U32_BYTES',
     'U64_BYTES',
     'U128_BYTES',
+
+    # I8
+    # 'i8_high',
+    # 'i8_low',
+    'i8_iter_from_catbuffer',
+    'i8_iter_from_dto',
+    'i8_iter_to_catbuffer',
+    'i8_iter_to_dto',
+    'i8_from_catbuffer',
+    'i8_from_dto',
+    'i8_to_catbuffer',
+    'i8_to_dto',
 
     # U8
     'u8_high',
@@ -120,6 +134,14 @@ U32_MAX = 0xFFFFFFFF
 U64_MAX = 0xFFFFFFFFFFFFFFFF
 U128_MAX = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
+I8_BITS = 8
+
+I8_BYTES = I8_BITS // 8
+
+I8_MAX = 0x7F
+
+I8_MIN = -0x80
+
 U8DTOType = int
 U16DTOType = int
 U32DTOType = int
@@ -127,6 +149,8 @@ U64DTOType = typing.Sequence[U32DTOType]
 U128DTOType = typing.Sequence[U64DTOType]
 YieldIntType = typing.Generator[int, None, None]
 YieldBytesType = typing.Generator[bytes, None, None]
+
+I8DTOType = int
 
 # HELPERS
 
@@ -161,16 +185,16 @@ def low(max: int, bits: int, mask: int) -> typing.Callable[[int], int]:
     return wrapper
 
 
-def to_catbuffer_impl(size: int) -> typing.Callable[[int], bytes]:
-    def wrapper(value: int) -> bytes:
-        return value.to_bytes(size, 'little', signed=False)
+def to_catbuffer_impl(size: int, signed: bool = False) -> typing.Callable[[int], bytes]:
+    def wrapper(value: int, signed: bool = False) -> bytes:
+        return value.to_bytes(size, 'little', signed=signed)
     return wrapper
 
 
-def to_catbuffer(bits: int) -> typing.Callable[[int], bytes]:
-    cb = to_catbuffer_impl(bits // 8)
+def to_catbuffer(bits: int, signed: bool = False) -> typing.Callable[[int], bytes]:
+    cb = to_catbuffer_impl(bits // 8, signed=signed)
 
-    def wrapper(value: int) -> bytes:
+    def wrapper(value: int, signed: bool = False) -> bytes:
         return cb(value)
 
     wrapper.__name__ = f'u{bits}_to_catbuffer'
@@ -180,10 +204,10 @@ def to_catbuffer(bits: int) -> typing.Callable[[int], bytes]:
     return wrapper
 
 
-def iter_to_catbuffer(bits: int):
-    cb = to_catbuffer_impl(bits // 8)
+def iter_to_catbuffer(bits: int, signed: bool = False):
+    cb = to_catbuffer_impl(bits // 8, signed=signed)
 
-    def wrapper(iterable):
+    def wrapper(iterable, signed: bool = False):
         for value in iterable:
             yield cb(value)
 
@@ -194,17 +218,17 @@ def iter_to_catbuffer(bits: int):
     return wrapper
 
 
-def from_catbuffer_impl(bits: int) -> typing.Callable[[bytes], int]:
-    def wrapper(catbuffer: bytes) -> int:
-        return int.from_bytes(catbuffer, 'little', signed=False)
+def from_catbuffer_impl(bits: int, signed: bool = False) -> typing.Callable[[bytes], int]:
+    def wrapper(catbuffer: bytes, signed: bool = False) -> int:
+        return int.from_bytes(catbuffer, 'little', signed=signed)
     return wrapper
 
 
-def from_catbuffer(bits: int) -> typing.Callable[[bytes], int]:
+def from_catbuffer(bits: int, signed: bool = False) -> typing.Callable[[bytes], int]:
     size = bits // 8
-    cb = from_catbuffer_impl(size)
+    cb = from_catbuffer_impl(size, signed=signed)
 
-    def wrapper(catbuffer: bytes) -> int:
+    def wrapper(catbuffer: bytes, signed: bool = False) -> int:
         if len(catbuffer) > size:
             raise OverflowError('bytes too big to convert')
         return cb(catbuffer)
@@ -216,11 +240,11 @@ def from_catbuffer(bits: int) -> typing.Callable[[bytes], int]:
     return wrapper
 
 
-def iter_from_catbuffer(bits: int) -> typing.Callable[[bytes], YieldIntType]:
+def iter_from_catbuffer(bits: int, signed: bool = False) -> typing.Callable[[bytes], YieldIntType]:
     size = bits // 8
-    cb = from_catbuffer_impl(size)
+    cb = from_catbuffer_impl(size, signed=signed)
 
-    def wrapper(catbuffer: bytes) -> YieldIntType:
+    def wrapper(catbuffer: bytes, signed: bool = False) -> YieldIntType:
         length = len(catbuffer)
         if length % size != 0:
             raise ValueError(f'iter from_catbuffer requires multiple of {size}.')
@@ -286,6 +310,34 @@ u8_iter_to_catbuffer = iter_to_catbuffer(U8_BITS)
 u8_iter_from_catbuffer = iter_from_catbuffer(U8_BITS)
 u8_iter_to_dto = iter_to_dto(U8_BITS, u8_to_dto)
 u8_iter_from_dto = iter_from_dto(U8_BITS, u8_from_dto)
+
+
+# INT8
+
+
+def i8_to_dto(value: int) -> I8DTOType:
+    """Convert 8-bit int to DTO."""
+
+    check_overflow(I8_MIN <= value <= I8_MAX)
+    return value
+
+
+def i8_from_dto(dto: I8DTOType) -> int:
+    """Convert DTO to 8-bit int."""
+
+    check_overflow(I8_MIN <= dto <= I8_MAX)
+    return dto
+
+
+# i8_high = high(I8_MAX, I4_BITS, I4_MAX)
+# i8_low = low(I8_MAX, I4_BITS, I4_MAX)
+i8_to_catbuffer = to_catbuffer(I8_BITS, signed=True)
+i8_from_catbuffer = from_catbuffer(I8_BITS, signed=True)
+i8_iter_to_catbuffer = iter_to_catbuffer(I8_BITS, signed=True)
+i8_iter_from_catbuffer = iter_from_catbuffer(I8_BITS, signed=True)
+i8_iter_to_dto = iter_to_dto(I8_BITS, i8_to_dto)
+i8_iter_from_dto = iter_from_dto(I8_BITS, i8_from_dto)
+
 
 # UINT16
 

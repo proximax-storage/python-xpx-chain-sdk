@@ -310,6 +310,88 @@ class TestAccountHttp(harness.TestCase):
             self.assertEqual(tx.action_type, models.AliasActionType.LINK)
             self.assertEqual(tx.address, self.mike.address)
 
+        elif (task == 'test_account_properties'):
+            self.alice = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
+            self.bob = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
+            self.mike = models.Account.generate_new_account(models.NetworkType.MIJIN_TEST, entropy=lambda x: os.urandom(32))
+            self.send_funds(config.nemesis, self.alice, 100000000)
+            self.send_funds(config.nemesis, self.bob, 100000000)
+
+            # ALLOW_ADDRESS
+            tx = models.ModifyAccountPropertyAddressTransaction.create(
+                deadline=models.Deadline.create(),
+                network_type=models.NetworkType.MIJIN_TEST,
+                property_type=models.PropertyType.ALLOW_ADDRESS,
+                modifications=[models.AccountPropertyModification(models.PropertyModificationType.ADD, self.mike.address)]
+            )
+
+            signed_tx = tx.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+
+            with client.TransactionHTTP(responses.ENDPOINT) as http:
+                http.announce(signed_tx)
+
+            tx = self.listen(self.alice)
+
+            # ALLOW_MOSAIC
+            tx = models.ModifyAccountPropertyMosaicTransaction.create(
+                deadline=models.Deadline.create(),
+                network_type=models.NetworkType.MIJIN_TEST,
+                property_type=models.PropertyType.ALLOW_MOSAIC,
+                modifications=[models.AccountPropertyModification(models.PropertyModificationType.ADD, config.mosaic_id)]
+            )
+
+            signed_tx = tx.sign_with(self.alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+
+            with client.TransactionHTTP(responses.ENDPOINT) as http:
+                http.announce(signed_tx)
+
+            tx = self.listen(self.alice)
+
+            # BLOCK_ADDRESS
+            tx = models.ModifyAccountPropertyAddressTransaction.create(
+                deadline=models.Deadline.create(),
+                network_type=models.NetworkType.MIJIN_TEST,
+                property_type=models.PropertyType.BLOCK_ADDRESS,
+                modifications=[models.AccountPropertyModification(models.PropertyModificationType.ADD, self.mike.address)]
+            )
+
+            signed_tx = tx.sign_with(self.bob, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+
+            with client.TransactionHTTP(responses.ENDPOINT) as http:
+                http.announce(signed_tx)
+
+            tx = self.listen(self.bob)
+
+            # BLOCK_MOSAIC
+            tx = models.ModifyAccountPropertyMosaicTransaction.create(
+                deadline=models.Deadline.create(),
+                network_type=models.NetworkType.MIJIN_TEST,
+                property_type=models.PropertyType.BLOCK_MOSAIC,
+                modifications=[models.AccountPropertyModification(models.PropertyModificationType.ADD, config.mosaic_id)]
+            )
+
+            signed_tx = tx.sign_with(self.bob, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+
+            with client.TransactionHTTP(responses.ENDPOINT) as http:
+                http.announce(signed_tx)
+
+            tx = self.listen(self.bob)
+
+            # BLOCK_TRANSACTION
+            tx = models.ModifyAccountPropertyEntityTypeTransaction.create(
+                deadline=models.Deadline.create(),
+                network_type=models.NetworkType.MIJIN_TEST,
+                property_type=models.PropertyType.BLOCK_TRANSACTION,
+                modifications=[models.AccountPropertyModification(models.PropertyModificationType.ADD, models.TransactionType.AGGREGATE_COMPLETE)]
+            )
+
+            signed_tx = tx.sign_with(self.bob, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+
+            with client.TransactionHTTP(responses.ENDPOINT) as http:
+                http.announce(signed_tx)
+
+            tx = self.listen(self.bob)
+
     async def listen(self, account):
         async with client.Listener(f'{responses.ENDPOINT}/ws') as listener:
             await listener.confirmed(account.address)
@@ -343,6 +425,8 @@ class TestAccountHttp(harness.TestCase):
 
         return tx
 
+    # TESTS
+
     def test_multisig_account_info(self):
         with client.AccountHTTP(responses.ENDPOINT) as http:
             info = http.get_multisig_account_info(self.multisig.address)
@@ -359,7 +443,7 @@ class TestAccountHttp(harness.TestCase):
             self.assertEqual(len(info), 1)
             self.assertEqual(isinstance(info[0], models.AccountNames), True)
             self.assertEqual(len(info[0].names), 1)
-            self.assertEqual(info[0].names[0], models.NamespaceId(self.mikes_namespace))
+            self.assertEqual(info[0].names[0], self.mikes_namespace)
 
     def test_account_transactions(self):
         with client.AccountHTTP(responses.ENDPOINT) as http:
@@ -384,3 +468,62 @@ class TestAccountHttp(harness.TestCase):
             self.assertEqual(len(info[0].mosaics), 1)
             self.assertEqual(info[0].mosaics[0], models.Mosaic(config.mosaic_id, 10000000))
             self.assertEqual(info[0].recipient, self.bob.address)
+
+    def test_account_properties(self):
+        with client.AccountHTTP(responses.ENDPOINT) as http:
+            info = http.get_account_properties(self.alice.address)
+            self.assertEqual(len(info.properties), 3)
+            self.assertEqual(info.properties[0].property_type, models.PropertyType.ALLOW_ADDRESS)
+            self.assertEqual(len(info.properties[0].values), 1)
+            self.assertEqual(info.properties[0].values[0], self.mike.address)
+            self.assertEqual(info.properties[1].property_type, models.PropertyType.ALLOW_MOSAIC)
+            self.assertEqual(len(info.properties[1].values), 1)
+            self.assertEqual(info.properties[1].values[0], config.mosaic_id)
+            self.assertEqual(info.properties[2].property_type, models.PropertyType.BLOCK_TRANSACTION)
+            self.assertEqual(len(info.properties[2].values), 0)
+
+        with client.AccountHTTP(responses.ENDPOINT) as http:
+            info = http.get_account_properties(self.bob.address)
+            self.assertEqual(len(info.properties), 3)
+            self.assertEqual(info.properties[0].property_type, models.PropertyType.BLOCK_ADDRESS)
+            self.assertEqual(len(info.properties[0].values), 1)
+            self.assertEqual(info.properties[0].values[0], self.mike.address)
+            self.assertEqual(info.properties[1].property_type, models.PropertyType.BLOCK_MOSAIC)
+            self.assertEqual(len(info.properties[1].values), 1)
+            self.assertEqual(info.properties[1].values[0], config.mosaic_id)
+            self.assertEqual(info.properties[2].property_type, models.PropertyType.BLOCK_TRANSACTION)
+            self.assertEqual(len(info.properties[2].values), 1)
+            self.assertEqual(info.properties[2].values[0], models.TransactionType.AGGREGATE_COMPLETE)
+
+        with client.AccountHTTP(responses.ENDPOINT) as http:
+            info = http.get_accounts_properties([self.alice.address, self.bob.address])
+            self.assertEqual(len(info), 2)
+
+            for i in info:
+                if (i.address == self.alice.address):
+                    alice = i
+                elif (i.address == self.bob.address):
+                    bob = i
+                else:
+                    raise Exception(f'Unknown address{i.address.address}')
+
+            self.assertEqual(len(alice.properties), 3)
+            self.assertEqual(alice.properties[0].property_type, models.PropertyType.ALLOW_ADDRESS)
+            self.assertEqual(len(alice.properties[0].values), 1)
+            self.assertEqual(alice.properties[0].values[0], self.mike.address)
+            self.assertEqual(alice.properties[1].property_type, models.PropertyType.ALLOW_MOSAIC)
+            self.assertEqual(len(alice.properties[1].values), 1)
+            self.assertEqual(alice.properties[1].values[0], config.mosaic_id)
+            self.assertEqual(alice.properties[2].property_type, models.PropertyType.BLOCK_TRANSACTION)
+            self.assertEqual(len(alice.properties[2].values), 0)
+            self.assertEqual(len(alice.properties), 3)
+
+            self.assertEqual(bob.properties[0].property_type, models.PropertyType.BLOCK_ADDRESS)
+            self.assertEqual(len(bob.properties[0].values), 1)
+            self.assertEqual(bob.properties[0].values[0], self.mike.address)
+            self.assertEqual(bob.properties[1].property_type, models.PropertyType.BLOCK_MOSAIC)
+            self.assertEqual(len(bob.properties[1].values), 1)
+            self.assertEqual(bob.properties[1].values[0], config.mosaic_id)
+            self.assertEqual(bob.properties[2].property_type, models.PropertyType.BLOCK_TRANSACTION)
+            self.assertEqual(len(bob.properties[2].values), 1)
+            self.assertEqual(bob.properties[2].values[0], models.TransactionType.AGGREGATE_COMPLETE)

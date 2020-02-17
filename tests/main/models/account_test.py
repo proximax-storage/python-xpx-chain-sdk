@@ -79,7 +79,8 @@ class TestAccount(harness.TestCase):
     'type': models.AccountInfo,
     'network_type': models.NetworkType.MIJIN_TEST,
     'data': {
-        'meta': models.AccountMetadata(),
+        # 'meta': models.AccountMeta(1, '40af0cb5a7a7533f07a4ba6f1cb2df64f2347feb1b2eaabb93', '74d28603d146497ea83d3d6ee15758d39c298b48f58', 1, 'e578'),
+        'meta': models.AccountMeta(),
         'address': models.Address('SCBO3CAFOVAOGYBAHQKPUOGLAYWFLNJUFFCH3RYY'),
         'address_height': 1,
         'public_key': '7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808',
@@ -90,7 +91,13 @@ class TestAccount(harness.TestCase):
         'snapshots': [],
     },
     'dto': {
-        'meta': {},
+        'meta': {
+            # 'height': [1, 0],
+            # 'hash': '40af0cb5a7a7533f07a4ba6f1cb2df64f2347feb1b2eaabb93',
+            # 'merkleComponentHash': '74d28603d146497ea83d3d6ee15758d39c298b48f58',
+            # 'index': 1,
+            # 'id': 'e578',
+        },
         'account': {
             'address': '9082ed88057540e360203c14fa38cb062c55b53429447dc718',
             'addressHeight': [1, 0],
@@ -111,13 +118,25 @@ class TestAccountInfo(harness.TestCase):
 
 
 @harness.model_test_case({
-    'type': models.AccountMetadata,
+    'type': models.AccountMeta,
     'network_type': models.NetworkType.MIJIN_TEST,
-    'data': {},
-    'dto': {},
+    'data': {
+        # 'height': 1,
+        # 'hash': '40af0cb5a7a7533f07a4ba6f1cb2df64f2347feb1b2eaabb93',
+        # 'merkle_component_hash': '74d28603d146497ea83d3d6ee15758d39c298b48f58',
+        # 'index': 1,
+        # 'id': 'e578',
+    },
+    'dto': {
+        # 'height': [1, 0],
+        # 'hash': '40af0cb5a7a7533f07a4ba6f1cb2df64f2347feb1b2eaabb93',
+        # 'merkleComponentHash': '74d28603d146497ea83d3d6ee15758d39c298b48f58',
+        # 'index': 1,
+        # 'id': 'e578',
+    },
     'eq': False,
 })
-class TestAccountMetadata(harness.TestCase):
+class TestAccountMeta(harness.TestCase):
     pass
 
 
@@ -134,8 +153,8 @@ class TestAccountMetadata(harness.TestCase):
     'dto': {
         'propertyType': 0x01,
         'values': [
-            'kCiRICJxVnplFmh3pkfYpf/Tu+Ywq5JeRg==',
-            'kILtiAV1QONgIDwU+jjLBixVtTQpRH3HGA==',
+            '902891202271567A65166877A647D8A5FFD3BBE630AB925E46',
+            '9082ED88057540E360203C14FA38CB062C55B53429447DC718',
         ],
     },
 })
@@ -160,63 +179,18 @@ class TestAccountProperty(harness.TestCase):
         ],
     },
     'dto': {
-        'address': 'U0FVSkNJQkNPRkxIVVpJV05CMzJNUjZZVVg3NUhPN0dHQ1ZaRVhTRw==',
-        'properties': [
-            {
-                'propertyType': 0x01,
-                'values': [],
-            },
-        ],
-    },
-})
-class TestAccountProperties(harness.TestCase):
-    # TODO(ahuszagh) Check when stabilized.
-    pass
-
-
-@harness.model_test_case({
-    'type': models.AccountPropertiesInfo,
-    'network_type': models.NetworkType.MIJIN_TEST,
-    'data': {
-        'meta': models.AccountPropertiesMetadata('00000000000000000000032f'),
-        'account_properties': models.AccountProperties(
-            address=models.Address('SAUJCIBCOFLHUZIWNB32MR6YUX75HO7GGCVZEXSG'),
-            properties=[
-                models.AccountProperty(models.PropertyType.ALLOW_ADDRESS, []),
-            ],
-        ),
-    },
-    'dto': {
-        'meta': {
-            'id': '00000000000000000000032f',
-        },
         'accountProperties': {
-            'address': 'U0FVSkNJQkNPRkxIVVpJV05CMzJNUjZZVVg3NUhPN0dHQ1ZaRVhTRw==',
+            'address': '902891202271567A65166877A647D8A5FFD3BBE630AB925E46',
             'properties': [
                 {
                     'propertyType': 0x01,
                     'values': [],
                 },
             ],
-        },
+        }
     },
 })
-class TestAccountPropertiesInfo(harness.TestCase):
-    # TODO(ahuszagh) Check when stabilized.
-    pass
-
-
-@harness.model_test_case({
-    'type': models.AccountPropertiesMetadata,
-    'network_type': models.NetworkType.MIJIN_TEST,
-    'data': {
-        'id': '00000000000000000000032f',
-    },
-    'dto': {
-        'id': '00000000000000000000032f',
-    },
-})
-class TestAccountPropertiesMetadata(harness.TestCase):
+class TestAccountProperties(harness.TestCase):
     # TODO(ahuszagh) Check when stabilized.
     pass
 

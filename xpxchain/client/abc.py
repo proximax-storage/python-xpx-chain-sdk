@@ -218,10 +218,10 @@ class HTTP(HTTPSharedBase):
         """Get BlockchainHTTP to the same endpoint."""
         raise util.AbstractMethodError
 
-    @property
-    def contract(self) -> ContractHTTP:
-        """Get ContractHTTP to the same endpoint."""
-        raise util.AbstractMethodError
+    # @property
+    # def contract(self) -> ContractHTTP:
+    #    """Get ContractHTTP to the same endpoint."""
+    #    raise util.AbstractMethodError
 
     @property
     def metadata(self) -> MetadataHTTP:
@@ -288,7 +288,7 @@ class AccountHTTP(HTTPSharedBase):
         """
         return self(nis.get_accounts_info, addresses, **kwds)
 
-    def get_account_property(
+    def get_account_properties(
         self,
         address: models.Address,
         **kwds
@@ -299,9 +299,9 @@ class AccountHTTP(HTTPSharedBase):
         :param address: Account address.
         :return: AccountPropertiesInfo object.
         """
-        return self(nis.get_account_property, address, **kwds)
+        return self(nis.get_account_properties, address, **kwds)
 
-    def get_account_properties(
+    def get_accounts_properties(
         self,
         addresses: typing.Sequence[models.Address],
         **kwds
@@ -312,7 +312,7 @@ class AccountHTTP(HTTPSharedBase):
         :param addresses: Sequence of account addresses.
         :return: AccountPropertiesInfo object.
         """
-        return self(nis.get_account_properties, addresses, **kwds)
+        return self(nis.get_accounts_properties, addresses, **kwds)
 
     def get_multisig_account_info(
         self,
@@ -404,19 +404,19 @@ class AccountHTTP(HTTPSharedBase):
         :return: List of aggregate bonded transaction objects.
         """
         return self(nis.get_account_partial_transactions, public_account, **kwds)
-
-    def contracts(
-        self,
-        public_account: models.PublicAccount,
-        **kwds
-    ):
-        """
-        Get account contracts.
-
-        :param public_account: Public account.
-        :return: List of ContractInfo object.
-        """
-        return self(nis.get_account_contracts, public_account, **kwds)
+# TODO: Check when stabilized
+#     def contracts(
+#         self,
+#         public_account: models.PublicAccount,
+#         **kwds
+#     ):
+#         """
+#         Get account contracts.
+#
+#         :param public_account: Public account.
+#         :return: List of ContractInfo object.
+#         """
+#         return self(nis.get_account_contracts, public_account, **kwds)
 
     def get_account_names(
         self,
@@ -527,32 +527,33 @@ class BlockchainHTTP(HTTPSharedBase):
 
 class ContractHTTP(HTTPSharedBase):
     """Abstract base class for the Contract HTTP client."""
-
-    def get_contract(
-        self,
-        contract_id: str,
-        **kwds
-    ):
-        """
-        Gets the contract for a given contractId.
-
-        :param contractId: The account identifier.
-        :return: ContractInfo.
-        """
-        return self(nis.get_contract, contract_id, **kwds)
-
-    def get_contracts(
-        self,
-        addresses: typing.Sequence[models.Address],
-        **kwds
-    ):
-        """
-        Get contracts for an array of addresses
-
-        :param height: The height of the blockchain to get config.
-        :return: Sequence of ContractInfo.
-        """
-        return self(nis.get_contracts, addresses, **kwds)
+    pass
+# TODO: Check when stabilized
+#     def get_contract(
+#         self,
+#         contract_id: str,
+#         **kwds
+#     ):
+#         """
+#         Gets the contract for a given contractId.
+#
+#         :param contractId: The account identifier.
+#         :return: ContractInfo.
+#         """
+#         return self(nis.get_contract, contract_id, **kwds)
+#
+#     def get_contracts(
+#         self,
+#         addresses: typing.Sequence[models.Address],
+#         **kwds
+#     ):
+#         """
+#         Get contracts for an array of addresses
+#
+#         :param height: The height of the blockchain to get config.
+#         :return: Sequence of ContractInfo.
+#         """
+#         return self(nis.get_contracts, addresses, **kwds)
 
 
 class MetadataHTTP(HTTPSharedBase):
@@ -639,6 +640,19 @@ class ConfigHTTP(HTTPSharedBase):
         :return: CatapultConfig.
         """
         return self(nis.get_config, height, **kwds)
+
+    def get_upgrade(
+        self,
+        height: int,
+        **kwds
+    ):
+        """
+        Gets upgrade of network at height.
+
+        :param height: The height of the blockchain to get upgrade.
+        :return: CatapultUpgrade.
+        """
+        return self(nis.get_upgrade, height, **kwds)
 
 
 class NodeHTTP(HTTPSharedBase):

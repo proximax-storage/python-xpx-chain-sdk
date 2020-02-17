@@ -2,6 +2,7 @@ from xpxchain import client
 from xpxchain import models
 from tests import harness
 from tests import responses
+from xpxchain import util
 
 
 @harness.mocked_http_test_case({
@@ -29,9 +30,83 @@ from tests import responses
                 lambda x: (x[0].mosaics, []),
             ],
         },
-        #  TODO(ahuszagh) Add more examples...
-        # get_account_property
-        # get_account_properties
+        {
+            'name': 'test_get_account_properties',
+            'response': responses.ACCOUNT_PROPERTIES["Ok"],
+            'params': [models.Address.create_from_encoded('906DE63B4FDC66936F823B1CA8B08992C6FBCF0D0AEA2310AF')],
+            'method': 'get_account_properties',
+            'validation': [
+                lambda x: (isinstance(x, models.AccountProperties), True),
+                lambda x: (isinstance(x.address, models.Address), True),
+                lambda x: (x.address.hex, '906DE63B4FDC66936F823B1CA8B08992C6FBCF0D0AEA2310AF'),
+                lambda x: (len(x.properties), 3),
+                lambda x: (isinstance(x.properties[0], models.AccountProperty), True),
+                lambda x: (x.properties[0].property_type, models.PropertyType.ALLOW_ADDRESS),
+                lambda x: (len(x.properties[0].values), 1),
+                lambda x: (isinstance(x.properties[0].values[0], models.Address), True),
+                lambda x: (x.properties[0].values[0].hex, '905F14582E43F82A7C8660D55F441C38AB3F0B630B30B21066'),
+                lambda x: (x.properties[1].property_type, models.PropertyType.ALLOW_MOSAIC),
+                lambda x: (len(x.properties[1].values), 1),
+                lambda x: (isinstance(x.properties[1].values[0], models.MosaicId), True),
+                lambda x: (int(x.properties[1].values[0]), util.u64_from_dto([481110499, 231112638])),
+                lambda x: (x.properties[2].property_type, models.PropertyType.BLOCK_TRANSACTION),
+                lambda x: (len(x.properties[2].values), 0),
+            ],
+        },
+        {
+            'name': 'test_get_accounts_properties',
+            'response': responses.ACCOUNTS_PROPERTIES["Ok"],
+            'params': [[
+                models.Address.create_from_encoded('906DE63B4FDC66936F823B1CA8B08992C6FBCF0D0AEA2310AF'),
+                models.Address.create_from_encoded('907833A9D4D5EC393ADB9FE69AC7558AA397EC33094174D6C3'),
+            ]],
+            'method': 'get_accounts_properties',
+            'validation': [
+                lambda x: (len(x), 2),
+                lambda x: (isinstance(x[0], models.AccountProperties), True),
+                lambda x: (isinstance(x[0].address, models.Address), True),
+                lambda x: (x[0].address.hex, '906DE63B4FDC66936F823B1CA8B08992C6FBCF0D0AEA2310AF'),
+                lambda x: (x[1].address.hex, '907833A9D4D5EC393ADB9FE69AC7558AA397EC33094174D6C3'),
+                lambda x: (len(x[0].properties), 3),
+                lambda x: (isinstance(x[0].properties[0], models.AccountProperty), True),
+                lambda x: (x[0].properties[0].property_type, models.PropertyType.ALLOW_ADDRESS),
+                lambda x: (len(x[0].properties[0].values), 1),
+                lambda x: (isinstance(x[0].properties[0].values[0], models.Address), True),
+                lambda x: (x[0].properties[0].values[0].hex, '905F14582E43F82A7C8660D55F441C38AB3F0B630B30B21066'),
+                lambda x: (x[0].properties[1].property_type, models.PropertyType.ALLOW_MOSAIC),
+                lambda x: (len(x[0].properties[1].values), 1),
+                lambda x: (isinstance(x[0].properties[1].values[0], models.MosaicId), True),
+                lambda x: (int(x[0].properties[1].values[0]), util.u64_from_dto([481110499, 231112638])),
+                lambda x: (x[0].properties[2].property_type, models.PropertyType.BLOCK_TRANSACTION),
+                lambda x: (len(x[0].properties[2].values), 0),
+                lambda x: (len(x[1].properties), 3),
+                lambda x: (isinstance(x[1].properties[0], models.AccountProperty), True),
+                lambda x: (x[1].properties[0].property_type, models.PropertyType.BLOCK_ADDRESS),
+                lambda x: (len(x[1].properties[0].values), 1),
+                lambda x: (isinstance(x[1].properties[0].values[0], models.Address), True),
+                lambda x: (x[1].properties[0].values[0].hex, '905F14582E43F82A7C8660D55F441C38AB3F0B630B30B21066'),
+                lambda x: (x[1].properties[1].property_type, models.PropertyType.BLOCK_MOSAIC),
+                lambda x: (len(x[1].properties[1].values), 1),
+                lambda x: (isinstance(x[1].properties[1].values[0], models.MosaicId), True),
+                lambda x: (int(x[1].properties[1].values[0]), util.u64_from_dto([481110499, 231112638])),
+                lambda x: (x[1].properties[2].property_type, models.PropertyType.BLOCK_TRANSACTION),
+                lambda x: (len(x[1].properties[2].values), 1),
+                lambda x: (isinstance(x[1].properties[2].values[0], models.TransactionType), True),
+                lambda x: (x[1].properties[2].values[0], models.TransactionType.AGGREGATE_COMPLETE),
+            ],
+        },
+        {
+            'name': 'test_get_account_names',
+            'response': responses.ACCOUNT_NAMES["Ok"],
+            'params': [[models.Address.create_from_encoded('904E828FB27B84589C2FCFFC3B09CBC9E56C6612E4E133A558')]],
+            'method': 'get_account_names',
+            'validation': [
+                lambda x: (len(x), 1),
+                lambda x: (x[0].address.hex, '904E828FB27B84589C2FCFFC3B09CBC9E56C6612E4E133A558'),
+                lambda x: (len(x[0].names), 1),
+                lambda x: (x[0].names[0], 'foo.bar'),
+            ],
+        },
         {
             'name': 'test_get_multisig_account_info',
             'response': responses.MULTISIG_INFO["Ok"],

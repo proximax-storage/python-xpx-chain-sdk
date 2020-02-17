@@ -58,19 +58,26 @@ class AccountProperties(util.DTO):
     def validate_dto(cls, data: dict) -> bool:
         """Validate the data-transfer object."""
 
-        required_keys = {'address', 'properties'}
+        required_l1 = {'accountProperties'}
+        required_l2 = {'address', 'properties'}
         return (
-            cls.validate_dto_required(data, required_keys)
-            and cls.validate_dto_all(data, required_keys)
+            cls.validate_dto_required(data, required_l1)
+            and cls.validate_dto_all(data, required_l1)
+            and cls.validate_dto_required(data['accountProperties'], required_l2)
+            and cls.validate_dto_all(data['accountProperties'], required_l2)
         )
 
     def to_dto(
         self,
         network_type: OptionalNetworkType = None,
     ) -> dict:
-        return {
-            'address': util.b64encode(self.address.address.encode('ascii')),
+        account_properties = {
+            'address': self.address.hex,
             'properties': AccountProperty.sequence_to_dto(self.properties, network_type),
+        }
+
+        return {
+            'accountProperties': account_properties,
         }
 
     @classmethod
@@ -82,9 +89,10 @@ class AccountProperties(util.DTO):
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')
 
-        address = util.b64decode(data['address']).decode('ascii')
+        account_properties = data['accountProperties']
+
         from_dto = AccountProperty.sequence_from_dto
         return cls(
-            address=Address.create_from_raw_address(address),
-            properties=from_dto(data['properties'], network_type),
+            address=Address.create_from_encoded(account_properties['address']),
+            properties=from_dto(account_properties['properties'], network_type),
         )

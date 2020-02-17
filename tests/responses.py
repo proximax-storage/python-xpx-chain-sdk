@@ -45,12 +45,28 @@ ACCOUNTS_INFO = {
     'Ok': load_response('accounts_info.json'),
 }
 
+ACCOUNT_PROPERTIES = {
+    'Ok': load_response('account_properties.json'),
+}
+
+ACCOUNTS_PROPERTIES = {
+    'Ok': load_response('accounts_properties.json'),
+}
+
+ACCOUNT_NAMES = {
+    'Ok': load_response('account_names.json'),
+}
+
 BLOCK_INFO = {
     'Ok': load_response('block_info.json'),
 }
 
 BLOCKS_INFO = {
     'Ok': load_response('blocks_info.json'),
+}
+
+BLOCK_TRANSACTION_MERKLE = {
+    'Ok': load_response('block_transaction_merkle.json'),
 }
 
 CHAIN_HEIGHT = {

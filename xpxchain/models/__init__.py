@@ -30,11 +30,9 @@
 # Account
 from .account.account import *
 from .account.account_info import *
-from .account.account_metadata import *
+from .account.account_meta import *
 from .account.account_property import *
 from .account.account_properties import *
-from .account.account_properties_info import *
-from .account.account_properties_metadata import *
 from .account.address import *
 from .account.multisig_account_graph_info import *
 from .account.multisig_account_info import *
@@ -73,9 +71,12 @@ from .receipt import *
 
 # Config
 from .config.catapult_config import *
+from .config.catapult_upgrade import *
+from .config import *
 
 # Contract
 from .contract.contract_info import *
+from .contract import *
 
 # Metadata
 from .metadata.address_metadata_info import *
@@ -95,8 +96,6 @@ from .metadata import *
 from .mosaic.mosaic import *
 from .mosaic.mosaic_id import *
 from .mosaic.mosaic_info import *
-from .mosaic.mosaic_levy import *
-from .mosaic.mosaic_levy_type import *
 from .mosaic.mosaic_name import *
 from .mosaic.mosaic_nonce import *
 from .mosaic.mosaic_properties import *
@@ -131,6 +130,7 @@ from .transaction.aggregate_transaction_cosignature import *
 from .transaction.aggregate_transaction_info import *
 from .transaction.aggregate_transaction import *
 from .transaction.alias_transaction import *
+from .transaction.blockchain_upgrade_transaction import *
 from .transaction.cosignature_signed_transaction import *
 from .transaction.cosignature_transaction import *
 from .transaction.deadline import *
@@ -155,6 +155,7 @@ from .transaction.mosaic_definition_transaction import *
 from .transaction.mosaic_supply_change_transaction import *
 from .transaction.multisig_cosignatory_modification import *
 from .transaction.multisig_cosignatory_modification_type import *
+from .transaction.network_config_transaction import *
 from .transaction.plain_message import *
 from .transaction.register_namespace_transaction import *
 from .transaction.secret_lock_transaction import *
@@ -176,11 +177,9 @@ __all__ = (
     # Account
     account.__all__
     + account_info.__all__
-    + account_metadata.__all__
+    + account_meta.__all__
     + account_property.__all__
     + account_properties.__all__
-    + account_properties_info.__all__
-    + account_properties_metadata.__all__
     + account_names.__all__
     + address.__all__
     + multisig_account_graph_info.__all__
@@ -212,6 +211,10 @@ __all__ = (
     + resolution_statement.__all__
     + resolution_entry.__all__
 
+    # Config
+    + catapult_config.__all__
+    + catapult_upgrade.__all__
+
     # Metadata
     + address_metadata_info.__all__
     + address_metadata.__all__
@@ -229,8 +232,6 @@ __all__ = (
     + mosaic.__all__
     + mosaic_id.__all__
     + mosaic_info.__all__
-    + mosaic_levy.__all__
-    + mosaic_levy_type.__all__
     + mosaic_name.__all__
     + mosaic_nonce.__all__
     + mosaic_properties.__all__
@@ -262,6 +263,7 @@ __all__ = (
     + aggregate_transaction_info.__all__
     + aggregate_transaction.__all__
     + alias_transaction.__all__
+    + blockchain_upgrade_transaction.__all__
     + cosignature_signed_transaction.__all__
     + cosignature_transaction.__all__
     + deadline.__all__
@@ -286,6 +288,7 @@ __all__ = (
     + mosaic_supply_change_transaction.__all__
     + multisig_cosignatory_modification.__all__
     + multisig_cosignatory_modification_type.__all__
+    + network_config_transaction.__all__
     + plain_message.__all__
     + register_namespace_transaction.__all__
     + secret_lock_transaction.__all__

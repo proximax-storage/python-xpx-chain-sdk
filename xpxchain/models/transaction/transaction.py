@@ -207,8 +207,6 @@ class Transaction(TransactionBase):
         required_keys = {
             'version',
             'type',
-            'maxFee',
-            'deadline',
         }
         return cls.validate_dto_required(data, required_keys)
 
