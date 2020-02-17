@@ -443,7 +443,7 @@ class TestAccountHttp(harness.TestCase):
             self.assertEqual(len(info), 1)
             self.assertEqual(isinstance(info[0], models.AccountNames), True)
             self.assertEqual(len(info[0].names), 1)
-            self.assertEqual(info[0].names[0], models.NamespaceId(self.mikes_namespace))
+            self.assertEqual(info[0].names[0], self.mikes_namespace)
 
     def test_account_transactions(self):
         with client.AccountHTTP(responses.ENDPOINT) as http:

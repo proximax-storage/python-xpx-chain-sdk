@@ -220,8 +220,8 @@ class HTTP(HTTPSharedBase):
 
     # @property
     # def contract(self) -> ContractHTTP:
-        # """Get ContractHTTP to the same endpoint."""
-        # raise util.AbstractMethodError
+    #    """Get ContractHTTP to the same endpoint."""
+    #    raise util.AbstractMethodError
 
     @property
     def metadata(self) -> MetadataHTTP:
@@ -404,7 +404,7 @@ class AccountHTTP(HTTPSharedBase):
         :return: List of aggregate bonded transaction objects.
         """
         return self(nis.get_account_partial_transactions, public_account, **kwds)
-# TODO: Check when stabilized 
+# TODO: Check when stabilized
 #     def contracts(
 #         self,
 #         public_account: models.PublicAccount,
@@ -412,7 +412,7 @@ class AccountHTTP(HTTPSharedBase):
 #     ):
 #         """
 #         Get account contracts.
-# 
+#
 #         :param public_account: Public account.
 #         :return: List of ContractInfo object.
 #         """
@@ -536,12 +536,12 @@ class ContractHTTP(HTTPSharedBase):
 #     ):
 #         """
 #         Gets the contract for a given contractId.
-# 
+#
 #         :param contractId: The account identifier.
 #         :return: ContractInfo.
 #         """
 #         return self(nis.get_contract, contract_id, **kwds)
-# 
+#
 #     def get_contracts(
 #         self,
 #         addresses: typing.Sequence[models.Address],
@@ -549,7 +549,7 @@ class ContractHTTP(HTTPSharedBase):
 #     ):
 #         """
 #         Get contracts for an array of addresses
-# 
+#
 #         :param height: The height of the blockchain to get config.
 #         :return: Sequence of ContractInfo.
 #         """

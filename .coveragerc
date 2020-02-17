@@ -22,7 +22,8 @@ omit =
     xpxchain/util/reactive.py
     # Ignore incomplete or not yet implemented models in the catapult API.
     # TODO: Restore these models when they are stabilized in catapult.
-    nem2/models/account/account_meta.py
+    xpxchain/models/account/account_meta.py
+    xpxchain/models/contract/*
 
 [report]
 show_missing = True

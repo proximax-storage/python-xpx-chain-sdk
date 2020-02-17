@@ -56,7 +56,7 @@ ACCOUNTS_PROPERTIES = {
 ACCOUNT_NAMES = {
     'Ok': load_response('account_names.json'),
 }
-    
+
 BLOCK_INFO = {
     'Ok': load_response('block_info.json'),
 }
