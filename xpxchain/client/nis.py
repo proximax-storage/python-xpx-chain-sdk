@@ -499,43 +499,44 @@ def process_get_account_partial_transactions(
 
 
 get_account_partial_transactions = request("get_account_partial_transactions")
-
-
-def request_get_account_contracts(
-    client: client.Client,
-    public_account: models.PublicAccount,
-    **kwds
-):
-    """
-    Make "/account/{public_key}/contracts" request.
-
-    :param client: Wrapper for client.
-    :param public_account: Public account.
-    :param timeout: (Optional) timeout for request (in seconds).
-    """
-
-    url = f"/account/{public_account.public_key}/contracts"
-    return client.get(url, **kwds)
-
-
-def process_get_account_contracts(
-    status: int,
-    json: list,
-    network_type: models.NetworkType,
-) -> typing.Sequence[models.Transaction]:
-    """
-    Process the "/account/{public_key}/contracts" HTTP response.
-
-    :param status: Status code for HTTP response.
-    :param json: JSON data for response message.
-    :param network_type: Network type..
-    """
-
-    assert status == 200
-    return [models.ContractInfo.create_from_dto(i, network_type) for i in json]
-
-
-get_account_contracts = request("get_account_contracts")
+# TODO: Check when stabilized
+#
+#
+# def request_get_account_contracts(
+#     client: client.Client,
+#     public_account: models.PublicAccount,
+#     **kwds
+# ):
+#     """
+#     Make "/account/{public_key}/contracts" request.
+# 
+#     :param client: Wrapper for client.
+#     :param public_account: Public account.
+#     :param timeout: (Optional) timeout for request (in seconds).
+#     """
+# 
+#     url = f"/account/{public_account.public_key}/contracts"
+#     return client.get(url, **kwds)
+# 
+# 
+# def process_get_account_contracts(
+#     status: int,
+#     json: list,
+#     network_type: models.NetworkType,
+# ) -> typing.Sequence[models.Transaction]:
+#     """
+#     Process the "/account/{public_key}/contracts" HTTP response.
+# 
+#     :param status: Status code for HTTP response.
+#     :param json: JSON data for response message.
+#     :param network_type: Network type..
+#     """
+# 
+#     assert status == 200
+#     return [models.ContractInfo.create_from_dto(i, network_type) for i in json]
+#
+#
+#get_account_contracts = request("get_account_contracts")
 
 
 def request_get_account_names(
@@ -935,81 +936,82 @@ def process_get_diagnostic_server(
 
 
 get_diagnostic_server = request("get_diagnostic_server")
-
-
+# TODO: Check when stabilized
+# 
+#
 # CONTRACT HTTP
 # -----------
-
-
-def request_get_contracts(
-    client: client.Client,
-    addresses: typing.Sequence[models.Address],
-    **kwds
-):
-    """
-    Make "/contract" request.
-
-    :param addresses: Sequence of account addresses.
-    """
-
-    url = f"/contract"
-    json = {"addresses": [i.address for i in addresses]}
-    return client.post(url, json=json, **kwds)
-
-
-def process_get_contracts(
-    status: int,
-    json: list,
-    network_type: models.NetworkType,
-) -> typing.Sequence[models.ContractInfo]:
-    """
-    Process the "/contract" HTTP response.
-
-    :param status: Status code for HTTP response.
-    :param json: JSON data for response message.
-    :param network_type: Network type.
-    """
-
-    assert status == 200
-    return [models.ContractInfo.create_from_dto(i, network_type) for i in json]
-
-
-get_contracts = request("get_contracts")
-
-
-def request_get_contract(
-    client: client.Client,
-    contract_id: str,
-    **kwds
-):
-    """
-    Make "/contract/{contract_id}" request.
-
-    :param contract_id: The account identifier.
-    """
-
-    url = f"/contract/{contract_id}"
-    return client.get(url, **kwds)
-
-
-def process_get_contract(
-    status: int,
-    json: dict,
-    network_type: models.NetworkType,
-) -> models.ContractInfo:
-    """
-    Process the "/contract/{contract_id}" HTTP response.
-
-    :param status: Status code for HTTP response.
-    :param json: JSON data for response message.
-    :param network_type: Network type.
-    """
-
-    assert status == 200
-    return models.ContractInfo.create_from_dto(json, network_type)
-
-
-get_contract = request("get_contract")
+# 
+# 
+# def request_get_contracts(
+#     client: client.Client,
+#     addresses: typing.Sequence[models.Address],
+#     **kwds
+# ):
+#     """
+#     Make "/contract" request.
+# 
+#     :param addresses: Sequence of account addresses.
+#     """
+# 
+#     url = f"/contract"
+#     json = {"addresses": [i.address for i in addresses]}
+#     return client.post(url, json=json, **kwds)
+# 
+# 
+# def process_get_contracts(
+#     status: int,
+#     json: list,
+#     network_type: models.NetworkType,
+# ) -> typing.Sequence[models.ContractInfo]:
+#     """
+#     Process the "/contract" HTTP response.
+# 
+#     :param status: Status code for HTTP response.
+#     :param json: JSON data for response message.
+#     :param network_type: Network type.
+#     """
+# 
+#     assert status == 200
+#     return [models.ContractInfo.create_from_dto(i, network_type) for i in json]
+# 
+# 
+# get_contracts = request("get_contracts")
+# 
+# 
+# def request_get_contract(
+#     client: client.Client,
+#     contract_id: str,
+#     **kwds
+# ):
+#     """
+#     Make "/contract/{contract_id}" request.
+# 
+#     :param contract_id: The account identifier.
+#     """
+# 
+#     url = f"/contract/{contract_id}"
+#     return client.get(url, **kwds)
+# 
+# 
+# def process_get_contract(
+#     status: int,
+#     json: dict,
+#     network_type: models.NetworkType,
+# ) -> models.ContractInfo:
+#     """
+#     Process the "/contract/{contract_id}" HTTP response.
+# 
+#     :param status: Status code for HTTP response.
+#     :param json: JSON data for response message.
+#     :param network_type: Network type.
+#     """
+# 
+#     assert status == 200
+#     return models.ContractInfo.create_from_dto(json, network_type)
+# 
+# 
+# get_contract = request("get_contract")
 
 
 # METADATA HTTP
@@ -2024,10 +2026,10 @@ CLIENT_CB = {
         request_get_account_partial_transactions,
         process_get_account_partial_transactions,
     ),
-    'get_account_contracts': (
-        request_get_account_contracts,
-        process_get_account_contracts,
-    ),
+    # 'get_account_contracts': (
+        # request_get_account_contracts,
+        # process_get_account_contracts,
+    # ),
     'get_account_names': (
         request_get_account_names,
         process_get_account_names,
@@ -2076,14 +2078,14 @@ CLIENT_CB = {
     ),
 
     # CONTRACT
-    'get_contract': (
-        request_get_contract,
-        process_get_contract,
-    ),
-    'get_contracts': (
-        request_get_contracts,
-        process_get_contracts,
-    ),
+    # 'get_contract': (
+        # request_get_contract,
+        # process_get_contract,
+    # ),
+    # 'get_contracts': (
+        # request_get_contracts,
+        # process_get_contracts,
+    # ),
 
     # METADATA
     'get_account_metadata': (

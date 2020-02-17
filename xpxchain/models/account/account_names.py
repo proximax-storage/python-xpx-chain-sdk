@@ -26,7 +26,6 @@ from __future__ import annotations
 import typing
 
 from .address import Address
-from ..namespace.namespace_id import NamespaceId
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
 
@@ -52,7 +51,7 @@ class AccountNames(util.DTO):
     """
 
     address: Address
-    names: typing.Sequence[NamespaceId]
+    names: typing.Sequence[str]
 
     @classmethod
     def validate_dto(cls, data: dict) -> bool:
@@ -70,8 +69,7 @@ class AccountNames(util.DTO):
     ) -> dict:
         return {
             'address': self.address.address,
-            # TODO
-            # 'names': AccountProperty.sequence_to_dto(self.properties, network_type),
+            'names': self.names,
         }
 
     @classmethod
@@ -85,5 +83,5 @@ class AccountNames(util.DTO):
 
         return cls(
             address=Address.create_from_encoded(data['address']),
-            names=[NamespaceId(namespace_name) for namespace_name in data['names']],
+            names=data['names'],
         )

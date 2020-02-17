@@ -113,6 +113,19 @@ from tests import responses
                 lambda x: (x.num_accounts, 25),
             ]
         },
+        {
+            'name': 'test_get_merkle_by_hash_in_block',
+            'response': responses.BLOCK_TRANSACTION_MERKLE["Ok"],
+            'params': [1, '6C274716520ABCDCE0BB799CF6F82B64EBC9B954DBE3B14FD5767CD1A89970BE'],
+            'method': 'get_merkle_by_hash_in_block',
+            'validation': [
+                lambda x: (isinstance(x, models.MerkleProofInfo), True),
+                lambda x: (len(x.merkle_path), 6),
+                lambda x: (isinstance(x.merkle_path[0], models.MerklePathItem), True),
+                lambda x: (x.merkle_path[0].position, 2),
+                lambda x: (x.merkle_path[0].hash, 'D41D8437B13EFEBCD9077A325B0604E4FF6691FDE13D6D46B318508EC09B8DA7'),
+            ]
+        },
     ],
 })
 class TestBlockchainHTTP(harness.TestCase):

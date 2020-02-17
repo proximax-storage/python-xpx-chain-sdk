@@ -153,8 +153,8 @@ class TestAccountMeta(harness.TestCase):
     'dto': {
         'propertyType': 0x01,
         'values': [
-            '902891202271567a65166877a647d8a5ffd3bbe630ab925e46',
-            '9082ed88057540e360203c14fa38cb062c55b53429447dc718',
+            '902891202271567A65166877A647D8A5FFD3BBE630AB925E46',
+            '9082ED88057540E360203C14FA38CB062C55B53429447DC718',
         ],
     },
 })
@@ -180,7 +180,7 @@ class TestAccountProperty(harness.TestCase):
     },
     'dto': {
         'accountProperties': {
-            'address': '902891202271567a65166877a647d8a5ffd3bbe630ab925e46',
+            'address': '902891202271567A65166877A647D8A5FFD3BBE630AB925E46',
             'properties': [
                 {
                     'propertyType': 0x01,

@@ -15,11 +15,11 @@ omit =
     # Ignore the setup script.
     setup.py
     # Ignore hash and signature implementations.
-    nem2/util/hashlib/*
-    nem2/util/signature/*
+    xpxchain/util/hashlib/*
+    xpxchain/util/signature/*
     # Ignore RxPy extensions.
-    nem2/util/rx/*
-    nem2/util/reactive.py
+    xpxchain/util/rx/*
+    xpxchain/util/reactive.py
     # Ignore incomplete or not yet implemented models in the catapult API.
     # TODO: Restore these models when they are stabilized in catapult.
     nem2/models/account/account_meta.py
