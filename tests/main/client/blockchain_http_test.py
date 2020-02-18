@@ -134,7 +134,7 @@ from tests import responses
             'validation': [
                 lambda x: (isinstance(x, models.Statements), True),
                 lambda x: (len(x.transaction_statements), 1),
-                lambda x: (len(x.address_resolution_statements), 0),  # TODO: Add statements 
+                lambda x: (len(x.address_resolution_statements), 0),  # TODO: Add statements
                 lambda x: (len(x.mosaic_resolution_statements), 0),  # TODO: Add statements
                 lambda x: (x.transaction_statements[0].height, 25),
                 lambda x: (isinstance(x.transaction_statements[0].source, models.Source), True),

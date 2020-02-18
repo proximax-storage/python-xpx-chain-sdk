@@ -936,9 +936,9 @@ def process_get_diagnostic_server(
 
 
 get_diagnostic_server = request("get_diagnostic_server")
+
+
 # TODO: Check when stabilized
-#
-#
 # CONTRACT HTTP
 # -----------
 #
@@ -1012,8 +1012,8 @@ get_diagnostic_server = request("get_diagnostic_server")
 #
 #
 # get_contract = request("get_contract")
-
-
+#
+#
 # METADATA HTTP
 # -----------
 

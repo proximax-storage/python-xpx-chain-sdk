@@ -37,7 +37,7 @@ def load_response(name):
         return data
 
 
-# ACCOUNT        
+# ACCOUNT
 ACCOUNT_INFO = {
     'Ok': load_response('account_info.json'),
 }
