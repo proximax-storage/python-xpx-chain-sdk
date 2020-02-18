@@ -60,8 +60,7 @@ LONG_DESCRIPTION = "ProximaX Sirius Blockchain Python SDK is a Python library fo
 PACKAGES = setuptools.find_packages()
 
 REQUIRES = [
-    'aiohttp>=3.5',
-    'aiohttp<4',
+    'aiohttp>=3.5,<4',
     'bidict>=0.18',
     'requests>=2.21',
     'websockets>=7.0',
