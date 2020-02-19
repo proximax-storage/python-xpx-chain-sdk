@@ -35,15 +35,15 @@ __all__ = ['ResolutionEntry']
 @util.dataclass(frozen=True)
 class ResolutionEntry(util.DTO):
     """
-    Merkle path item information.
+    Resolution entry.
 
-    :param source:
-    :param resolved:.
+    :param source: The receipt source.
+    :param resolved: A resolved address or resolved mosaicId.
 
     DTO Format:
         .. code-block:: yaml
 
-            MerklePathItemDTO:
+            ResolutionEntryDTO:
                 source: SourceDTO
                 resolved: Uint64DTO
     """
