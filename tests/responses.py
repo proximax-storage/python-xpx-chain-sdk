@@ -83,6 +83,28 @@ METADATA = {
     'Ok': load_response('metadata.json'),
 }
 
+METADATAS = {
+    'Ok': load_response('metadatas.json'),
+}
+
+# CONFIG
+CONFIG = {
+    'Ok': load_response('config.json'),
+}
+
+UPGRADE = {
+    'Ok': load_response('upgrade.json'),
+}
+
+# Node
+INFO = {
+    'Ok': load_response('node_info.json'),
+}
+
+TIME = {
+    'Ok': load_response('node_time.json'),
+}
+
 # BLOCKCHAIN
 BLOCK_INFO = {
     'Ok': load_response('block_info.json'),
@@ -90,6 +112,10 @@ BLOCK_INFO = {
 
 BLOCKS_INFO = {
     'Ok': load_response('blocks_info.json'),
+}
+
+BLOCK_TRANSACTIONS = {
+    'Ok': load_response('block_transactions.json'),
 }
 
 BLOCK_TRANSACTION_MERKLE = {
@@ -133,6 +159,10 @@ MOSAICS_INFO = {
     'Ok': load_response('mosaics_info.json'),
 }
 
+MOSAICS_NAMES = {
+    'Ok': load_response('mosaic_names.json'),
+}
+
 # NAMESPACE
 NAMESPACE = {
     'nem': load_response('namespace.json'),
@@ -152,6 +182,30 @@ NETWORK_TYPE = {
 }
 
 # TRANSACTION
+TRANSACTION = {
+    'Ok': load_response('transaction.json'),
+}
+
 TRANSACTIONS = {
     'Ok': load_response('transactions.json'),
+}
+
+TRANSACTION_STATUS = {
+    'Ok': load_response('transaction_status.json'),
+}
+
+TRANSACTION_STATUSES = {
+    'Ok': load_response('transaction_statuses.json'),
+}
+
+ANNOUNCE = {
+    'Ok': load_response('announce.json'),
+}
+
+ANNOUNCE_PARTIAL = {
+    'Ok': load_response('announce_partial.json'),
+}
+
+ANNOUNCE_COSIGNATURE = {
+    'Ok': load_response('announce_cosignature.json'),
 }

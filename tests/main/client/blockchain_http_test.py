@@ -46,7 +46,7 @@ from tests import responses
         },
         {
             'name': 'test_get_block_transactions',
-            'response': responses.TRANSACTIONS["Ok"],
+            'response': responses.BLOCK_TRANSACTIONS["Ok"],
             'params': [1],
             'method': 'get_block_transactions',
             'validation': [

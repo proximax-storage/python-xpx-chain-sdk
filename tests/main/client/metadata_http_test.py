@@ -85,7 +85,27 @@ from xpxchain import util
                 lambda x: (x.metadata.flds[1].value, 'bar'),
             ],
         },
+        {
+            'name': 'test_get_metadatas',
+            'response': responses.METADATAS["Ok"],
+            'params': [[models.Address('SCV36Q2G5CJ2R2SOIIGG3O46X2N6SGAM2QCW5KRI')]],
+            'method': 'get_metadatas',
+            'validation': [
+                lambda x: (len(x), 1),
+                lambda x: (isinstance(x[0], models.MetadataInfo), True),
+                lambda x: (isinstance(x[0].metadata, models.AddressMetadata), True),
+                lambda x: (x[0].metadata.metadata_type, models.MetadataType.ADDRESS),
+                lambda x: (isinstance(x[0].metadata.metadata_id, models.Address), True),
+                lambda x: (x[0].metadata.metadata_id.hex, '90ABBF4346E893A8EA4E420C6DBB9EBE9BE9180CD4056EAA28'),
+                lambda x: (len(x[0].metadata.flds), 2),
+                lambda x: (isinstance(x[0].metadata.flds[0], models.Field), True),
+                lambda x: (x[0].metadata.flds[0].key, 'foo'),
+                lambda x: (x[0].metadata.flds[0].value, 'bar'),
+                lambda x: (x[0].metadata.flds[1].key, 'foo2'),
+                lambda x: (x[0].metadata.flds[1].value, 'bar'),
+            ],
+        },
     ],
 })
-class TestAccountHTTP(harness.TestCase):
+class TestMetadataHTTP(harness.TestCase):
     pass

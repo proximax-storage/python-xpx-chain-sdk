@@ -1896,7 +1896,7 @@ def process_announce(
     :param json: JSON data for response message.
     """
 
-    assert (status == 200 | status == 202)
+    assert ((status == 200) | (status == 202))
     return models.TransactionAnnounceResponse.create_from_dto(json)
 
 
@@ -1933,7 +1933,7 @@ def process_announce_partial(
     :param json: JSON data for response message.
     """
 
-    assert (status == 200 | status == 202)
+    assert ((status == 200) | (status == 202))
     return models.TransactionAnnounceResponse.create_from_dto(json)
 
 
@@ -1970,7 +1970,7 @@ def process_announce_cosignature(
     :param json: JSON data for response message.
     """
 
-    assert (status == 200 | status == 202)
+    assert ((status == 200) | (status == 202))
     return models.TransactionAnnounceResponse.create_from_dto(json)
 
 
