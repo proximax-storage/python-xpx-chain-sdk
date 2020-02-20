@@ -936,9 +936,9 @@ def process_get_diagnostic_server(
 
 
 get_diagnostic_server = request("get_diagnostic_server")
+
+
 # TODO: Check when stabilized
-#
-#
 # CONTRACT HTTP
 # -----------
 #
@@ -1012,8 +1012,8 @@ get_diagnostic_server = request("get_diagnostic_server")
 #
 #
 # get_contract = request("get_contract")
-
-
+#
+#
 # METADATA HTTP
 # -----------
 
@@ -1896,7 +1896,7 @@ def process_announce(
     :param json: JSON data for response message.
     """
 
-    assert (status == 200 | status == 202)
+    assert ((status == 200) | (status == 202))
     return models.TransactionAnnounceResponse.create_from_dto(json)
 
 
@@ -1933,7 +1933,7 @@ def process_announce_partial(
     :param json: JSON data for response message.
     """
 
-    assert (status == 200 | status == 202)
+    assert ((status == 200) | (status == 202))
     return models.TransactionAnnounceResponse.create_from_dto(json)
 
 
@@ -1970,7 +1970,7 @@ def process_announce_cosignature(
     :param json: JSON data for response message.
     """
 
-    assert (status == 200 | status == 202)
+    assert ((status == 200) | (status == 202))
     return models.TransactionAnnounceResponse.create_from_dto(json)
 
 

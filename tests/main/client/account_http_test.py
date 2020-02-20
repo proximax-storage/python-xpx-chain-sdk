@@ -143,7 +143,7 @@ from xpxchain import util
         },
         {
             'name': 'test_transactions',
-            'response': responses.TRANSACTIONS["Ok"],
+            'response': responses.BLOCK_TRANSACTIONS["Ok"],
             'params': [models.PublicAccount.create_from_public_key('7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808', models.NetworkType.MIJIN_TEST)],
             'method': 'transactions',
             'validation': [
@@ -164,7 +164,7 @@ from xpxchain import util
         },
         {
             'name': 'test_incoming_transactions',
-            'response': responses.TRANSACTIONS["Ok"],
+            'response': responses.BLOCK_TRANSACTIONS["Ok"],
             'params': [models.PublicAccount.create_from_public_key('7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808', models.NetworkType.MIJIN_TEST)],
             'method': 'incoming_transactions',
             'validation': [
@@ -175,7 +175,7 @@ from xpxchain import util
         },
         {
             'name': 'test_outgoing_transactions',
-            'response': responses.TRANSACTIONS["Ok"],
+            'response': responses.BLOCK_TRANSACTIONS["Ok"],
             'params': [models.PublicAccount.create_from_public_key('7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808', models.NetworkType.MIJIN_TEST)],
             'method': 'outgoing_transactions',
             'validation': [
@@ -186,7 +186,7 @@ from xpxchain import util
         },
         {
             'name': 'test_outgoing_transactions',
-            'response': responses.TRANSACTIONS["Ok"],
+            'response': responses.BLOCK_TRANSACTIONS["Ok"],
             'params': [models.PublicAccount.create_from_public_key('7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808', models.NetworkType.MIJIN_TEST)],
             'method': 'outgoing_transactions',
             'validation': [
@@ -197,7 +197,7 @@ from xpxchain import util
         },
         {
             'name': 'test_unconfirmed_transactions',
-            'response': responses.TRANSACTIONS["Ok"],
+            'response': responses.BLOCK_TRANSACTIONS["Ok"],
             'params': [models.PublicAccount.create_from_public_key('7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808', models.NetworkType.MIJIN_TEST)],
             'method': 'unconfirmed_transactions',
             'validation': [
@@ -208,7 +208,7 @@ from xpxchain import util
         },
         {
             'name': 'test_aggregate_bonded_transactions',
-            'response': responses.TRANSACTIONS["Ok"],
+            'response': responses.BLOCK_TRANSACTIONS["Ok"],
             'params': [models.PublicAccount.create_from_public_key('7A562888C7AE1E082579951D6D93BF931DE979360ACCA4C4085D754E5E122808', models.NetworkType.MIJIN_TEST)],
             'method': 'aggregate_bonded_transactions',
             'validation': [

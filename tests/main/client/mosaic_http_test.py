@@ -35,6 +35,20 @@ from tests import responses
                 lambda x: (x[0].meta_id, '5CC07CBC3A48065F47D6DF80'),
             ]
         },
+        {
+            'name': 'test_get_mosaic_names',
+            'response': responses.MOSAICS_NAMES["Ok"],
+            'params': [[models.MosaicId.create_from_hex('0dc67fbe1cad29e3')]],
+            'method': 'get_mosaic_names',
+            'validation': [
+                lambda x: (len(x), 1),
+                lambda x: (isinstance(x[0], models.MosaicName), True),
+                lambda x: (isinstance(x[0].mosaic_id, models.MosaicId), True),
+                lambda x: (int(x[0].mosaic_id), 0x0dc67fbe1cad29e3),
+                lambda x: (len(x[0].names), 1),
+                lambda x: (x[0].names[0], 'prx.xpx'),
+            ]
+        },
     ],
 })
 class TestMosaicHTTP(harness.TestCase):

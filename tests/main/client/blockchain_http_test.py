@@ -46,7 +46,7 @@ from tests import responses
         },
         {
             'name': 'test_get_block_transactions',
-            'response': responses.TRANSACTIONS["Ok"],
+            'response': responses.BLOCK_TRANSACTIONS["Ok"],
             'params': [1],
             'method': 'get_block_transactions',
             'validation': [
@@ -126,6 +126,42 @@ from tests import responses
                 lambda x: (x.merkle_path[0].hash, 'D41D8437B13EFEBCD9077A325B0604E4FF6691FDE13D6D46B318508EC09B8DA7'),
             ]
         },
+        {
+            'name': 'test_get_block_receipts',
+            'response': responses.BLOCK_RECEIPTS["Ok"],
+            'params': [25],
+            'method': 'get_block_receipts',
+            'validation': [
+                lambda x: (isinstance(x, models.Statements), True),
+                lambda x: (len(x.transaction_statements), 1),
+                lambda x: (len(x.address_resolution_statements), 0),  # TODO: Add statements
+                lambda x: (len(x.mosaic_resolution_statements), 0),  # TODO: Add statements
+                lambda x: (x.transaction_statements[0].height, 25),
+                lambda x: (isinstance(x.transaction_statements[0].source, models.Source), True),
+                lambda x: (x.transaction_statements[0].source.primary_id, 0),
+                lambda x: (x.transaction_statements[0].source.secondary_id, 0),
+                lambda x: (len(x.transaction_statements[0].receipts), 1),
+                lambda x: (isinstance(x.transaction_statements[0].receipts[0], models.Receipt), True),
+                lambda x: (x.transaction_statements[0].receipts[0].type, models.ReceiptType.VALIDATE_FEE),
+                lambda x: (x.transaction_statements[0].receipts[0].version, 1),
+                lambda x: (isinstance(x.transaction_statements[0].receipts[0].account, models.PublicAccount), True),
+                lambda x: (x.transaction_statements[0].receipts[0].account.public_key, '346E56F77F07B19D48B3AEF969EDB01F68A5AC9FAF8E5E007577D71BA66385FB'),
+                lambda x: (isinstance(x.transaction_statements[0].receipts[0].mosaic, models.Mosaic), True),
+                lambda x: (x.transaction_statements[0].receipts[0].mosaic.id, models.MosaicId(992621222383397347)),
+                lambda x: (x.transaction_statements[0].receipts[0].mosaic.amount, 0),
+            ]
+        },
+        {
+            'name': 'test_get_diagnostic_server',
+            'response': responses.DIAGNOSTIC_SERVER["Ok"],
+            'params': [],
+            'method': 'get_diagnostic_server',
+            'validation': [
+                lambda x: (isinstance(x, models.BlockchainServerInfo), True),
+                lambda x: (x.rest_version, '1.0.16'),
+                lambda x: (x.sdk_version, '0.7.16'),
+            ]
+        }
     ],
 })
 class TestBlockchainHTTP(harness.TestCase):

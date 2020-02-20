@@ -37,6 +37,7 @@ def load_response(name):
         return data
 
 
+# ACCOUNT
 ACCOUNT_INFO = {
     'Ok': load_response('account_info.json'),
 }
@@ -57,6 +58,54 @@ ACCOUNT_NAMES = {
     'Ok': load_response('account_names.json'),
 }
 
+MULTISIG_INFO = {
+    'Ok': load_response('multisig_info.json'),
+}
+
+MULTISIG_GRAPH_INFO = {
+    'Ok': load_response('multisig_graph_info.json'),
+}
+
+# METADATA
+ACCOUNT_METADATA = {
+    'Ok': load_response('account_metadata.json'),
+}
+
+MOSAIC_METADATA = {
+    'Ok': load_response('mosaic_metadata.json'),
+}
+
+NAMESPACE_METADATA = {
+    'Ok': load_response('namespace_metadata.json'),
+}
+
+METADATA = {
+    'Ok': load_response('metadata.json'),
+}
+
+METADATAS = {
+    'Ok': load_response('metadatas.json'),
+}
+
+# CONFIG
+CONFIG = {
+    'Ok': load_response('config.json'),
+}
+
+UPGRADE = {
+    'Ok': load_response('upgrade.json'),
+}
+
+# Node
+INFO = {
+    'Ok': load_response('node_info.json'),
+}
+
+TIME = {
+    'Ok': load_response('node_time.json'),
+}
+
+# BLOCKCHAIN
 BLOCK_INFO = {
     'Ok': load_response('block_info.json'),
 }
@@ -65,8 +114,20 @@ BLOCKS_INFO = {
     'Ok': load_response('blocks_info.json'),
 }
 
+BLOCK_TRANSACTIONS = {
+    'Ok': load_response('block_transactions.json'),
+}
+
 BLOCK_TRANSACTION_MERKLE = {
     'Ok': load_response('block_transaction_merkle.json'),
+}
+
+BLOCK_RECEIPTS = {
+    'Ok': load_response('block_receipts.json'),
+}
+
+DIAGNOSTIC_SERVER = {
+    'Ok': load_response('diagnostic_server.json'),
 }
 
 CHAIN_HEIGHT = {
@@ -85,6 +146,11 @@ DIAGNOSTIC_STORAGE = {
     'Ok': load_response('diagnostic_storage.json'),
 }
 
+BLOCK_RECEIPTS = {
+    'Ok': load_response('block_receipts.json'),
+}
+
+# MOSAIC
 MOSAIC_INFO = {
     'Ok': load_response('mosaic_info.json'),
 }
@@ -93,14 +159,11 @@ MOSAICS_INFO = {
     'Ok': load_response('mosaics_info.json'),
 }
 
-MULTISIG_GRAPH_INFO = {
-    'Ok': load_response('multisig_graph_info.json'),
+MOSAICS_NAMES = {
+    'Ok': load_response('mosaic_names.json'),
 }
 
-MULTISIG_INFO = {
-    'Ok': load_response('multisig_info.json'),
-}
-
+# NAMESPACE
 NAMESPACE = {
     'nem': load_response('namespace.json'),
 }
@@ -113,10 +176,36 @@ NAMESPACE_NAMES = {
     'nem': load_response('namespace_names.json'),
 }
 
+# NETWORK
 NETWORK_TYPE = {
     'MIJIN_TEST': load_response('mijin_test_network.json'),
 }
 
+# TRANSACTION
+TRANSACTION = {
+    'Ok': load_response('transaction.json'),
+}
+
 TRANSACTIONS = {
     'Ok': load_response('transactions.json'),
+}
+
+TRANSACTION_STATUS = {
+    'Ok': load_response('transaction_status.json'),
+}
+
+TRANSACTION_STATUSES = {
+    'Ok': load_response('transaction_statuses.json'),
+}
+
+ANNOUNCE = {
+    'Ok': load_response('announce.json'),
+}
+
+ANNOUNCE_PARTIAL = {
+    'Ok': load_response('announce_partial.json'),
+}
+
+ANNOUNCE_COSIGNATURE = {
+    'Ok': load_response('announce_cosignature.json'),
 }
