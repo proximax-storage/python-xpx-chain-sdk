@@ -1,41 +1,25 @@
 from xpxchain import client
 from xpxchain import models
 from tests import harness
+from tests import config
 
 
-@harness.http_test_case({
-    'clients': (client.MosaicHTTP, client.AsyncMosaicHTTP),
-    'tests': [
-        {
-            # /mosaic/{mosaicId}
-            'name': 'test_get_mosaic',
-            'params': [models.MosaicId.create_from_hex('0dc67fbe1cad29e3')],
-            'method': 'get_mosaic',
-            'validation': [
-                lambda x: (x.owner.public_key, 'B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF'),
-            ]
-        },
-        {
-            # /mosaic
-            'name': 'test_get_mosaics',
-            'params': [[models.MosaicId.create_from_hex('0dc67fbe1cad29e3')]],
-            'method': 'get_mosaics',
-            'validation': [
-                lambda x: (len(x), 1),
-                lambda x: (x[0].owner.public_key, 'B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF'),
-            ]
-        },
-        {
-            # /mosaic/names
-            'name': 'test_get_mosaic_names',
-            'params': [[models.MosaicId.create_from_hex('0dc67fbe1cad29e3')]],
-            'method': 'get_mosaic_names',
-            'validation': [
-                lambda x: (len(x), 1),
-                lambda x: (x[0].names[0], 'prx.xpx'),
-            ]
-        },
-    ],
-})
 class TestMosaicHttp(harness.TestCase):
-    pass
+    
+    def test_get_mosaic(self):
+        with client.MosaicHTTP(config.ENDPOINT) as http:
+            info = http.get_mosaic(models.MosaicId.create_from_hex('0dc67fbe1cad29e3'))
+            self.assertEqual(isinstance(info, models.MosaicInfo), True)
+    
+    def test_get_mosaics(self):
+        with client.MosaicHTTP(config.ENDPOINT) as http:
+            info = http.get_mosaics([models.MosaicId.create_from_hex('0dc67fbe1cad29e3')])
+            self.assertEqual(len(info), 1)
+            self.assertEqual(isinstance(info[0], models.MosaicInfo), True)
+    
+    def test_get_mosaic_names(self):
+        with client.MosaicHTTP(config.ENDPOINT) as http:
+            info = http.get_mosaic_names([models.MosaicId.create_from_hex('0dc67fbe1cad29e3')])
+            self.assertEqual(len(info), 1),
+            self.assertEqual(isinstance(info[0], models.MosaicName), True)
+            self.assertEqual(info[0].names[0], 'prx.xpx')

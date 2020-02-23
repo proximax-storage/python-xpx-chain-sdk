@@ -1,28 +1,17 @@
 from xpxchain import client
 from xpxchain import models
 from tests import harness
+from tests import config
 
 
-@harness.http_test_case({
-    'clients': (client.ConfigHTTP, client.AsyncConfigHTTP),
-    'tests': [
-        {
-            'name': 'test_get_config',
-            'params': [100, ],
-            'method': 'get_config',
-            'validation': [
-                lambda x: (isinstance(x, models.CatapultConfig), True),
-            ]
-        },
-        {
-            'name': 'test_get_upgrade',
-            'params': [100, ],
-            'method': 'get_upgrade',
-            'validation': [
-                lambda x: (isinstance(x, models.CatapultUpgrade), True),
-            ]
-        },
-    ],
-})
 class TestConfigHttp(harness.TestCase):
-    pass
+    
+    def test_get_config(self):
+        with client.ConfigHTTP(config.ENDPOINT) as http:
+            info = http.get_config(1)
+            self.assertEqual(isinstance(info, models.CatapultConfig), True),
+    
+    def test_get_upgrade(self):
+        with client.ConfigHTTP(config.ENDPOINT) as http:
+            info = http.get_upgrade(1)
+            self.assertEqual(isinstance(info, models.CatapultUpgrade), True),

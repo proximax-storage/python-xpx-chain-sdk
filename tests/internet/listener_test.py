@@ -1,21 +1,16 @@
 from xpxchain import models
+from xpxchain import client
 from tests import harness
+from tests import config
 
-BLOCK_VALIDATOR = [
-    lambda x: (x.channel_name, 'block'),
-    lambda x: (isinstance(x.message, models.BlockInfo), True),
-    lambda x: (x.message.height >= 1, True),
-]
-
-
-@harness.listener_test_case({
-    'tests': [
-        {
-            'name': 'test_new_block',
-            'subscriptions': ['new_block'],
-            'validation': [BLOCK_VALIDATOR],
-        },
-    ],
-})
 class TestListener(harness.TestCase):
-    pass
+    
+    async def test_new_block(self):
+        async with client.Listener(f'{config.ENDPOINT}/ws') as listener:
+            await listener.new_block()
+
+            async for m in listener:
+                self.assertEqual(m.channel_name, 'block')
+                self.assertEqual(isinstance(m.message, models.BlockInfo), True)
+                self.assertEqual(m.message.height >= 1, True)
+                break
