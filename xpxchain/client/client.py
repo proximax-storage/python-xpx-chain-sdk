@@ -7,11 +7,9 @@
 """
 
 from __future__ import annotations
-import contextlib
 import typing
 import urllib.error
 import urllib3
-import warnings
 
 from .. import util
 

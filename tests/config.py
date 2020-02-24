@@ -2,7 +2,6 @@ from xpxchain import models
 from xpxchain import client
 import os
 import requests
-import sys
 
 gen_hash = None
 mosaic_id = None
@@ -12,11 +11,13 @@ nemesis = None
 
 if (not tester):
 
-    ENDPOINT = os.environ.get('SIRIUS_ENDPOINT', '//localhost:3000')
-    FAUCET = os.environ.get('SIRIUS_FAUCET', '')
+    ENDPOINT = os.environ.get('ENDPOINT', '//localhost:3000')
+    FAUCET = os.environ.get('FAUCET', '')
     PRIVATE_KEY = os.environ.get('PRIVATE_KEY', '')
 
-    FUNDS = 10000
+    print(f"Endpoint: '{ENDPOINT}'")
+    if (FAUCET):
+        print(f"Fauce: '{FAUCET}'")
 
     if (not ENDPOINT):
         raise Exception('No endpoint provided.')
@@ -63,16 +64,5 @@ if (not tester):
     print(f"Private key: {account.private_key}")
     print(f" Public key: {account.public_key}")
     print()
-
-    # Checking for sufficient funds
-    with client.AccountHTTP(ENDPOINT) as http:
-        account_info = http.get_account_info(account.address)
-
-        for mosaic in account_info.mosaics:
-            if (mosaic.id == mosaic_id):
-                amount = mosaic.amount / divisibility
-
-                if (amount < FUNDS):
-                    raise Exception(f"Insufficient funds: {amount} < {FUNDS}")
 
     tester = account
