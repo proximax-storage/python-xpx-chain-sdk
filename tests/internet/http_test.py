@@ -29,24 +29,34 @@ class TestT1Http(harness.TestCase):
     t2: typing.Sequence[models.Account]
     t3: typing.Sequence[models.Account]
     t4: typing.Sequence[models.Account]
+    t5: typing.Sequence[models.Account]
+    t6: typing.Sequence[models.Account]
     hashes: typing.Sequence[str] = []
 
     @classmethod
     def setUpClass(cls):
 
+        print("Setting up tests... ", end='')
+
         cls.t1 = [models.Account.generate_new_account(config.network_type, entropy=lambda x: os.urandom(32)) for i in range(2)]
         cls.t2 = [models.Account.generate_new_account(config.network_type, entropy=lambda x: os.urandom(32)) for i in range(19)]
         cls.t3 = [models.Account.generate_new_account(config.network_type, entropy=lambda x: os.urandom(32)) for i in range(3)]
-        cls.t4 = [models.Account.generate_new_account(config.network_type, entropy=lambda x: os.urandom(32)) for i in range(6)]
+        cls.t4 = [models.Account.generate_new_account(config.network_type, entropy=lambda x: os.urandom(32)) for i in range(2)]
+        cls.t5 = [models.Account.generate_new_account(config.network_type, entropy=lambda x: os.urandom(32)) for i in range(3)]
+        cls.t6 = [models.Account.generate_new_account(config.network_type, entropy=lambda x: os.urandom(32)) for i in range(1)]
 
         loop = asyncio.get_event_loop()
         cls.hashes = loop.run_until_complete(helper.prepare(
             [send_funds(config.tester, account, _1) for account in cls.t1]
             + [send_funds(config.tester, account, _10) for account in cls.t2]
             + [send_funds(config.tester, account, _100) for account in cls.t3]
-            + [send_funds(config.tester, account, _10000) for account in cls.t4],
+            + [send_funds(config.tester, account, _10000 + _100) for account in cls.t4]
+            + [send_funds(config.tester, account, 2 * _10000 + _100) for account in cls.t5]
+            + [send_funds(config.tester, account, 3 * _10000 + _100) for account in cls.t6],
             max_run=10
         ))
+
+        print("Done")
 
     # TESTS
 
@@ -203,39 +213,16 @@ class TestT1Http(harness.TestCase):
                 self.assertEqual(tx.modifications[0].value, tx_type)
 
     async def test_register_namespace_transaction(self):
-        alice = self.t4.pop()
+        alice = self.t6.pop()
 
-        namespace_name = 'foo' + hexlify(os.urandom(4)).decode('utf-8')
+        namespace_l1 = 'foo' + hexlify(os.urandom(4)).decode('utf-8')
+        namespace_l2 = 'bar'
+        namespace_name = namespace_l1 + '.' + namespace_l2
 
-        # Create namespace
-        tx = models.RegisterNamespaceTransaction.create_root_namespace(
-            deadline=models.Deadline.create(),
-            network_type=config.network_type,
-            namespace_name=namespace_name,
-            duration=60
-        )
-
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
-
-        tx = await announce(signed_tx)
-        self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
-        self.assertEqual(tx.namespace_name, namespace_name)
-
-        # Create sub namespace
-        tx = models.RegisterNamespaceTransaction.create_sub_namespace(
-            deadline=models.Deadline.create(),
-            network_type=config.network_type,
-            namespace_name='bar',
-            parent_namespace=namespace_name
-        )
-
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
-
-        tx = await announce(signed_tx)
-        self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
-        self.assertEqual(tx.namespace_name, 'bar')
-
-        alices_namespace = namespace_name + ".bar"
+        n1, n2 = await helper.create_namespace(alice, namespace_name)
+        self.assertEqual(n1.name, namespace_l1)
+        self.assertEqual(n2.name, namespace_l2)
+        self.assertEqual(isinstance(n2.parent_id, models.NamespaceId), True)
 
         # Link address alias
         for action_type in [models.AliasActionType.LINK, models.AliasActionType.UNLINK]:
@@ -244,7 +231,7 @@ class TestT1Http(harness.TestCase):
                 network_type=config.network_type,
                 max_fee=1,
                 action_type=action_type,
-                namespace_id=models.NamespaceId(alices_namespace),
+                namespace_id=n2.namespace_id,
                 address=alice.address
             )
 
@@ -255,23 +242,8 @@ class TestT1Http(harness.TestCase):
             self.assertEqual(tx.action_type, action_type)
             self.assertEqual(tx.address, alice.address)
 
-        # Create mosaic
-        nonce = models.MosaicNonce(1)
-        mosaic_id = models.MosaicId.create_from_nonce(nonce, alice)
-
-        tx = models.MosaicDefinitionTransaction.create(
-            deadline=models.Deadline.create(),
-            network_type=config.network_type,
-            nonce=nonce,
-            mosaic_id=mosaic_id,
-            mosaic_properties=models.MosaicProperties(0x3, 3),
-        )
-
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
-
-        tx = await announce(signed_tx)
-        self.assertEqual(isinstance(tx, models.MosaicDefinitionTransaction), True)
-        self.assertEqual(tx.mosaic_id, mosaic_id)
+        mosaic_id = await helper.create_mosaic(alice, 1)
+        self.assertEqual(isinstance(mosaic_id, models.MosaicId), True)
 
         # Link mosaic alias
         for action_type in [models.AliasActionType.LINK, models.AliasActionType.UNLINK]:
@@ -280,7 +252,7 @@ class TestT1Http(harness.TestCase):
                 network_type=config.network_type,
                 max_fee=1,
                 action_type=action_type,
-                namespace_id=models.NamespaceId(alices_namespace),
+                namespace_id=n2.namespace_id,
                 mosaic_id=mosaic_id,
             )
 
@@ -550,39 +522,10 @@ class TestT1Http(harness.TestCase):
             self.assertEqual(isinstance(info, models.MultisigAccountGraphInfo), True)
 
     async def test_account_names(self):
-        alice = self.t4.pop()
+        alice = self.t5.pop()
 
-        namespace_name = 'foo' + hexlify(os.urandom(4)).decode('utf-8')
-
-        # Create namespace
-        tx = models.RegisterNamespaceTransaction.create_root_namespace(
-            deadline=models.Deadline.create(),
-            network_type=config.network_type,
-            namespace_name=namespace_name,
-            duration=60
-        )
-
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
-
-        tx = await announce(signed_tx)
-        self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
-        self.assertEqual(tx.namespace_name, namespace_name)
-
-        # Create sub namespace
-        tx = models.RegisterNamespaceTransaction.create_sub_namespace(
-            deadline=models.Deadline.create(),
-            network_type=config.network_type,
-            namespace_name='bar',
-            parent_namespace=namespace_name
-        )
-
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
-
-        tx = await announce(signed_tx)
-        self.assertEqual(isinstance(tx, models.RegisterNamespaceTransaction), True)
-        self.assertEqual(tx.namespace_name, 'bar')
-
-        namespace_name = namespace_name + ".bar"
+        namespace_name = 'foo' + hexlify(os.urandom(4)).decode('utf-8') + '.bar'
+        n1, n2 = await helper.create_namespace(alice, namespace_name)
 
         # Link address alias
         tx = models.AddressAliasTransaction.create(
@@ -590,7 +533,7 @@ class TestT1Http(harness.TestCase):
             network_type=config.network_type,
             max_fee=1,
             action_type=models.AliasActionType.LINK,
-            namespace_id=models.NamespaceId(namespace_name),
+            namespace_id=n2.namespace_id,
             address=alice.address
         )
 
@@ -917,7 +860,7 @@ class TestT1Http(harness.TestCase):
             self.assertEqual(tx.modifications[0].field.value, 'bar')
 
     async def test_modify_namespace_metadata_transaction(self):
-        alice = self.t4.pop()
+        alice = self.t5.pop()
 
         namespace = 'foo' + hexlify(os.urandom(4)).decode('utf-8') + ".bar"
         await helper.create_namespace(alice, namespace)
@@ -1032,7 +975,7 @@ class TestT1Http(harness.TestCase):
             self.assertEqual(reply[0].metadata.flds[1], self.modifications[1].field)
 
     async def test_namespace_metadata(self):
-        alice = self.t4.pop()
+        alice = self.t5.pop()
 
         self.namespace = 'foo' + hexlify(os.urandom(4)).decode('utf-8') + ".bar"
         await helper.create_namespace(alice, self.namespace)

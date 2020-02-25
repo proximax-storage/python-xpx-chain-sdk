@@ -2,6 +2,7 @@
 from xpxchain import client
 from xpxchain import models
 from xpxchain import util
+from xpxchain import errors
 from tests import config
 import asyncio
 
@@ -18,7 +19,7 @@ async def announce(tx):
 
         async for m in listener:
             if ((m.channel_name == 'status') and (m.message.hash == tx.hash.upper())):
-                raise Exception(m.message)
+                raise errors.TransactionError(m.message)
             elif ((m.channel_name == 'confirmedAdded') and (m.message.transaction_info.hash == tx.hash.upper())):
                 return m.message
 
@@ -35,7 +36,7 @@ async def announce_partial(tx):
 
         async for m in listener:
             if ((m.channel_name == 'status') and (m.message.hash == tx.hash.upper())):
-                raise Exception(m.message)
+                raise errors.TransactionError(m.message)
             elif ((m.channel_name == 'partialAdded') and (m.message.transaction_info.hash == tx.hash.upper())):
                 return m.message
 
@@ -52,12 +53,12 @@ async def announce_cosignature(tx):
 
         async for m in listener:
             if ((m.channel_name == 'status') and (m.message.hash == tx.hash.upper())):
-                raise Exception(m.message)
+                raise errors.TransactionError(m.message)
             elif ((m.channel_name == 'confirmedAdded') and (m.message.transaction_info.hash == tx.parent_hash.upper())):
                 return m.message
 
 
-async def send_funds(sender, recipient, amount, quiet=False):
+async def send_funds(sender, recipient, amount, quiet=True):
     tx = models.TransferTransaction.create(
         deadline=models.Deadline.create(),
         recipient=recipient.address,
@@ -80,10 +81,15 @@ async def prepare(plan, max_run=100):
 
     while (aws):
         done, pending = await asyncio.wait(aws, return_when=asyncio.FIRST_COMPLETED)
+
         aws = []
 
         for task in done:
-            tx = task.result()
+            try:
+                tx = task.result()
+            except errors.TransactionError as e:
+                print(f"Error transaction {e.hash}: {e}")
+
             hashes.append(tx.transaction_info.hash)
 
         for task in pending:
@@ -99,31 +105,37 @@ async def prepare(plan, max_run=100):
 
 
 async def create_namespace(account, namespace):
-    namespace = namespace.split(".")
+    namespace_name = namespace.split(".")
 
     tx = models.RegisterNamespaceTransaction.create_root_namespace(
         deadline=models.Deadline.create(),
         network_type=config.network_type,
-        namespace_name=namespace[0],
+        namespace_name=namespace_name[0],
         duration=60
     )
 
     signed_tx = tx.sign_with(account, config.gen_hash)
 
     tx = await announce(signed_tx)
+    n1 = models.NamespaceName(tx.namespace_id, tx.namespace_name)
 
-    if (len(namespace) > 1):
+    if (len(namespace_name) > 1):
         # Create sub namespace
         tx = models.RegisterNamespaceTransaction.create_sub_namespace(
             deadline=models.Deadline.create(),
             network_type=config.network_type,
-            namespace_name=namespace[1],
-            parent_namespace=namespace[0]
+            namespace_name=namespace_name[1],
+            parent_namespace=namespace_name[0]
         )
 
         signed_tx = tx.sign_with(account, config.gen_hash)
 
         tx = await announce(signed_tx)
+        n2 = models.NamespaceName(tx.namespace_id, tx.namespace_name, n1.namespace_id)
+
+        return n1, n2
+
+    return n1
 
 
 async def create_mosaic(account, nonce):

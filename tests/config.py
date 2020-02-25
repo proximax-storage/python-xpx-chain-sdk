@@ -15,9 +15,10 @@ if (not tester):
     FAUCET = os.environ.get('FAUCET', '')
     PRIVATE_KEY = os.environ.get('PRIVATE_KEY', '')
 
+    print()
     print(f"Endpoint: '{ENDPOINT}'")
     if (FAUCET):
-        print(f"Fauce: '{FAUCET}'")
+        print(f"  Faucet: '{FAUCET}'")
 
     if (not ENDPOINT):
         raise Exception('No endpoint provided.')
