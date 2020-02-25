@@ -66,7 +66,7 @@ async def send_funds(sender, recipient, amount, quiet=True):
         network_type=config.network_type,
     )
 
-    signed_tx = tx.sign_with(sender, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+    signed_tx = tx.sign_with(sender, config.gen_hash)
 
     if (not quiet):
         print(f"Sending funds to {recipient.address.address} {signed_tx.hash}")
@@ -150,7 +150,7 @@ async def create_mosaic(account, nonce):
         mosaic_properties=models.MosaicProperties(0x3, 3),
     )
 
-    signed_tx = tx.sign_with(account, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+    signed_tx = tx.sign_with(account, config.gen_hash)
 
     tx = await announce(signed_tx)
 

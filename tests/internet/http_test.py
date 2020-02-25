@@ -36,7 +36,7 @@ class TestT1Http(harness.TestCase):
     @classmethod
     def setUpClass(cls):
 
-        print("Setting up tests... ", end='')
+        print("Setting up tests... ")
 
         cls.t1 = [models.Account.generate_new_account(config.network_type, entropy=lambda x: os.urandom(32)) for i in range(2)]
         cls.t2 = [models.Account.generate_new_account(config.network_type, entropy=lambda x: os.urandom(32)) for i in range(19)]
@@ -55,8 +55,6 @@ class TestT1Http(harness.TestCase):
             + [send_funds(config.tester, account, 3 * _10000 + _100) for account in cls.t6],
             max_run=10
         ))
-
-        print("Done")
 
     # TESTS
 
@@ -104,7 +102,7 @@ class TestT1Http(harness.TestCase):
             message=message
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.TransferTransaction), True)
@@ -122,7 +120,7 @@ class TestT1Http(harness.TestCase):
             network_type=config.network_type,
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AccountLinkTransaction), True)
@@ -136,7 +134,7 @@ class TestT1Http(harness.TestCase):
             network_type=config.network_type,
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AccountLinkTransaction), True)
@@ -157,7 +155,7 @@ class TestT1Http(harness.TestCase):
                     modifications=[models.AccountPropertyModification(modification_type, bob.address)]
                 )
 
-                signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+                signed_tx = tx.sign_with(alice, config.gen_hash)
 
                 tx = await announce(signed_tx)
                 self.assertEqual(isinstance(tx, models.ModifyAccountPropertyAddressTransaction), True)
@@ -179,7 +177,7 @@ class TestT1Http(harness.TestCase):
                     modifications=[models.AccountPropertyModification(modification_type, config.mosaic_id)]
                 )
 
-                signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+                signed_tx = tx.sign_with(alice, config.gen_hash)
 
                 tx = await announce(signed_tx)
                 self.assertEqual(isinstance(tx, models.ModifyAccountPropertyMosaicTransaction), True)
@@ -203,7 +201,7 @@ class TestT1Http(harness.TestCase):
                     modifications=[models.AccountPropertyModification(modification_type, tx_type)]
                 )
 
-                signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+                signed_tx = tx.sign_with(alice, config.gen_hash)
 
                 tx = await announce(signed_tx)
                 self.assertEqual(isinstance(tx, models.ModifyAccountPropertyEntityTypeTransaction), True)
@@ -235,7 +233,7 @@ class TestT1Http(harness.TestCase):
                 address=alice.address
             )
 
-            signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+            signed_tx = tx.sign_with(alice, config.gen_hash)
 
             tx = await announce(signed_tx)
             self.assertEqual(isinstance(tx, models.AddressAliasTransaction), True)
@@ -256,7 +254,7 @@ class TestT1Http(harness.TestCase):
                 mosaic_id=mosaic_id,
             )
 
-            signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+            signed_tx = tx.sign_with(alice, config.gen_hash)
 
             tx = await announce(signed_tx)
             self.assertEqual(isinstance(tx, models.MosaicAliasTransaction), True)
@@ -282,7 +280,7 @@ class TestT1Http(harness.TestCase):
             recipient=bob.address,
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.SecretLockTransaction), True)
@@ -298,7 +296,7 @@ class TestT1Http(harness.TestCase):
             recipient=bob.address,
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.SecretProofTransaction), True)
@@ -329,7 +327,7 @@ class TestT1Http(harness.TestCase):
             network_type=config.network_type,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(alice, config.gen_hash, [bob], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_transaction_with_cosignatories(alice, config.gen_hash, [bob])
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
@@ -361,7 +359,7 @@ class TestT1Http(harness.TestCase):
             network_type=config.network_type,
         )
 
-        signed_bonded = bonded.sign_transaction_with_cosignatories(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_bonded = bonded.sign_transaction_with_cosignatories(alice, config.gen_hash)
 
         lock = models.LockFundsTransaction.create(
             deadline=models.Deadline.create(),
@@ -371,7 +369,7 @@ class TestT1Http(harness.TestCase):
             signed_transaction=signed_bonded,
         )
 
-        signed_lock = lock.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_lock = lock.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_lock)
         self.assertEqual(isinstance(tx, models.LockFundsTransaction), True)
@@ -412,7 +410,7 @@ class TestT1Http(harness.TestCase):
             network_type=config.network_type,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(multisig, config.gen_hash, [alice, bob], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_transaction_with_cosignatories(multisig, config.gen_hash, [alice, bob])
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
@@ -430,7 +428,7 @@ class TestT1Http(harness.TestCase):
             network_type=config.network_type,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(alice, config.gen_hash, [bob], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_transaction_with_cosignatories(alice, config.gen_hash, [bob])
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
@@ -457,7 +455,7 @@ class TestT1Http(harness.TestCase):
             network_type=config.network_type,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(multisig, config.gen_hash, [alice, bob], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_transaction_with_cosignatories(multisig, config.gen_hash, [alice, bob])
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
@@ -490,7 +488,7 @@ class TestT1Http(harness.TestCase):
             network_type=config.network_type,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(multisig, config.gen_hash, [alice, bob], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_transaction_with_cosignatories(multisig, config.gen_hash, [alice, bob])
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
@@ -512,7 +510,7 @@ class TestT1Http(harness.TestCase):
             network_type=config.network_type,
         )
 
-        signed_tx = tx.sign_transaction_with_cosignatories(multisig2, config.gen_hash, [alice, bob, mike], fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_transaction_with_cosignatories(multisig2, config.gen_hash, [alice, bob, mike])
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
@@ -537,7 +535,7 @@ class TestT1Http(harness.TestCase):
             address=alice.address
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AddressAliasTransaction), True)
@@ -597,7 +595,7 @@ class TestT1Http(harness.TestCase):
             modifications=[models.AccountPropertyModification(models.PropertyModificationType.ADD, bob.address)]
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
 
@@ -609,7 +607,7 @@ class TestT1Http(harness.TestCase):
             modifications=[models.AccountPropertyModification(models.PropertyModificationType.ADD, config.mosaic_id)]
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
 
@@ -621,7 +619,7 @@ class TestT1Http(harness.TestCase):
             modifications=[models.AccountPropertyModification(models.PropertyModificationType.ADD, bob.address)]
         )
 
-        signed_tx = tx.sign_with(pete, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(pete, config.gen_hash)
 
         tx = await announce(signed_tx)
 
@@ -633,7 +631,7 @@ class TestT1Http(harness.TestCase):
             modifications=[models.AccountPropertyModification(models.PropertyModificationType.ADD, config.mosaic_id)]
         )
 
-        signed_tx = tx.sign_with(pete, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(pete, config.gen_hash)
 
         tx = await announce(signed_tx)
 
@@ -645,7 +643,7 @@ class TestT1Http(harness.TestCase):
             modifications=[models.AccountPropertyModification(models.PropertyModificationType.ADD, models.TransactionType.AGGREGATE_COMPLETE)]
         )
 
-        signed_tx = tx.sign_with(pete, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(pete, config.gen_hash)
 
         tx = await announce(signed_tx)
 
@@ -823,7 +821,7 @@ class TestT1Http(harness.TestCase):
                 ],
             )
 
-            signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+            signed_tx = tx.sign_with(alice, config.gen_hash)
 
             tx = await announce(signed_tx)
             self.assertEqual(isinstance(tx, models.ModifyAccountMetadataTransaction), True)
@@ -850,7 +848,7 @@ class TestT1Http(harness.TestCase):
                 ],
             )
 
-            signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+            signed_tx = tx.sign_with(alice, config.gen_hash)
 
             tx = await announce(signed_tx)
             self.assertEqual(isinstance(tx, models.ModifyMosaicMetadataTransaction), True)
@@ -879,7 +877,7 @@ class TestT1Http(harness.TestCase):
                 ],
             )
 
-            signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+            signed_tx = tx.sign_with(alice, config.gen_hash)
 
             tx = await announce(signed_tx)
             self.assertEqual(isinstance(tx, models.ModifyNamespaceMetadataTransaction), True)
@@ -904,7 +902,7 @@ class TestT1Http(harness.TestCase):
             modifications=self.modifications,
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
 
@@ -948,7 +946,7 @@ class TestT1Http(harness.TestCase):
             modifications=self.modifications,
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
 
@@ -993,7 +991,7 @@ class TestT1Http(harness.TestCase):
             modifications=self.modifications,
         )
 
-        signed_tx = tx.sign_with(alice, config.gen_hash, fee_strategy=util.FeeCalculationStrategy.MEDIUM)
+        signed_tx = tx.sign_with(alice, config.gen_hash)
 
         tx = await announce(signed_tx)
 

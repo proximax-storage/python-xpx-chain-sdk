@@ -179,7 +179,7 @@ class AggregateTransaction(Transaction):
         initiator: Account,
         gen_hash: typing.AnyStr,
         cosignatories: typing.Optional[typing.Sequence[Account]] = None,
-        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO,
+        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.MEDIUM,
     ) -> SignedTransaction:
         """
         Sign transaction with cosignatories.
