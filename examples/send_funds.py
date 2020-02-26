@@ -2,10 +2,11 @@
 
 from xpxchain import models
 from xpxchain import client
-from xpxchain import util
+from xpxchain import errors
 
 import requests
 import asyncio
+import sys
 
 nodes = [
     "bctestnet1.brimstone.xpxsirius.io:3000",
@@ -14,25 +15,34 @@ nodes = [
 ]
 
 # Choosing one of the endpoints
-endpoint = nodes[0]
-    
+endpoint = nodes[0]    
 
-async def listen(account):
+async def announce(tx):
+    address = models.PublicAccount.create_from_public_key(tx.signer, tx.network_type).address
+
     # Create listener and subscribe to confirmed / unconfirmed transactions and error status
+    # Subscription should occur prior to announcing the transaction
     async with client.Listener(f'{endpoint}/ws') as listener:
-        await listener.confirmed(account.address)
-        await listener.status(account.address)
-        await listener.unconfirmed_added(account.address)
+        await listener.confirmed(address)
+        await listener.status(address)
+        await listener.unconfirmed_added(address)
 
+        # Announce the transaction to the network
+        print(f"Sending {amount} XPX to {bob.address.address}\n")
+        with client.TransactionHTTP(endpoint) as http:
+            http.announce(tx)
+
+        # Listener gets all messages regarding the address given but we care only
+        # about our transaciton
         async for m in listener:
-            if (m.channel_name == 'status'):
+            if ((m.channel_name == 'status') and (m.message.hash == tx.hash.upper())):
                 # An error occured and the transaction was rejected by the node
-                raise Exception(m.message.status)
-            elif (m.channel_name == 'unconfirmedAdded'):
+                raise errors.TransactionError(m.message)
+            elif ((m.channel_name == 'unconfirmedAdded') and (m.message.transaction_info.hash == tx.hash.upper())):
                 # The transaction was accepted by the node and is about to be included in a block
                 print(f"Unconfirmed transaction {m.message.transaction_info.hash}")
                 print("Waiting for confirmation\n")
-            elif (m.channel_name == 'confirmedAdded'):
+            elif ((m.channel_name == 'confirmedAdded') and (m.message.transaction_info.hash == tx.hash.upper())):
                 # The transaction was included in a block
                 return m.message
 
@@ -81,18 +91,24 @@ with client.NamespaceHTTP(endpoint) as http:
 with client.MosaicHTTP(endpoint) as http:
     xpx = http.get_mosaic(namespace_info.alias.value)
 
-# Generate two random accounts: Alice and Bob
-alice = models.Account.generate_new_account(network_type)
+# Generate Alice's account. If we have a private key, use it. Otherwise generate a new account and ask
+# the faucet for test XPX
+if (len(sys.argv) > 1):
+    alice = models.Account.create_from_private_key(sys.argv[1], network_type)
+else:
+    alice = models.Account.generate_new_account(network_type)
+
+    # Ask for test XPX from the faucet
+    print(f"Requesting test XPX for {alice.address.address}")
+    reply = requests.get(f"https://bctestnetfaucet.xpxsirius.io/api/faucet/GetXpx/{alice.address.address}").json()
+    print(f"{reply}\n")
+
+# Generate Bob's account
 bob = models.Account.generate_new_account(network_type)
 
 # Print their addresses, private and public keys
 print_account_info(alice)
 print_account_info(bob)
-
-# Ask for test XPX from the faucet
-print(f"Requesting test XPX for {alice.address.address}")
-reply = requests.get(f"https://bctestnetfaucet.xpxsirius.io/api/faucet/GetXpx/{alice.address.address}").json()
-print(f"{reply}\n")
 
 amount = 1
 
@@ -107,18 +123,13 @@ tx = models.TransferTransaction.create(
 # Sign the transaction with Alice's account
 signed_tx = tx.sign_with(
     account=alice, 
-    gen_hash=block_info.generation_hash, 
-    fee_strategy=util.FeeCalculationStrategy.MEDIUM
+    gen_hash=block_info.generation_hash
 )
 
-# Announce the transaction to the blockchain
-print(f"Sending {amount} XPX to {bob.address.address}\n")
-with client.TransactionHTTP(endpoint) as http:
-    http.announce(signed_tx)
+# We run announce() as an asynchronous function because it uses Listener that comes
+# only in async implementation
+result = asyncio.run(announce(signed_tx))
 
-# Create event loop for asynchronous listener
-loop = asyncio.get_event_loop()
-result = loop.run_until_complete(listen(alice))
 print(f"Confirmed transaction {result.transaction_info.hash}\n")
 
 # Print resulting account balances
