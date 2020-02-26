@@ -495,7 +495,7 @@ def model_test_catbuffer(self):
     encoded = util.encode_hex(self.catbuffer)
     decoded = util.decode_hex(self.catbuffer)
     self.maxDiff = 2048
-    self.assertEqual(util.hexlify(self.model.to_catbuffer(nt)), encoded)
+    self.assertEqual(util.hexlify(self.model.to_catbuffer(nt, fee_strategy=util.FeeCalculationStrategy.ZERO)), encoded)
     self.assertEqual(self.model, self.type.create_from_catbuffer(decoded, nt))
 
 
@@ -603,7 +603,8 @@ def transaction_test_sign_with(self):
     signer = models.Account.create_from_private_key(private_key, self.network_type)
 
     # Sign transaction and check signed data.
-    signed_transaction = self.model.sign_with(signer, self.extras['gen_hash'])
+    print(f"STRATEGY {self.extras['fee_strategy']}")
+    signed_transaction = self.model.sign_with(signer, self.extras['gen_hash'], fee_strategy=self.extras['fee_strategy'])
     self.maxDiff = 2048
     self.assertEqual(signed_transaction.payload, self.extras['signed']['payload'])
     self.assertEqual(signed_transaction.hash, self.extras['signed']['hash'])

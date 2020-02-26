@@ -127,7 +127,7 @@ class TestAccountPropertyTransaction(harness.TestCase):
             modifications=modifications,
             network_type=self.network_type,
         )
-        catbuffer = util.hexlify(model.to_catbuffer(self.network_type))
+        catbuffer = util.hexlify(model.to_catbuffer(self.network_type, fee_strategy=util.FeeCalculationStrategy.ZERO))
         self.assertEqual(catbuffer, '960000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100009050410000000000000000683d8c8b15000000010100902891202271567a65166877a647d8a5ffd3bbe630ab925e46')
 
     def test_create_mosaic_property_modification_transaction(self):
@@ -140,7 +140,7 @@ class TestAccountPropertyTransaction(harness.TestCase):
             modifications=modifications,
             network_type=self.network_type,
         )
-        catbuffer = util.hexlify(model.to_catbuffer(self.network_type))
+        catbuffer = util.hexlify(model.to_catbuffer(self.network_type, fee_strategy=util.FeeCalculationStrategy.ZERO))
         self.maxDiff = 2048
         self.assertEqual(catbuffer, '850000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100009050420000000000000000683d8c8b1500000002010055a9be17159a696c')
 
@@ -154,7 +154,7 @@ class TestAccountPropertyTransaction(harness.TestCase):
             modifications=modifications,
             network_type=self.network_type,
         )
-        catbuffer = util.hexlify(model.to_catbuffer(self.network_type))
+        catbuffer = util.hexlify(model.to_catbuffer(self.network_type, fee_strategy=util.FeeCalculationStrategy.ZERO))
         self.maxDiff = 2048
         self.assertEqual(catbuffer, '7f0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100009050430000000000000000683d8c8b150000000401004841')
 
@@ -279,7 +279,7 @@ class TestAliasTransaction(harness.TestCase):
         )
         catbuffer = '9c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000904e420000000000000000683d8c8b15000000004471f4e23b4cb68890fa39ec47e05600afa74308a7ea607d145e371b5f4f1447bc'
         self.maxDiff = 2048
-        self.assertEqual(catbuffer, util.hexlify(model.to_catbuffer(network_type)))
+        self.assertEqual(catbuffer, util.hexlify(model.to_catbuffer(network_type, fee_strategy=util.FeeCalculationStrategy.ZERO)))
 
     def test_create_for_mosaic(self):
         network_type = models.NetworkType.MIJIN_TEST
@@ -293,7 +293,7 @@ class TestAliasTransaction(harness.TestCase):
         )
         catbuffer = '8b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000904e430000000000000000683d8c8b15000000004471f4e23b4cb688a6c03b484fd6f72f'
         self.maxDiff = 2048
-        self.assertEqual(catbuffer, util.hexlify(model.to_catbuffer(network_type)))
+        self.assertEqual(catbuffer, util.hexlify(model.to_catbuffer(network_type, fee_strategy=util.FeeCalculationStrategy.ZERO)))
 
 
 @harness.model_test_case({

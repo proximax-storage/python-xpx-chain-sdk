@@ -127,6 +127,7 @@ class MosaicNonce(util.Model):
     def to_catbuffer(
         self,
         network_type: OptionalNetworkType = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.MEDIUM,
     ) -> bytes:
         return util.u32_to_catbuffer(int(self))
 

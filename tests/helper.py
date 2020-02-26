@@ -1,7 +1,6 @@
 
 from xpxchain import client
 from xpxchain import models
-from xpxchain import util
 from xpxchain import errors
 from tests import config
 import asyncio

@@ -106,6 +106,7 @@ class MultisigCosignatoryModification(util.Model):
     def to_catbuffer(
         self,
         network_type: OptionalNetworkType = None,
+        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.MEDIUM,
     ) -> bytes:
         type = self.type.to_catbuffer(network_type)
         cosignatory = util.unhexlify(self.cosignatory_public_account.public_key)

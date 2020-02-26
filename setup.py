@@ -173,4 +173,8 @@ setuptools.setup(
     maintainer_email=MAINTAINER_EMAIL,
     url=URL,
     license=LICENSE,
+    keywords=['ProximaX', 'XPX', 'Sirius', 'Catapult', 'Blockchain'],
+    classifiers=[
+        'Programming Language :: Python :: 3.7',
+    ]
 )

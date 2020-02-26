@@ -5,7 +5,6 @@ from tests import config
 import binascii
 import hashlib
 import os
-from xpxchain import util
 from binascii import hexlify
 import typing
 import asyncio

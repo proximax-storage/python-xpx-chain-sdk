@@ -286,6 +286,7 @@ class MosaicDefinitionProperties(util.Model):
     def to_catbuffer(
         self,
         network_type: OptionalNetworkType = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.MEDIUM,
     ) -> bytes:
         # Serialize the required properties.
         flags = util.u8_to_catbuffer(self.model.flags)
