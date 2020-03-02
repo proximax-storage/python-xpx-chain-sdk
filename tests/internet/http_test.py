@@ -58,13 +58,13 @@ class TestT1Http(harness.TestCase):
     # TESTS
 
     def test_get_transaction(self):
-        with client.TransactionHTTP(config.ENDPOINT) as http:
+        with client.TransactionHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             reply = http.get_transaction(self.hashes[0])
             self.assertEqual(isinstance(reply, models.TransferTransaction), True)
             self.assertEqual(reply.transaction_info.hash, self.hashes[0])
 
     def test_get_transactions(self):
-        with client.TransactionHTTP(config.ENDPOINT) as http:
+        with client.TransactionHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             reply = http.get_transactions(self.hashes[:2])
             self.assertEqual(len(reply), len(self.hashes[:2]))
             self.assertEqual(isinstance(reply[0], models.TransferTransaction), True)
@@ -72,13 +72,13 @@ class TestT1Http(harness.TestCase):
                 self.assertEqual(tx.transaction_info.hash in self.hashes, True)
 
     def test_get_transaction_status(self):
-        with client.TransactionHTTP(config.ENDPOINT) as http:
+        with client.TransactionHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             reply = http.get_transaction_status(self.hashes[0])
             self.assertEqual(isinstance(reply, models.TransactionStatus), True)
             self.assertEqual(reply.hash, self.hashes[0])
 
     def test_get_transaction_statuses(self):
-        with client.TransactionHTTP(config.ENDPOINT) as http:
+        with client.TransactionHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             reply = http.get_transaction_statuses(self.hashes[:2])
             self.assertEqual(len(reply), len(self.hashes[:2]))
             self.assertEqual(isinstance(reply[0], models.TransactionStatus), True)
@@ -376,7 +376,7 @@ class TestT1Http(harness.TestCase):
         tx = await announce_partial(signed_bonded)
         self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
 
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             reply = http.aggregate_bonded_transactions(bob)
             self.assertEqual(isinstance(reply[0], models.Transaction), True)
             self.assertEqual(isinstance(reply[0], models.AggregateTransaction), True)
@@ -459,7 +459,7 @@ class TestT1Http(harness.TestCase):
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
 
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_multisig_account_info(multisig.address)
             self.assertEqual(isinstance(info, models.MultisigAccountInfo), True)
 
@@ -514,7 +514,7 @@ class TestT1Http(harness.TestCase):
         tx = await announce(signed_tx)
         self.assertEqual(isinstance(tx, models.AggregateTransaction), True)
 
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_multisig_account_graph_info(multisig.address)
             self.assertEqual(isinstance(info, models.MultisigAccountGraphInfo), True)
 
@@ -541,7 +541,7 @@ class TestT1Http(harness.TestCase):
         self.assertEqual(tx.action_type, models.AliasActionType.LINK)
         self.assertEqual(tx.address, alice.address)
 
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_account_names([alice.address])
             self.assertEqual(len(info), 1)
             self.assertEqual(isinstance(info[0], models.AccountNames), True)
@@ -551,7 +551,7 @@ class TestT1Http(harness.TestCase):
     async def test_account_transactions(self):
         alice = self.t1.pop()
 
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.transactions(alice)
             self.assertEqual(len(info), 1)
             self.assertEqual(len(info[0].mosaics), 1)
@@ -561,7 +561,7 @@ class TestT1Http(harness.TestCase):
     async def test_incoming_transactions(self):
         alice = self.t1.pop()
 
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.incoming_transactions(alice)
             self.assertEqual(len(info), 1)
             self.assertEqual(len(info[0].mosaics), 1)
@@ -574,7 +574,7 @@ class TestT1Http(harness.TestCase):
 
         await send_funds(alice, bob, _1, quiet=True)
 
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.outgoing_transactions(alice)
             self.assertEqual(len(info), 1)
             self.assertEqual(len(info[0].mosaics), 1)
@@ -646,7 +646,7 @@ class TestT1Http(harness.TestCase):
 
         tx = await announce(signed_tx)
 
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_account_properties(alice.address)
             self.assertEqual(len(info.properties), 3)
             self.assertEqual(info.properties[0].property_type, models.PropertyType.ALLOW_ADDRESS)
@@ -702,7 +702,7 @@ class TestT1Http(harness.TestCase):
         alice = self.t2.pop()
 
         # TODO: Add bonded transaction
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.aggregate_bonded_transactions(alice)
             self.assertEqual(len(info), 0)
 
@@ -710,23 +710,23 @@ class TestT1Http(harness.TestCase):
         alice = self.t2.pop()
 
         # TODO: Add unconfirmed transaction
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.unconfirmed_transactions(alice)
             self.assertEqual(len(info), 0)
 
     async def test_get_account_info(self):
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_account_info(config.tester.address)
             self.assertEqual(info.public_key, config.tester.public_key.upper()),
 
     async def test_get_accountis_info(self):
-        with client.AccountHTTP(config.ENDPOINT) as http:
+        with client.AccountHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_accounts_info([config.tester.address])
             self.assertEqual(len(info), 1)
             self.assertEqual(info[0].public_key, config.tester.public_key.upper())
 
     def test_get_merkle_by_hash_in_block(self):
-        with client.BlockchainHTTP(config.ENDPOINT) as http:
+        with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             reply = http.get_block_transactions(1)
             tx_hash = reply[0].transaction_info.hash
 
@@ -736,25 +736,25 @@ class TestT1Http(harness.TestCase):
             self.assertEqual(isinstance(info.merkle_path[0], models.MerklePathItem), True)
 
     def test_get_blocks_by_height_with_limit(self):
-        with client.BlockchainHTTP(config.ENDPOINT) as http:
+        with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_blocks_by_height_with_limit(25, 25)
             self.assertEqual(len(info), 25)
             self.assertEqual(isinstance(info[0], models.BlockInfo), True)
 
     def test_get_block_by_height(self):
-        with client.BlockchainHTTP(config.ENDPOINT) as http:
+        with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_block_by_height(25)
             self.assertEqual(isinstance(info, models.BlockInfo), True)
 
     def test_get_block_transactions(self):
-        with client.BlockchainHTTP(config.ENDPOINT) as http:
+        with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_block_transactions(1)
             self.assertEqual(len(info) > 0, True)
             self.assertEqual(isinstance(info[0], models.Transaction), True)
             self.assertEqual(info[0].signer.public_key, config.nemesis.public_key.upper())
 
     def test_get_block_receipts(self):
-        with client.BlockchainHTTP(config.ENDPOINT) as http:
+        with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_block_receipts(25)
             self.assertEqual(isinstance(info, models.Statements), True)
             self.assertEqual(len(info.transaction_statements), 1)
@@ -763,38 +763,38 @@ class TestT1Http(harness.TestCase):
             self.assertEqual(isinstance(info.transaction_statements[0].receipts[0], models.BalanceChangeReceipt), True)
 
     def test_get_diagnostic_storage(self):
-        with client.BlockchainHTTP(config.ENDPOINT) as http:
+        with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_diagnostic_storage()
             self.assertEqual(isinstance(info, models.BlockchainStorageInfo), True)
 
     def test_get_diagnostic_server(self):
-        with client.BlockchainHTTP(config.ENDPOINT) as http:
+        with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_diagnostic_server()
             self.assertEqual(isinstance(info, models.BlockchainServerInfo), True)
 
     def test_get_blockchain_height(self):
-        with client.BlockchainHTTP(config.ENDPOINT) as http:
+        with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_blockchain_height()
             self.assertEqual(isinstance(info, int), True)
             self.assertEqual(info >= 1, True)
 
     def test_get_blockchain_score(self):
-        with client.BlockchainHTTP(config.ENDPOINT) as http:
+        with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_blockchain_score()
             self.assertEqual(isinstance(info, models.BlockchainScore), True)
 
     def test_get_config(self):
-        with client.ConfigHTTP(config.ENDPOINT) as http:
+        with client.ConfigHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_config(1)
             self.assertEqual(isinstance(info, models.CatapultConfig), True)
 
     def test_get_upgrade(self):
-        with client.ConfigHTTP(config.ENDPOINT) as http:
+        with client.ConfigHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_upgrade(1)
             self.assertEqual(isinstance(info, models.CatapultUpgrade), True)
 
     async def test_new_block(self):
-        async with client.Listener(f'{config.ENDPOINT}/ws') as listener:
+        async with client.Listener(f'{config.ENDPOINT}/ws', network_type=config.network_type) as listener:
             await listener.new_block()
 
             async for m in listener:
@@ -905,7 +905,7 @@ class TestT1Http(harness.TestCase):
 
         tx = await announce(signed_tx)
 
-        with client.MetadataHTTP(config.ENDPOINT) as http:
+        with client.MetadataHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             reply = http.get_account_metadata(alice)
             self.assertEqual(isinstance(reply, models.AddressMetadataInfo), True)
             self.assertEqual(len(reply.metadata.flds), 2)
@@ -949,7 +949,7 @@ class TestT1Http(harness.TestCase):
 
         tx = await announce(signed_tx)
 
-        with client.MetadataHTTP(config.ENDPOINT) as http:
+        with client.MetadataHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             reply = http.get_mosaic_metadata(mosaic_id)
             self.assertEqual(isinstance(reply, models.MosaicMetadataInfo), True)
             self.assertEqual(len(reply.metadata.flds), 2)
@@ -994,7 +994,7 @@ class TestT1Http(harness.TestCase):
 
         tx = await announce(signed_tx)
 
-        with client.MetadataHTTP(config.ENDPOINT) as http:
+        with client.MetadataHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             reply = http.get_namespace_metadata(models.NamespaceId(self.namespace))
             self.assertEqual(isinstance(reply, models.NamespaceMetadataInfo), True)
             self.assertEqual(len(reply.metadata.flds), 2)
@@ -1017,58 +1017,58 @@ class TestT1Http(harness.TestCase):
             self.assertEqual(reply[0].metadata.flds[1], self.modifications[1].field)
 
     def test_get_mosaic(self):
-        with client.MosaicHTTP(config.ENDPOINT) as http:
+        with client.MosaicHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_mosaic(config.mosaic_id)
             self.assertEqual(isinstance(info, models.MosaicInfo), True)
 
     def test_get_mosaics(self):
-        with client.MosaicHTTP(config.ENDPOINT) as http:
+        with client.MosaicHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_mosaics([config.mosaic_id])
             self.assertEqual(len(info), 1)
             self.assertEqual(isinstance(info[0], models.MosaicInfo), True)
 
     def test_get_mosaic_names(self):
-        with client.MosaicHTTP(config.ENDPOINT) as http:
+        with client.MosaicHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_mosaic_names([config.mosaic_id])
             self.assertEqual(len(info), 1),
             self.assertEqual(isinstance(info[0], models.MosaicName), True)
             self.assertEqual(info[0].names[0], 'prx.xpx')
 
     def test_get_namespace(self):
-        with client.NamespaceHTTP(config.ENDPOINT) as http:
+        with client.NamespaceHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_namespace(models.NamespaceId('prx.xpx'))
             self.assertEqual(isinstance(info, models.NamespaceInfo), True)
             self.assertEqual(info.owner.public_key, config.nemesis.public_key.upper())
 
     def test_get_namespaces_from_account(self):
-        with client.NamespaceHTTP(config.ENDPOINT) as http:
+        with client.NamespaceHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_namespaces_from_account(config.nemesis.address)
             self.assertEqual(len(info) > 0, True)
             self.assertEqual(isinstance(info[0], models.NamespaceInfo), True)
 
     def test_get_namespaces_from_accounts(self):
-        with client.NamespaceHTTP(config.ENDPOINT) as http:
+        with client.NamespaceHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_namespaces_from_accounts([config.nemesis.address])
             self.assertEqual(len(info) > 0, True)
             self.assertEqual(isinstance(info[0], models.NamespaceInfo), True)
 
     def test_get_namespaces_name(self):
-        with client.NamespaceHTTP(config.ENDPOINT) as http:
+        with client.NamespaceHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_namespaces_name([models.NamespaceId('prx.xpx')])
             self.assertEqual(len(info), 1)
             self.assertEqual(info[0].name, 'prx.xpx')
 
     def test_get_network_type(self):
-        with client.NetworkHTTP(config.ENDPOINT) as http:
+        with client.NetworkHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_network_type()
             self.assertEqual(isinstance(info, models.NetworkType), True)
 
     def test_get_node_info(self):
-        with client.NodeHTTP(config.ENDPOINT) as http:
+        with client.NodeHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_node_info()
             self.assertEqual(isinstance(info, models.NodeInfo), True)
 
     def test_get_node_time(self):
-        with client.NodeHTTP(config.ENDPOINT) as http:
+        with client.NodeHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_node_time()
             self.assertEqual(isinstance(info, models.NodeTime), True)

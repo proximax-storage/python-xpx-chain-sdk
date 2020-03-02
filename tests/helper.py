@@ -7,13 +7,13 @@ import asyncio
 
 
 async def announce(tx):
-    async with client.Listener(f'{config.ENDPOINT}/ws') as listener:
+    async with client.Listener(f'{config.ENDPOINT}/ws', network_type=config.network_type) as listener:
         address = models.PublicAccount.create_from_public_key(tx.signer, config.network_type).address
 
         await listener.confirmed(address)
         await listener.status(address)
 
-        async with client.AsyncTransactionHTTP(config.ENDPOINT) as http:
+        async with client.AsyncTransactionHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             await http.announce(tx)
 
         async for m in listener:
@@ -24,13 +24,13 @@ async def announce(tx):
 
 
 async def announce_partial(tx):
-    async with client.Listener(f'{config.ENDPOINT}/ws') as listener:
+    async with client.Listener(f'{config.ENDPOINT}/ws', network_type=config.network_type) as listener:
         address = models.PublicAccount.create_from_public_key(tx.signer, config.network_type).address
 
         await listener.aggregate_bonded_added(address)
         await listener.status(address)
 
-        async with client.AsyncTransactionHTTP(config.ENDPOINT) as http:
+        async with client.AsyncTransactionHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             await http.announce_partial(tx)
 
         async for m in listener:
@@ -41,13 +41,13 @@ async def announce_partial(tx):
 
 
 async def announce_cosignature(tx):
-    async with client.Listener(f'{config.ENDPOINT}/ws') as listener:
+    async with client.Listener(f'{config.ENDPOINT}/ws', network_type=config.network_type) as listener:
         address = models.PublicAccount.create_from_public_key(tx.signer, config.network_type).address
 
         await listener.confirmed(address)
         await listener.status(address)
 
-        async with client.AsyncTransactionHTTP(config.ENDPOINT) as http:
+        async with client.AsyncTransactionHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             await http.announce_cosignature(tx)
 
         async for m in listener:
