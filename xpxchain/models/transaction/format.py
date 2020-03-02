@@ -195,11 +195,12 @@ def load_signer_dto(data, network_type):
 
 
 def load_version_dto(data, network_type):
-    return data & 0xFF
+    # Version are 3B
+    return data & 0xFFFFFF
 
 
 def load_network_type_dto(data, network_type):
-    return NetworkType((data >> 24) & 0x000000ff)
+    return NetworkType((data >> 24) & 0x000000FF)
 
 
 def load_transaction_info_dto(data, network_type):

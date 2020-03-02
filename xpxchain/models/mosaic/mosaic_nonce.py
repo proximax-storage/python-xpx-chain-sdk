@@ -117,7 +117,7 @@ class MosaicNonce(util.Model):
     ):
         # Rest api returns negative number but it should be unsigned. Anyway, the size
         # stays 4B so this mask should be OK
-        data &= 0xffffffff
+        data &= 0xFFFFFFFF
 
         if not cls.validate_dto(data):
             raise ValueError('Invalid data-transfer object.')

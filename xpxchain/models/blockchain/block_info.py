@@ -276,7 +276,7 @@ class BlockInfo(util.DTO):
         meta = data['meta']
         block = data['block']
         version = block['version']
-        network_type = NetworkType((version >> 24) & 0x000000ff)
+        network_type = NetworkType((version >> 24) & 0x000000FF)
         beneficiary = None
         if 'beneficiary' in block:
             # TODO(ahuszagh) Is base64-encoded rather than hex-encoded.
@@ -291,7 +291,7 @@ class BlockInfo(util.DTO):
             num_statements=meta.get('numStatements', 1),
             signature=block['signature'],
             signer=PublicAccount.create_from_public_key(block['signer'], network_type),
-            version=TransactionVersion(version & 0xFF),
+            version=TransactionVersion(version & 0xFFFFFF),  # Version are 3B
             type=BlockType.create_from_dto(block['type'], network_type),
             height=util.u64_from_dto(block['height']),
             timestamp=util.u64_from_dto(block['timestamp']),
