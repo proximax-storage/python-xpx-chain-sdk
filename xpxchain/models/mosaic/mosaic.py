@@ -91,6 +91,7 @@ class Mosaic(util.Model):
     def to_catbuffer(
         self,
         network_type: OptionalNetworkType = None,
+        fee_strategy: typing.Optional[util.FeeCalculationStrategy] = util.FeeCalculationStrategy.MEDIUM,
     ) -> bytes:
         mosaic_id = util.u64_to_catbuffer(int(self.id))
         amount = util.u64_to_catbuffer(self.amount)

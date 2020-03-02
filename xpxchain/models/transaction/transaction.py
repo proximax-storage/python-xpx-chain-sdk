@@ -90,7 +90,7 @@ class Transaction(TransactionBase):
         self,
         account: Account,
         gen_hash: typing.AnyStr,
-        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO,
+        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.MEDIUM,
     ) -> SignedTransaction:
         """
         Serialize and sign transaction.

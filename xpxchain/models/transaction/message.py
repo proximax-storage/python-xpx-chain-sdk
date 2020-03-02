@@ -83,6 +83,7 @@ class Message(util.Model):
     def to_catbuffer(
         self,
         network_type: OptionalNetworkType = None,
+        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.MEDIUM,
     ) -> bytes:
         return util.u8_to_catbuffer(self.type) + self.payload
 

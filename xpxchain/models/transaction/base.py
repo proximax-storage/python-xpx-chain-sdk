@@ -145,7 +145,7 @@ class TransactionBase(util.Model):
     def to_catbuffer(
         self,
         network_type: OptionalNetworkType = None,
-        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO,
+        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.MEDIUM,
     ) -> bytes:
         # Check network type matches transaction.
         if network_type is not None and network_type != self.network_type:

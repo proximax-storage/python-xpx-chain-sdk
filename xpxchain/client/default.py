@@ -29,10 +29,12 @@ from __future__ import annotations
 import aiohttp
 import requests
 import websockets
+import typing
 
 from . import abc
 from . import client
 from .. import util
+from ..models.blockchain.network_type import NetworkType
 
 __all__ = [
     # Synchronous
@@ -81,9 +83,10 @@ AsyncHTTPError = aiohttp.ClientResponseError
 class HTTPBase(abc.HTTPBase):
     """Abstract base class for synchronous HTTP clients."""
 
-    def __init__(self, endpoint: str) -> None:
+    def __init__(self, endpoint: str, network_type: typing.Optional[NetworkType] = None) -> None:
         self._endpoint = endpoint
         self._index = 0
+        self._network_type = network_type
 
     def __enter__(self) -> HTTPBase:
         self._client = client.Client(requests.Session(), self._endpoint)
@@ -202,12 +205,14 @@ class AsyncHTTPBase(abc.AsyncHTTPBase):
     def __init__(
         self,
         endpoint: str,
-        loop: util.OptionalLoopType = None
+        loop: util.OptionalLoopType = None,
+        network_type: typing.Optional[NetworkType] = None,
     ) -> None:
         self._endpoint = endpoint
         self._index = 1
         self._loop = loop
         self._session = aiohttp.ClientSession(loop=loop)
+        self._network_type = network_type
 
     async def __aenter__(self) -> AsyncHTTPBase:
         self._client = client.AsyncClient(self._session, self._endpoint)
@@ -326,11 +331,13 @@ class Listener(abc.Listener):
     def __init__(
         self,
         endpoint: str,
-        loop: util.OptionalLoopType = None
+        loop: util.OptionalLoopType = None,
+        network_type: typing.Optional[NetworkType] = None,
     ) -> None:
         url = client.parse_ws_url(endpoint)
         self._loop = loop
         self._conn = websockets.connect(url.url, loop=loop)
+        self._network_type = network_type
 
     async def __aenter__(self) -> Listener:
         self._session = await self._conn.__aenter__()

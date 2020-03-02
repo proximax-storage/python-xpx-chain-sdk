@@ -69,7 +69,6 @@ class AggregateTransaction(Transaction):
     """
 
     inner_transactions: InnerTransactionList
-    cosignatures: Cosignatures
 
     def __init__(
         self,
@@ -103,7 +102,6 @@ class AggregateTransaction(Transaction):
         deadline: Deadline,
         inner_transactions: typing.Optional[InnerTransactionList],
         network_type: NetworkType,
-        cosignatures: typing.Optional[Cosignatures] = None,
         max_fee: int = 0,
     ):
         """
@@ -111,7 +109,6 @@ class AggregateTransaction(Transaction):
 
         :param deadline: Deadline to include transaction.
         :param inner_transactions: Inner transactions to be included.
-        :param cosignatures: Transaction cosigner signatures.
         :param network_type: Network type.
         :param max_fee: (Optional) Max fee defined by sender.
         """
@@ -123,7 +120,6 @@ class AggregateTransaction(Transaction):
             deadline,
             max_fee,
             inner_transactions,
-            cosignatures,
         )
 
     @classmethod
@@ -132,7 +128,6 @@ class AggregateTransaction(Transaction):
         deadline: Deadline,
         inner_transactions: typing.Optional[InnerTransactionList],
         network_type: NetworkType,
-        cosignatures: typing.Optional[Cosignatures] = None,
         max_fee: int = 0,
     ):
         """
@@ -140,7 +135,6 @@ class AggregateTransaction(Transaction):
 
         :param deadline: Deadline to include transaction.
         :param inner_transactions: Inner transactions to be included.
-        :param cosignatures: Transaction cosigner signatures.
         :param network_type: Network type.
         :param max_fee: (Optional) Max fee defined by sender.
         """
@@ -152,7 +146,6 @@ class AggregateTransaction(Transaction):
             deadline,
             max_fee,
             inner_transactions,
-            cosignatures,
         )
 
     # SIGNING
@@ -186,7 +179,7 @@ class AggregateTransaction(Transaction):
         initiator: Account,
         gen_hash: typing.AnyStr,
         cosignatories: typing.Optional[typing.Sequence[Account]] = None,
-        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.ZERO,
+        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.MEDIUM,
     ) -> SignedTransaction:
         """
         Sign transaction with cosignatories.
@@ -239,10 +232,6 @@ class AggregateTransaction(Transaction):
         """Get payload size, the size in bytes of all sub-transactions."""
         return sum(i.catbuffer_size() for i in self.inner_transactions)
 
-    def cosignatures_size(self) -> int:
-        """Get the size in bytes of all cosignatures."""
-        return sum(i.CATBUFFER_SIZE for i in self.cosignatures)
-
     def catbuffer_size_specific(self) -> int:
         # 4 extra bytes for the payload size.
         # The payload size is the size from all inner transactions.
@@ -261,17 +250,6 @@ class AggregateTransaction(Transaction):
             network_type
         )
 
-    def to_cosignatures_bytes(
-        self,
-        network_type: NetworkType,
-    ) -> bytes:
-        """Get the serialized byte array of all cosignatures."""
-
-        return util.Model.sequence_to_catbuffer(
-            self.cosignatures,
-            network_type
-        )
-
     def to_catbuffer_specific(
         self,
         network_type: NetworkType,
@@ -280,7 +258,6 @@ class AggregateTransaction(Transaction):
 
         # uint32_t payload_size
         # uint8_t[payload_size] transactions
-        # uint8_t[size - payload_size] cosignatures
         payload_size = util.u32_to_catbuffer(self.inner_transactions_size())
         transactions = self.to_inner_transactions_bytes(network_type)
         return payload_size + transactions
@@ -305,18 +282,6 @@ class AggregateTransaction(Transaction):
             )
             transactions.append(value)
         return data[size:]
-
-    def load_cosignatures_bytes(
-        self,
-        data: bytes,
-        network_type: NetworkType,
-    ) -> bytes:
-        """Load cosignatures data from catbuffer."""
-
-        count = len(data) // Cosignature.CATBUFFER_SIZE
-        value, data = Cosignature.sequence_from_catbuffer_pair(data, count, network_type)
-        self._set('cosignatures', value)
-        return data
 
     def load_catbuffer_specific(
         self,
@@ -359,7 +324,6 @@ class AggregateBondedTransaction(AggregateTransaction):
         cls,
         deadline: Deadline,
         inner_transactions: typing.Optional[InnerTransactionList],
-        cosignatures: Cosignatures,
         network_type: NetworkType,
         max_fee: int = 0,
     ):
@@ -368,7 +332,6 @@ class AggregateBondedTransaction(AggregateTransaction):
 
         :param deadline: Deadline to include transaction.
         :param inner_transactions: Inner transactions to be included.
-        :param cosignatures: Transaction cosigner signatures.
         :param network_type: Network type.
         :param max_fee: (Optional) Max fee defined by sender.
         """
@@ -376,7 +339,6 @@ class AggregateBondedTransaction(AggregateTransaction):
             deadline,
             inner_transactions,
             network_type,
-            cosignatures,
             max_fee,
         )
 
@@ -390,7 +352,6 @@ class AggregateCompleteTransaction(AggregateTransaction):
         cls,
         deadline: Deadline,
         inner_transactions: typing.Optional[InnerTransactionList],
-        cosignatures: typing.Optional[Cosignatures],
         network_type: NetworkType,
         max_fee: int = 0,
     ):
@@ -399,14 +360,12 @@ class AggregateCompleteTransaction(AggregateTransaction):
 
         :param deadline: Deadline to include transaction.
         :param inner_transactions: Inner transactions to be included.
-        :param cosignatures: Transaction cosigner signatures.
         :param network_type: Network type.
         :param max_fee: (Optional) Max fee defined by sender.
         """
         return cls.create_complete(
             deadline,
             inner_transactions,
-            cosignatures,
             network_type,
             max_fee,
         )

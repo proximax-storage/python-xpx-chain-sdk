@@ -7,11 +7,9 @@
 """
 
 from __future__ import annotations
-import contextlib
 import typing
 import urllib.error
 import urllib3
-import warnings
 
 from .. import util
 
@@ -227,21 +225,6 @@ class AsyncClient(ClientSharedBase):
 # WEBSOCKETS
 
 
-@contextlib.contextmanager
-def catch_deprecation_warning():
-    """
-    Catch the `async with` deprecation error in websockets.
-    Remove after 3.4 is dropped.
-    """
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore",
-            category=DeprecationWarning,
-            module='websockets'
-        )
-        yield
-
-
 class WebsocketClient(util.Object):
     """Asynchronous host using websockets."""
 
@@ -251,9 +234,8 @@ class WebsocketClient(util.Object):
         self._session = session
 
     async def __aiter__(self) -> typing.AsyncIterator[typing.AnyStr]:
-        with catch_deprecation_warning():
-            async for message in self._session:
-                yield typing.cast(typing.AnyStr, message)
+        async for message in self._session:
+            yield typing.cast(typing.AnyStr, message)
 
     @property
     def closed(self) -> bool:
@@ -263,25 +245,21 @@ class WebsocketClient(util.Object):
 
     async def recv(self) -> typing.AnyStr:
         """Receive next message."""
-        with catch_deprecation_warning():
-            result = await self._session.recv()
-            return typing.cast(typing.AnyStr, result)
+        result = await self._session.recv()
+        return typing.cast(typing.AnyStr, result)
 
     async def send(self, data: typing.AnyStr) -> None:
         """Send message."""
-        with catch_deprecation_warning():
-            await self._session.send(data)
+        await self._session.send(data)
 
     async def ping(
         self,
         data: typing.Optional[bytes] = None
     ) -> typing.Awaitable[None]:
         """Send websocket a ping."""
-        with catch_deprecation_warning():
-            result = await self._session.ping(data)
-            return typing.cast(typing.Awaitable[None], result)
+        result = await self._session.ping(data)
+        return typing.cast(typing.Awaitable[None], result)
 
     async def pong(self, data: bytes = b'') -> None:
         """Send websocket a pong."""
-        with catch_deprecation_warning():
-            await self._session.pong(data)
+        await self._session.pong(data)

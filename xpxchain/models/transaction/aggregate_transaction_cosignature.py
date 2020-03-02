@@ -94,6 +94,7 @@ class AggregateTransactionCosignature(util.Model):
     def to_catbuffer(
         self,
         network_type: OptionalNetworkType = None,
+        fee_strategy: util.FeeCalculationStrategy = util.FeeCalculationStrategy.MEDIUM,
     ) -> bytes:
         # uint8_t[32] signer
         # uint8_t[64] signature
