@@ -1,6 +1,7 @@
 <p align="center"><a href="https://golang.org" target="_blank" rel="noopener noreferrer"><img width="300" src="https://github.com/proximax-storage/python-xpx-chain-sdk/raw/master/doc/ProximaX%20-%20Sirius%20Chain%20-%20Python%20-%20SDK.png" alt="Python logo"></a></p>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Python version](https://img.shields.io/pypi/pyversions/xpx-chain.svg)
 ![Python Tox](https://github.com/proximax-storage/python-xpx-chain-sdk/workflows/Python%20Tox/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/proximax-storage/python-xpx-chain-sdk/badge.svg?branch=master)](https://coveralls.io/github/proximax-storage/python-xpx-chain-sdk?branch=master)
 [![PyPI version](https://badge.fury.io/py/xpx-chain.svg)](https://badge.fury.io/py/xpx-chain)
