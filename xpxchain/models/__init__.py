@@ -40,6 +40,7 @@ from .account.property_modification_type import *
 from .account.property_type import *
 from .account.public_account import *
 from .account.account_names import *
+from .account.account_balance import *
 from .account import *
 
 # Blockchain

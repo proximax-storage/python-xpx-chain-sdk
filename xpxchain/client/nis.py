@@ -142,7 +142,7 @@ def request_get_accounts_info(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/account"
+    url = "/account"
     json = {"addresses": [i.address for i in addresses]}
     return client.post(url, json=json, **kwds)
 
@@ -217,7 +217,7 @@ def request_get_accounts_properties(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/account/properties"
+    url = "/account/properties"
     json = {"addresses": [i.address for i in addresses]}
     return client.post(url, json=json, **kwds)
 
@@ -552,7 +552,7 @@ def request_get_account_names(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/account/names"
+    url = "/account/names"
     json = {"addresses": [i.address for i in addresses]}
     return client.post(url, json=json, **kwds)
 
@@ -1173,7 +1173,7 @@ def request_get_metadatas(
 
     """
 
-    url = f"/metadata"
+    url = "/metadata"
     json = {"metadataIds": metadata_ids}
     return client.post(url, json=json, **kwds)
 
@@ -1285,7 +1285,7 @@ def request_get_node_info(
 
     """
 
-    url = f"/node/info"
+    url = "/node/info"
     return client.get(url, **kwds)
 
 
@@ -1318,7 +1318,7 @@ def request_get_node_time(
 
     """
 
-    url = f"/node/time"
+    url = "/node/time"
     return client.get(url, **kwds)
 
 
@@ -1455,6 +1455,41 @@ def process_get_mosaic_names(
 
 get_mosaic_names = request("get_mosaic_names")
 
+
+def request_get_mosaic_richlist(
+    client: client.Client,
+    mosaic_id: str,
+    **kwds
+):
+    """
+    Make "/mosaic/{mosaic_id}/richlist" request.
+
+    :param client: Wrapper for client.
+    :param mosaic_id: Mosaic IDs to request richlist for.
+    :param timeout: (Optional) timeout for request (in seconds).
+    """
+
+    url = f"/mosaic/{mosaic_id}/richlist"
+    return client.get(url, **kwds)
+
+
+def process_get_mosaic_richlist(
+    status: int,
+    json: list,
+    network_type: models.NetworkType,
+) -> typing.Sequence[models.AccountBalance]:
+    """
+    Process the "/mosaic/{mosaic_id}/richlist" HTTP response.
+
+    :param status: Status code for HTTP response.
+    :param json: JSON data for response message.
+    """
+
+    assert status == 200
+    return [models.AccountBalance.create_from_dto(i, network_type) for i in json]
+
+
+get_mosaic_richlist = request("get_mosaic_richlist")
 
 # NAMESPACE HTTP
 # --------------
@@ -1769,7 +1804,7 @@ def request_get_transactions(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/transaction"
+    url = "/transaction"
     json = {'transactionIds': list(hashes)}
     return client.post(url, json=json, **kwds)
 
@@ -1842,7 +1877,7 @@ def request_get_transaction_statuses(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/transaction/statuses"
+    url = "/transaction/statuses"
     json = {'hashes': list(hashes)}
     return client.post(url, json=json, **kwds)
 
@@ -1879,7 +1914,7 @@ def request_announce(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/transaction"
+    url = "/transaction"
     json = {'payload': transaction.payload}
     return client.put(url, json=json, **kwds)
 
@@ -1916,7 +1951,7 @@ def request_announce_partial(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/transaction/partial"
+    url = "/transaction/partial"
     json = {'payload': transaction.payload}
     return client.put(url, json=json, **kwds)
 
@@ -1953,7 +1988,7 @@ def request_announce_cosignature(
     :param timeout: (Optional) timeout for request (in seconds).
     """
 
-    url = f"/transaction/cosignature"
+    url = "/transaction/cosignature"
     json = transaction.to_dto()
     return client.put(url, json=json, **kwds)
 
@@ -2141,6 +2176,10 @@ CLIENT_CB = {
     'get_mosaic_names': (
         request_get_mosaic_names,
         process_get_mosaic_names,
+    ),
+    'get_mosaic_richlist': (
+        request_get_mosaic_richlist,
+        process_get_mosaic_richlist,
     ),
 
     # NAMESPACE

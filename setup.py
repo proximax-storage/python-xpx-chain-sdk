@@ -52,7 +52,7 @@ MAINTAINER = "Jan"
 MAINTAINER_EMAIL = "wirfeon@gmail.com"
 NAME = "xpx-chain"
 URL = "https://github.com/proximax-storage/python-xpx-chain-sdk"
-VERSION = "0.6.4"
+VERSION = "0.6.5"
 
 DESCRIPTION = "ProximaX Sirius Blockchain Python SDK"
 LONG_DESCRIPTION = "ProximaX Sirius Blockchain Python SDK is a Python library for interacting with the Sirius Blockchain."

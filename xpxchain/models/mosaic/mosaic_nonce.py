@@ -65,7 +65,7 @@ class MosaicNonce(util.Model):
     def __init__(self, nonce: typing.Union[int, str, bytes]) -> None:
         self._set('nonce', nonce_as_bytes(nonce))
         if len(self.nonce) != 4:
-            raise ValueError(f"Nonce length is incorrect.")
+            raise ValueError("Nonce length is incorrect.")
 
     def __int__(self) -> int:
         return util.u32_from_catbuffer(self.nonce)
