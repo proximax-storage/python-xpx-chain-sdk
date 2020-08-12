@@ -723,6 +723,19 @@ class MosaicHTTP(HTTPSharedBase):
         """
         return self(nis.get_mosaic_names, ids, **kwds)
 
+    def get_mosaic_richlist(
+        self,
+        mosaic_id: models.MosaicId,
+        **kwds
+    ):
+        """
+        Get account balances in a given Mosaic.
+
+        :param mosaic_id: Mosaic ID.
+        :return: Account balances.
+        """
+        return self(nis.get_mosaic_richlist, mosaic_id, **kwds)
+
 
 class NamespaceHTTP(HTTPSharedBase):
     """Abstract base class for the namespace HTTP client."""
