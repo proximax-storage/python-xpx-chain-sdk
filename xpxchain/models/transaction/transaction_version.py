@@ -31,7 +31,7 @@ __all__ = ['TransactionVersion']
 
 
 @util.inherit_doc
-class TransactionVersion(util.U8Mixin, enum.IntEnum):
+class TransactionVersion(util.U24Mixin, enum.IntEnum):
     """Transaction version."""
 
     TRANSFER = 3
