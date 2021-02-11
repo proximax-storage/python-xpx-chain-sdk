@@ -73,6 +73,8 @@ from .receipt import *
 # Config
 from .config.catapult_config import *
 from .config.catapult_upgrade import *
+from .config.config_sections import *
+from .config.config_fields import *
 from .config import *
 
 # Contract
@@ -215,6 +217,8 @@ __all__ = (
     # Config
     + catapult_config.__all__
     + catapult_upgrade.__all__
+    + config_sections.__all__
+    + config_fields.__all__
 
     # Metadata
     + address_metadata_info.__all__
