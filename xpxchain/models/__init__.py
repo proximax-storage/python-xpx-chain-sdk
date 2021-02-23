@@ -49,8 +49,6 @@ from .blockchain.block_type import *
 from .blockchain.blockchain_score import *
 from .blockchain.blockchain_storage_info import *
 from .blockchain.blockchain_server_info import *
-from .blockchain.merkle_path_item import *
-from .blockchain.merkle_proof_info import *
 from .blockchain.network_type import *
 from .blockchain import *
 
@@ -196,8 +194,6 @@ __all__ = (
     + block_type.__all__
     + blockchain_score.__all__
     + blockchain_storage_info.__all__
-    + merkle_path_item.__all__
-    + merkle_proof_info.__all__
     + network_type.__all__
 
     # Receipt

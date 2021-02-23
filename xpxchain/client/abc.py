@@ -463,16 +463,6 @@ class BlockchainHTTP(HTTPSharedBase):
         """
         return self(nis.get_block_transactions, height, **kwds)
 
-    def get_merkle_by_hash_in_block(self, height: int, hash: str, **kwds):
-        """
-        Get information for all transactions included in a block by height.
-
-        :param height: Block height.
-        :param hash: Transaction hash.
-        :return: Sequence of information models describing transactions.
-        """
-        return self(nis.get_merkle_by_hash_in_block, height, hash, **kwds)
-
     def get_block_receipts(self, height: int, **kwds):
         """
         Get receipts for a block by height.
