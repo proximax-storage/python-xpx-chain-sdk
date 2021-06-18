@@ -13,9 +13,9 @@ class FeeCalculationStrategy(util.U8Mixin, util.EnumMixin, enum.IntEnum):
     """ Fee calculation strategy """
 
     ZERO = 0
-    LOW = 25
-    MEDIUM = 250
-    HIGH = 2500
+    LOW = 15000
+    MEDIUM = 150000
+    HIGH = 1500000
 
     def description(self) -> str:
         return DESCRIPTION[self]
