@@ -24,4 +24,4 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox tox-gh-actions
     - name: Run tox
-      run: tox -e base,mypy,flake8,flake8_tests
+      run: tox -e base,flake8,flake8_tests
