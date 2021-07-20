@@ -1707,9 +1707,9 @@ class TestTransactionType(harness.TestCase):
         3,
     ],
     'catbuffer': [
-        b'\x01',
-        b'\x02',
-        b'\x03',
+        b'\x01\x00\x00',
+        b'\x02\x00\x00',
+        b'\x03\x00\x00',
     ],
 })
 class TestTransactionVersion(harness.TestCase):

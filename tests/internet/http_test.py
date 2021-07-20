@@ -725,16 +725,6 @@ class TestT1Http(harness.TestCase):
             self.assertEqual(len(info), 1)
             self.assertEqual(info[0].public_key, config.tester.public_key.upper())
 
-    def test_get_merkle_by_hash_in_block(self):
-        with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
-            reply = http.get_block_transactions(1)
-            tx_hash = reply[0].transaction_info.hash
-
-            info = http.get_merkle_by_hash_in_block(1, tx_hash)
-            self.assertEqual(isinstance(info, models.MerkleProofInfo), True)
-            self.assertEqual(len(info.merkle_path) > 0, True)
-            self.assertEqual(isinstance(info.merkle_path[0], models.MerklePathItem), True)
-
     def test_get_blocks_by_height_with_limit(self):
         with client.BlockchainHTTP(config.ENDPOINT, network_type=config.network_type) as http:
             info = http.get_blocks_by_height_with_limit(25, 25)

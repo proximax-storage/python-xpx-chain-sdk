@@ -49,8 +49,6 @@ from .blockchain.block_type import *
 from .blockchain.blockchain_score import *
 from .blockchain.blockchain_storage_info import *
 from .blockchain.blockchain_server_info import *
-from .blockchain.merkle_path_item import *
-from .blockchain.merkle_proof_info import *
 from .blockchain.network_type import *
 from .blockchain import *
 
@@ -73,6 +71,8 @@ from .receipt import *
 # Config
 from .config.catapult_config import *
 from .config.catapult_upgrade import *
+from .config.config_sections import *
+from .config.config_fields import *
 from .config import *
 
 # Contract
@@ -194,8 +194,6 @@ __all__ = (
     + block_type.__all__
     + blockchain_score.__all__
     + blockchain_storage_info.__all__
-    + merkle_path_item.__all__
-    + merkle_proof_info.__all__
     + network_type.__all__
 
     # Receipt
@@ -215,6 +213,8 @@ __all__ = (
     # Config
     + catapult_config.__all__
     + catapult_upgrade.__all__
+    + config_sections.__all__
+    + config_fields.__all__
 
     # Metadata
     + address_metadata_info.__all__

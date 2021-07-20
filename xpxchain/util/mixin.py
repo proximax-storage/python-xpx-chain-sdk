@@ -34,6 +34,7 @@ __all__ = [
     'IntMixin',
     'U8Mixin',
     'U16Mixin',
+    'U24Mixin',
     'U32Mixin',
     'U64Mixin',
     'U128Mixin',
@@ -42,6 +43,7 @@ __all__ = [
 IntMixinType = typing.TypeVar('IntMixinType', bound='IntMixin')
 U8MixinType = typing.TypeVar('U8MixinType', bound='U8Mixin')
 U16MixinType = typing.TypeVar('U16MixinType', bound='U16Mixin')
+U24MixinType = typing.TypeVar('U24MixinType', bound='U24Mixin')
 U32MixinType = typing.TypeVar('U32MixinType', bound='U32Mixin')
 U64MixinType = typing.TypeVar('U64MixinType', bound='U64Mixin')
 U128MixinType = typing.TypeVar('U128MixinType', bound='U128Mixin')
@@ -188,6 +190,58 @@ class U16Mixin(abc.Model):
     ) -> U16MixinType:
         size = cls.CATBUFFER_SIZE
         asint = stdint.u16_from_catbuffer(data[:size])
+        return cls(asint)           # type: ignore
+
+
+@documentation.inherit_doc
+class U24Mixin(abc.Model):
+    """Mixin for classes wrapping 24-bit integer types."""
+
+    __slots__ = ()
+    CATBUFFER_SIZE: typing.ClassVar[int] = stdint.U24_BYTES
+
+    @classmethod
+    def validate_dto(
+        cls: typing.Type[U24MixinType],
+        data: stdint.U24DTOType
+    ) -> bool:
+        """Validate the data-transfer object."""
+        return isinstance(data, int) and 0 <= data < (1 << 24)
+
+    def to_dto(
+        self: U24MixinType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> stdint.U24DTOType:
+        asint: int = int(self)      # type: ignore
+        return stdint.u24_to_dto(asint)
+
+    @classmethod
+    def create_from_dto(
+        cls: typing.Type[U24MixinType],
+        data: stdint.U24DTOType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U24MixinType:
+        if not cls.validate_dto(data):
+            raise ValueError('Invalid data-transfer object.')
+
+        asint = stdint.u24_from_dto(data)
+        return cls(asint)           # type: ignore
+
+    def to_catbuffer(
+        self: U24MixinType,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> bytes:
+        asint: int = int(self)      # type: ignore
+        return stdint.u24_to_catbuffer(asint)
+
+    @classmethod
+    def create_from_catbuffer(
+        cls: typing.Type[U24MixinType],
+        data: bytes,
+        network_type: abc.OptionalNetworkType = None,
+    ) -> U24MixinType:
+        size = cls.CATBUFFER_SIZE
+        asint = stdint.u24_from_catbuffer(data[:size])
         return cls(asint)           # type: ignore
 
 

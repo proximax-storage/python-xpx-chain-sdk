@@ -29,6 +29,7 @@ __all__ = [
     'I8DTOType',
     'U8DTOType',
     'U16DTOType',
+    'U24DTOType',
     'U32DTOType',
     'U64DTOType',
     'U128DTOType',
@@ -37,6 +38,7 @@ __all__ = [
     'I8_BYTES',
     'U8_BYTES',
     'U16_BYTES',
+    'U24_BYTES',
     'U32_BYTES',
     'U64_BYTES',
     'U128_BYTES',
@@ -76,6 +78,18 @@ __all__ = [
     'u16_from_dto',
     'u16_to_catbuffer',
     'u16_to_dto',
+
+    # U24
+    'u24_high',
+    'u24_low',
+    'u24_iter_from_catbuffer',
+    'u24_iter_from_dto',
+    'u24_iter_to_catbuffer',
+    'u24_iter_to_dto',
+    'u24_from_catbuffer',
+    'u24_from_dto',
+    'u24_to_catbuffer',
+    'u24_to_dto',
 
     # U32
     'u32_high',
@@ -117,12 +131,14 @@ __all__ = [
 U4_BITS = 4
 U8_BITS = 8
 U16_BITS = 16
+U24_BITS = 24
 U32_BITS = 32
 U64_BITS = 64
 U128_BITS = 128
 
 U8_BYTES = U8_BITS // 8
 U16_BYTES = U16_BITS // 8
+U24_BYTES = U24_BITS // 8
 U32_BYTES = U32_BITS // 8
 U64_BYTES = U64_BITS // 8
 U128_BYTES = U128_BITS // 8
@@ -130,6 +146,7 @@ U128_BYTES = U128_BITS // 8
 U4_MAX = 0xF
 U8_MAX = 0xFF
 U16_MAX = 0xFFFF
+U24_MAX = 0xFFFFFF
 U32_MAX = 0xFFFFFFFF
 U64_MAX = 0xFFFFFFFFFFFFFFFF
 U128_MAX = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
@@ -144,6 +161,7 @@ I8_MIN = -0x80
 
 U8DTOType = int
 U16DTOType = int
+U24DTOType = int
 U32DTOType = int
 U64DTOType = typing.Sequence[U32DTOType]
 U128DTOType = typing.Sequence[U64DTOType]
@@ -364,6 +382,32 @@ u16_iter_to_catbuffer = iter_to_catbuffer(U16_BITS)
 u16_iter_from_catbuffer = iter_from_catbuffer(U16_BITS)
 u16_iter_to_dto = iter_to_dto(U16_BITS, u16_to_dto)
 u16_iter_from_dto = iter_from_dto(U16_BITS, u16_from_dto)
+
+# UINT24
+
+
+def u24_to_dto(value: int) -> U24DTOType:
+    """Convert 24-bit int to DTO."""
+
+    check_overflow(0 <= value <= U24_MAX)
+    return value
+
+
+def u24_from_dto(dto: U24DTOType) -> int:
+    """Convert DTO to 24-bit int."""
+
+    check_overflow(0 <= dto <= U24_MAX)
+    return dto
+
+
+u24_high = high(U24_MAX, U8_BITS, U8_MAX)
+u24_low = low(U24_MAX, U8_BITS, U8_MAX)
+u24_to_catbuffer = to_catbuffer(U24_BITS)
+u24_from_catbuffer = from_catbuffer(U24_BITS)
+u24_iter_to_catbuffer = iter_to_catbuffer(U24_BITS)
+u24_iter_from_catbuffer = iter_from_catbuffer(U24_BITS)
+u24_iter_to_dto = iter_to_dto(U24_BITS, u24_to_dto)
+u24_iter_from_dto = iter_from_dto(U24_BITS, u24_from_dto)
 
 # UINT32
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from ..blockchain.network_type import OptionalNetworkType
 from ... import util
+from .config_sections import Sections
 
 __all__ = ['CatapultConfig']
 
@@ -28,7 +29,7 @@ class CatapultConfig(util.DTO):
     """
 
     height: int
-    network_config: str
+    network_config: Sections
     supported_entity_versions: str
 
     @classmethod
@@ -56,7 +57,7 @@ class CatapultConfig(util.DTO):
     ) -> dict:
         network_config = {
             'height': util.u64_to_dto(self.height),
-            'networkConfig': self.network_config,
+            'networkConfig': self.network_config.to_string(),
             'supportedEntityVersions': self.supported_entity_versions
         }
 
@@ -76,6 +77,6 @@ class CatapultConfig(util.DTO):
         network_config = data['networkConfig']
         return cls(
             height=util.u64_from_dto(network_config.get('height', [0, 0])),
-            network_config=network_config['networkConfig'],
+            network_config=Sections.create_from_string(network_config['networkConfig']),
             supported_entity_versions=network_config['supportedEntityVersions']
         )

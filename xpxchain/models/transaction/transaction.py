@@ -50,7 +50,7 @@ class Transaction(TransactionBase):
         #   uint32_t size
         #   uint8_t[64] signature
         #   uint8_t[32] signer
-        #   uint8_t[3] version
+        #   uint24_t version
         #   uint8_t network_type
         #   uint16_t type
         #   uint64_t max_fee
