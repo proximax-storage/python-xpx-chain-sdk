@@ -152,7 +152,7 @@ class TransactionBase(util.Model):
             raise ValueError('Network type does not match transaction.')
 
         # Use fee calculation algorithm
-        max_fee = util.calculate_fee(fee_strategy, self.max_fee, self.catbuffer_size())
+        max_fee = util.calculate_fee(fee_strategy, self.catbuffer_size(), self.max_fee)
         self._set('max_fee', max_fee)
 
         # Save shared and specific transaction data.

@@ -195,8 +195,8 @@ class AggregateTransaction(Transaction):
             COSIGNATURE_SIZE = 96
             new_fee = util.calculate_fee(
                 fee_strategy,
+                self.catbuffer_size() + COSIGNATURE_SIZE * len(cosignatories),
                 self.max_fee,
-                self.catbuffer_size() + COSIGNATURE_SIZE * len(cosignatories)
             )
 
             if (self.max_fee != new_fee):

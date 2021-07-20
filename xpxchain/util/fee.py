@@ -29,5 +29,5 @@ DESCRIPTION = {
 }
 
 
-def calculate_fee(strategy: FeeCalculationStrategy, max_fee: int, transaction_size: int) -> int:
-    return max(max_fee, strategy * transaction_size)
+def calculate_fee(strategy: FeeCalculationStrategy, transaction_size: int, max_fee: int = 75000000) -> int:
+    return min(max_fee, strategy * transaction_size)
