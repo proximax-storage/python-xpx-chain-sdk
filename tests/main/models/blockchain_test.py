@@ -152,41 +152,51 @@ class TestBlockchainStorageInfo(harness.TestCase):
         models.NetworkType.TEST_NET,
         models.NetworkType.MIJIN,
         models.NetworkType.MIJIN_TEST,
+        models.NetworkType.PRIVATE,
+        models.NetworkType.PRIVATE_TEST
     ],
     'values': [
         0xb8,
         0xa8,
         0x60,
         0x90,
+        0xc8,
+        0xb0,
     ],
     'descriptions': [
         "Main network",
         "Test network",
         "Mijin network",
         "Mijin test network",
+        "Private network",
+        "Private test network",
     ],
     'dto': [
         0xb8,
         0xa8,
         0x60,
         0x90,
+        0xc8,
+        0xb0,
     ],
     'catbuffer': [
         b'\xb8',
         b'\xa8',
         b'\x60',
         b'\x90',
+        b'\xc8',
+        b'\xb0',
     ],
     'custom': [
         {
             'name': 'test_identifier',
             'callback': lambda self, x: x.identifier(),
-            'results': [b'X', B'V', b'M', b'S'],
+            'results': [b'X', B'V', b'M', b'S', b'Z', b'W'],
         },
         {
             'name': 'test_create_from_identifier',
             'callback': lambda self, x: self.type.create_from_identifier(x),
-            'inputs': [b'X', b'V', b'M', b'S'],
+            'inputs': [b'X', b'V', b'M', b'S', b'Z', b'W'],
         },
         {
             'name': 'test_create_from_raw_address',
@@ -196,6 +206,8 @@ class TestBlockchainStorageInfo(harness.TestCase):
                 'VD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54',
                 'MD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54',
                 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54',
+                'ZD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54',
+                'WD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54'
             ],
         },
         {

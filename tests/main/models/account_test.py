@@ -235,6 +235,12 @@ class TestAddress(harness.TestCase):
         value = self.type.create_from_public_key(public_key, models.NetworkType.MIJIN_TEST)
         self.assertEqual(value.address, 'SD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5HRIR54')
 
+        value = self.type.create_from_public_key(public_key, models.NetworkType.PRIVATE)
+        self.assertEqual(value.address, 'ZD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5O47WNH')
+
+        value = self.type.create_from_public_key(public_key, models.NetworkType.PRIVATE_TEST)
+        self.assertEqual(value.address, 'WD5DT3CH4BLABL5HIMEKP2TAPUKF4NY3L5S2PKHO')
+
     def test_plain(self):
         self.assertEqual(self.model.plain(), self.extras['plain'])
 
