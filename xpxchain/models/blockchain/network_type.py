@@ -45,10 +45,12 @@ class NetworkType(util.U8Mixin, util.EnumMixin, enum.IntEnum):
                 description: string
     """
 
-    MAIN_NET   = 0xb8       # noqa: E221
-    TEST_NET   = 0xa8       # noqa: E221
-    MIJIN      = 0x60       # noqa: E221
-    MIJIN_TEST = 0x90       # noqa: E221
+    MAIN_NET     = 0xb8       # noqa: E221
+    TEST_NET     = 0xa8       # noqa: E221
+    MIJIN        = 0x60       # noqa: E221
+    MIJIN_TEST   = 0x90       # noqa: E221
+    PRIVATE      = 0xc8       # noqa: E221
+    PRIVATE_TEST = 0xb0       # noqa: E221
 
     def description(self) -> str:
         return DESCRIPTION[self]
@@ -85,6 +87,8 @@ DESCRIPTION = {
     NetworkType.TEST_NET: "Test network",
     NetworkType.MIJIN: "Mijin network",
     NetworkType.MIJIN_TEST: "Mijin test network",
+    NetworkType.PRIVATE: "Private network",
+    NetworkType.PRIVATE_TEST: "Private test network",
 }
 
 TO_IDENTIFIER = {
@@ -92,6 +96,8 @@ TO_IDENTIFIER = {
     NetworkType.TEST_NET: b"V",
     NetworkType.MIJIN: b"M",
     NetworkType.MIJIN_TEST: b"S",
+    NetworkType.PRIVATE: b"Z",
+    NetworkType.PRIVATE_TEST: b"W",
 }
 
 FROM_IDENTIFIER = {
@@ -99,6 +105,8 @@ FROM_IDENTIFIER = {
     b"V": NetworkType.TEST_NET,
     b"M": NetworkType.MIJIN,
     b"S": NetworkType.MIJIN_TEST,
+    b"Z": NetworkType.PRIVATE,
+    b"W": NetworkType.PRIVATE_TEST,
 }
 
 OptionalNetworkType = typing.Optional[NetworkType]

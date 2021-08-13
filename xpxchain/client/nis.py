@@ -1680,6 +1680,8 @@ NETWORK_TYPE = {
     'mijinTest': models.NetworkType.MIJIN_TEST,
     'public': models.NetworkType.MAIN_NET,
     'publicTest': models.NetworkType.TEST_NET,
+    'private': models.NetworkType.PRIVATE,
+    'privateTest': models.NetworkType.PRIVATE_TEST,
 }
 
 
